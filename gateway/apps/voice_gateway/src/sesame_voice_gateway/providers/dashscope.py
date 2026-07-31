@@ -14,7 +14,12 @@ from dashscope.audio.http_tts.http_speech_synthesizer import (  # type: ignore[i
     HttpSpeechSynthesizer,
 )
 
-from sesame_voice_gateway.providers.base import AsrResult, AudioFormat, VoiceSpec
+from sesame_voice_gateway.providers.base import (
+    AsrResult,
+    AudioFormat,
+    NoSpeechDetected,
+    VoiceSpec,
+)
 from sesame_voice_gateway.privacy import (
     require_secure_provider_url,
     validate_remote_pcm,
@@ -70,7 +75,9 @@ class _RecognitionCollector(RecognitionCallback):  # type: ignore[misc]
         return None
 
     def on_error(self, result: Any) -> None:
-        del result
+        if _asr_error_code(result) in {"emptyaudio", "nospeech"}:
+            self.error = NoSpeechDetected("DashScope ASR detected no speech")
+            return
         self.error = RuntimeError("DashScope ASR request failed")
 
     def on_event(self, result: RecognitionResult) -> None:
@@ -173,6 +180,15 @@ class DashScopeAudioClient:
         dashscope.base_websocket_api_url = self._websocket_base_url
 
 
+def _asr_error_code(result: Any) -> str:
+    if isinstance(result, dict):
+        code = result.get("code")
+    else:
+        getter = getattr(result, "get", None)
+        code = getter("code") if callable(getter) else getattr(result, "code", None)
+    return code.strip().lower() if isinstance(code, str) else ""
+
+
 @dataclass(slots=True)
 class DashScopeAsrProvider:
     client: DashScopeAudioClientProtocol
@@ -204,7 +220,7 @@ class DashScopeAsrProvider:
             timeout=self.timeout_seconds,
         )
         if not transcript.strip():
-            raise RuntimeError("DashScope ASR returned an empty transcript")
+            raise NoSpeechDetected("DashScope ASR returned an empty transcript")
         return AsrResult(text=transcript.strip(), confidence=None)
 
 

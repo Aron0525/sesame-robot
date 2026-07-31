@@ -61,6 +61,10 @@ class AsrProvider(Protocol):
     async def transcribe(self, pcm: bytes, audio_format: AudioFormat) -> AsrResult: ...
 
 
+class NoSpeechDetected(RuntimeError):
+    """Raised when ASR completed but found no usable speech."""
+
+
 class AgentProvider(Protocol):
     async def reply(
         self,

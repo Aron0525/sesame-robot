@@ -44,9 +44,9 @@ class Settings(BaseSettings):
     conversation_ttl_seconds: int = Field(default=1_800, ge=60, le=86_400)
     conversation_cleanup_interval_seconds: int = Field(default=60, ge=10, le=3_600)
     dashboard_event_limit: int = Field(default=500, ge=50, le=5_000)
-    # The dashboard is bound to loopback-only HTTP requests. Even there, user
-    # text remains hidden unless a local operator deliberately enables this.
-    dashboard_debug_content: bool = False
+    # The dashboard is bound to loopback-only HTTP requests. Local operators
+    # need the recognized text and assistant reply to diagnose voice turns.
+    dashboard_debug_content: bool = True
     # Optional direct USB serial observation for the ESP32 attached to this Mac.
     # The Gateway becomes the sole serial owner while this is enabled.
     serial_monitor_enabled: bool = False

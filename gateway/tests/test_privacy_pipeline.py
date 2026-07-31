@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from sesame_voice_gateway.config import Settings
+from sesame_voice_gateway.observability import ObservabilityStore
 from sesame_voice_gateway.pipeline import ConversationContext, ConversationPipeline
 from sesame_voice_gateway.privacy import PrivacyPolicyViolation, validate_remote_pcm
 from sesame_voice_gateway.providers.base import (
@@ -35,6 +36,12 @@ class FakeAsr:
         return AsrResult(text="合成测试请求")
 
 
+class SilentAsr:
+    async def transcribe(self, pcm: bytes, audio_format: object) -> AsrResult:
+        del pcm, audio_format
+        return AsrResult(text="")
+
+
 class FakeAgent:
     async def reply(self, **_: object) -> AgentResult:
         return AgentResult(
@@ -49,6 +56,21 @@ class FakeTts:
         if text != "合成测试回复":
             raise ValueError("unexpected test text")
         return b"\x00" * 640
+
+
+class RecordingTts:
+    def __init__(self) -> None:
+        self.texts: list[str] = []
+
+    async def synthesize(self, text: str, voice: VoiceSpec) -> bytes:
+        del voice
+        self.texts.append(text)
+        return b"\x00" * 640
+
+
+class FailIfCalledAgent:
+    async def reply(self, **_: object) -> AgentResult:
+        raise AssertionError("OpenClaw must not receive an empty ASR result")
 
 
 class FakeObserver:
@@ -107,6 +129,38 @@ class PrivacyAndPipelineTest(unittest.IsolatedAsyncioTestCase):
                 serial_monitor_device_id="missing-device",
             )
 
+    def test_dashboard_text_is_visible_by_default(self) -> None:
+        settings = Settings(
+            _env_file=None,
+            device_tokens={"device": "token"},
+            device_users={"device": "user"},
+            allow_remote_speech=True,
+            dashscope_api_key="test-key",
+            openclaw_token="test-token",
+            openclaw_session_key_secret="test-secret",
+        )
+        store = ObservabilityStore(expose_debug_content=settings.dashboard_debug_content)
+        store.record_stage(
+            device_id="device",
+            turn_id="turn",
+            stage="asr",
+            status="completed",
+            details={"transcript": "请站立"},
+        )
+        store.record_stage(
+            device_id="device",
+            turn_id="turn",
+            stage="openclaw",
+            status="completed",
+            details={"reply_text": "好的，正在站立。"},
+        )
+
+        details = [event["details"] for event in store.snapshot()["events"]]
+
+        self.assertTrue(settings.dashboard_debug_content)
+        self.assertEqual(details[0]["transcript"], "请站立")
+        self.assertEqual(details[1]["reply_text"], "好的，正在站立。")
+
     async def test_pipeline_completes_a_synthetic_turn_without_external_data(self) -> None:
         asr = FakeAsr()
         pipeline = ConversationPipeline(
@@ -128,6 +182,30 @@ class PrivacyAndPipelineTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.transcript.text, "合成测试请求")
         self.assertEqual(result.opus_packets, (b"downlink-opus",))
         self.assertEqual(result.generation_id, 1)
+
+    async def test_pipeline_replies_when_asr_returns_no_speech(self) -> None:
+        tts = RecordingTts()
+        pipeline = ConversationPipeline(
+            codec_factory=FakeCodec,
+            asr=SilentAsr(),
+            agent=FailIfCalledAgent(),
+            tts=tts,
+        )
+
+        result = await pipeline.process_turn(
+            context=ConversationContext(
+                device_id="device",
+                user_id="user",
+                conversation_id="conversation",
+                turn_id="turn",
+            ),
+            opus_packets=[b"uplink-opus"],
+        )
+
+        self.assertEqual(result.transcript.text, "")
+        self.assertEqual(result.agent.text, "抱歉，我没有听清，请再说一遍。")
+        self.assertEqual(tts.texts, ["抱歉，我没有听清，请再说一遍。"])
+        self.assertEqual(result.opus_packets, (b"downlink-opus",))
 
     async def test_each_turn_gets_a_fresh_opus_codec(self) -> None:
         created_codecs: list[FakeCodec] = []
