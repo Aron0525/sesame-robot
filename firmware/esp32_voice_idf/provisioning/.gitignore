@@ -1,0 +1,2 @@
+# Per-device NVS contains Wi-Fi, token and CA material. Never commit it.
+private/

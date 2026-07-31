@@ -1,0 +1,8 @@
+{
+  "name": "sesame-v3-openclaw-runtime",
+  "private": true,
+  "description": "Pinned OpenClaw runtime version for Sesame Robot V3",
+  "dependencies": {
+    "openclaw": "2026.7.1-1"
+  }
+}

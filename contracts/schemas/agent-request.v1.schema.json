@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sesame.local/schemas/agent-request.v1.schema.json",
+  "title": "Sesame Agent Request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "request_id",
+    "conversation_id",
+    "turn_id",
+    "input",
+    "capabilities"
+  ],
+  "properties": {
+    "v": {
+      "const": 1
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "conversation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "turn_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "text"
+      ],
+      "properties": {
+        "type": {
+          "const": "text"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actions",
+        "expressions",
+        "voices"
+      ],
+      "properties": {
+        "actions": {
+          "const": ["stop", "wave", "rest", "stand"]
+        },
+        "expressions": {
+          "const": [
+            "idle",
+            "happy",
+            "sad",
+            "angry",
+            "surprised",
+            "sleepy",
+            "love",
+            "excited",
+            "confused",
+            "thinking"
+          ]
+        },
+        "voices": {
+          "const": ["sesame_default"]
+        }
+      }
+    }
+  }
+}

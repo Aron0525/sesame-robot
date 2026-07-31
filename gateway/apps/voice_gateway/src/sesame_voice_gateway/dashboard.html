@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sesame · Voice Trace</title>
+  <style>
+    :root {
+      --ink: #111612;
+      --panel: #18221c;
+      --panel-2: #213126;
+      --line: #39513e;
+      --mist: #d7e3d7;
+      --muted: #8ca18f;
+      --signal: #c8f36d;
+      --hot: #ffb85c;
+      --danger: #ff8373;
+      --paper: #f0f3e8;
+      --mono: "SFMono-Regular", "Cascadia Code", "PingFang SC", monospace;
+      --display: "Bodoni 72", "Songti SC", serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--mist);
+      background:
+        radial-gradient(circle at 86% -8%, #405738 0, transparent 30rem),
+        linear-gradient(135deg, #101611 0%, #0b0e0c 58%, #16140e 100%);
+      min-height: 100vh;
+      font-family: var(--mono);
+      letter-spacing: .015em;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .19;
+      background-image: linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+    .shell { width: min(1440px, calc(100% - 36px)); margin: 0 auto; padding: 32px 0 48px; position: relative; }
+    header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; padding-bottom: 30px; border-bottom: 1px solid var(--line); }
+    .eyebrow { color: var(--signal); font-size: 11px; letter-spacing: .18em; margin: 0 0 9px; }
+    h1 { font: 400 clamp(42px, 8vw, 85px)/.85 var(--display); letter-spacing: -.055em; color: var(--paper); margin: 0; }
+    h1 em { color: var(--signal); font-style: italic; }
+    .sub { max-width: 630px; color: var(--muted); font-size: 12px; line-height: 1.8; margin: 17px 0 0; }
+    .live { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border: 1px solid var(--line); background: rgba(20,31,23,.84); white-space: nowrap; font-size: 11px; }
+    .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 0 rgba(200,243,109,.7); animation: pulse 1.8s infinite; }
+    .live[data-state="down"] .pulse { background: var(--danger); animation: none; }
+    @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(200,243,109,0); } 100% { box-shadow: 0 0 0 0 rgba(200,243,109,0); } }
+    .strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-top: 0; }
+    .metric { min-height: 104px; padding: 19px 20px; border-right: 1px solid var(--line); }
+    .metric:last-child { border-right: 0; }
+    .metric b { display:block; color:var(--paper); font-size:26px; letter-spacing:-.08em; margin-top:13px; }
+    .label { color:var(--muted); font-size:10px; letter-spacing:.13em; text-transform:uppercase; }
+    main { display:grid; grid-template-columns: 1.03fr 1.57fr; gap: 18px; margin-top: 18px; }
+    .panel { background: linear-gradient(145deg, rgba(30,45,34,.88), rgba(16,23,18,.95)); border: 1px solid var(--line); }
+    .panel-title { padding: 16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); font-size:11px; letter-spacing:.13em; color:var(--muted); text-transform:uppercase; }
+    .panel-title strong { color:var(--signal); font-weight:500; }
+    .devices { min-height: 250px; }
+    .device { padding: 19px; border-bottom: 1px solid var(--line); position:relative; overflow:hidden; }
+    .device:last-child { border-bottom:0; }
+    .device::after { content:""; width:6px; height:100%; position:absolute; right:0; top:0; background:var(--signal); opacity:.75; }
+    .device.offline::after { background:var(--danger); }
+    .device-top { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .device-id { color:var(--paper); font-size:15px; font-weight:600; }
+    .badge { border:1px solid var(--line); padding:4px 7px; font-size:9px; letter-spacing:.12em; color:var(--signal); }
+    .badge.offline { color:var(--danger); }
+    .stage-now { font: 400 29px/1.05 var(--display); letter-spacing:-.035em; color:var(--paper); margin:20px 0 10px; }
+    .micro { color:var(--muted); font-size:10px; line-height:1.65; }
+    .turn { min-height: 250px; }
+    .turn-list { padding: 10px 0; max-height: 360px; overflow:auto; }
+    .turn-row { display:grid; grid-template-columns: 12px 1fr auto; align-items:center; gap:13px; padding:14px 18px; border-bottom:1px solid rgba(57,81,62,.55); }
+    .turn-row:last-child { border-bottom:0; }
+    .dot { width:7px; height:7px; border-radius:50%; background:var(--muted); }
+    .dot.running { background:var(--hot); box-shadow:0 0 12px var(--hot); }
+    .dot.completed { background:var(--signal); }
+    .dot.failed, .dot.cancelled { background:var(--danger); }
+    .turn-row b { color:var(--paper); font-size:12px; }
+    .turn-row span { color:var(--muted); font-size:10px; display:block; margin-top:5px; }
+    .turn-row time { color:var(--muted); font-size:10px; }
+    .plan-grid { display:grid; grid-template-columns:repeat(3,1fr); }
+    .plan-cell { min-height:104px; padding:18px; border-right:1px solid var(--line); }
+    .plan-cell:last-child { border-right:0; }
+    .plan-value { display:block; color:var(--paper); font:400 28px/1 var(--display); letter-spacing:-.04em; margin-top:13px; overflow-wrap:anywhere; }
+    .plan-empty { color:var(--muted); }
+    .full { grid-column: 1 / -1; }
+    .timeline { max-height: 510px; overflow:auto; }
+    .event { display:grid; grid-template-columns: 88px 118px 1fr auto; gap:12px; align-items:start; padding:13px 18px; border-bottom:1px solid rgba(57,81,62,.55); font-size:11px; }
+    .event:last-child { border-bottom:0; }
+    .event time { color:var(--muted); }
+    .event-stage { color:var(--signal); }
+    .event-stage.failed, .event-stage.cancelled { color:var(--danger); }
+    .event-detail { color:var(--mist); line-height:1.55; overflow-wrap:anywhere; }
+    .event-status { font-size:9px; color:var(--muted); letter-spacing:.09em; text-transform:uppercase; }
+    .empty { padding:38px 18px; color:var(--muted); font-size:11px; line-height:1.8; }
+    .foot { display:flex; justify-content:space-between; gap:16px; color:var(--muted); font-size:10px; padding:13px 2px 0; }
+    .lock { color:var(--signal); }
+    @media (max-width: 860px) {
+      .shell { width:min(100% - 22px, 1440px); padding-top:20px; }
+      header { display:block; } .live { display:inline-flex; margin-top:18px; }
+      .strip { grid-template-columns:repeat(2,1fr); } .metric:nth-child(2) { border-right:0; } .metric:nth-child(-n+2) { border-bottom:1px solid var(--line); }
+      main { grid-template-columns:1fr; } .full { grid-column:auto; }
+      .event { grid-template-columns:72px 1fr auto; } .event-stage { grid-column:2; } .event-detail { grid-column:2 / -1; } .foot { display:block; line-height:1.8; }
+      .plan-grid { grid-template-columns:1fr; } .plan-cell { border-right:0; border-bottom:1px solid var(--line); } .plan-cell:last-child { border-bottom:0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">SESAME ROBOT / LOCAL VOICE GATEWAY</p>
+        <h1>VOICE<br><em>TRACE</em></h1>
+        <p class="sub">实时观察每一个对话回合：从 ESP32 的 WSS 与 Opus 包，到 ASR、OpenClaw、TTS，再回到机器人。此页面不保存原始音频。</p>
+      </div>
+      <div class="live" id="live"><i class="pulse"></i><span id="live-text">正在连接监控流</span></div>
+    </header>
+
+    <section class="strip" aria-label="运行概览">
+      <div class="metric"><span class="label">设备在线</span><b id="metric-devices">0</b></div>
+      <div class="metric"><span class="label">运行中回合</span><b id="metric-running">0</b></div>
+      <div class="metric"><span class="label">最近上行 Opus</span><b id="metric-up">—</b></div>
+      <div class="metric"><span class="label">最近下行 Opus</span><b id="metric-down">—</b></div>
+    </section>
+
+    <main>
+      <section class="panel devices">
+        <div class="panel-title">设备状态 <strong>WSS / SESSION</strong></div>
+        <div id="devices"><div class="empty">等待 ESP32 建立 WSS 连接。连接并收到 <code>session.ready</code> 后，设备会出现在这里。</div></div>
+      </section>
+
+      <section class="panel turn">
+        <div class="panel-title">回合运行状态 <strong id="turn-caption">TURN</strong></div>
+        <div class="turn-list" id="turns"><div class="empty">还没有对话回合。按下 ESP32 的 BOOT 键开始录音。</div></div>
+      </section>
+
+      <section class="panel full" aria-label="最新 OpenClaw 下发计划">
+        <div class="panel-title">最新下发计划 <strong>OPENCLAW → ESP32</strong></div>
+        <div class="plan-grid" id="plan"><div class="empty">等待一次通过验证的 OpenClaw 回复。</div></div>
+      </section>
+
+      <section class="panel full">
+        <div class="panel-title">事件时间线 <strong>LIVE EVENT STREAM</strong></div>
+        <div class="timeline" id="timeline"><div class="empty">等待网关事件。</div></div>
+      </section>
+    </main>
+
+    <div class="foot"><span><span class="lock">●</span> 浏览器监控台仅允许本机访问。音频只在内存流转，不写入文件。</span><span id="privacy">调试文本：默认隐藏</span></div>
+  </div>
+
+  <script>
+    const stageName = {
+      'wss': 'WSS 连接', 'session': '会话就绪', 'listen': '录音',
+      'audio.up': 'Opus 上行', 'opus.decode': 'Opus 解码', 'asr': 'ASR 识别',
+      'openclaw': 'OpenClaw', 'tts.synthesis': 'TTS 合成', 'opus.encode': 'Opus 编码',
+      'response.plan': '动作 / 表情计划', 'tts.downlink': 'Opus 下行',
+      'action.execute': '动作执行', 'pipeline': '网关处理', 'turn': '对话回合',
+      'serial': 'USB 串口监控', 'device.wss': 'ESP32 WSS 已连接',
+      'device.session': 'ESP32 会话就绪', 'device.listen': 'ESP32 正在录音',
+      'device.audio.up': 'ESP32 正在上传 Opus', 'device.response.plan': 'ESP32 已接收动作计划',
+      'device.playback': 'ESP32 正在播放', 'device.action': 'ESP32 动作结果',
+      'device.error': 'ESP32 设备错误'
+    };
+    const stageHelp = {
+      'listen': 'ESP32 正在从 I2S 麦克风采样',
+      'audio.up': 'ESP32 每 20 ms 上传一个 Opus 二进制包',
+      'opus.decode': '网关将 Opus 解码为 16 kHz PCM',
+      'asr': 'ASR 将 PCM 语音转换为文字',
+      'openclaw': 'OpenClaw 根据文字生成受约束的回复和动作计划',
+      'tts.synthesis': 'TTS 将回复文字合成为 PCM',
+      'opus.encode': '网关将 PCM 分帧编码为 Opus',
+      'tts.downlink': '网关每 20 ms 向 ESP32 发送一个 Opus 包',
+      'action.execute': 'ESP32 执行动作或表情',
+      'serial': 'Gateway 正在独占读取 ESP32 的 USB 串口',
+      'device.wss': '固件确认 WebSocket/WSS 传输层已经连接',
+      'device.session': '固件确认已收到 Gateway 的 session.ready',
+      'device.listen': '固件已识别 BOOT 按键，正在采集 I2S 麦克风',
+      'device.audio.up': '固件正在把每 20 ms 音频帧编码并上传',
+      'device.response.plan': '固件已验证并接受动作与表情计划',
+      'device.playback': '固件正在将下行 Opus 解码后通过 I2S 输出',
+      'device.action': '固件已回报本地动作执行结果',
+      'device.error': '固件报告了已知的安全错误状态',
+    };
+    let state = { devices: [], turns: [], events: [], debug_content: false };
+    const $ = id => document.getElementById(id);
+    const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    const time = ms => ms ? new Date(ms).toLocaleTimeString('zh-CN', { hour12:false }) : '—';
+    const size = bytes => bytes >= 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${bytes || 0} B`;
+    const stage = key => stageName[key] || key;
+    const planValue = value => value === null || value === undefined || value === '' ? '<span class="plan-empty">无</span>' : escape(value);
+    const emptyAudioProgress = () => ({ packet_count: 0, byte_count: 0, duration_ms: 0 });
+    const eventTimestamp = event => Number.isFinite(event.timestamp_ms) ? event.timestamp_ms : Date.now();
+    const audioProgress = details => ({
+      packet_count: Number.isFinite(details?.packet_count) ? details.packet_count : 0,
+      byte_count: Number.isFinite(details?.byte_count) ? details.byte_count : 0,
+      duration_ms: Number.isFinite(details?.duration_ms) ? details.duration_ms : 0,
+    });
+
+    function mergeDeviceEvent(event) {
+      if (!event.device_id) return;
+      const devices = state.devices || (state.devices = []);
+      let device = devices.find(item => item.device_id === event.device_id);
+      if (!device) {
+        device = {
+          device_id: event.device_id,
+          online: false,
+          session_id: null,
+          current_turn_id: null,
+          current_stage: 'offline',
+          updated_at_ms: 0,
+        };
+        devices.push(device);
+      }
+
+      const isConnected = event.stage === 'wss' && event.status === 'connected';
+      const isReady = event.stage === 'session' && event.status === 'ready';
+      const isDisconnected = event.stage === 'wss' && event.status === 'disconnected';
+      device.updated_at_ms = eventTimestamp(event);
+      if (isDisconnected) {
+        device.online = false;
+        device.session_id = null;
+        device.current_turn_id = null;
+        device.current_stage = 'offline';
+      } else {
+        if (isConnected || isReady) device.online = true;
+        if (isConnected) device.current_stage = 'wss.connected';
+        else if (isReady) device.current_stage = 'ready';
+        else if (event.stage) device.current_stage = event.stage;
+        if (event.turn_id) device.current_turn_id = event.turn_id;
+        if (event.status === 'failed' || event.status === 'cancelled' || (event.stage === 'tts.downlink' && event.status === 'completed')) {
+          device.current_turn_id = null;
+          if (device.online) device.current_stage = event.status === 'completed' ? 'ready' : event.status;
+        }
+      }
+      devices.sort((left, right) => (right.updated_at_ms || 0) - (left.updated_at_ms || 0));
+    }
+
+    function mergeTurnEvent(event) {
+      if (!event.turn_id || !event.device_id) return;
+      const turns = state.turns || (state.turns = []);
+      let turn = turns.find(item => item.turn_id === event.turn_id && item.device_id === event.device_id);
+      if (!turn) {
+        turn = {
+          device_id: event.device_id,
+          turn_id: event.turn_id,
+          status: 'running',
+          current_stage: 'created',
+          created_at_ms: eventTimestamp(event),
+          updated_at_ms: eventTimestamp(event),
+          uplink: emptyAudioProgress(),
+          downlink: emptyAudioProgress(),
+        };
+        turns.push(turn);
+      }
+      turn.current_stage = event.stage || turn.current_stage;
+      turn.updated_at_ms = eventTimestamp(event);
+      if (event.stage === 'audio.up') turn.uplink = audioProgress(event.details);
+      if (event.stage === 'audio.down') turn.downlink = audioProgress(event.details);
+      if (event.status === 'failed' || event.status === 'cancelled') turn.status = event.status;
+      if (event.stage === 'tts.downlink' && event.status === 'completed') turn.status = 'completed';
+      turns.sort((left, right) => (right.updated_at_ms || 0) - (left.updated_at_ms || 0));
+    }
+
+    function applyEvent(event) {
+      state.events = [...(state.events || []).filter(item => item.id !== event.id), event].slice(-500);
+      mergeDeviceEvent(event);
+      mergeTurnEvent(event);
+      render();
+    }
+    function render() {
+      const devices = state.devices || [];
+      const turns = state.turns || [];
+      const latest = turns[0];
+      $('metric-devices').textContent = devices.filter(d => d.online).length;
+      $('metric-running').textContent = turns.filter(t => t.status === 'running').length;
+      $('metric-up').textContent = latest ? `${latest.uplink.packet_count} / ${size(latest.uplink.byte_count)}` : '—';
+      $('metric-down').textContent = latest ? `${latest.downlink.packet_count} / ${size(latest.downlink.byte_count)}` : '—';
+      $('privacy').textContent = state.debug_content ? '调试文本：本机临时可见' : '调试文本：默认隐藏';
+      $('devices').innerHTML = devices.length ? devices.map(d => `
+        <article class="device ${d.online ? '' : 'offline'}">
+          <div class="device-top"><span class="device-id">${escape(d.device_id)}</span><span class="badge ${d.online ? '' : 'offline'}">${d.online ? 'ONLINE' : 'OFFLINE'}</span></div>
+          <div class="stage-now">${escape(stage(d.current_stage))}</div>
+          <div class="micro">${escape(stageHelp[d.current_stage] || '等待下一条网关事件')}<br>会话：${escape(d.session_id || '—')}　回合：${escape(d.current_turn_id || '—')}</div>
+        </article>`).join('') : '<div class="empty">等待 ESP32 建立 WSS 连接。连接并收到 <code>session.ready</code> 后，设备会出现在这里。</div>';
+      $('turn-caption').textContent = turns.length ? `${turns.length} RECENT` : 'TURN';
+      $('turns').innerHTML = turns.length ? turns.map(t => `
+        <div class="turn-row"><i class="dot ${escape(t.status)}"></i><div><b>${escape(stage(t.current_stage))}</b><span>${escape(t.turn_id)} · 上行 ${t.uplink.packet_count} 包 / 下行 ${t.downlink.packet_count} 包</span></div><time>${time(t.updated_at_ms)}</time></div>`).join('') : '<div class="empty">还没有对话回合。按下 ESP32 的 BOOT 键开始录音。</div>';
+      const events = [...(state.events || [])].sort((a,b) => b.id - a.id);
+      const latestPlan = events.find(event => event.stage === 'response.plan' && event.status === 'completed');
+      $('plan').innerHTML = latestPlan ? (() => {
+        const details = latestPlan.details || {};
+        const action = details.action || null;
+        return `<div class="plan-cell"><span class="label">表情（必填）</span><span class="plan-value">${planValue(details.expression)}</span></div><div class="plan-cell"><span class="label">动作（可为空）</span><span class="plan-value">${action ? planValue(action) : '<span class="plan-empty">无动作 · actions=[]</span>'}</span></div><div class="plan-cell"><span class="label">TTS 语气</span><span class="plan-value">${planValue(details.voice_style)}</span></div>`;
+      })() : '<div class="empty">等待一次通过验证的 OpenClaw 回复。表情每次必填；没有合适动作时明确显示 <code>actions=[]</code>。</div>';
+      $('timeline').innerHTML = events.length ? events.map(e => {
+        const details = Object.entries(e.details || {}).map(([k,v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : v}`).join(' · ') || '—';
+        return `<div class="event"><time>${time(e.timestamp_ms)}</time><span class="event-stage ${escape(e.status)}">${escape(stage(e.stage))}</span><span class="event-detail">${escape(details)}</span><span class="event-status">${escape(e.status)}</span></div>`;
+      }).join('') : '<div class="empty">等待网关事件。</div>';
+    }
+    async function loadSnapshot() {
+      const response = await fetch('/api/observability/snapshot', { cache: 'no-store' });
+      if (!response.ok) throw new Error(`snapshot HTTP ${response.status}`);
+      state = await response.json(); render();
+    }
+    function connect() {
+      const live = $('live'); const text = $('live-text');
+      const source = new EventSource('/api/observability/stream');
+      source.addEventListener('open', () => { live.dataset.state = 'up'; text.textContent = '监控流实时连接'; });
+      source.addEventListener('snapshot', event => { state = JSON.parse(event.data); render(); });
+      source.addEventListener('trace', event => applyEvent(JSON.parse(event.data)));
+      source.addEventListener('error', () => { live.dataset.state = 'down'; text.textContent = '监控流正在重连'; });
+    }
+    loadSnapshot().catch(() => {}).finally(connect);
+  </script>
+</body>
+</html>

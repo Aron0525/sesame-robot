@@ -1,0 +1,26 @@
+# Runtime secrets and generated files
+gateway/.env
+gateway/.venv/
+gateway/__pycache__/
+gateway/**/__pycache__/
+gateway/**/.pytest_cache/
+gateway/**/.ruff_cache/
+
+# ESP-IDF generated dependencies and build outputs
+firmware/esp32_voice_idf/build*/
+firmware/esp32_voice_idf/managed_components/
+firmware/esp32_voice_idf/*.bin
+firmware/esp32_voice_idf/device-nvs.bin
+firmware/esp32_voice_idf/components/sesame_transport/include/sesame_transport/local-device-config.h
+
+# Arduino and diagnostic generated outputs
+firmware/arduino/**/build/
+firmware/esp32_voice_idf/diagnostics/**/build*/
+
+# Local Python environments and caches
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+
+# macOS metadata
+.DS_Store

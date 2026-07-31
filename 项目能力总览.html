@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sesame V3 语音机器人的本地能力总览与运行边界。">
+  <title>Sesame V3 · 系统能力总览</title>
+  <style>
+    :root {
+      --ink: #061519;
+      --ink-soft: #0b2226;
+      --panel: rgba(14, 40, 43, .83);
+      --line: rgba(190, 229, 219, .18);
+      --paper: #e9efe7;
+      --muted: #aac0bb;
+      --mint: #8ff1cd;
+      --cyan: #67c9d4;
+      --sun: #ffc96b;
+      --coral: #ff8b70;
+      --danger: #ff6f79;
+      --shadow: 0 18px 55px rgba(0, 0, 0, .28);
+      --display: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      --mono: "SFMono-Regular", "Cascadia Code", "PingFang SC", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--paper);
+      font-family: var(--display);
+      background:
+        radial-gradient(circle at 82% 12%, rgba(103, 201, 212, .15), transparent 28rem),
+        radial-gradient(circle at 10% 39%, rgba(143, 241, 205, .10), transparent 31rem),
+        linear-gradient(145deg, #061519 0%, #082025 54%, #071317 100%);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .24;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+    a { color: inherit; }
+    button { font: inherit; }
+
+    .shell { max-width: 1280px; margin: 0 auto; padding: 25px 28px 54px; position: relative; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0 29px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; gap: 12px; align-items: center; letter-spacing: .08em; text-transform: uppercase; font: 700 12px var(--mono); color: var(--mint); }
+    .brand-mark { width: 12px; height: 12px; border: 2px solid var(--mint); border-radius: 2px; transform: rotate(45deg); box-shadow: 0 0 18px rgba(143,241,205,.65); }
+    .scan { color: var(--muted); font: 12px var(--mono); text-align: right; }
+
+    .hero { display: grid; grid-template-columns: minmax(0, 1.22fr) minmax(250px, .78fr); gap: 44px; align-items: center; padding: 57px 0 45px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; color: var(--sun); font: 700 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 34px; border-top: 1px solid var(--sun); }
+    h1 { font-size: clamp(46px, 7.1vw, 91px); line-height: .98; margin: 14px 0 19px; letter-spacing: -.065em; font-weight: 720; max-width: 760px; }
+    h1 em { color: var(--mint); font-style: normal; }
+    .hero p { max-width: 720px; color: #c1d2cd; margin: 0; font-size: 18px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 27px; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; min-height: 43px; padding: 0 16px;
+      border-radius: 3px; border: 1px solid rgba(143,241,205,.5); color: #092025;
+      background: var(--mint); text-decoration: none; cursor: pointer; font-size: 14px; font-weight: 700;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .button:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(143,241,205,.18); }
+    .button.secondary { color: var(--paper); background: transparent; border-color: var(--line); }
+    .button.secondary:hover { background: rgba(255,255,255,.07); }
+
+    .robot-card { min-height: 310px; padding: 27px; background: linear-gradient(160deg, rgba(26,68,70,.9), rgba(8,27,31,.88)); border: 1px solid rgba(143,241,205,.28); border-radius: 8px; box-shadow: var(--shadow); overflow: hidden; position: relative; }
+    .robot-card::after { content: ""; position: absolute; width: 280px; height: 280px; border: 1px solid rgba(143,241,205,.16); border-radius: 50%; right: -114px; top: -144px; }
+    .robot-label { color: var(--muted); font: 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .face { width: min(100%, 270px); display: block; margin: 18px auto 11px; filter: drop-shadow(0 0 18px rgba(143,241,205,.12)); }
+    .robot-caption { display: flex; justify-content: space-between; gap: 10px; padding-top: 9px; border-top: 1px solid var(--line); color: var(--mint); font: 12px var(--mono); }
+
+    .signal-row { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-bottom: 26px; background: rgba(1,12,14,.27); }
+    .signal { padding: 17px 18px; border-right: 1px solid var(--line); min-height: 104px; }
+    .signal:last-child { border-right: none; }
+    .signal strong { display: block; color: var(--mint); font: 700 26px var(--mono); letter-spacing: -.08em; }
+    .signal span { color: var(--muted); font-size: 13px; }
+    .signal.caution strong { color: var(--sun); }
+
+    .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; margin: 65px 0 21px; }
+    .section-heading h2 { margin: 0; font-size: clamp(27px, 4vw, 43px); letter-spacing: -.045em; line-height: 1; }
+    .section-heading p { margin: 0; max-width: 480px; color: var(--muted); font-size: 14px; }
+    .index { color: var(--cyan); font: 12px var(--mono); letter-spacing: .08em; }
+
+    .flow {
+      display: grid; grid-template-columns: repeat(9, minmax(90px, 1fr)); gap: 0; overflow-x: auto;
+      padding: 7px 0 17px;
+    }
+    .node { min-width: 108px; padding: 15px 13px; background: rgba(14,43,46,.8); border: 1px solid var(--line); border-radius: 5px; position: relative; min-height: 118px; }
+    .node:not(:last-child)::after { content: "→"; color: var(--sun); position: absolute; right: -20px; top: 42px; font-size: 20px; z-index: 1; }
+    .node b { display: block; color: var(--mint); font-size: 15px; margin-bottom: 7px; }
+    .node small { color: var(--muted); display: block; font-size: 11px; line-height: 1.48; }
+    .node.hot { background: linear-gradient(155deg, rgba(35,86,78,.95), rgba(12,46,47,.9)); border-color: rgba(143,241,205,.55); }
+    .node.ai b { color: var(--sun); }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 9px; margin: 17px 0 4px; }
+    .tag { display: inline-flex; gap: 7px; align-items: center; border: 1px solid var(--line); border-radius: 99px; padding: 5px 10px; color: var(--muted); font: 11px var(--mono); }
+    .tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+    .tag.cloud i { background: var(--sun); }
+    .tag.device i { background: var(--cyan); }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    .filter { background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; cursor: pointer; font-size: 12px; }
+    .filter[aria-pressed="true"] { color: var(--ink); background: var(--mint); border-color: var(--mint); font-weight: 700; }
+    .capabilities { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+    .cap { grid-column: span 4; border: 1px solid var(--line); padding: 21px; border-radius: 6px; background: var(--panel); min-height: 250px; transition: opacity .18s ease, transform .18s ease, border-color .18s ease; }
+    .cap:hover { transform: translateY(-3px); border-color: rgba(143,241,205,.48); }
+    .cap.hidden { display: none; }
+    .cap.wide { grid-column: span 8; }
+    .cap-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--muted); font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .state { padding: 3px 7px; border: 1px solid currentColor; border-radius: 99px; font-size: 10px; }
+    .state.ready { color: var(--mint); }
+    .state.configure { color: var(--sun); }
+    .state.boundary { color: var(--coral); }
+    .cap h3 { font-size: 23px; line-height: 1.1; margin: 22px 0 12px; letter-spacing: -.035em; }
+    .cap p { color: var(--muted); font-size: 14px; margin: 0 0 13px; }
+    .cap ul { margin: 0; padding: 0; list-style: none; color: #c7d7d2; font-size: 13px; }
+    .cap li { position: relative; padding: 6px 0 6px 17px; border-top: 1px solid rgba(190,229,219,.1); }
+    .cap li::before { content: ""; position: absolute; left: 1px; top: 13px; width: 6px; height: 6px; border: 1px solid var(--mint); transform: rotate(45deg); }
+
+    .use-grid { display: grid; grid-template-columns: .87fr 1.13fr; gap: 16px; }
+    .use-case, .terminal { border: 1px solid var(--line); border-radius: 6px; background: rgba(5,24,27,.69); }
+    .use-case { padding: 25px; }
+    .use-case h3 { margin: 0 0 17px; font-size: 25px; letter-spacing: -.03em; }
+    .scenario { border-top: 1px solid var(--line); padding: 15px 0; }
+    .scenario:first-of-type { border-top: none; padding-top: 0; }
+    .scenario b { display: block; color: var(--mint); margin-bottom: 4px; font-size: 15px; }
+    .scenario span { color: var(--muted); font-size: 13px; }
+    .terminal { overflow: hidden; }
+    .terminal-head { display: flex; gap: 6px; align-items: center; padding: 13px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font: 11px var(--mono); }
+    .dot { width: 8px; height: 8px; background: var(--coral); border-radius: 50%; }
+    .dot:nth-child(2) { background: var(--sun); }
+    .dot:nth-child(3) { background: var(--mint); }
+    .code-block { padding: 20px 20px 21px; font: 13px/1.8 var(--mono); color: #d8e6e1; white-space: pre-wrap; overflow-x: auto; }
+    .code-block .prompt { color: var(--mint); }
+    .code-block .comment { color: #77928c; }
+    .copy-row { padding: 0 20px 21px; display: flex; gap: 9px; flex-wrap: wrap; }
+    .copy { color: var(--mint); background: transparent; border: 1px solid rgba(143,241,205,.42); padding: 8px 11px; border-radius: 3px; cursor: pointer; font: 12px var(--mono); }
+    .copy:hover { background: rgba(143,241,205,.1); }
+
+    .boundary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .boundary-card { border-top: 2px solid var(--coral); background: rgba(38,21,24,.35); padding: 20px; min-height: 185px; }
+    .boundary-card:nth-child(2) { border-color: var(--sun); background: rgba(54,44,21,.29); }
+    .boundary-card:nth-child(3) { border-color: var(--cyan); background: rgba(14,40,49,.42); }
+    .boundary-card h3 { margin: 0 0 9px; font-size: 18px; }
+    .boundary-card p { margin: 0; color: #c0d1cc; font-size: 13px; }
+
+    details { border: 1px solid var(--line); border-radius: 5px; background: rgba(4,20,23,.45); }
+    summary { cursor: pointer; padding: 15px 17px; color: var(--paper); font-weight: 650; }
+    details div { padding: 0 17px 16px; color: var(--muted); font-size: 13px; }
+    .footer { margin-top: 63px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 20px; color: var(--muted); font: 11px var(--mono); }
+    .toast { position: fixed; left: 50%; bottom: 28px; translate: -50% 15px; opacity: 0; pointer-events: none; background: var(--mint); color: var(--ink); padding: 10px 13px; border-radius: 3px; font: 700 12px var(--mono); transition: opacity .18s ease, translate .18s ease; }
+    .toast.show { opacity: 1; translate: -50% 0; }
+
+    @media (max-width: 920px) {
+      .hero, .use-grid { grid-template-columns: 1fr; }
+      .hero { gap: 25px; }
+      .robot-card { max-width: 520px; }
+      .signal-row { grid-template-columns: 1fr 1fr; }
+      .signal:nth-child(2) { border-right: none; }
+      .signal:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .cap { grid-column: span 6; }
+      .cap.wide { grid-column: span 12; }
+    }
+    @media (max-width: 650px) {
+      .shell { padding: 19px 17px 35px; }
+      .topbar { align-items: flex-start; flex-direction: column; padding-bottom: 21px; }
+      .scan { text-align: left; }
+      .hero { padding: 37px 0 26px; }
+      h1 { font-size: clamp(43px, 14vw, 70px); }
+      .hero p { font-size: 16px; }
+      .signal-row, .boundary { grid-template-columns: 1fr; }
+      .signal, .signal:nth-child(2) { border-right: none; border-bottom: 1px solid var(--line); }
+      .signal:last-child { border-bottom: none; }
+      .section-heading { align-items: flex-start; flex-direction: column; margin-top: 47px; }
+      .flow { grid-template-columns: repeat(9, 136px); }
+      .cap, .cap.wide { grid-column: span 12; }
+      .footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Sesame V3 / Capability Map</div>
+      <div class="scan">本地代码扫描 · 2026-07-29<br>此页是静态能力说明，不读取密钥或音频</div>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow">ESP32-S3 voice robot</div>
+        <h1 id="page-title">能听、能说、<br><em>能表达</em>的机器人。</h1>
+        <p>这个目录已经具备一条完整的语音机器人软件链路：ESP32 采集声音，经 WSS/Opus 交给电脑端网关；网关完成 ASR、OpenClaw 决策和 TTS，再把声音、表情与安全动作返回机器人。</p>
+        <div class="hero-actions">
+          <a class="button" href="https://sesame-gateway.local:8765/dashboard" target="_blank" rel="noreferrer">打开电脑端监控台</a>
+          <a class="button secondary" href="http://sesame-robot.local/" target="_blank" rel="noreferrer">打开机器人网页控制</a>
+          <a class="button secondary" href="README.md" target="_blank">查看项目 README</a>
+        </div>
+      </div>
+      <aside class="robot-card" aria-label="机器人能力图示">
+        <div class="robot-label">device / expression output</div>
+        <svg class="face" viewBox="0 0 360 210" role="img" aria-label="带快乐眼睛的机器人 OLED 表情">
+          <rect x="11" y="11" width="338" height="188" rx="21" fill="#07171a" stroke="#8ff1cd" stroke-width="2"/>
+          <rect x="33" y="31" width="294" height="148" rx="12" fill="#0b282b"/>
+          <path d="M74 95c16-22 40-22 56 0M230 95c16-22 40-22 56 0" fill="none" stroke="#8ff1cd" stroke-width="12" stroke-linecap="round"/>
+          <path d="M118 128c31 28 93 28 124 0" fill="none" stroke="#ffc96b" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="58" cy="136" r="7" fill="#ff8b70" opacity=".8"/><circle cx="302" cy="136" r="7" fill="#ff8b70" opacity=".8"/>
+          <path d="M180 0v22M0 105h22M338 105h22M50 15l14 15M310 15l-14 15" stroke="#67c9d4" stroke-width="2" opacity=".7"/>
+        </svg>
+        <div class="robot-caption"><span>expression: happy</span><span>action: wave</span></div>
+      </aside>
+    </section>
+
+    <section class="signal-row" aria-label="实现状态摘要">
+      <div class="signal"><strong>50 / 50</strong><span>电脑 Gateway 自动化测试通过</span></div>
+      <div class="signal"><strong>20 ms</strong><span>固定 Opus 音频帧</span></div>
+      <div class="signal"><strong>10</strong><span>白名单 OLED 表情</span></div>
+      <div class="signal caution"><strong>1</strong><span>当前 USB 串口只能由 Gateway 独占</span></div>
+    </section>
+
+    <section aria-labelledby="flow-title">
+      <div class="section-heading">
+        <div><div class="index">01 / DATA FLOW</div><h2 id="flow-title">一次对话，真实经过哪些部分？</h2></div>
+        <p>音频与模型推理由电脑网关编排；ESP32 只做采集、播放、连接与最终动作校验。</p>
+      </div>
+      <div class="flow" aria-label="语音数据流">
+        <div class="node hot"><b>BOOT</b><small>第一次按下开始录音；第二次按下结束。</small></div>
+        <div class="node"><b>I2S 采集</b><small>INMP441 → 16 kHz PCM → 20 ms 帧。</small></div>
+        <div class="node"><b>Opus</b><small>ESP32 编码为二进制音频包，不使用 Base64。</small></div>
+        <div class="node"><b>WSS</b><small>带设备鉴权的加密 WebSocket 上行。</small></div>
+        <div class="node ai"><b>ASR</b><small>Gateway 通过 DashScope 将语音识别为文字。</small></div>
+        <div class="node ai"><b>OpenClaw</b><small>仅收到文字与能力白名单，返回结构化计划。</small></div>
+        <div class="node ai"><b>TTS</b><small>回复文字合成为 16 kHz PCM。</small></div>
+        <div class="node"><b>Opus 下行</b><small>Gateway 重新编码，通过 WSS 回传。</small></div>
+        <div class="node hot"><b>播放 / 动作</b><small>MAX98357A 播放；OLED 和舵机执行受限计划。</small></div>
+      </div>
+      <div class="legend"><span class="tag device"><i></i>设备端</span><span class="tag"><i></i>电脑网关</span><span class="tag cloud"><i></i>云端或本机 Agent</span></div>
+    </section>
+
+    <section aria-labelledby="capability-title">
+      <div class="section-heading">
+        <div><div class="index">02 / IMPLEMENTED</div><h2 id="capability-title">目录里已经实现了什么？</h2></div>
+        <p>点击筛选可分开看代码已实现、启动前需要配置，以及刻意禁止的能力边界。</p>
+      </div>
+      <div class="filters" aria-label="能力筛选">
+        <button class="filter" type="button" data-filter="all" aria-pressed="true">全部</button>
+        <button class="filter" type="button" data-filter="ready" aria-pressed="false">代码已实现</button>
+        <button class="filter" type="button" data-filter="configure" aria-pressed="false">需要配置 / 接线</button>
+        <button class="filter" type="button" data-filter="boundary" aria-pressed="false">安全边界</button>
+      </div>
+      <div class="capabilities">
+        <article class="cap" data-state="ready">
+          <div class="cap-label"><span>ESP32 formal firmware</span><span class="state ready">已实现</span></div>
+          <h3>硬件端语音与机器人控制</h3>
+          <p>正式固件位于 <code>firmware/esp32_voice_idf</code>，不是 Arduino 草图的替代品。</p>
+          <ul>
+            <li>INMP441 采集、MAX98357A 播放与 I2S 全双工</li>
+            <li>Opus 编解码、BOOT 录音状态机、WSS 会话</li>
+            <li>OLED 表情、8 路舵机 PWM、动作二次校验</li>
+            <li>保留本地 HTTP 网页控制与舵机调试</li>
+          </ul>
+        </article>
+        <article class="cap" data-state="ready">
+          <div class="cap-label"><span>Computer voice gateway</span><span class="state ready">已实现</span></div>
+          <h3>电脑端的唯一编排器</h3>
+          <p>FastAPI Gateway 位于 <code>gateway</code>，负责把各个组件串成一条受控链路。</p>
+          <ul>
+            <li>WSS 设备鉴权、JSON/binary 协议和严格序号检查</li>
+            <li>Opus → PCM → ASR → Agent → TTS → Opus</li>
+            <li>会话 TTL、打断、超时、OpenClaw abort 与有限重试</li>
+            <li>mDNS、TLS、设备单会话与状态审计</li>
+          </ul>
+        </article>
+        <article class="cap" data-state="ready">
+          <div class="cap-label"><span>Local observability</span><span class="state ready">已实现</span></div>
+          <h3>浏览器运行监控台</h3>
+          <p>Gateway 运行后可打开 <code>/dashboard</code>，不是抓取终端窗口，而是读取网关直接产生的事件。</p>
+          <ul>
+            <li>设备 WSS 状态、turn_id、上下行 Opus 包数</li>
+            <li>ASR、OpenClaw、TTS 与动作计划的阶段时间线</li>
+            <li>可选 USB 串口日志翻译；原始串口文本不保留</li>
+            <li>默认隐藏 ASR 与回复文本，仅本机浏览器可访问</li>
+          </ul>
+        </article>
+        <article class="cap wide" data-state="ready">
+          <div class="cap-label"><span>OpenClaw structured response</span><span class="state ready">已实现</span></div>
+          <h3>模型输出不是自由文本，而是固定结构化计划</h3>
+          <p>Gateway 只把 ASR 文字、短期 <code>conversation_id</code> 和设备能力列表发给本机 OpenClaw。模型必须返回版本化 JSON；不合规就终止该轮，不会调用 TTS 或驱动动作。</p>
+          <ul>
+            <li>表情白名单：idle、happy、sad、angry、surprised、sleepy、love、excited、confused、thinking</li>
+            <li>模型动作白名单：stop、wave、rest、stand；每轮最多一个动作</li>
+            <li>Gateway 与 ESP32 均会再次校验表情、动作、时长、频率与机械安全</li>
+          </ul>
+        </article>
+        <article class="cap" data-state="configure">
+          <div class="cap-label"><span>Speech providers</span><span class="state configure">需配置</span></div>
+          <h3>真实 ASR 与 TTS</h3>
+          <p>代码已接入 DashScope 的实时 ASR 与 TTS，但必须在电脑私有 <code>.env</code> 中配置凭据并显式同意云端语音处理。</p>
+          <ul>
+            <li>ASR：fun-asr-realtime</li>
+            <li>TTS：qwen-audio-3.0-tts-flash</li>
+            <li>可选合规的授权音色注册</li>
+            <li>当前 TTS 会收齐 PCM 再编码下发，不是边生成边播放</li>
+          </ul>
+        </article>
+        <article class="cap" data-state="configure">
+          <div class="cap-label"><span>OpenClaw runtime</span><span class="state configure">需配置</span></div>
+          <h3>本机 Agent 与 Workspace</h3>
+          <p>项目已包含 OpenClaw 安装入口和固定协议；实际运行仍依赖本机 daemon、token、Agent 与 workspace 配置。</p>
+          <ul>
+            <li>默认只允许回环地址 <code>127.0.0.1:18789</code></li>
+            <li>按 conversation 派生 session key，而非暴露用户身份</li>
+            <li>需要为真实业务逐项批准工具，而不是默认开放</li>
+          </ul>
+        </article>
+        <article class="cap" data-state="configure">
+          <div class="cap-label"><span>Field deployment</span><span class="state configure">需配置</span></div>
+          <h3>设备接入与网页控制</h3>
+          <p>每台设备都需要私有 NVS：Wi‑Fi、DeviceID、设备 token 和网关根证书不写入源码。</p>
+          <ul>
+            <li>mDNS 用于发现，TLS 身份和设备 token 用于认证</li>
+            <li>需同一非访客 Wi‑Fi/VLAN，允许 mDNS 与客户端互访</li>
+            <li>接好 INMP441、MAX98357A、OLED 与独立舵机供电</li>
+          </ul>
+        </article>
+        <article class="cap" data-state="boundary">
+          <div class="cap-label"><span>privacy by default</span><span class="state boundary">刻意限制</span></div>
+          <h3>默认不保存原始音频</h3>
+          <p>PCM/Opus 默认只在内存中存在。日志与监控台只保留时间、包数、状态与动作/表情 ID。</p>
+          <ul>
+            <li>OpenClaw 不接收原始音频、设备 token 或 Wi‑Fi 密码</li>
+            <li>云端 ASR/TTS 必须显式设置允许，不能静默回退</li>
+            <li>调试文本默认隐藏，需本机短时开启</li>
+          </ul>
+        </article>
+        <article class="cap" data-state="boundary">
+          <div class="cap-label"><span>physical safety</span><span class="state boundary">刻意限制</span></div>
+          <h3>模型不能直接控制舵机</h3>
+          <p>模型只能选择有限意图；不能下发 8 路舵机角度，也不能绕过 Gateway 和 ESP32 的安全检查。</p>
+          <ul>
+            <li>单轮至多一个白名单动作</li>
+            <li>动作时长限制 100–5000 ms</li>
+            <li>设备端保留急停和机械限位校验</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="use-title">
+      <div class="section-heading">
+        <div><div class="index">03 / WHAT IT CAN DO</div><h2 id="use-title">现在可用来做什么？</h2></div>
+        <p>它已经是一个能验证核心产品体验的垂直 MVP，而不是只有一堆独立模块。</p>
+      </div>
+      <div class="use-grid">
+        <article class="use-case">
+          <h3>三类立即可做的场景</h3>
+          <div class="scenario"><b>语音陪伴与问答</b><span>按 BOOT 说话，机器人用 TTS 回复，同时选择情绪表情。</span></div>
+          <div class="scenario"><b>语音触发的有限动作</b><span>例如“挥挥手”，OpenClaw 返回 <code>wave</code>，Gateway 和 ESP32 再完成安全校验。</span></div>
+          <div class="scenario"><b>机器人调试与演示</b><span>浏览器查看链路每一段耗时，或通过 ESP32 原网页进行舵机、动作和表情测试。</span></div>
+          <div class="scenario"><b>私有化 Agent 的原型</b><span>将 OpenClaw 作为受限的本机 Agent 层，后续可逐项增加业务工具。</span></div>
+        </article>
+        <article class="terminal" aria-label="常用入口">
+          <div class="terminal-head"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span style="margin-left:7px">常用入口 / macOS</span></div>
+          <div class="code-block"><span class="comment"># 一键烧录 ESP32-S3（会暂时释放 USB 串口）</span>
+<span class="prompt">zsh</span> "/Users/mac/Desktop/刷写芝麻机器人.command"
+
+<span class="comment"># 启动或检查电脑端 Gateway</span>
+<span class="prompt">cd</span> "/Users/mac/Desktop/1/SesameV3_语音机器人项目/gateway"
+make run
+
+<span class="comment"># 网关运行后，在本机浏览器打开</span>
+https://sesame-gateway.local:8765/dashboard
+
+<span class="comment"># ESP32 原网页控制（设备可达时）</span>
+http://sesame-robot.local/</div>
+          <div class="copy-row">
+            <button class="copy" type="button" data-copy='zsh "/Users/mac/Desktop/刷写芝麻机器人.command"'>复制烧录命令</button>
+            <button class="copy" type="button" data-copy='cd "/Users/mac/Desktop/1/SesameV3_语音机器人项目/gateway" && make run'>复制 Gateway 命令</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="boundary-title">
+      <div class="section-heading">
+        <div><div class="index">04 / HONEST BOUNDARIES</div><h2 id="boundary-title">当前不能假装已经完成的部分</h2></div>
+        <p>这三项不是缺代码，而是需要真实部署条件或下一阶段产品决策。</p>
+      </div>
+      <div class="boundary">
+        <article class="boundary-card"><h3>端到端体验取决于现场网络</h3><p>ESP32 必须看得到 2.4 GHz Wi‑Fi，并能与电脑 Gateway 在非访客网络内进行 mDNS/TCP/WSS 通信。路由器 AP 隔离会阻断网页和直连访问。</p></article>
+        <article class="boundary-card"><h3>云端语音仍有隐私与成本边界</h3><p>DashScope 启用后，当前轮音频或待合成文字会离开电脑。需要用户同意、费用控制和数据保留策略，不能把“云端可用”等同于“完全本地”。</p></article>
+        <article class="boundary-card"><h3>Agent 工具应从零权限开始</h3><p>OpenClaw 目前适合负责结构化回复与场景扩展。接入任何真实工具前，应使用独立 workspace / sandbox，并逐项白名单批准，而不是给模型终端或文件系统权限。</p></article>
+      </div>
+    </section>
+
+    <section aria-label="验证说明" style="margin-top: 20px">
+      <details>
+        <summary>本页基于什么证据？</summary>
+        <div>已扫描项目根目录、ESP32 正式固件、Gateway、协议、部署与安全文档；本次在 Gateway 工作目录运行自动化测试，50 项通过。固件 host test 脚本以 zsh 运行退出码为 0。此页不代表此刻设备一定在线：运行状态需以 Gateway 监控台和真实硬件回合为准。</div>
+      </details>
+    </section>
+
+    <footer class="footer"><span>Sesame V3 · local capability map</span><span>路径：Desktop/1/SesameV3_语音机器人项目</span></footer>
+  </main>
+  <div class="toast" role="status" aria-live="polite">已复制</div>
+  <script>
+    const filters = document.querySelectorAll('.filter');
+    const cards = document.querySelectorAll('.cap');
+    filters.forEach((button) => {
+      button.addEventListener('click', () => {
+        const state = button.dataset.filter;
+        filters.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+        cards.forEach((card) => card.classList.toggle('hidden', state !== 'all' && card.dataset.state !== state));
+      });
+    });
+
+    const toast = document.querySelector('.toast');
+    let toastTimer;
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(button.dataset.copy);
+          toast.textContent = '命令已复制到剪贴板';
+        } catch (_) {
+          toast.textContent = '请手动复制命令';
+        }
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1900);
+      });
+    });
+  </script>
+</body>
+</html>
