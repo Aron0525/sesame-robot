@@ -50,7 +50,10 @@ class Settings(BaseSettings):
     # Optional direct USB serial observation for the ESP32 attached to this Mac.
     # The Gateway becomes the sole serial owner while this is enabled.
     serial_monitor_enabled: bool = False
-    serial_monitor_port: str = "/dev/cu.usbmodem101"
+    # Leave this unset to identify the attached ESP32 dynamically. Set it only
+    # when multiple USB serial devices are connected and the intended board is
+    # therefore ambiguous.
+    serial_monitor_port: str | None = None
     serial_monitor_baud_rate: int = Field(default=115_200, ge=9_600, le=4_000_000)
     serial_monitor_device_id: str | None = Field(default=None, min_length=1, max_length=100)
 

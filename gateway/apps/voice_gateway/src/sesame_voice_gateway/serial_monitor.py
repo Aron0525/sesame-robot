@@ -15,6 +15,17 @@ class FirmwareTraceEvent:
     details: dict[str, Any]
 
 
+@dataclass(frozen=True, slots=True)
+class SerialPortCandidate:
+    device: str
+    vendor_id: int | None
+    description: str
+
+
+_ESPRESSIF_USB_VENDOR_ID = 0x303A
+_MACOS_PSEUDO_SERIAL_PORTS = frozenset({"cu.Bluetooth-Incoming-Port", "cu.debug-console"})
+
+
 _BOOT_START = re.compile(r"P2 BOOT start: turn=(?P<turn>\d+)")
 _BOOT_STOP = re.compile(r"P2 BOOT stop: turn=(?P<turn>\d+) uplink_frames=(?P<frames>\d+)")
 _UPLINK_PROGRESS = re.compile(r"P2 uplink progress: turn=(?P<turn>\d+) frames=(?P<frames>\d+)")
@@ -112,7 +123,7 @@ class FirmwareSerialMonitor:
     def __init__(
         self,
         *,
-        port: str,
+        port: str | None,
         baud_rate: int,
         device_id: str,
         store: ObservabilityStore,
@@ -129,8 +140,9 @@ class FirmwareSerialMonitor:
         while True:
             connection: Any | None = None
             try:
+                port = await asyncio.to_thread(resolve_serial_port, self._port)
                 connection = await asyncio.to_thread(
-                    _open_serial_connection, self._port, self._baud_rate
+                    _open_serial_connection, port, self._baud_rate
                 )
             except asyncio.CancelledError:
                 raise
@@ -152,7 +164,7 @@ class FirmwareSerialMonitor:
                 device_id=self._device_id,
                 stage="serial",
                 status="connected",
-                details={"baud_rate": self._baud_rate},
+                details={"baud_rate": self._baud_rate, "port": port},
                 update_current_stage=False,
             )
             try:
@@ -190,3 +202,55 @@ def _open_serial_connection(port: str, baud_rate: int) -> Any:
     connection.rts = False
     connection.open()
     return connection
+
+
+def resolve_serial_port(configured_port: str | None) -> str:
+    """Resolve the current ESP32 USB serial endpoint without a fixed suffix."""
+    if configured_port:
+        return configured_port
+    try:
+        from serial.tools import list_ports  # type: ignore[import-not-found]
+    except ImportError as exc:
+        raise RuntimeError("pyserial is required for firmware serial monitoring") from exc
+
+    candidates = tuple(
+        SerialPortCandidate(
+            device=port.device,
+            vendor_id=port.vid,
+            description=port.description or "",
+        )
+        for port in list_ports.comports()
+        if port.device.startswith("/dev/cu.")
+    )
+    return choose_serial_port(None, candidates=candidates)
+
+
+def choose_serial_port(
+    configured_port: str | None, *, candidates: tuple[SerialPortCandidate, ...]
+) -> str:
+    """Choose an ESP32 endpoint, rejecting ambiguous USB serial topologies."""
+    if configured_port:
+        return configured_port
+
+    candidates = tuple(
+        candidate
+        for candidate in candidates
+        if candidate.device.rsplit("/", maxsplit=1)[-1] not in _MACOS_PSEUDO_SERIAL_PORTS
+    )
+
+    esp32_candidates = tuple(
+        candidate
+        for candidate in candidates
+        if candidate.vendor_id == _ESPRESSIF_USB_VENDOR_ID
+        or "espressif" in candidate.description.lower()
+        or "esp32" in candidate.description.lower()
+    )
+    if len(esp32_candidates) == 1:
+        return esp32_candidates[0].device
+    if len(esp32_candidates) > 1:
+        raise RuntimeError("multiple Espressif USB serial devices are connected")
+    if len(candidates) == 1:
+        return candidates[0].device
+    if not candidates:
+        raise RuntimeError("no USB serial device is currently connected")
+    raise RuntimeError("multiple USB serial devices are connected; configure SESAME_SERIAL_MONITOR_PORT")

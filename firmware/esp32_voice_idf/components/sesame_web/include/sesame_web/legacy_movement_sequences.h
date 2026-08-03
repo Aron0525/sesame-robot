@@ -82,9 +82,9 @@ inline void runStandPose(int face) {
   setServoAngle(L1, 45); 
   setServoAngle(L2, 135); 
   setServoAngle(R4, 0); 
-  setServoAngle(R3, 180); 
+  setServoAngle(R3, 30); 
   setServoAngle(L3, 0); 
-  setServoAngle(L4, 180); 
+  setServoAngle(L4, 30); 
   if (face == 1) enterIdle();
 }
 

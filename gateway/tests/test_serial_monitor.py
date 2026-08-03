@@ -3,7 +3,12 @@ from __future__ import annotations
 import unittest
 
 from sesame_voice_gateway.observability import ObservabilityStore
-from sesame_voice_gateway.serial_monitor import parse_firmware_log_line, publish_firmware_event
+from sesame_voice_gateway.serial_monitor import (
+    SerialPortCandidate,
+    choose_serial_port,
+    parse_firmware_log_line,
+    publish_firmware_event,
+)
 
 
 class FirmwareSerialMonitorTest(unittest.TestCase):
@@ -37,6 +42,56 @@ class FirmwareSerialMonitorTest(unittest.TestCase):
 
     def test_ignores_unmapped_firmware_log_lines(self) -> None:
         self.assertIsNone(parse_firmware_log_line("I (10) wifi: unrelated low-level log"))
+
+    def test_chooses_the_unique_espressif_port_dynamically(self) -> None:
+        selected = choose_serial_port(
+            None,
+            candidates=(
+                SerialPortCandidate("/dev/cu.usbserial-other", 0x0403, "FTDI USB Serial"),
+                SerialPortCandidate("/dev/cu.usbmodem21301", 0x303A, "Espressif USB JTAG/serial"),
+            ),
+        )
+
+        self.assertEqual(selected, "/dev/cu.usbmodem21301")
+
+    def test_uses_the_only_usb_serial_port_when_board_vid_is_unknown(self) -> None:
+        selected = choose_serial_port(
+            None,
+            candidates=(SerialPortCandidate("/dev/cu.wchusbserial1410", 0x1A86, "USB Serial"),),
+        )
+
+        self.assertEqual(selected, "/dev/cu.wchusbserial1410")
+
+    def test_requires_an_explicit_port_when_multiple_unknown_devices_exist(self) -> None:
+        with self.assertRaisesRegex(RuntimeError, "multiple USB serial devices"):
+            choose_serial_port(
+                None,
+                candidates=(
+                    SerialPortCandidate("/dev/cu.usbserial-a", 0x0403, "FTDI USB Serial"),
+                    SerialPortCandidate("/dev/cu.usbserial-b", 0x1A86, "USB Serial"),
+                ),
+            )
+
+    def test_ignores_macos_builtin_pseudo_serial_ports(self) -> None:
+        with self.assertRaisesRegex(RuntimeError, "no USB serial device"):
+            choose_serial_port(
+                None,
+                candidates=(
+                    SerialPortCandidate(
+                        "/dev/cu.Bluetooth-Incoming-Port", None, "Bluetooth-Incoming-Port"
+                    ),
+                    SerialPortCandidate("/dev/cu.debug-console", None, "debug-console"),
+                ),
+            )
+
+    def test_keeps_an_explicit_port_override(self) -> None:
+        self.assertEqual(
+            choose_serial_port(
+                "/dev/cu.usbmodem-custom",
+                candidates=(SerialPortCandidate("/dev/cu.usbmodem-other", 0x303A, "Espressif"),),
+            ),
+            "/dev/cu.usbmodem-custom",
+        )
 
 
 if __name__ == "__main__":
