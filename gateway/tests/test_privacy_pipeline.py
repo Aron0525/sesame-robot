@@ -7,11 +7,13 @@ from sesame_voice_gateway.observability import ObservabilityStore
 from sesame_voice_gateway.pipeline import ConversationContext, ConversationPipeline
 from sesame_voice_gateway.privacy import PrivacyPolicyViolation, validate_remote_pcm
 from sesame_voice_gateway.providers.base import (
+    AgentToolCall,
     AgentResult,
     AsrResult,
     ExpressionSpec,
     VoiceSpec,
 )
+from sesame_voice_gateway.tools.web_search import WebSearchRequest, WebSearchResult, WebSearchSource
 from sesame_voice_gateway.providers.dashscope import DashScopeAudioClient
 
 
@@ -51,9 +53,43 @@ class FakeAgent:
         )
 
 
+class SearchThenAnswerAgent:
+    def __init__(self) -> None:
+        self.prompts: list[str] = []
+
+    async def reply(self, *, text: str, allow_web_search: bool = False, **_: object) -> AgentResult | AgentToolCall:
+        self.prompts.append(text)
+        if allow_web_search:
+            return AgentToolCall(name="web_search", arguments={"query": "深圳明天天气"})
+        return AgentResult(
+            text="深圳明天多云，气温 25°C。",
+            voice=VoiceSpec(),
+            expression=ExpressionSpec(name="thinking", ttl_ms=1_000),
+        )
+
+
+class FakeWebSearch:
+    def __init__(self) -> None:
+        self.requests: list[WebSearchRequest] = []
+
+    async def search(self, request: WebSearchRequest) -> WebSearchResult:
+        self.requests.append(request)
+        return WebSearchResult(
+            summary="深圳明天多云，气温 25°C。",
+            sources=(
+                WebSearchSource(
+                    title="深圳天气",
+                    url="https://weather.example.test/shenzhen",
+                    snippet="多云",
+                    published_at="2026-08-03",
+                ),
+            ),
+        )
+
+
 class FakeTts:
     async def synthesize(self, text: str, voice: VoiceSpec) -> bytes:
-        if text != "合成测试回复":
+        if text not in {"合成测试回复", "深圳明天多云，气温 25°C。"}:
             raise ValueError("unexpected test text")
         return b"\x00" * 640
 
@@ -182,6 +218,31 @@ class PrivacyAndPipelineTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.transcript.text, "合成测试请求")
         self.assertEqual(result.opus_packets, (b"downlink-opus",))
         self.assertEqual(result.generation_id, 1)
+
+    async def test_pipeline_executes_one_web_search_then_generates_the_final_reply(self) -> None:
+        agent = SearchThenAnswerAgent()
+        search = FakeWebSearch()
+        pipeline = ConversationPipeline(
+            codec_factory=FakeCodec,
+            asr=FakeAsr(),
+            agent=agent,
+            tts=FakeTts(),
+            web_search=search,
+        )
+
+        result = await pipeline.process_turn(
+            context=ConversationContext(
+                device_id="device",
+                user_id="user",
+                conversation_id="conversation",
+                turn_id="turn",
+            ),
+            opus_packets=[b"uplink-opus"],
+        )
+
+        self.assertEqual(search.requests, [WebSearchRequest(query="深圳明天天气")])
+        self.assertEqual(result.agent.text, "深圳明天多云，气温 25°C。")
+        self.assertIn("UNTRUSTED_WEB_SEARCH_RESULT", agent.prompts[1])
 
     async def test_pipeline_replies_when_asr_returns_no_speech(self) -> None:
         tts = RecordingTts()

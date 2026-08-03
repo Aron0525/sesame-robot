@@ -50,6 +50,14 @@ class ActionSpec:
 
 
 @dataclass(frozen=True, slots=True)
+class AgentToolCall:
+    """A model request that must be authorized and executed by the Gateway."""
+
+    name: str
+    arguments: dict[str, object]
+
+
+@dataclass(frozen=True, slots=True)
 class AgentResult:
     text: str
     voice: VoiceSpec = field(default_factory=VoiceSpec)
@@ -74,7 +82,8 @@ class AgentProvider(Protocol):
         user_id: str,
         conversation_id: str,
         turn_id: str,
-    ) -> AgentResult: ...
+        allow_web_search: bool = False,
+    ) -> AgentResult | AgentToolCall: ...
 
 
 class TtsProvider(Protocol):

@@ -59,6 +59,7 @@ from sesame_voice_gateway.providers.dashscope import (
 )
 from sesame_voice_gateway.sandbox_cleanup import OpenClawSandboxReaper
 from sesame_voice_gateway.serial_monitor import FirmwareSerialMonitor
+from sesame_voice_gateway.tools.web_search import DashScopeWebSearchProvider, WebSearchProvider
 
 logger = logging.getLogger(__name__)
 
@@ -284,6 +285,7 @@ def _build_pipeline(
     asr: AsrProvider
     agent: AgentProvider
     tts: TtsProvider
+    web_search: WebSearchProvider | None = None
 
     dashscope_client: DashScopeAudioClient | None = None
     if settings.asr_provider == "dashscope" or settings.tts_provider == "dashscope":
@@ -327,6 +329,16 @@ def _build_pipeline(
         audio_format=audio_format,
     )
 
+    if settings.web_search_enabled:
+        if settings.dashscope_api_key is None:
+            raise ValueError("DashScope API key is required for web search")
+        web_search = DashScopeWebSearchProvider(
+            api_key=settings.dashscope_api_key.get_secret_value(),
+            http_base_url=settings.dashscope_http_base_url,
+            model=settings.web_search_model,
+            timeout_seconds=settings.web_search_timeout_seconds,
+        )
+
     return ConversationPipeline(
         codec_factory=lambda: OpusCodec(audio_format),
         asr=asr,
@@ -334,6 +346,7 @@ def _build_pipeline(
         tts=tts,
         audio_format=audio_format,
         observer=observer,
+        web_search=web_search,
     )
 
 
@@ -342,6 +355,7 @@ def _provider_status(settings: Settings) -> dict[str, str]:
         "asr": settings.asr_provider,
         "agent": settings.provider_mode,
         "tts": settings.tts_provider,
+        "web_search": settings.web_search_model if settings.web_search_enabled else "disabled",
         "opus": "libopus",
     }
 

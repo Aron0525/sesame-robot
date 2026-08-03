@@ -70,6 +70,15 @@ OpenClaw Gateway 保持 loopback 绑定，不向 ESP32-S3 或局域网暴露。
 
 OpenClaw 原生事件可能随锁定版本变化，Adapter 必须把它们映射为项目内部固定 Schema。具体 OpenClaw RPC method 只有在锁定版本后才能写入实现。
 
+## 受控联网搜索
+
+当 Voice Gateway 配置了联网搜索，OpenClaw 可以在第一轮返回 `agent-response.v2` 的
+`requires_tool` 请求，且只允许 `web_search(query, freshness_days?)`；`freshness_days` 只能是
+`7`、`30`、`180` 或 `365`。Gateway 校验参数、
+执行一次 DashScope 搜索，再将来源受限的结果作为不可信证据送回 OpenClaw。第二轮必须返回
+原有的 `agent-response.v1` `completed` 结果；不允许再次请求工具。OpenClaw 不获得搜索 API Key、
+任意 URL 访问或网页抓取权限。
+
 ## 数据边界
 
 允许发送：

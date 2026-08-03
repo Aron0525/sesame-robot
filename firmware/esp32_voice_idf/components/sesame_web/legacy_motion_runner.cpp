@@ -8,6 +8,7 @@
 
 #include "sesame_robot/esp32_servo_driver.h"
 #include "sesame_ui/oled_expression_display.h"
+#include "sesame_web/legacy_motion_calibration.h"
 
 // The migrated movement table was originally written for Arduino globals.
 // Keep that narrow compatibility seam here rather than duplicating or
@@ -43,7 +44,10 @@ sesame::ui::FaceAnimationMode to_display_face_mode(FaceAnimMode mode) {
 
 void setServoAngle(uint8_t channel, int angle) {
   if (g_runner == nullptr || angle < 0 || angle > 180) return;
-  g_runner->set_servo_angle(channel, static_cast<uint8_t>(angle));
+  g_runner->set_servo_angle(
+      channel,
+      sesame::web::physical_angle_for_legacy_motion(
+          channel, static_cast<uint8_t>(angle)));
 }
 
 void setFace(const String& face_name) {

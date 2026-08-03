@@ -45,4 +45,18 @@ Opus 上行、`response.plan`、TTS 和播放完成日志为监控台事件。�
 - DashScope ASR/TTS。
 - 本机回环地址上的 OpenClaw Gateway（只接收 ASR 文本）。
 
+## 联网搜索
+
+联网搜索默认关闭。它复用现有的 DashScope API Key，但只有 Voice Gateway 能调用；
+OpenClaw 只能返回受限的 `web_search` 请求，不能直接访问网络、URL 或 API Key。
+
+```text
+SESAME_WEB_SEARCH_ENABLED=true
+SESAME_WEB_SEARCH_MODEL=qwen-plus
+SESAME_WEB_SEARCH_TIMEOUT_SECONDS=15
+```
+
+每轮最多执行一次搜索。Gateway 会校验查询长度与可选时效参数，向 OpenClaw 返回有界、
+不可信的搜索证据，再要求它生成最终回复。搜索失败时本轮安全失败，不会回退到任意网页抓取。
+
 协议和设备能力的唯一来源在项目根目录的 [`contracts`](../contracts)。部署与安全说明在 [`docs`](../docs)。

@@ -10,6 +10,7 @@ from typing import Protocol
 from sesame_voice_gateway.policy import validate_agent_result, validate_asr_result
 from sesame_voice_gateway.privacy import validate_remote_pcm, validate_remote_tts_text
 from sesame_voice_gateway.providers.base import (
+    AgentToolCall,
     AgentProvider,
     AgentResult,
     AsrProvider,
@@ -19,6 +20,13 @@ from sesame_voice_gateway.providers.base import (
     NoSpeechDetected,
     TtsProvider,
     VoiceSpec,
+)
+from sesame_voice_gateway.tools.web_search import (
+    WebSearchPolicyError,
+    WebSearchProvider,
+    WebSearchUnavailableError,
+    format_untrusted_web_search_result,
+    validate_web_search_request,
 )
 
 MAX_UPLINK_PACKETS = 1_500
@@ -114,6 +122,7 @@ class ConversationPipeline:
         tts: TtsProvider,
         audio_format: AudioFormat | None = None,
         observer: TurnObserver | None = None,
+        web_search: WebSearchProvider | None = None,
     ) -> None:
         self._codec_factory = codec_factory
         self._asr = asr
@@ -121,6 +130,7 @@ class ConversationPipeline:
         self._tts = tts
         self._audio_format = audio_format or AudioFormat()
         self._observer = observer
+        self._web_search = web_search
         self._generation_id = 0
         self._generation_lock = asyncio.Lock()
 
@@ -237,12 +247,18 @@ class ConversationPipeline:
             agent_started_at = time.perf_counter()
             self._record_stage(context=context, stage="openclaw", status="started")
             try:
-                agent_result = await self._agent.reply(
+                agent_reply = await self._agent.reply(
                     text=transcript.text,
                     device_id=context.device_id,
                     user_id=context.user_id,
                     conversation_id=context.conversation_id,
                     turn_id=context.turn_id,
+                    allow_web_search=self._web_search is not None,
+                )
+                agent_result = await self._resolve_agent_tool_call(
+                    agent_reply=agent_reply,
+                    original_text=transcript.text,
+                    context=context,
                 )
             except Exception as exc:
                 self._record_failure(
@@ -325,6 +341,56 @@ class ConversationPipeline:
             generation_id=generation_id,
             opus_packets=opus_output,
         )
+
+    async def _resolve_agent_tool_call(
+        self,
+        *,
+        agent_reply: AgentResult | AgentToolCall,
+        original_text: str,
+        context: ConversationContext,
+    ) -> AgentResult:
+        if isinstance(agent_reply, AgentResult):
+            return agent_reply
+        if self._web_search is None or agent_reply.name != "web_search":
+            raise PolicyViolation("agent requested an unavailable tool")
+        try:
+            request = validate_web_search_request(agent_reply.arguments)
+        except WebSearchPolicyError as exc:
+            raise PolicyViolation("agent requested invalid web-search arguments") from exc
+
+        started_at = time.perf_counter()
+        self._record_stage(context=context, stage="web_search", status="started")
+        try:
+            result = await self._web_search.search(request)
+        except WebSearchUnavailableError as exc:
+            self._record_failure(
+                context=context,
+                stage="web_search",
+                started_at=started_at,
+                exc=exc,
+            )
+            raise
+        self._record_stage(
+            context=context,
+            stage="web_search",
+            status="completed",
+            elapsed_ms=self._elapsed_ms(started_at),
+            details={"source_count": len(result.sources)},
+        )
+        final_reply = await self._agent.reply(
+            text=(
+                f"Original user request: {original_text}\n\n"
+                f"{format_untrusted_web_search_result(result)}"
+            ),
+            device_id=context.device_id,
+            user_id=context.user_id,
+            conversation_id=context.conversation_id,
+            turn_id=context.turn_id,
+            allow_web_search=False,
+        )
+        if isinstance(final_reply, AgentToolCall):
+            raise PolicyViolation("agent requested more than one tool call in a turn")
+        return final_reply
 
     async def _next_generation_id(self) -> int:
         async with self._generation_lock:

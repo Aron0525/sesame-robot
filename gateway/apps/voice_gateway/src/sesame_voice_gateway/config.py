@@ -70,6 +70,11 @@ class Settings(BaseSettings):
     dashscope_tts_model: str = "qwen-audio-3.0-tts-flash"
     dashscope_tts_voice_id: str = "longanhuan_v3.6"
     dashscope_timeout_seconds: float = Field(default=30.0, gt=0, le=120)
+    # Web Search is opt-in: it sends text queries to DashScope but never grants
+    # OpenClaw direct network access or the DashScope credential.
+    web_search_enabled: bool = False
+    web_search_model: str = Field(default="qwen-plus", min_length=1, max_length=100)
+    web_search_timeout_seconds: float = Field(default=15.0, gt=0, le=60)
 
     openclaw_url: str = "ws://127.0.0.1:18789"
     openclaw_agent_id: str = Field(default="sesame", pattern=r"^[a-z0-9][a-z0-9_-]{0,63}$")
@@ -90,9 +95,9 @@ class Settings(BaseSettings):
                 "SESAME_TLS_CERT_FILE and SESAME_TLS_KEY_FILE are required when TLS is enabled"
             )
         uses_dashscope = self.asr_provider == "dashscope" or self.tts_provider == "dashscope"
-        if uses_dashscope and self.dashscope_api_key is None:
+        if (uses_dashscope or self.web_search_enabled) and self.dashscope_api_key is None:
             raise ValueError(
-                "SESAME_DASHSCOPE_API_KEY is required for DashScope audio providers"
+                "SESAME_DASHSCOPE_API_KEY is required for DashScope providers"
             )
         if uses_dashscope and not self.allow_remote_speech:
             raise ValueError(

@@ -9,6 +9,7 @@ SCHEMA_NAMES = frozenset(
     {
         "agent-request.v1.schema.json",
         "agent-response.v1.schema.json",
+        "agent-response.v2.schema.json",
         "control-event.v1.schema.json",
     }
 )
