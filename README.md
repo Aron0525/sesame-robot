@@ -29,10 +29,22 @@ ops/openclaw/              固定版本的 OpenClaw 安装入口
    DHCP IPv4 可作为不支持 mDNS 的备用入口。电脑和 ESP32 必须位于同一非访客
    Wi-Fi/VLAN，且网络不得拦截客户端之间的 mDNS 和 TCP 连接。
 
-## 当前边界
+## v1.3.2 项目状态
 
-- 已整理出 ESP32 语音固件、电脑网关和协议的完整代码路径。
-- 真实硬件的 I2S 接线、TLS 证书、云端 ASR/TTS 凭据与 OpenClaw token 仍需在本机完成配置和联调。
-- 网关和协议只允许 `stop`、`rest`、`stand`、`wave` 四个模型动作；本地网页控制保留完整的受校验动作和舵机调试能力。
+完整的版本说明见 [v1.3.2 发布说明](docs/releases/v1.3.2.md)。以下只列当前事实，避免将代码存在误写为实机闭环已经完成。
+
+### 已实现
+
+- ESP32-S3 固件、Voice Gateway 和共享 JSON/音频契约已整理为单一运行链路；固件包含 I2S、Opus、WSS、网页控制、OLED、舵机和独立 NVS 配置。
+- Gateway 已实现 ASR → OpenClaw → TTS 编排、受限 `response.plan`、中断处理、监控台和串口事件翻译。
+- 基础聊天与可选联网搜索已实现；联网搜索默认关闭，仅 Gateway 可使用 DashScope，并对模型提出的查询、时效和结果进行边界校验。
+- OLED 表情、可扩展表情资源、本地网页动作/舵机调试已实现；模型动作仅允许 `stop`、`rest`、`stand`、`wave`。
+
+### 未完成或待实机验收
+
+- 当前实机环境未发现 NVS 中配置的 2.4 GHz Wi-Fi，WSS 会话尚未在该环境建立。
+- BOOT 录音到 ASR、OpenClaw、TTS Opus 播放、表情、模型动作及播放中断的完整 P2 硬件闭环待验收。
+- 动作控制在真实语音闭环中的稳定触发、完成确认和异常恢复仍需调试；修正版 OLED 显示也待新的实机验证。
+- 云端 ASR/TTS、OpenClaw 与联网搜索均需要本机配置凭据；音乐流媒体只有设计方案，未在本版本实现。
 
 硬件模块、GPIO 和供电关系见 [硬件模块清单](docs/hardware_modules.md)。

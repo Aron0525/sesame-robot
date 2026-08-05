@@ -7,6 +7,7 @@ mkdir -p "$build_dir"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_robot/include" \
+  -I"$project_root/components/sesame_web/include" \
   "$project_root/tests/test_servo_calibration.cpp" \
   -o "$build_dir/test_servo_calibration"
 "$build_dir/test_servo_calibration"
