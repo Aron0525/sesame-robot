@@ -35,3 +35,16 @@ c++ -std=c++20 -Wall -Wextra -Werror \
   "$project_root/components/sesame_transport/transport_policy.cpp" \
   -o "$build_dir/test_transport_policy"
 "$build_dir/test_transport_policy"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_voice_turn_detector.cpp" \
+  "$project_root/components/sesame_voice/voice_turn_detector.cpp" \
+  -o "$build_dir/test_voice_turn_detector"
+"$build_dir/test_voice_turn_detector"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_wake_capture_policy.cpp" \
+  -o "$build_dir/test_wake_capture_policy"
+"$build_dir/test_wake_capture_policy"

@@ -26,6 +26,7 @@ enum class ControlEventType {
   kTtsFlush,
   kExpressionSet,
   kActionExecute,
+  kOperatorControl,
   kActionResult,
   kError,
 };

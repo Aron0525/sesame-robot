@@ -201,6 +201,29 @@
       "if": {
         "properties": {
           "type": {
+            "const": "operator.control"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "turn_id": {
+            "const": null
+          },
+          "request_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "payload": {
+            "$ref": "#/$defs/operatorControlPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
             "const": "action.result"
           }
         }
@@ -251,6 +274,7 @@
         "tts.flush",
         "expression.set",
         "action.execute",
+        "operator.control",
         "action.result",
         "error"
       ]
@@ -634,6 +658,82 @@
           "minimum": 0
         }
       }
+    },
+    "operatorControlPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "action",
+            "expression",
+            "servo",
+            "settings",
+            "stop"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "expression": {
+          "type": "string",
+          "maxLength": 24
+        },
+        "servo": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "angle": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 180
+        },
+        "frame_delay_ms": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 1000
+        },
+        "walk_cycles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "motor_current_delay_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "action"}}},
+          "then": {"required": ["action"]}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "expression"}}},
+          "then": {"required": ["expression"]}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "servo"}}},
+          "then": {"required": ["servo", "angle"]}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "settings"}}},
+          "then": {
+            "required": [
+              "frame_delay_ms",
+              "walk_cycles",
+              "motor_current_delay_ms"
+            ]
+          }
+        }
+      ]
     },
     "actionResultPayload": {
       "type": "object",

@@ -21,6 +21,10 @@ GATEWAY_STOPPED=false
 SERIAL_CANDIDATES=()
 
 pause_before_exit() {
+  # The app bundle keeps this terminal open after flashing.  Restoring only in
+  # the EXIT trap meant the Gateway stayed offline until the user pressed
+  # Enter, even though the serial port was already free.
+  restore_gateway
   if [[ -t 0 ]]; then
     echo
     read -r "?按 Enter 键关闭此窗口..."
@@ -37,6 +41,7 @@ restore_gateway() {
   for attempt in {1..5}; do
     if launchctl bootstrap "${GATEWAY_DOMAIN}" "${GATEWAY_PLIST}" 2>/dev/null; then
       launchctl kickstart -k "${GATEWAY_TARGET}" 2>/dev/null || true
+      GATEWAY_STOPPED=false
       echo "Gateway 已重新启动。"
       return
     fi
@@ -207,4 +212,7 @@ idf.py -p "${PORT}" -b 115200 -B "${BUILD_DIR}" build flash
 
 echo "烧录完成：ESP32 已自动重启。"
 echo "等待 Gateway 重连后，按 BOOT 一次开始录音、再按一次结束。"
+# Restore before the terminal's optional Enter prompt, rather than holding the
+# local web console offline while the user reads this success message.
+restore_gateway
 pause_before_exit

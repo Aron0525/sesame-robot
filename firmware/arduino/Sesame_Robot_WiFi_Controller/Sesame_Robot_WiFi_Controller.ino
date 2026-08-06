@@ -109,10 +109,6 @@ const int servoPins[8] = {4, 5, 6, 7, 10, 11, 12, 13};
 // Lolin S2 Mini Pinout
 //const int servoPins[8] = {1, 2, 4, 6, 8, 10, 13, 14};
 
-// Subtrim values for each servo (offset in degrees)
-int8_t servoSubtrim[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-
 // Animation constants
 int frameDelay = 100;
 int walkCycles = 10;
@@ -556,45 +552,6 @@ void loop() {
         else if(strcmp(command_buffer, "rn sg") == 0) { currentCommand = "shrug"; runShrugPose(); }
         else if(strcmp(command_buffer, "rn dd") == 0) { currentCommand = "dead"; runDeadPose(); }
         else if(strcmp(command_buffer, "rn cb") == 0) { currentCommand = "crab"; runCrabPose(); }
-        else if (strcmp(command_buffer, "subtrim") == 0 || strcmp(command_buffer, "st") == 0) {
-          Serial.println("Subtrim values:");
-          for (int i = 0; i < 8; i++) {
-            Serial.print("Motor "); Serial.print(i); Serial.print(": ");
-            if (servoSubtrim[i] >= 0) Serial.print("+");
-            Serial.println(servoSubtrim[i]);
-          }
-        }
-        else if (strcmp(command_buffer, "subtrim save") == 0 || strcmp(command_buffer, "st save") == 0) {
-          Serial.println("Copy and paste this into your code:");
-          Serial.print("int8_t servoSubtrim[8] = {");
-          for (int i = 0; i < 8; i++) {
-            Serial.print(servoSubtrim[i]);
-            if (i < 7) Serial.print(", ");
-          }
-          Serial.println("};");
-        }
-        else if (strncmp(command_buffer, "subtrim reset", 13) == 0 || strncmp(command_buffer, "st reset", 8) == 0) {
-          for (int i = 0; i < 8; i++) servoSubtrim[i] = 0;
-          Serial.println("All subtrim values reset to 0");
-        }
-        else if (strncmp(command_buffer, "subtrim ", 8) == 0 || strncmp(command_buffer, "st ", 3) == 0) {
-          const char* params = (command_buffer[1] == 't') ? command_buffer + 3 : command_buffer + 8;
-          int trimMotor, trimValue;
-          if (sscanf(params, "%d %d", &trimMotor, &trimValue) == 2) {
-            if (trimMotor >= 0 && trimMotor < 8) {
-              if (trimValue >= -90 && trimValue <= 90) {
-                servoSubtrim[trimMotor] = trimValue;
-                Serial.print("Motor "); Serial.print(trimMotor); Serial.print(" subtrim set to ");
-                if (trimValue >= 0) Serial.print("+");
-                Serial.println(trimValue);
-              } else {
-                Serial.println("Subtrim value must be between -90 and +90");
-              }
-            } else {
-              Serial.println("Invalid motor number (0-7)");
-            }
-          }
-        }
         else if (strncmp(command_buffer, "all ", 4) == 0) {
              if (sscanf(command_buffer + 4, "%d", &angle) == 1) {
                  for (int i = 0; i < 8; i++) setServoAngle(i, angle);
@@ -782,10 +739,10 @@ void updateIdleBlink() {
 }
 
 // ====== HELPERS ======
-void setServoAngle(uint8_t channel, int angle) { 
-  if (channel < 8) {
-    int adjustedAngle = constrain(angle + servoSubtrim[channel], 0, 180);
-    servos[channel].write(adjustedAngle);
+void setServoAngle(uint8_t channel, int angle) {
+  if (channel < 8 && angle >= 0 && angle <= 180) {
+    const int outputAngle = (channel == R3 || channel == L4) ? min(angle, 150) : angle;
+    servos[channel].write(outputAngle);
     delayWithFace(motorCurrentDelay);
   }
 }

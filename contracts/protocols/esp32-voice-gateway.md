@@ -59,8 +59,12 @@ response.plan
 tts.start
 tts.stop
 tts.flush
+operator.control
 error
 ```
+
+`operator.control` 是本机统一控制台下发的带 `request_id` 命令，`turn_id` 固定为
+`null`。它与模型生成的 `response.plan` 分开，不扩大模型动作白名单。
 
 ### Control sequence
 
@@ -136,3 +140,9 @@ Python `struct` 格式为 `!4sBBHIIIQI`。单个 Opus payload 上限为 1500 字
 
 `action_deadline_ms` 与该控制帧顶层 `timestamp_ms` 使用同一网关时钟。ESP32 只
 使用两者的差值换算为本地截止时间，因此不依赖电脑与 ESP32 的系统时钟同步。
+
+## 本机操作员控制
+
+`operator.control.payload.kind` 支持 `stop`、`action`、`expression`、`servo` 和
+`settings`。网关只向当前已认证、已连接的目标设备发送；ESP32 校验会话绑定、
+字段范围和操作员动作白名单，执行后使用同一 `request_id` 返回 `action.result`。

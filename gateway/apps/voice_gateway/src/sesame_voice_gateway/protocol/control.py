@@ -25,6 +25,7 @@ ControlEventType = Literal[
     "tts.flush",
     "expression.set",
     "action.execute",
+    "operator.control",
     "action.result",
     "error",
 ]

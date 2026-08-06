@@ -27,6 +27,7 @@ constexpr TypeName kTypeNames[] = {
     {ControlEventType::kTtsFlush, "tts.flush"},
     {ControlEventType::kExpressionSet, "expression.set"},
     {ControlEventType::kActionExecute, "action.execute"},
+    {ControlEventType::kOperatorControl, "operator.control"},
     {ControlEventType::kActionResult, "action.result"},
     {ControlEventType::kError, "error"},
 };

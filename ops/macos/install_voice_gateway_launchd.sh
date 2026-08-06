@@ -41,6 +41,10 @@ cat >"$plist" <<EOF
   <true/>
   <key>KeepAlive</key>
   <true/>
+  <key>ThrottleInterval</key>
+  <integer>5</integer>
+  <key>ProcessType</key>
+  <string>Background</string>
   <key>Umask</key>
   <integer>63</integer>
   <key>StandardOutPath</key>
@@ -52,7 +56,15 @@ cat >"$plist" <<EOF
 EOF
 
 launchctl bootout "gui/$user_id/$label" 2>/dev/null || true
-launchctl bootstrap "gui/$user_id" "$plist"
+attempt=1
+while ! launchctl bootstrap "gui/$user_id" "$plist" 2>/dev/null; do
+  if [ "$attempt" -ge 10 ]; then
+    echo "Voice Gateway launchd 服务注册失败：$label" >&2
+    exit 1
+  fi
+  attempt=$((attempt + 1))
+  sleep 1
+done
 launchctl kickstart -k "gui/$user_id/$label"
 launchctl print "gui/$user_id/$label" >/dev/null
 

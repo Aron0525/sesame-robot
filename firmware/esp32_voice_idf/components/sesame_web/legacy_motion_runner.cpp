@@ -8,7 +8,6 @@
 
 #include "sesame_robot/esp32_servo_driver.h"
 #include "sesame_ui/oled_expression_display.h"
-#include "sesame_web/legacy_motion_calibration.h"
 
 // The migrated movement table was originally written for Arduino globals.
 // Keep that narrow compatibility seam here rather than duplicating or
@@ -23,6 +22,9 @@ String currentCommand;
 namespace {
 
 constexpr char kTag[] = "sesame_web_motion";
+// Movement routines use small fixed locals; 4 KiB fits in the available internal
+// heap after voice/WakeNet startup, whereas the previous 6 KiB task could fail.
+constexpr uint32_t kMotionTaskStackBytes = 4096;
 sesame::web::LegacyMotionRunner* g_runner = nullptr;
 
 sesame::ui::FaceAnimationMode g_face_mode =
@@ -44,10 +46,7 @@ sesame::ui::FaceAnimationMode to_display_face_mode(FaceAnimMode mode) {
 
 void setServoAngle(uint8_t channel, int angle) {
   if (g_runner == nullptr || angle < 0 || angle > 180) return;
-  g_runner->set_servo_angle(
-      channel,
-      sesame::web::physical_angle_for_legacy_motion(
-          channel, static_cast<uint8_t>(angle)));
+  g_runner->set_servo_angle(channel, static_cast<uint8_t>(angle));
 }
 
 void setFace(const String& face_name) {
@@ -96,19 +95,34 @@ LegacyMotionRunner::LegacyMotionRunner(robot::Esp32ServoDriver* servos,
 }
 
 bool LegacyMotionRunner::start(std::string_view action) {
-  if (servos_ == nullptr || action.empty() || busy_.exchange(true)) return false;
+  if (servos_ == nullptr) {
+    ESP_LOGW(kTag, "web movement rejected: servo driver unavailable");
+    return false;
+  }
+  if (action.empty()) {
+    ESP_LOGW(kTag, "web movement rejected: empty action");
+    return false;
+  }
+  if (busy_.exchange(true)) {
+    ESP_LOGW(kTag, "web movement rejected: runner busy (action=%.*s)",
+             static_cast<int>(action.size()), action.data());
+    return false;
+  }
 
   copy_string(&active_action_, action);
   cancel_requested_.store(false);
   if (display_ != nullptr) display_->exit_idle();
   if (!servos_->begin_web_motion()) {
+    ESP_LOGW(kTag, "web movement rejected: servo driver not running");
     busy_.store(false);
     active_action_[0] = '\0';
     return false;
   }
 
-  if (xTaskCreatePinnedToCore(task_entry, "sesame_web_motion", 6144, this, 5,
+  if (xTaskCreatePinnedToCore(task_entry, "sesame_web_motion",
+                              kMotionTaskStackBytes, this, 5,
                               &task_, 1) != pdPASS) {
+    ESP_LOGW(kTag, "web movement rejected: task creation failed");
     servos_->end_web_control(true);
     busy_.store(false);
     active_action_[0] = '\0';

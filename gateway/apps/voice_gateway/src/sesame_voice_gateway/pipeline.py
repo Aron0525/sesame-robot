@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import struct
 import time
 from collections.abc import Callable
@@ -21,6 +22,7 @@ from sesame_voice_gateway.providers.base import (
     TtsProvider,
     VoiceSpec,
 )
+from sesame_voice_gateway.recordings import TestRecordingStore
 from sesame_voice_gateway.tools.web_search import (
     WebSearchPolicyError,
     WebSearchProvider,
@@ -31,6 +33,7 @@ from sesame_voice_gateway.tools.web_search import (
 
 MAX_UPLINK_PACKETS = 1_500
 NO_SPEECH_REPLY = "抱歉，我没有听清，请再说一遍。"
+logger = logging.getLogger(__name__)
 
 
 def pcm_signal_metrics(pcm: bytes, *, sample_rate_hz: int = 16_000) -> dict[str, int]:
@@ -123,6 +126,7 @@ class ConversationPipeline:
         audio_format: AudioFormat | None = None,
         observer: TurnObserver | None = None,
         web_search: WebSearchProvider | None = None,
+        recording_store: TestRecordingStore | None = None,
     ) -> None:
         self._codec_factory = codec_factory
         self._asr = asr
@@ -131,6 +135,7 @@ class ConversationPipeline:
         self._audio_format = audio_format or AudioFormat()
         self._observer = observer
         self._web_search = web_search
+        self._recording_store = recording_store
         self._generation_id = 0
         self._generation_lock = asyncio.Lock()
 
@@ -196,6 +201,7 @@ class ConversationPipeline:
         if len(pcm) % self._audio_format.sample_width_bytes:
             raise ValueError("PCM audio must contain complete samples")
         validate_remote_pcm(pcm)
+        await self._save_test_recording(context=context, pcm=pcm)
         asr_started_at = time.perf_counter()
         self._record_stage(
             context=context,
@@ -340,6 +346,49 @@ class ConversationPipeline:
             agent=agent_result,
             generation_id=generation_id,
             opus_packets=opus_output,
+        )
+
+    async def _save_test_recording(self, *, context: ConversationContext, pcm: bytes) -> None:
+        if self._recording_store is None:
+            return
+        try:
+            artifact = await asyncio.to_thread(
+                self._recording_store.save,
+                device_id=context.device_id,
+                turn_id=context.turn_id,
+                pcm=pcm,
+                audio_format=self._audio_format,
+            )
+        except Exception as exc:
+            logger.warning(
+                "test_recording_save_failed device_id=%s turn_id=%s error_type=%s",
+                context.device_id,
+                context.turn_id,
+                type(exc).__name__,
+            )
+            self._record_stage(
+                context=context,
+                stage="test.recording",
+                status="failed",
+                details={"error_type": type(exc).__name__},
+            )
+            return
+        if artifact is None:
+            self._record_stage(
+                context=context,
+                stage="test.recording",
+                status="limit_reached",
+            )
+            return
+        self._record_stage(
+            context=context,
+            stage="test.recording",
+            status="completed",
+            details={
+                "index": artifact.index,
+                "path": str(artifact.path),
+                "duration_ms": artifact.duration_ms,
+            },
         )
 
     async def _resolve_agent_tool_call(

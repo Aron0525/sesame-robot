@@ -1,6 +1,7 @@
 # Runtime secrets and generated files
 gateway/.env
 gateway/.venv/
+gateway/test-recordings/
 gateway/__pycache__/
 gateway/**/__pycache__/
 gateway/**/.pytest_cache/

@@ -38,6 +38,17 @@ SESAME_DASHBOARD_DEBUG_CONTENT=true
 Opus 上行、`response.plan`、TTS 和播放完成日志为监控台事件。此时不要并行运行
 `idf.py monitor`、Arduino Serial Monitor 或 `screen`；一个串口同一时刻只能由一个进程读取。
 
+## 机器人统一控制台
+
+在运行网关的这台电脑浏览器打开：
+
+```text
+https://localhost:8765/console
+```
+
+控制台复用监控台的实时状态流，并可向已连接 ESP32 下发停止、动作、表情、
+单舵机角度和运动参数。此页面与对应 API 仅允许本机访问；设备离线时命令不会入队。
+
 ## 运行依赖
 
 - Python 3.12、`uv`、系统 `libopus`。

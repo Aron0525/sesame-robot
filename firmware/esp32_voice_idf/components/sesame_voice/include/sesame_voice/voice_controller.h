@@ -18,6 +18,8 @@
 #include "sesame_transport/gateway_client.h"
 #include "sesame_transport/transport_policy.h"
 #include "sesame_voice/recording_button.h"
+#include "sesame_voice/voice_turn_detector.h"
+#include "sesame_voice/wake_vad_engine.h"
 
 namespace sesame::voice {
 
@@ -80,7 +82,13 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   void enqueue_gateway_event(GatewayEventKind kind, const void* data,
                              size_t size);
   void handle_button(ButtonEvent event, uint64_t now_ms);
-  void capture_and_send(uint64_t now_ms);
+  void capture_and_process(uint64_t now_ms);
+  void process_wake_vad_signals(uint64_t now_ms);
+  void handle_voice_turn_event(VoiceTurnEvent event, uint64_t now_ms);
+  void begin_listening(uint64_t now_ms, const char* source);
+  void finish_listening(const char* source);
+  void send_pcm_frame(const int16_t* pcm, size_t samples, uint64_t now_ms);
+  esp_err_t play_wake_acknowledgement();
   void play_pending_audio();
   esp_err_t send_control(sesame::protocol::ControlEventType type,
                          const char* payload_json,
@@ -101,6 +109,8 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   sesame::transport::GatewayClient gateway_;
   sesame::protocol::TurnStateMachine turn_state_;
   RecordingButton button_{40, 30000};
+  WakeVadEngine wake_vad_;
+  VoiceTurnDetector turn_detector_{kWakeVoiceTurnConfig};
   QueueHandle_t downlink_queue_{nullptr};
   QueueHandle_t gateway_event_queue_{nullptr};
   TaskHandle_t task_{nullptr};

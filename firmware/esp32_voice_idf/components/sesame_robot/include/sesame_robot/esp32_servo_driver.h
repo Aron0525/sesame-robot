@@ -34,10 +34,10 @@ class Esp32ServoDriver final : public RobotDriver, public MotionOutput {
   // its task; a manual slider keeps its selected pulse until an explicit Stop
   // or a safety takeover releases it.
   bool begin_web_motion();
-  bool begin_manual_control();
+  bool begin_manual_control() override;
   void end_web_control(bool release_outputs);
   bool set_motion_angle(uint8_t servo_index, uint8_t angle);
-  bool set_manual_angle(uint8_t servo_index, uint8_t angle);
+  bool set_manual_angle(uint8_t servo_index, uint8_t angle) override;
 
   void apply_pose(const std::array<uint8_t, 8>& angles) override;
   void release_all() override;

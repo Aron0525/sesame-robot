@@ -19,6 +19,19 @@ void cancel_local_web_motion(void* context) {
   auto* runner = static_cast<sesame::web::LegacyMotionRunner*>(context);
   if (runner != nullptr) runner->stop();
 }
+
+bool start_local_web_motion(void* context, const char* action) {
+  auto* runner = static_cast<sesame::web::LegacyMotionRunner*>(context);
+  return runner != nullptr && action != nullptr && runner->start(action);
+}
+
+bool configure_local_web_motion(void* context, int frame_delay_ms,
+                                int walk_cycles, int motor_current_delay_ms) {
+  auto* runner = static_cast<sesame::web::LegacyMotionRunner*>(context);
+  return runner != nullptr &&
+         runner->set_settings(frame_delay_ms, walk_cycles,
+                              motor_current_delay_ms);
+}
 }
 
 extern "C" void app_main() {
@@ -64,6 +77,8 @@ extern "C" void app_main() {
   static sesame::web::LegacyMotionRunner legacy_motion(&robot_driver, &display);
   static sesame::robot::RobotAdapter robot(&robot_driver, cancel_local_web_motion,
                                             &legacy_motion);
+  robot.set_action_executor(start_local_web_motion, &legacy_motion);
+  robot.set_motion_settings_executor(configure_local_web_motion, &legacy_motion);
   static sesame::web::WebControlServer web_control(&robot_driver, &display,
                                                     &legacy_motion);
   const esp_err_t web_result = web_control.start();

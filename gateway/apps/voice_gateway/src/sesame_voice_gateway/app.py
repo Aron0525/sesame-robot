@@ -57,6 +57,7 @@ from sesame_voice_gateway.providers.dashscope import (
     DashScopeAudioClient,
     DashScopeTtsProvider,
 )
+from sesame_voice_gateway.recordings import create_test_recording_store
 from sesame_voice_gateway.sandbox_cleanup import OpenClawSandboxReaper
 from sesame_voice_gateway.serial_monitor import FirmwareSerialMonitor
 from sesame_voice_gateway.tools.web_search import DashScopeWebSearchProvider, WebSearchProvider
@@ -85,6 +86,47 @@ REMOTE_ACTIONS = frozenset(
         "backward",
         "left",
         "right",
+    }
+)
+REMOTE_EXPRESSIONS = frozenset(
+    {
+        "default",
+        "idle",
+        "idle_blink",
+        "walk",
+        "rest",
+        "swim",
+        "dance",
+        "wave",
+        "point",
+        "stand",
+        "cute",
+        "pushup",
+        "freaky",
+        "bow",
+        "worm",
+        "shake",
+        "shrug",
+        "dead",
+        "crab",
+        "happy",
+        "talk_happy",
+        "sad",
+        "talk_sad",
+        "angry",
+        "talk_angry",
+        "surprised",
+        "talk_surprised",
+        "sleepy",
+        "talk_sleepy",
+        "love",
+        "talk_love",
+        "excited",
+        "talk_excited",
+        "confused",
+        "talk_confused",
+        "thinking",
+        "talk_thinking",
     }
 )
 
@@ -182,35 +224,77 @@ class RemoteControlRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    kind: Literal["action", "servo", "stop"]
+    kind: Literal["action", "expression", "servo", "settings", "stop"]
     action: str | None = None
+    expression: str | None = None
     servo: int | None = None
     angle: int | None = None
+    frame_delay_ms: int | None = None
+    walk_cycles: int | None = None
+    motor_current_delay_ms: int | None = None
 
     @model_validator(mode="after")
     def validate_shape(self) -> RemoteControlRequest:
         if self.kind == "action":
-            if self.action not in REMOTE_ACTIONS or self.servo is not None or self.angle is not None:
+            if (
+                self.action not in REMOTE_ACTIONS
+                or self.expression is not None
+                or self.servo is not None
+                or self.angle is not None
+                or self.frame_delay_ms is not None
+                or self.walk_cycles is not None
+                or self.motor_current_delay_ms is not None
+            ):
                 raise ValueError("action command must contain one supported action")
+        elif self.kind == "expression":
+            if (
+                self.expression not in REMOTE_EXPRESSIONS
+                or self.action is not None
+                or self.servo is not None
+                or self.angle is not None
+                or self.frame_delay_ms is not None
+                or self.walk_cycles is not None
+                or self.motor_current_delay_ms is not None
+            ):
+                raise ValueError("expression command must contain one supported expression")
         elif self.kind == "servo":
             if (
                 self.action is not None
+                or self.expression is not None
                 or self.servo is None
                 or self.angle is None
+                or self.frame_delay_ms is not None
+                or self.walk_cycles is not None
+                or self.motor_current_delay_ms is not None
                 or not 1 <= self.servo <= 8
                 or not 0 <= self.angle <= 180
             ):
                 raise ValueError("servo command must contain servo 1-8 and angle 0-180")
-        elif self.action is not None or self.servo is not None or self.angle is not None:
+        elif self.kind == "settings":
+            if (
+                self.action is not None
+                or self.expression is not None
+                or self.servo is not None
+                or self.angle is not None
+                or self.frame_delay_ms is None
+                or self.walk_cycles is None
+                or self.motor_current_delay_ms is None
+                or not 10 <= self.frame_delay_ms <= 1_000
+                or not 1 <= self.walk_cycles <= 50
+                or not 0 <= self.motor_current_delay_ms <= 500
+            ):
+                raise ValueError("settings command contains values outside the safe range")
+        elif (
+            self.action is not None
+            or self.expression is not None
+            or self.servo is not None
+            or self.angle is not None
+            or self.frame_delay_ms is not None
+            or self.walk_cycles is not None
+            or self.motor_current_delay_ms is not None
+        ):
             raise ValueError("stop command cannot contain parameters")
         return self
-
-    def payload(self) -> dict[str, Any]:
-        if self.kind == "action":
-            return {"kind": "action", "action": self.action}
-        if self.kind == "servo":
-            return {"kind": "servo", "servo": self.servo, "angle": self.angle}
-        return {"kind": "stop"}
 
 
 class ActiveDeviceSessionRegistry:
@@ -252,25 +336,26 @@ class DeviceControlRegistry:
             if current is not None and current[1].session_id == session.session_id:
                 del self._connections[session.device_id]
 
-    async def dispatch(self, device_id: str, payload: dict[str, Any]) -> None:
+    async def dispatch(self, device_id: str, command: RemoteControlRequest) -> None:
         async with self._lock:
             connection = self._connections.get(device_id)
         if connection is None:
             raise RuntimeError("device is offline")
         websocket, session = connection
-        if payload.get("kind") != "stop" and (
+        if command.kind != "stop" and (
             session.is_listening
             or session.active_generation != 0
             or (session.active_turn_task is not None and not session.active_turn_task.done())
         ):
             raise RuntimeError("device is busy with a voice turn")
+        payload = command.model_dump(exclude_none=True)
         try:
             await _send_control(
                 websocket,
                 session,
-                "remote.control",
+                "operator.control",
                 turn_id=None,
-                request_id=None,
+                request_id=f"ctl_{uuid.uuid4().hex}",
                 payload=payload,
             )
         except Exception as exc:
@@ -339,6 +424,12 @@ def _build_pipeline(
             timeout_seconds=settings.web_search_timeout_seconds,
         )
 
+    recording_store = create_test_recording_store(
+        enabled=settings.save_test_recordings,
+        output_directory=settings.test_recording_dir,
+        limit=settings.test_recording_limit,
+    )
+
     return ConversationPipeline(
         codec_factory=lambda: OpusCodec(audio_format),
         asr=asr,
@@ -347,6 +438,7 @@ def _build_pipeline(
         audio_format=audio_format,
         observer=observer,
         web_search=web_search,
+        recording_store=recording_store,
     )
 
 
@@ -367,6 +459,7 @@ def create_app(
     sandbox_reaper: SandboxReaper | None = None,
     mdns_advertiser: ServiceAdvertiser | None = None,
     observability: ObservabilityStore | None = None,
+    device_controls: DeviceControlRegistry | None = None,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
     resolved_observability = observability or ObservabilityStore(
@@ -379,6 +472,7 @@ def create_app(
     advertiser = mdns_advertiser or MdnsAdvertiser(resolved_settings)
     conversations = ConversationRegistry(ttl_seconds=resolved_settings.conversation_ttl_seconds)
     active_device_sessions = ActiveDeviceSessionRegistry()
+    resolved_device_controls = device_controls or DeviceControlRegistry()
     resolved_reaper = sandbox_reaper
     if resolved_reaper is None and resolved_settings.openclaw_sandbox_cleanup_enabled:
         resolved_reaper = OpenClawSandboxReaper()
@@ -448,6 +542,7 @@ def create_app(
 
     app = FastAPI(title="Sesame Voice Gateway", version="0.1.0", lifespan=lifespan)
     app.state.observability = resolved_observability
+    app.state.device_controls = resolved_device_controls
 
     @app.get("/healthz")
     async def health() -> dict[str, Any]:
@@ -464,6 +559,40 @@ def create_app(
             encoding="utf-8"
         )
         return HTMLResponse(html, headers={"Cache-Control": "no-store"})
+
+    @app.get("/console", response_class=HTMLResponse, include_in_schema=False)
+    async def console(request: Request) -> HTMLResponse:
+        _require_loopback_dashboard_access(request)
+        html = files("sesame_voice_gateway").joinpath("console.html").read_text(
+            encoding="utf-8"
+        )
+        return HTMLResponse(html, headers={"Cache-Control": "no-store"})
+
+    @app.post("/api/local-control/{device_id}", status_code=202, include_in_schema=False)
+    async def local_control(
+        device_id: str, command: RemoteControlRequest, request: Request
+    ) -> JSONResponse:
+        _require_loopback_dashboard_access(request)
+        try:
+            await resolved_device_controls.dispatch(device_id, command)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        resolved_observability.record_device_stage(
+            device_id=device_id,
+            stage="operator.control",
+            status="delivered",
+            details={
+                "kind": command.kind,
+                "action": command.action,
+                "expression": command.expression,
+            },
+            update_current_stage=False,
+        )
+        return JSONResponse(
+            {"status": "accepted", "device_id": device_id, "kind": command.kind},
+            status_code=202,
+            headers={"Cache-Control": "no-store"},
+        )
 
     @app.get("/api/observability/snapshot", include_in_schema=False)
     async def observability_snapshot(request: Request) -> JSONResponse:
@@ -487,6 +616,7 @@ def create_app(
             pipeline=resolved_pipeline,
             conversations=conversations,
             active_device_sessions=active_device_sessions,
+            device_controls=resolved_device_controls,
             observability=resolved_observability,
         )
 
@@ -500,6 +630,7 @@ async def _handle_device_stream(
     pipeline: ConversationPipeline,
     conversations: ConversationRegistry,
     active_device_sessions: ActiveDeviceSessionRegistry,
+    device_controls: DeviceControlRegistry,
     observability: ObservabilityStore,
 ) -> None:
     await websocket.accept()
@@ -511,6 +642,7 @@ async def _handle_device_stream(
             conversations,
             active_device_sessions,
         )
+        await device_controls.register(websocket, session)
         observability.device_connected(device_id=session.device_id, session_id=session.session_id)
         await _send_control(
             websocket,
@@ -546,6 +678,7 @@ async def _handle_device_stream(
                 device_id=session.device_id, session_id=session.session_id
             )
             await active_device_sessions.release(session.device_id, session.session_id)
+            await device_controls.unregister(session)
 
 
 async def _authenticate_session(
@@ -1034,17 +1167,27 @@ async def _handle_control_event(
             event.payload["status"],
             event.payload["error_code"] is not None,
         )
-        if observability is not None and event.turn_id is not None:
-            observability.record_stage(
-                device_id=session.device_id,
-                turn_id=event.turn_id,
-                stage="action.execute",
-                status=str(event.payload["status"]),
-                details={
-                    "request_id": event.request_id,
-                    "error_code": event.payload["error_code"],
-                },
-            )
+        if observability is not None:
+            details = {
+                "request_id": event.request_id,
+                "error_code": event.payload["error_code"],
+            }
+            if event.turn_id is None:
+                observability.record_device_stage(
+                    device_id=session.device_id,
+                    stage="operator.control",
+                    status=str(event.payload["status"]),
+                    details=details,
+                    update_current_stage=False,
+                )
+            else:
+                observability.record_stage(
+                    device_id=session.device_id,
+                    turn_id=event.turn_id,
+                    stage="action.execute",
+                    status=str(event.payload["status"]),
+                    details=details,
+                )
         return
 
     raise ControlProtocolError(f"event is not allowed from device: {event.type}")

@@ -47,6 +47,10 @@ class Settings(BaseSettings):
     # The dashboard is bound to loopback-only HTTP requests. Local operators
     # need the recognized text and assistant reply to diagnose voice turns.
     dashboard_debug_content: bool = True
+    # Test recordings are opt-in so normal conversations are never persisted.
+    save_test_recordings: bool = False
+    test_recording_dir: Path = Path("test-recordings")
+    test_recording_limit: int = Field(default=10, ge=1, le=100)
     # Optional direct USB serial observation for the ESP32 attached to this Mac.
     # The Gateway becomes the sole serial owner while this is enabled.
     serial_monitor_enabled: bool = False
