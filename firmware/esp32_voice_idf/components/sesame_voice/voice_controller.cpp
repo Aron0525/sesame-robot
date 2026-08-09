@@ -1,5 +1,6 @@
 #include "sesame_voice/voice_controller.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <cstring>
@@ -13,6 +14,7 @@
 
 #include "sesame_protocol/audio_frame.h"
 #include "sesame_protocol/control_event.h"
+#include "sesame_voice/wake_ack_audio.h"
 #include "sesame_voice/wake_capture_policy.h"
 
 namespace sesame::voice {
@@ -22,11 +24,6 @@ constexpr char kTag[] = "sesame_voice";
 constexpr gpio_num_t kVoiceButton = GPIO_NUM_0;
 constexpr uint64_t kMaximumActionDeadlineLeadMs = 5000;
 constexpr uint64_t kGatewayConnectDeadlineMs = 15000;
-constexpr uint32_t kWakeAckPlaybackTimeoutMs = 100;
-constexpr uint32_t kWakeAckSettleMs = 150;
-
-extern const uint8_t wake_ack_pcm_start[] asm("_binary_wake_ack_pcm_start");
-extern const uint8_t wake_ack_pcm_end[] asm("_binary_wake_ack_pcm_end");
 
 uint64_t now_ms() {
   return static_cast<uint64_t>(esp_timer_get_time()) / 1000ULL;
@@ -61,6 +58,18 @@ const char* string_field(const cJSON* object, const char* key) {
 
 bool is_null_field(const cJSON* object, const char* key) {
   return cJSON_IsNull(cJSON_GetObjectItemCaseSensitive(object, key));
+}
+
+bool integer_field_in_range(const cJSON* object, const char* key, int minimum,
+                            int maximum, int* output) {
+  const cJSON* value = cJSON_GetObjectItemCaseSensitive(object, key);
+  if (!cJSON_IsNumber(value) || value->valuedouble < minimum ||
+      value->valuedouble > maximum ||
+      value->valuedouble != static_cast<int>(value->valuedouble)) {
+    return false;
+  }
+  if (output != nullptr) *output = static_cast<int>(value->valuedouble);
+  return true;
 }
 
 bool is_identifier_character(char value) {
@@ -134,13 +143,9 @@ esp_err_t VoiceController::start() {
     return ESP_ERR_INVALID_STATE;
   }
   ESP_RETURN_ON_ERROR(codec_.initialize(), kTag, "initialize Opus codec");
+  ESP_RETURN_ON_ERROR(wake_vad_.start(), kTag, "initialize WakeNet + VAD");
   ESP_RETURN_ON_ERROR(load_device_config(&config_), kTag,
                       "load device configuration from NVS");
-  const esp_err_t wake_vad_result = wake_vad_.start();
-  if (wake_vad_result != ESP_OK) {
-    codec_.shutdown();
-    return wake_vad_result;
-  }
 
   const gpio_config_t button_config{
       .pin_bit_mask = 1ULL << kVoiceButton,
@@ -149,26 +154,16 @@ esp_err_t VoiceController::start() {
       .pull_down_en = GPIO_PULLDOWN_DISABLE,
       .intr_type = GPIO_INTR_DISABLE,
   };
-  const esp_err_t button_config_result = gpio_config(&button_config);
-  if (button_config_result != ESP_OK) {
-    wake_vad_.stop();
-    codec_.shutdown();
-    return button_config_result;
-  }
+  ESP_RETURN_ON_ERROR(gpio_config(&button_config), kTag,
+                      "configure BOOT voice button");
 
   downlink_queue_ = xQueueCreate(16, sizeof(DownlinkPacket));
-  if (downlink_queue_ == nullptr) {
-    wake_vad_.stop();
-    codec_.shutdown();
-    return ESP_ERR_NO_MEM;
-  }
+  if (downlink_queue_ == nullptr) return ESP_ERR_NO_MEM;
   gateway_event_queue_ =
       xQueueCreate(kGatewayEventQueueDepth, sizeof(GatewayEvent));
   if (gateway_event_queue_ == nullptr) {
     vQueueDelete(downlink_queue_);
     downlink_queue_ = nullptr;
-    wake_vad_.stop();
-    codec_.shutdown();
     return ESP_ERR_NO_MEM;
   }
 
@@ -184,8 +179,6 @@ esp_err_t VoiceController::start() {
     downlink_queue_ = nullptr;
     vQueueDelete(gateway_event_queue_);
     gateway_event_queue_ = nullptr;
-    wake_vad_.stop();
-    codec_.shutdown();
     return ESP_ERR_NO_MEM;
   }
 
@@ -194,6 +187,7 @@ esp_err_t VoiceController::start() {
 
 void VoiceController::stop() {
   running_ = false;
+  wake_vad_.stop();
   gateway_.stop();
   if (task_ != nullptr) {
     for (int attempt = 0; attempt < 50 && task_ != nullptr; ++attempt) {
@@ -204,6 +198,8 @@ void VoiceController::stop() {
       task_ = nullptr;
     }
   }
+  // The voice task is now stopped, so no I2S writer can race this final mute.
+  stop_wake_ack();
   if (downlink_queue_ != nullptr) {
     vQueueDelete(downlink_queue_);
     downlink_queue_ = nullptr;
@@ -212,8 +208,6 @@ void VoiceController::stop() {
     vQueueDelete(gateway_event_queue_);
     gateway_event_queue_ = nullptr;
   }
-  wake_vad_.stop();
-  turn_detector_.reset();
   codec_.shutdown();
 }
 
@@ -232,9 +226,25 @@ void VoiceController::run() {
     const bool pressed = gpio_get_level(kVoiceButton) == 0;
     handle_button(button_.update(pressed, timestamp), timestamp);
 
-    if (should_capture_for_wake(tts_active_)) {
-      capture_and_process(timestamp);
+    if (wake_ack_active_) {
+      // AEC is intentionally not enabled in this change. Keep the microphone
+      // off while the local acknowledgement plays, then open the 3-second
+      // first-speech window after its final audio frame.
+      play_wake_ack_frame(timestamp);
+    } else if (should_capture_for_wake(tts_active_)) {
+      std::array<int16_t, sesame::audio::kSamplesPerFrame> pcm{};
+      if (audio_->read_microphone_frame(pcm.data(), pcm.size(), 100) == ESP_OK) {
+        if (wake_vad_.feed_pcm(pcm.data(), pcm.size()) != ESP_OK) {
+          ESP_LOGW(kTag, "WakeNet feed failed");
+        }
+        if ((button_.recording() && session_ready_) || wake_listening_) {
+          capture_and_send(pcm.data(), timestamp);
+        }
+        process_wake_vad_signals(timestamp);
+      }
     } else {
+      // The TTS barge-in transition is represented by VoiceTurnDetector, but
+      // remains unwired until AEC provides speech-safe microphone frames.
       play_pending_audio();
       complete_tts_if_drained();
       vTaskDelay(pdMS_TO_TICKS(5));
@@ -339,41 +349,127 @@ void VoiceController::process_gateway_event(const GatewayEvent& event) {
 void VoiceController::handle_button(ButtonEvent event, uint64_t timestamp) {
   if (!session_ready_) return;
   if (event == ButtonEvent::kStartRecording) {
-    handle_voice_turn_event(turn_detector_.start_listening(timestamp),
-                            timestamp);
+    // BOOT retains priority over every local wake state, including the short
+    // acknowledgement and either three-second speech window.
+    if (wake_ack_active_) stop_wake_ack();
+    if (wake_listening_) {
+      wake_listening_ = false;
+      finish_listening("wakeword-interrupted");
+    }
+    wake_turn_detector_.reset();
+    start_listening(timestamp, "device_button");
   } else if (event == ButtonEvent::kStopRecording ||
              event == ButtonEvent::kMaximumDuration) {
-    if (turn_detector_.listening()) {
-      turn_detector_.reset();
-      finish_listening("button");
+    finish_listening("device_button");
+  }
+}
+
+void VoiceController::begin_wake_ack() {
+  if (audio_ == nullptr || !audio_->initialized()) {
+    ESP_LOGW(kTag, "wake acknowledgement unavailable: audio not initialized");
+    wake_turn_detector_.reset();
+    return;
+  }
+  wake_ack_offset_samples_ = 0;
+  wake_ack_active_ = true;
+  audio_->set_amplifier_enabled(true);
+  ESP_LOGI(kTag, "wake detected: playing local acknowledgement");
+}
+
+void VoiceController::stop_wake_ack() {
+  wake_ack_active_ = false;
+  wake_ack_offset_samples_ = 0;
+  if (audio_ != nullptr && audio_->initialized()) {
+    std::array<int16_t, sesame::audio::kSamplesPerFrame> silence{};
+    audio_->write_speaker_frame(silence.data(), silence.size(), 100);
+    audio_->set_amplifier_enabled(false);
+  }
+}
+
+void VoiceController::play_wake_ack_frame(uint64_t timestamp) {
+  if (!wake_ack_active_) return;
+  const size_t sample_count = wake_ack_audio_sample_count();
+  if (wake_ack_offset_samples_ < sample_count) {
+    std::array<int16_t, sesame::audio::kSamplesPerFrame> frame{};
+    const size_t samples_to_copy = std::min(
+        frame.size(), sample_count - wake_ack_offset_samples_);
+    std::memcpy(frame.data(),
+                wake_ack_audio_samples() + wake_ack_offset_samples_,
+                samples_to_copy * sizeof(frame[0]));
+    if (audio_->write_speaker_frame(frame.data(), frame.size(), 100) != ESP_OK) {
+      ESP_LOGW(kTag, "wake acknowledgement playback failed");
+      stop_wake_ack();
+      wake_turn_detector_.reset();
+      return;
+    }
+    wake_ack_offset_samples_ += samples_to_copy;
+    // Pace fixed 20-ms I2S frames. This prevents the initial DMA queue from
+    // making the first-speech timeout begin before the prompt is audible.
+    vTaskDelay(pdMS_TO_TICKS(20));
+    return;
+  }
+
+  stop_wake_ack();
+  if (!wake_turn_detector_.start_first_speech_wait(timestamp)) {
+    ESP_LOGW(kTag, "wake acknowledgement completed outside wake state");
+    wake_turn_detector_.reset();
+    return;
+  }
+  ESP_LOGI(kTag, "wake acknowledgement complete: waiting 3000 ms for speech");
+}
+
+void VoiceController::process_wake_vad_signals(uint64_t timestamp) {
+  WakeVadSignal signal{};
+  while (wake_vad_.read_signal(&signal)) {
+    const VoiceTurnState prior_state = wake_turn_detector_.state();
+    const VoiceTurnEvent event =
+        wake_turn_detector_.update(timestamp, signal.wake_detected,
+                                   signal.vad_speech);
+    if (event == VoiceTurnEvent::kWakeDetected) {
+      if (!session_ready_ || button_.recording() || wake_listening_ ||
+          turn_state_.state() != sesame::protocol::TurnState::kIdle) {
+        wake_turn_detector_.reset();
+        continue;
+      }
+      begin_wake_ack();
+    } else if (event == VoiceTurnEvent::kListenStarted) {
+      if (!session_ready_ || button_.recording() || wake_listening_ ||
+          turn_state_.state() != sesame::protocol::TurnState::kIdle) {
+        wake_turn_detector_.reset();
+        continue;
+      }
+      wake_listening_ = true;
+      start_listening(timestamp,
+                      prior_state == VoiceTurnState::kWaitingForFollowupSpeech
+                          ? "tts-followup"
+                          : "wakeword");
+    } else if ((event == VoiceTurnEvent::kListenStopped ||
+                event == VoiceTurnEvent::kListenTimedOut) && wake_listening_) {
+      wake_listening_ = false;
+      finish_listening(event == VoiceTurnEvent::kListenStopped
+                           ? "wakeword-vad-endpoint"
+                           : "wakeword-max-duration");
+    } else if (event == VoiceTurnEvent::kWakeTimedOut ||
+               event == VoiceTurnEvent::kFollowupTimedOut) {
+      ESP_LOGI(kTag, "%s window expired without speech",
+               event == VoiceTurnEvent::kWakeTimedOut ? "wake" : "follow-up");
     }
   }
 }
 
-void VoiceController::begin_listening(uint64_t timestamp, const char* source) {
+void VoiceController::start_listening(uint64_t timestamp, const char* trigger) {
   if (!session_ready_) return;
-  const auto state = turn_state_.state();
-  if (state != sesame::protocol::TurnState::kIdle &&
-      state != sesame::protocol::TurnState::kThinking &&
-      state != sesame::protocol::TurnState::kSpeaking) {
-    return;
+  if (tts_active_ ||
+      turn_state_.state() == sesame::protocol::TurnState::kThinking ||
+      turn_state_.state() == sesame::protocol::TurnState::kSpeaking) {
+    copy_identifier(&pending_interrupt_turn_id_, turn_id_.data());
+    pending_interrupt_generation_ = active_generation_;
+    interrupt_pending_ = pending_interrupt_turn_id_[0] != '\0';
+    send_control(sesame::protocol::ControlEventType::kInterrupt, "{}");
+    flush_tts();
+    if (robot_ != nullptr) robot_->emergency_stop();
+    turn_state_.apply(sesame::protocol::TurnEvent::kInterrupted);
   }
-
-  if (state == sesame::protocol::TurnState::kThinking ||
-      state == sesame::protocol::TurnState::kSpeaking || tts_active_) {
-    if (tts_active_ ||
-        state == sesame::protocol::TurnState::kThinking ||
-        state == sesame::protocol::TurnState::kSpeaking) {
-      copy_identifier(&pending_interrupt_turn_id_, turn_id_.data());
-      pending_interrupt_generation_ = active_generation_;
-      interrupt_pending_ = pending_interrupt_turn_id_[0] != '\0';
-      send_control(sesame::protocol::ControlEventType::kInterrupt, "{}");
-      flush_tts();
-      if (robot_ != nullptr) robot_->emergency_stop();
-      turn_state_.apply(sesame::protocol::TurnEvent::kInterrupted);
-    }
-  }
-
   ++turn_counter_;
   std::snprintf(turn_id_.data(), turn_id_.size(), "turn_%08lx_%lu",
                 static_cast<unsigned long>(esp_random()),
@@ -383,99 +479,28 @@ void VoiceController::begin_listening(uint64_t timestamp, const char* source) {
   codec_.reset();
   turn_state_.apply(sesame::protocol::TurnEvent::kButtonPressed);
   send_control(sesame::protocol::ControlEventType::kListenStart, "{}");
-  ESP_LOGI(kTag, "listen start: source=%s turn=%lu", source,
+  ESP_LOGI(kTag, "listen start: trigger=%s turn=%lu", trigger,
            static_cast<unsigned long>(turn_counter_));
   (void)timestamp;
 }
 
-void VoiceController::finish_listening(const char* source) {
-  if (turn_state_.state() != sesame::protocol::TurnState::kListening) return;
+void VoiceController::finish_listening(const char* trigger) {
+  if (!session_ready_ ||
+      turn_state_.state() != sesame::protocol::TurnState::kListening) {
+    return;
+  }
   send_control(sesame::protocol::ControlEventType::kListenStop, "{}");
   turn_state_.apply(sesame::protocol::TurnEvent::kButtonPressed);
-  ESP_LOGI(kTag, "listen stop: source=%s turn=%lu uplink_frames=%lu", source,
+  ESP_LOGI(kTag, "listen stop: trigger=%s turn=%lu uplink_frames=%lu", trigger,
            static_cast<unsigned long>(turn_counter_),
            static_cast<unsigned long>(uplink_frame_count_));
 }
 
-void VoiceController::process_wake_vad_signals(uint64_t timestamp) {
-  WakeVadSignal signal{};
-  while (wake_vad_.read_signal(&signal)) {
-    const bool may_wake = session_ready_ &&
-                          turn_state_.state() == sesame::protocol::TurnState::kIdle;
-    const VoiceTurnEvent event =
-        turn_detector_.update(timestamp, may_wake && signal.wake_detected,
-                              signal.vad_speech);
-    handle_voice_turn_event(event, timestamp);
-    if (event == VoiceTurnEvent::kWakeDetected) return;
-  }
-}
-
-void VoiceController::handle_voice_turn_event(VoiceTurnEvent event,
-                                               uint64_t timestamp) {
-  switch (event) {
-    case VoiceTurnEvent::kWakeDetected:
-      ESP_LOGI(kTag, "WakeNet detected: 你好，小智");
-      if (play_wake_acknowledgement() != ESP_OK) {
-        ESP_LOGW(kTag, "local wake acknowledgement playback failed");
-      }
-      wake_vad_.discard_pending_signals();
-      turn_detector_.begin_waiting_for_speech(now_ms());
-      return;
-    case VoiceTurnEvent::kListenStarted:
-      begin_listening(timestamp, "wake_or_button");
-      return;
-    case VoiceTurnEvent::kListenStopped:
-      finish_listening("vad_silence_2000ms");
-      return;
-    case VoiceTurnEvent::kWakeTimedOut:
-      ESP_LOGI(kTag, "wake timed out before command speech");
-      return;
-    case VoiceTurnEvent::kListenTimedOut:
-      finish_listening("maximum_duration");
-      return;
-    case VoiceTurnEvent::kNone:
-      return;
-  }
-}
-
-esp_err_t VoiceController::play_wake_acknowledgement() {
-  if (audio_ == nullptr || !audio_->initialized()) return ESP_ERR_INVALID_STATE;
-
-  const size_t pcm_bytes = wake_ack_pcm_end - wake_ack_pcm_start;
-  if (pcm_bytes == 0 || pcm_bytes % sesame::audio::kPcmBytesPerFrame != 0) {
-    return ESP_ERR_INVALID_SIZE;
-  }
-
-  esp_err_t result = audio_->set_amplifier_enabled(true);
-  std::array<int16_t, sesame::audio::kSamplesPerFrame> frame{};
-  for (size_t offset = 0; result == ESP_OK && offset < pcm_bytes;
-       offset += sizeof(frame)) {
-    std::memcpy(frame.data(), wake_ack_pcm_start + offset, sizeof(frame));
-    result = audio_->write_speaker_frame(frame.data(), frame.size(),
-                                         kWakeAckPlaybackTimeoutMs);
-  }
-  audio_->set_amplifier_enabled(false);
-  if (result == ESP_OK) vTaskDelay(pdMS_TO_TICKS(kWakeAckSettleMs));
-  return result;
-}
-
-void VoiceController::capture_and_process(uint64_t timestamp) {
-  std::array<int16_t, sesame::audio::kSamplesPerFrame> pcm{};
-  if (audio_->read_microphone_frame(pcm.data(), pcm.size(), 100) != ESP_OK) {
-    return;
-  }
-  if (wake_vad_.feed_pcm(pcm.data(), pcm.size()) != ESP_OK) return;
-  process_wake_vad_signals(timestamp);
-  if (!turn_detector_.listening()) return;
-  send_pcm_frame(pcm.data(), pcm.size(), timestamp);
-}
-
-void VoiceController::send_pcm_frame(const int16_t* pcm, size_t samples,
-                                     uint64_t timestamp) {
-  if (pcm == nullptr || samples != sesame::audio::kSamplesPerFrame) return;
+void VoiceController::capture_and_send(const int16_t* pcm, uint64_t timestamp) {
+  if (pcm == nullptr) return;
   std::array<uint8_t, sesame::audio::OpusCodec::kMaxPacketBytes> opus{};
   size_t opus_size = 0;
-  if (codec_.encode(pcm, samples, opus.data(), opus.size(),
+  if (codec_.encode(pcm, sesame::audio::kSamplesPerFrame, opus.data(), opus.size(),
                     &opus_size) != ESP_OK) {
     return;
   }
@@ -525,12 +550,14 @@ void VoiceController::play_pending_audio() {
 
 esp_err_t VoiceController::send_control(
     sesame::protocol::ControlEventType type, const char* payload_json,
-    const char* request_id) {
+    const char* request_id, bool include_active_turn) {
   std::array<char, 1024> message{};
   const sesame::protocol::ControlEvent event{
       .type = type,
       .session_id = session_id_[0] == '\0' ? nullptr : session_id_.data(),
-      .turn_id = turn_id_[0] == '\0' ? nullptr : turn_id_.data(),
+      .turn_id = include_active_turn && turn_id_[0] != '\0'
+                     ? turn_id_.data()
+                     : nullptr,
       .request_id = request_id,
       .sequence = control_sequence_++,
       .timestamp_ms = now_ms(),
@@ -608,7 +635,9 @@ void VoiceController::handle_gateway_disconnected() {
   schedule_gateway_retry(now_ms());
   session_ready_ = false;
   button_.reset();
-  turn_detector_.reset();
+  stop_wake_ack();
+  wake_turn_detector_.reset();
+  wake_listening_ = false;
   flush_tts();
   turn_id_.fill('\0');
   pending_interrupt_turn_id_.fill('\0');
@@ -674,14 +703,13 @@ void VoiceController::process_control_json(const char* data, size_t size) {
       cJSON_GetObjectItemCaseSensitive(root, "sequence");
   const bool operator_control_event =
       type != nullptr && std::strcmp(type, "operator.control") == 0;
-  const char* inbound_request_id = string_field(root, "request_id");
-  const bool valid_request_id =
-      is_null_field(root, "request_id") ||
-      (operator_control_event &&
-       is_valid_identifier(inbound_request_id, 101));
+  const bool valid_request_binding =
+      operator_control_event
+          ? is_valid_identifier_field(root, "request_id", session_id_.size())
+          : is_null_field(root, "request_id");
   const bool valid_envelope =
       cJSON_IsObject(root) && is_version_one(root) && type != nullptr &&
-      payload != nullptr && has_timestamp(root) && valid_request_id &&
+      payload != nullptr && has_timestamp(root) && valid_request_binding &&
       cJSON_IsNumber(sequence) && sequence->valuedouble >= 0 &&
       sequence->valuedouble <= 4294967295.0 &&
       static_cast<uint32_t>(sequence->valuedouble) ==
@@ -707,6 +735,10 @@ void VoiceController::process_control_json(const char* data, size_t size) {
              !is_valid_identifier(inbound_session, session_id_.size()) ||
              std::strcmp(inbound_session, session_id_.data()) != 0) {
     ESP_LOGW(kTag, "discarded control frame with invalid session binding");
+    cJSON_Delete(root);
+    return;
+  } else if (operator_control_event && !is_null_field(root, "turn_id")) {
+    ESP_LOGW(kTag, "discarded operator control bound to a voice turn");
     cJSON_Delete(root);
     return;
   }
@@ -758,57 +790,44 @@ void VoiceController::process_control_json(const char* data, size_t size) {
     }
     ESP_LOGI(kTag,
              "P1 session.ready accepted: protocol=1 codec=opus rate=16000 frame_ms=20");
-  } else if (operator_control_event && robot_ != nullptr) {
+  } else if (operator_control_event) {
+    const char* request_id = string_field(root, "request_id");
     const char* kind = string_field(payload, "kind");
-    const char* request_id = inbound_request_id;
-    if (!session_ready_ || inbound_turn != nullptr ||
-        !is_valid_identifier(request_id, 101) || kind == nullptr) {
-      ESP_LOGW(kTag, "discarded invalid operator control command");
-      cJSON_Delete(root);
-      return;
+    bool accepted = false;
+    if (robot_ != nullptr && kind != nullptr) {
+      if (std::strcmp(kind, "action") == 0) {
+        accepted = robot_->execute_operator_action(string_field(payload, "action"));
+      } else if (std::strcmp(kind, "expression") == 0) {
+        accepted = robot_->set_operator_expression(
+            string_field(payload, "expression"));
+      } else if (std::strcmp(kind, "servo") == 0) {
+        int servo = 0;
+        int angle = 0;
+        accepted = integer_field_in_range(payload, "servo", 1, 8, &servo) &&
+                   integer_field_in_range(payload, "angle", 0, 180, &angle) &&
+                   robot_->set_manual_servo(static_cast<uint8_t>(servo),
+                                            static_cast<uint8_t>(angle));
+      } else if (std::strcmp(kind, "settings") == 0) {
+        int frame_delay_ms = 0;
+        int walk_cycles = 0;
+        int motor_current_delay_ms = 0;
+        accepted =
+            integer_field_in_range(payload, "frame_delay_ms", 10, 1000,
+                                   &frame_delay_ms) &&
+            integer_field_in_range(payload, "walk_cycles", 1, 50,
+                                   &walk_cycles) &&
+            integer_field_in_range(payload, "motor_current_delay_ms", 0, 500,
+                                   &motor_current_delay_ms) &&
+            robot_->configure_motion(frame_delay_ms, walk_cycles,
+                                     motor_current_delay_ms);
+      } else if (std::strcmp(kind, "stop") == 0) {
+        robot_->emergency_stop();
+        accepted = true;
+      }
     }
-
-    sesame::robot::ActionDecision result =
-        sesame::robot::ActionDecision::kUnsafeState;
-    if (std::strcmp(kind, "stop") == 0) {
-      robot_->emergency_stop();
-      result = sesame::robot::ActionDecision::kAllowed;
-    } else if (std::strcmp(kind, "action") == 0) {
-      const char* action = string_field(payload, "action");
-      result = robot_->execute_operator_action(action)
-                   ? sesame::robot::ActionDecision::kAllowed
-                   : sesame::robot::ActionDecision::kUnsafeState;
-    } else if (std::strcmp(kind, "expression") == 0) {
-      const char* expression = string_field(payload, "expression");
-      result = robot_->set_operator_expression(expression)
-                   ? sesame::robot::ActionDecision::kAllowed
-                   : sesame::robot::ActionDecision::kUnsafeState;
-    } else if (std::strcmp(kind, "servo") == 0) {
-      const uint32_t servo = uint_field(payload, "servo");
-      const uint32_t angle = uint_field(payload, "angle");
-      result = servo >= 1 && servo <= 8 && angle <= 180 &&
-                       robot_->set_manual_servo(static_cast<uint8_t>(servo),
-                                                static_cast<uint8_t>(angle))
-                   ? sesame::robot::ActionDecision::kAllowed
-                   : sesame::robot::ActionDecision::kUnsafeState;
-    } else if (std::strcmp(kind, "settings") == 0) {
-      const uint32_t frame_delay_ms = uint_field(payload, "frame_delay_ms");
-      const uint32_t walk_cycles = uint_field(payload, "walk_cycles");
-      const uint32_t motor_current_delay_ms =
-          uint_field(payload, "motor_current_delay_ms");
-      result = frame_delay_ms >= 10 && frame_delay_ms <= 1000 &&
-                       walk_cycles >= 1 && walk_cycles <= 50 &&
-                       motor_current_delay_ms <= 500 &&
-                       robot_->configure_motion(
-                           static_cast<int>(frame_delay_ms),
-                           static_cast<int>(walk_cycles),
-                           static_cast<int>(motor_current_delay_ms))
-                   ? sesame::robot::ActionDecision::kAllowed
-                   : sesame::robot::ActionDecision::kUnsafeState;
-    } else {
-      result = sesame::robot::ActionDecision::kUnknownAction;
-    }
-    send_action_result(result, request_id);
+    send_operator_result(accepted, request_id);
+    ESP_LOGI(kTag, "operator.control handled: kind=%s accepted=%s",
+             kind == nullptr ? "invalid" : kind, accepted ? "true" : "false");
   } else if (std::strcmp(type, "response.plan") == 0 && robot_ != nullptr) {
     const uint32_t generation_id = uint_field(payload, "generation_id");
     const char* expression_id = string_field(payload, "expression_id");
@@ -931,11 +950,26 @@ void VoiceController::process_control_json(const char* data, size_t size) {
     turn_id_.fill('\0');
     ESP_LOGW(kTag, "P2 gateway reported a safe processing failure");
   } else {
-    // Voice actions remain bound to response.plan. Only an authenticated
-    // operator.control event has an out-of-turn execution path.
+    // `expression.set` and `action.execute` are intentionally not accepted.
+    // All motion/expression must be bound to a response.plan for the current
+    // BOOT turn and must pass both policy layers.
     ESP_LOGW(kTag, "discarded unsupported gateway control type");
   }
   cJSON_Delete(root);
+}
+
+void VoiceController::send_operator_result(bool accepted,
+                                           const char* request_id) {
+  const char* status = accepted ? "accepted" : "rejected";
+  const char* error_code = accepted ? "null" : "\"operator_control_rejected\"";
+  std::array<char, 128> result_payload{};
+  const int length = std::snprintf(
+      result_payload.data(), result_payload.size(),
+      "{\"status\":\"%s\",\"error_code\":%s}", status, error_code);
+  if (length > 0 && static_cast<size_t>(length) < result_payload.size()) {
+    send_control(sesame::protocol::ControlEventType::kActionResult,
+                 result_payload.data(), request_id, false);
+  }
 }
 
 void VoiceController::send_action_result(
@@ -975,6 +1009,11 @@ void VoiceController::begin_tts(uint32_t generation_id) {
   active_generation_ = generation_id;
   expected_downlink_sequence_ = 0;
   tts_stop_requested_ = false;
+  if (!wake_turn_detector_.start_tts_playback()) {
+    ESP_LOGW(kTag, "resetting unexpected local wake state before TTS");
+    wake_turn_detector_.reset();
+    wake_turn_detector_.start_tts_playback();
+  }
   codec_.reset();
   std::array<int16_t, sesame::audio::kSamplesPerFrame> silence{};
   audio_->write_speaker_frame(silence.data(), silence.size(), 100);
@@ -1004,9 +1043,19 @@ void VoiceController::complete_tts_if_drained() {
   tts_active_ = false;
   tts_stop_requested_ = false;
   turn_state_.stop_generation(generation_id);
-  if (!interrupt_pending_) turn_id_.fill('\0');
-  ESP_LOGI(kTag, "P2 playback completed: generation=%lu",
-           static_cast<unsigned long>(generation_id));
+  if (!interrupt_pending_) {
+    turn_id_.fill('\0');
+    if (!wake_turn_detector_.start_followup_wait(now_ms())) {
+      ESP_LOGW(kTag, "follow-up wait skipped: TTS state was not active");
+      wake_turn_detector_.reset();
+    }
+    ESP_LOGI(kTag,
+             "P2 playback completed: generation=%lu; waiting 3000 ms for follow-up",
+             static_cast<unsigned long>(generation_id));
+  } else {
+    ESP_LOGI(kTag, "P2 playback completed: generation=%lu",
+             static_cast<unsigned long>(generation_id));
+  }
 }
 
 void VoiceController::flush_tts() {

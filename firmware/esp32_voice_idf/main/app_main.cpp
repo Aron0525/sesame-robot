@@ -20,9 +20,11 @@ void cancel_local_web_motion(void* context) {
   if (runner != nullptr) runner->stop();
 }
 
-bool start_local_web_motion(void* context, const char* action) {
+bool start_local_web_motion(void* context, const char* action,
+                            bool show_action_face) {
   auto* runner = static_cast<sesame::web::LegacyMotionRunner*>(context);
-  return runner != nullptr && action != nullptr && runner->start(action);
+  return runner != nullptr && action != nullptr &&
+         runner->start(action, show_action_face);
 }
 
 bool configure_local_web_motion(void* context, int frame_delay_ms,

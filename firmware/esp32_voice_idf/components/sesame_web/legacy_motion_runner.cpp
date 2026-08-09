@@ -94,7 +94,7 @@ LegacyMotionRunner::LegacyMotionRunner(robot::Esp32ServoDriver* servos,
   g_runner = this;
 }
 
-bool LegacyMotionRunner::start(std::string_view action) {
+bool LegacyMotionRunner::start(std::string_view action, bool show_action_face) {
   if (servos_ == nullptr) {
     ESP_LOGW(kTag, "web movement rejected: servo driver unavailable");
     return false;
@@ -111,6 +111,7 @@ bool LegacyMotionRunner::start(std::string_view action) {
 
   copy_string(&active_action_, action);
   cancel_requested_.store(false);
+  show_action_face_.store(show_action_face);
   if (display_ != nullptr) display_->exit_idle();
   if (!servos_->begin_web_motion()) {
     ESP_LOGW(kTag, "web movement rejected: servo driver not running");
@@ -177,11 +178,13 @@ bool LegacyMotionRunner::set_servo_angle(uint8_t servo_index, uint8_t angle) {
 
 void LegacyMotionRunner::set_face(std::string_view expression,
                                   ui::FaceAnimationMode mode) {
-  if (display_ != nullptr) display_->show_expression(expression, mode);
+  if (show_action_face_.load() && display_ != nullptr) {
+    display_->show_expression(expression, mode);
+  }
 }
 
 void LegacyMotionRunner::enter_idle() {
-  if (display_ != nullptr) display_->enter_idle();
+  if (show_action_face_.load() && display_ != nullptr) display_->enter_idle();
 }
 
 bool LegacyMotionRunner::should_continue(std::string_view action,
@@ -209,6 +212,7 @@ void LegacyMotionRunner::run() {
   currentCommand = "";
   active_action_[0] = '\0';
   busy_.store(false);
+  show_action_face_.store(true);
   task_ = nullptr;
   if (!cancelled && servos_ != nullptr) servos_->end_web_control(false);
   ESP_LOGI(kTag, "web movement finished%s", cancelled ? " after stop" : "");

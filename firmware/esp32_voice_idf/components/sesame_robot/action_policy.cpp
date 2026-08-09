@@ -1,20 +1,16 @@
 #include "sesame_robot/action_policy.h"
 
+#include "sesame_robot/control_catalog.h"
+
 namespace sesame::robot {
 namespace {
 
 bool is_action_allowed(std::string_view action) {
-  return action == "wave" || action == "stand" || action == "rest" ||
-         action == "stop";
+  return action == "stop" || is_web_action(action);
 }
 
 bool is_expression_allowed(std::string_view expression) {
-  return expression == "default" || expression == "idle" ||
-         expression == "happy" || expression == "sad" ||
-         expression == "angry" || expression == "surprised" ||
-         expression == "sleepy" || expression == "love" ||
-         expression == "excited" || expression == "confused" ||
-         expression == "thinking";
+  return expression == "default" || is_web_expression(expression);
 }
 
 }  // namespace

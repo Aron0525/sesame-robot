@@ -205,7 +205,11 @@ class OpenClawRetryTest(unittest.IsolatedAsyncioTestCase):
                     )
 
         self.assertLess(time.monotonic() - started_at, 0.2)
-        self.assertEqual(attempts, 1)
+        # Each attempt now has its own per-attempt timeout budget
+        # (timeout_seconds / max_attempts).  The outer deadline may
+        # still cancel the last retry, so we verify at least two
+        # attempts ran rather than the old single attempt.
+        self.assertGreaterEqual(attempts, 2)
         self.assertEqual(
             aborted,
             [("agent:sesame:conversation:test", "turn_001")],

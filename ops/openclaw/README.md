@@ -3,7 +3,7 @@
 本目录固定电脑端 LLM 网关所需的 OpenClaw 版本。
 
 ```bash
-cd "/Users/mac/Desktop/1/SesameV3_语音机器人项目/ops/openclaw"
+cd "/Users/mac/Desktop/2/ops/openclaw"
 sh install_openclaw.sh
 ```
 

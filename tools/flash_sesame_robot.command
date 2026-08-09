@@ -31,6 +31,42 @@ pause_before_exit() {
   fi
 }
 
+cleanup_orphaned_gateway_workers() {
+  local worker_pid attempt
+  local worker_pattern="${PROJECT_ROOT}/gateway/.venv/bin/sesame-voice-gateway"
+  local worker_pids
+
+  # launchctl manages the canonical instance. Detached workers can continue
+  # advertising mDNS after losing TCP/8765, so an ESP32 may select a dead peer.
+  worker_pids="$(pgrep -f -- "${worker_pattern}" 2>/dev/null || true)"
+  if [[ -n "${worker_pids}" ]]; then
+    while IFS= read -r worker_pid; do
+      [[ -n "${worker_pid}" ]] || continue
+      echo "停止遗留 Gateway worker（PID ${worker_pid}）..."
+      kill -TERM "${worker_pid}" 2>/dev/null || true
+    done <<< "${worker_pids}"
+  fi
+  for attempt in {1..10}; do
+    if ! pgrep -f -- "${worker_pattern}" >/dev/null 2>&1; then
+      return
+    fi
+    sleep 0.2
+  done
+
+  # A worker that ignores TERM can keep advertising mDNS even though the
+  # replacement Gateway owns TCP/8765.  Force it down before bootstrapping the
+  # one canonical LaunchAgent instance.
+  worker_pids="$(pgrep -f -- "${worker_pattern}" 2>/dev/null || true)"
+  if [[ -n "${worker_pids}" ]]; then
+    while IFS= read -r worker_pid; do
+      [[ -n "${worker_pid}" ]] || continue
+      echo "强制停止遗留 Gateway worker（PID ${worker_pid}）..."
+      kill -KILL "${worker_pid}" 2>/dev/null || true
+    done <<< "${worker_pids}"
+    sleep 0.2
+  fi
+}
+
 restore_gateway() {
   local attempt
 
@@ -38,6 +74,7 @@ restore_gateway() {
     return
   fi
   echo "恢复电脑 Voice Gateway..."
+  cleanup_orphaned_gateway_workers
   for attempt in {1..5}; do
     if launchctl bootstrap "${GATEWAY_DOMAIN}" "${GATEWAY_PLIST}" 2>/dev/null; then
       launchctl kickstart -k "${GATEWAY_TARGET}" 2>/dev/null || true

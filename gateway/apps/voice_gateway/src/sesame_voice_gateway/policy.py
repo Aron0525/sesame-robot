@@ -2,19 +2,67 @@ from __future__ import annotations
 
 from sesame_voice_gateway.providers.base import AgentResult, AsrResult
 
-ALLOWED_ACTIONS = frozenset({"stop", "wave", "rest", "stand"})
+ALLOWED_ACTIONS = frozenset(
+    {
+        "stop",
+        "rest",
+        "stand",
+        "wave",
+        "dance",
+        "swim",
+        "point",
+        "pushup",
+        "bow",
+        "cute",
+        "freaky",
+        "worm",
+        "shake",
+        "shrug",
+        "dead",
+        "crab",
+        "forward",
+        "backward",
+        "left",
+        "right",
+    }
+)
 ALLOWED_EXPRESSIONS = frozenset(
     {
+        "walk",
+        "rest",
+        "swim",
+        "dance",
+        "wave",
+        "point",
+        "cute",
+        "pushup",
+        "freaky",
+        "bow",
+        "worm",
+        "shake",
+        "shrug",
+        "dead",
+        "crab",
         "idle",
+        "idle_blink",
         "happy",
+        "talk_happy",
         "sad",
+        "talk_sad",
         "angry",
+        "talk_angry",
         "surprised",
+        "talk_surprised",
         "sleepy",
+        "talk_sleepy",
         "love",
+        "talk_love",
         "excited",
+        "talk_excited",
         "confused",
+        "talk_confused",
         "thinking",
+        "talk_thinking",
     }
 )
 ALLOWED_VOICE_IDS = frozenset({"sesame_default"})

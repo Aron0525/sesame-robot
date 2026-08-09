@@ -99,6 +99,56 @@ class ConsoleRoutesTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    def test_local_control_accepts_expression_and_motion_settings(self) -> None:
+        with TestClient(self.app, client=("127.0.0.1", 4321)) as client:
+            expression = client.post(
+                "/api/local-control/dev_001",
+                json={"kind": "expression", "expression": "talk_happy"},
+            )
+            settings = client.post(
+                "/api/local-control/dev_001",
+                json={
+                    "kind": "settings",
+                    "frame_delay_ms": 100,
+                    "walk_cycles": 10,
+                    "motor_current_delay_ms": 20,
+                },
+            )
+
+        self.assertEqual(expression.status_code, 202)
+        self.assertEqual(settings.status_code, 202)
+        self.assertEqual(
+            self.controls.commands[-2:],
+            [
+                (
+                    "dev_001",
+                    {
+                        "kind": "expression",
+                        "action": None,
+                        "expression": "talk_happy",
+                        "servo": None,
+                        "angle": None,
+                        "frame_delay_ms": None,
+                        "walk_cycles": None,
+                        "motor_current_delay_ms": None,
+                    },
+                ),
+                (
+                    "dev_001",
+                    {
+                        "kind": "settings",
+                        "action": None,
+                        "expression": None,
+                        "servo": None,
+                        "angle": None,
+                        "frame_delay_ms": 100,
+                        "walk_cycles": 10,
+                        "motor_current_delay_ms": 20,
+                    },
+                ),
+            ],
+        )
+
     def test_device_dispatch_uses_the_existing_control_protocol(self) -> None:
         async def exercise() -> None:
             registry = DeviceControlRegistry()

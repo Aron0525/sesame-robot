@@ -83,6 +83,7 @@ class AgentProvider(Protocol):
         conversation_id: str,
         turn_id: str,
         allow_web_search: bool = False,
+        timeout_override: float | None = None,
     ) -> AgentResult | AgentToolCall: ...
 
 

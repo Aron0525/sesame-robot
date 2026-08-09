@@ -14,17 +14,19 @@ make run
 
 语音固件只连接 TLS 网关：`SESAME_TLS_ENABLED=true`，并且 mDNS 广播必须声明 TLS。ESP32 的 NVS 中需写入该 TLS 根证书和与 `.env` 相同的设备 token。
 
-## 运行监控台
+## 运行控制台
 
 网关启动后，在**运行网关的这台电脑**浏览器打开：
 
 ```text
-https://sesame-gateway.local:8765/dashboard
+https://sesame-gateway.local:8765/console
 ```
 
-监控台通过 Server-Sent Events 实时显示设备 WSS 状态、`turn_id`、上下行 Opus
-统计、ASR、OpenClaw、TTS、动作/表情计划和失败阶段。原始 PCM/Opus 不落盘；页面
-仅允许回环地址访问。默认隐藏 ASR 与 TTS 文本，如需短时本机调试，可在 `.env` 临时设置：
+控制台把原机器人控制页和 Voice Trace 合并在一起：可执行动作、OLED 表情、8 路舵机、
+运动参数、手柄与命令行，同时通过 Server-Sent Events 实时显示设备 WSS 状态、`turn_id`、
+上下行 Opus 统计、ASR、OpenClaw、TTS、动作/表情计划和失败阶段。`/dashboard` 保留为
+仅监控视图。原始 PCM/Opus 不落盘；页面仅允许本机访问。默认隐藏 ASR 与 TTS 文本，
+如需短时本机调试，可在 `.env` 临时设置：
 
 ```text
 SESAME_DASHBOARD_DEBUG_CONTENT=true
@@ -37,17 +39,6 @@ SESAME_DASHBOARD_DEBUG_CONTENT=true
 并填写 `SESAME_SERIAL_MONITOR_DEVICE_ID`。Gateway 会直接占用串口，翻译固件的 BOOT、
 Opus 上行、`response.plan`、TTS 和播放完成日志为监控台事件。此时不要并行运行
 `idf.py monitor`、Arduino Serial Monitor 或 `screen`；一个串口同一时刻只能由一个进程读取。
-
-## 机器人统一控制台
-
-在运行网关的这台电脑浏览器打开：
-
-```text
-https://localhost:8765/console
-```
-
-控制台复用监控台的实时状态流，并可向已连接 ESP32 下发停止、动作、表情、
-单舵机角度和运动参数。此页面与对应 API 仅允许本机访问；设备离线时命令不会入队。
 
 ## 运行依赖
 

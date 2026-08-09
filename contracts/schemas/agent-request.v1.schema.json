@@ -59,20 +59,66 @@
       ],
       "properties": {
         "actions": {
-          "const": ["stop", "wave", "rest", "stand"]
+          "const": [
+            "stop",
+            "rest",
+            "stand",
+            "wave",
+            "dance",
+            "swim",
+            "point",
+            "pushup",
+            "bow",
+            "cute",
+            "freaky",
+            "worm",
+            "shake",
+            "shrug",
+            "dead",
+            "crab",
+            "forward",
+            "backward",
+            "left",
+            "right"
+          ]
         },
         "expressions": {
           "const": [
+            "walk",
+            "rest",
+            "swim",
+            "dance",
+            "wave",
+            "point",
+            "cute",
+            "pushup",
+            "freaky",
+            "bow",
+            "worm",
+            "shake",
+            "shrug",
+            "dead",
+            "crab",
             "idle",
+            "idle_blink",
             "happy",
+            "talk_happy",
             "sad",
+            "talk_sad",
             "angry",
+            "talk_angry",
             "surprised",
+            "talk_surprised",
             "sleepy",
+            "talk_sleepy",
             "love",
+            "talk_love",
             "excited",
+            "talk_excited",
             "confused",
-            "thinking"
+            "talk_confused",
+            "thinking",
+            "talk_thinking"
           ]
         },
         "voices": {

@@ -19,6 +19,12 @@ if [ ! -f "$gateway_dir/.env" ]; then
 fi
 
 uv_path=$(command -v uv)
+if ! command -v openclaw >/dev/null 2>&1; then
+  echo "找不到 openclaw；请先运行 ops/openclaw/install_openclaw.sh。" >&2
+  exit 1
+fi
+openclaw_path=$(command -v openclaw)
+runtime_path=$(dirname "$openclaw_path"):/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 mkdir -p "$launch_agents_dir" "$logs_dir"
 
 cat >"$plist" <<EOF
@@ -37,6 +43,11 @@ cat >"$plist" <<EOF
   </array>
   <key>WorkingDirectory</key>
   <string>$gateway_dir</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>$runtime_path</string>
+  </dict>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>

@@ -20,6 +20,7 @@ from sesame_voice_gateway.conversations import (
     ConversationOwnershipError,
     ConversationRegistry,
 )
+from sesame_voice_gateway.observability import ObservabilityStore
 from sesame_voice_gateway.pipeline import ConversationContext, TurnResult
 from sesame_voice_gateway.protocol.audio import (
     AUDIO_FLAG_PCM_S16LE,
@@ -388,6 +389,37 @@ class GatewayProtocolHardeningTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(event.type, "error")
         self.assertEqual(event.payload["code"], "voice_pipeline_failed")
         self.assertNotIn("private", event.payload["message"])
+
+    async def test_operator_control_ack_is_visible_without_a_voice_turn(self) -> None:
+        websocket = FakeWebSocket()
+        session = _session(listening=False)
+        observability = ObservabilityStore(max_events=5, clock=lambda: 1_000)
+
+        await _handle_control_event(
+            websocket,
+            session,
+            BrokenPipeline(),
+            ControlEvent(
+                v=1,
+                type="action.result",
+                session_id=session.session_id,
+                turn_id=None,
+                request_id="ctl_001",
+                sequence=1,
+                timestamp_ms=1_000,
+                payload={"status": "accepted", "error_code": None},
+            ),
+            observability,
+        )
+
+        events = observability.snapshot()["events"]
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["stage"], "device.action")
+        self.assertEqual(events[0]["status"], "accepted")
+        self.assertEqual(
+            events[0]["details"],
+            {"request_id": "ctl_001", "error_code": None},
+        )
 
     async def test_action_result_is_a_metadata_only_audit_event(self) -> None:
         websocket = FakeWebSocket()

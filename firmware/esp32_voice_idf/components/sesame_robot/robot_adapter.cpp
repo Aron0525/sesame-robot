@@ -2,29 +2,33 @@
 
 #include <cstring>
 
+#include "sesame_robot/control_catalog.h"
+
 namespace sesame::robot {
 namespace {
-
-bool is_operator_action_allowed(std::string_view action) {
-  return action == "rest" || action == "stand" || action == "wave" ||
-         action == "dance" || action == "swim" || action == "point" ||
-         action == "pushup" || action == "bow" || action == "cute" ||
-         action == "freaky" || action == "worm" || action == "shake" ||
-         action == "shrug" || action == "dead" || action == "crab" ||
-         action == "forward" || action == "backward" || action == "left" ||
-         action == "right";
-}
 
 }  // namespace
 
 ActionDecision RobotAdapter::execute(const ActionRequest& request,
                                      uint64_t now_ms) {
-  const bool safe = driver_ != nullptr && driver_->safe_for_motion();
+  // LegacyMotionRunner performs its own ownership transition through
+  // begin_web_motion(). Treat it as motion-capable even immediately after a
+  // stop, exactly as the web controller does.
+  const bool use_web_executor = action_executor_ != nullptr &&
+                                is_web_action(request.action);
+  const bool safe = driver_ != nullptr &&
+                    (driver_->safe_for_motion() || use_web_executor);
   const ActionDecision decision = validate_action(request, now_ms, safe);
   if (decision != ActionDecision::kAllowed) return decision;
   if (request.action == "stop") {
     emergency_stop();
     return ActionDecision::kAllowed;
+  }
+  if (use_web_executor) {
+    return action_executor_(action_executor_context_, request.action.data(),
+                            false)
+               ? ActionDecision::kAllowed
+               : ActionDecision::kUnsafeState;
   }
   return driver_->execute_action(request.action.data(), request.duration_ms)
              ? ActionDecision::kAllowed
@@ -33,14 +37,14 @@ ActionDecision RobotAdapter::execute(const ActionRequest& request,
 
 bool RobotAdapter::execute_operator_action(const char* action) {
   if (driver_ == nullptr || action_executor_ == nullptr || action == nullptr ||
-      !is_operator_action_allowed(action)) {
+      !is_web_action(action)) {
     return false;
   }
   // The legacy runner performs the ownership transition by calling
   // begin_web_motion(). Checking safe_for_motion() here prevents that
   // transition after emergency_stop(), leaving remote control permanently
   // latched off after the first WSS reconnect.
-  return action_executor_(action_executor_context_, action);
+  return action_executor_(action_executor_context_, action, true);
 }
 
 bool RobotAdapter::set_operator_expression(const char* expression) {

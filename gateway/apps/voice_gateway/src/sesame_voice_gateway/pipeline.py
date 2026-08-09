@@ -436,6 +436,7 @@ class ConversationPipeline:
             conversation_id=context.conversation_id,
             turn_id=context.turn_id,
             allow_web_search=False,
+            timeout_override=getattr(self._agent, "synthesis_timeout_seconds", None),
         )
         if isinstance(final_reply, AgentToolCall):
             raise PolicyViolation("agent requested more than one tool call in a turn")

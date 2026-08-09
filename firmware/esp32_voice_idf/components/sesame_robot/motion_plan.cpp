@@ -5,8 +5,9 @@ namespace {
 
 constexpr std::array<uint8_t, 8> kRestPose{90, 90, 90, 90,
                                             90, 90, 90, 90};
+// Channel order: R1, R2, L1, L2, R4, R3, L3, L4.
 constexpr std::array<uint8_t, 8> kStandPose{135, 45, 45, 135,
-                                             0,   180, 0,  180};
+                                             30,  150, 30, 150};
 constexpr std::array<uint8_t, 8> kWaveRaisedPose{100, 45, 45, 90,
                                                   80,  180, 180, 180};
 constexpr std::array<uint8_t, 8> kWaveLoweredPose{100, 45, 45, 90,

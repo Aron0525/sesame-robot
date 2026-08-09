@@ -26,7 +26,9 @@ class LegacyMotionRunner {
   LegacyMotionRunner(robot::Esp32ServoDriver* servos,
                      ui::OledExpressionDisplay* display);
 
-  bool start(std::string_view action);
+  // Web requests use action-owned faces; voice plans preserve the separately
+  // selected expression while running the exact same servo sequence.
+  bool start(std::string_view action, bool show_action_face = true);
   void stop();
   [[nodiscard]] bool busy() const;
   [[nodiscard]] std::string_view active_action() const;
@@ -55,6 +57,7 @@ class LegacyMotionRunner {
   std::array<char, 20> active_action_{};
   std::atomic<bool> busy_{false};
   std::atomic<bool> cancel_requested_{false};
+  std::atomic<bool> show_action_face_{true};
   TaskHandle_t task_{nullptr};
 };
 

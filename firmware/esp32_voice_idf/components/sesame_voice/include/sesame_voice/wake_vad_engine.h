@@ -1,16 +1,12 @@
 #pragma once
 
-#include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 
-#include "esp_afe_sr_iface.h"
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
-#include "freertos/task.h"
-#include "model_path.h"
 
 namespace sesame::voice {
 
@@ -19,6 +15,8 @@ struct WakeVadSignal {
   bool vad_speech;
 };
 
+// Runs the embedded 你好芝麻 TFLite model and ESP-SR VAD.
+// The VAD is a prebuilt ESP-SR runtime; it does not add a separate model file.
 class WakeVadEngine final {
  public:
   WakeVadEngine() = default;
@@ -31,22 +29,15 @@ class WakeVadEngine final {
   void stop();
   esp_err_t feed_pcm(const int16_t* pcm, size_t samples);
   bool read_signal(WakeVadSignal* signal);
-  void discard_pending_signals();
 
  private:
-  static void fetch_task_entry(void* context);
-  void fetch_loop();
+  struct WakeWordRuntime;
+  struct SpeechVadRuntime;
 
-  static constexpr size_t kMaxFeedSamples = 2048;
-  const esp_afe_sr_iface_t* afe_handle_{nullptr};
-  esp_afe_sr_data_t* afe_data_{nullptr};
-  srmodel_list_t* models_{nullptr};
   QueueHandle_t signal_queue_{nullptr};
-  TaskHandle_t fetch_task_{nullptr};
   std::atomic<bool> running_{false};
-  std::array<int16_t, kMaxFeedSamples> feed_buffer_{};
-  size_t buffered_samples_{0};
-  int feed_chunk_samples_{0};
+  WakeWordRuntime* wakeword_{nullptr};
+  SpeechVadRuntime* speech_vad_{nullptr};
 };
 
 }  // namespace sesame::voice

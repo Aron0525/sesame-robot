@@ -82,17 +82,18 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   void enqueue_gateway_event(GatewayEventKind kind, const void* data,
                              size_t size);
   void handle_button(ButtonEvent event, uint64_t now_ms);
-  void capture_and_process(uint64_t now_ms);
   void process_wake_vad_signals(uint64_t now_ms);
-  void handle_voice_turn_event(VoiceTurnEvent event, uint64_t now_ms);
-  void begin_listening(uint64_t now_ms, const char* source);
-  void finish_listening(const char* source);
-  void send_pcm_frame(const int16_t* pcm, size_t samples, uint64_t now_ms);
-  esp_err_t play_wake_acknowledgement();
+  void begin_wake_ack();
+  void play_wake_ack_frame(uint64_t now_ms);
+  void stop_wake_ack();
+  void start_listening(uint64_t now_ms, const char* trigger);
+  void finish_listening(const char* trigger);
+  void capture_and_send(const int16_t* pcm, uint64_t now_ms);
   void play_pending_audio();
   esp_err_t send_control(sesame::protocol::ControlEventType type,
                          const char* payload_json,
-                         const char* request_id = nullptr);
+                         const char* request_id = nullptr,
+                         bool include_active_turn = true);
   void send_session_hello();
   void process_control_json(const char* data, size_t size);
   void begin_tts(uint32_t generation_id);
@@ -101,6 +102,7 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   void flush_tts();
   void send_action_result(sesame::robot::ActionDecision decision,
                           const char* request_id);
+  void send_operator_result(bool accepted, const char* request_id);
 
   sesame::audio::AudioHal* audio_;
   sesame::robot::RobotAdapter* robot_;
@@ -110,7 +112,10 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   sesame::protocol::TurnStateMachine turn_state_;
   RecordingButton button_{40, 30000};
   WakeVadEngine wake_vad_;
-  VoiceTurnDetector turn_detector_{kWakeVoiceTurnConfig};
+  VoiceTurnDetector wake_turn_detector_{{3000, 1000, 10000, 3, 2}};
+  bool wake_ack_active_{false};
+  size_t wake_ack_offset_samples_{0};
+  bool wake_listening_{false};
   QueueHandle_t downlink_queue_{nullptr};
   QueueHandle_t gateway_event_queue_{nullptr};
   TaskHandle_t task_{nullptr};

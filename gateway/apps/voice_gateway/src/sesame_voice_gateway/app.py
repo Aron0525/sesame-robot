@@ -92,7 +92,6 @@ REMOTE_EXPRESSIONS = frozenset(
     {
         "default",
         "idle",
-        "idle_blink",
         "walk",
         "rest",
         "swim",
@@ -236,25 +235,29 @@ class RemoteControlRequest(BaseModel):
     @model_validator(mode="after")
     def validate_shape(self) -> RemoteControlRequest:
         if self.kind == "action":
-            if (
-                self.action not in REMOTE_ACTIONS
-                or self.expression is not None
-                or self.servo is not None
-                or self.angle is not None
-                or self.frame_delay_ms is not None
-                or self.walk_cycles is not None
-                or self.motor_current_delay_ms is not None
+            if self.action not in REMOTE_ACTIONS or any(
+                value is not None
+                for value in (
+                    self.expression,
+                    self.servo,
+                    self.angle,
+                    self.frame_delay_ms,
+                    self.walk_cycles,
+                    self.motor_current_delay_ms,
+                )
             ):
                 raise ValueError("action command must contain one supported action")
         elif self.kind == "expression":
-            if (
-                self.expression not in REMOTE_EXPRESSIONS
-                or self.action is not None
-                or self.servo is not None
-                or self.angle is not None
-                or self.frame_delay_ms is not None
-                or self.walk_cycles is not None
-                or self.motor_current_delay_ms is not None
+            if self.expression not in REMOTE_EXPRESSIONS or any(
+                value is not None
+                for value in (
+                    self.action,
+                    self.servo,
+                    self.angle,
+                    self.frame_delay_ms,
+                    self.walk_cycles,
+                    self.motor_current_delay_ms,
+                )
             ):
                 raise ValueError("expression command must contain one supported expression")
         elif self.kind == "servo":
@@ -263,11 +266,11 @@ class RemoteControlRequest(BaseModel):
                 or self.expression is not None
                 or self.servo is None
                 or self.angle is None
+                or not 1 <= self.servo <= 8
+                or not 0 <= self.angle <= 180
                 or self.frame_delay_ms is not None
                 or self.walk_cycles is not None
                 or self.motor_current_delay_ms is not None
-                or not 1 <= self.servo <= 8
-                or not 0 <= self.angle <= 180
             ):
                 raise ValueError("servo command must contain servo 1-8 and angle 0-180")
         elif self.kind == "settings":
@@ -277,24 +280,30 @@ class RemoteControlRequest(BaseModel):
                 or self.servo is not None
                 or self.angle is not None
                 or self.frame_delay_ms is None
-                or self.walk_cycles is None
-                or self.motor_current_delay_ms is None
                 or not 10 <= self.frame_delay_ms <= 1_000
+                or self.walk_cycles is None
                 or not 1 <= self.walk_cycles <= 50
+                or self.motor_current_delay_ms is None
                 or not 0 <= self.motor_current_delay_ms <= 500
             ):
-                raise ValueError("settings command contains values outside the safe range")
-        elif (
-            self.action is not None
-            or self.expression is not None
-            or self.servo is not None
-            or self.angle is not None
-            or self.frame_delay_ms is not None
-            or self.walk_cycles is not None
-            or self.motor_current_delay_ms is not None
+                raise ValueError("settings command must contain valid motion settings")
+        elif any(
+            value is not None
+            for value in (
+                self.action,
+                self.expression,
+                self.servo,
+                self.angle,
+                self.frame_delay_ms,
+                self.walk_cycles,
+                self.motor_current_delay_ms,
+            )
         ):
             raise ValueError("stop command cannot contain parameters")
         return self
+
+    def payload(self) -> dict[str, Any]:
+        return self.model_dump(exclude_none=True)
 
 
 class ActiveDeviceSessionRegistry:
@@ -348,7 +357,6 @@ class DeviceControlRegistry:
             or (session.active_turn_task is not None and not session.active_turn_task.done())
         ):
             raise RuntimeError("device is busy with a voice turn")
-        payload = command.model_dump(exclude_none=True)
         try:
             await _send_control(
                 websocket,
@@ -356,7 +364,7 @@ class DeviceControlRegistry:
                 "operator.control",
                 turn_id=None,
                 request_id=f"ctl_{uuid.uuid4().hex}",
-                payload=payload,
+                payload=command.payload(),
             )
         except Exception as exc:
             await self.unregister(session)
@@ -404,6 +412,8 @@ def _build_pipeline(
         retry_initial_delay_seconds=settings.openclaw_retry_initial_delay_seconds,
         retry_max_delay_seconds=settings.openclaw_retry_max_delay_seconds,
         abort_timeout_seconds=settings.openclaw_abort_timeout_seconds,
+        recv_timeout_seconds=settings.openclaw_recv_timeout_seconds,
+        synthesis_timeout_seconds=settings.openclaw_synthesis_timeout_seconds,
     )
 
     tts = DashScopeTtsProvider(
@@ -542,7 +552,6 @@ def create_app(
 
     app = FastAPI(title="Sesame Voice Gateway", version="0.1.0", lifespan=lifespan)
     app.state.observability = resolved_observability
-    app.state.device_controls = resolved_device_controls
 
     @app.get("/healthz")
     async def health() -> dict[str, Any]:
@@ -568,28 +577,23 @@ def create_app(
         )
         return HTMLResponse(html, headers={"Cache-Control": "no-store"})
 
-    @app.post("/api/local-control/{device_id}", status_code=202, include_in_schema=False)
+    @app.post(
+        "/api/local-control/{device_id}",
+        include_in_schema=False,
+        status_code=202,
+    )
     async def local_control(
-        device_id: str, command: RemoteControlRequest, request: Request
+        device_id: str,
+        command: RemoteControlRequest,
+        request: Request,
     ) -> JSONResponse:
         _require_loopback_dashboard_access(request)
         try:
             await resolved_device_controls.dispatch(device_id, command)
         except RuntimeError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
-        resolved_observability.record_device_stage(
-            device_id=device_id,
-            stage="operator.control",
-            status="delivered",
-            details={
-                "kind": command.kind,
-                "action": command.action,
-                "expression": command.expression,
-            },
-            update_current_stage=False,
-        )
         return JSONResponse(
-            {"status": "accepted", "device_id": device_id, "kind": command.kind},
+            {"status": "accepted", "device_id": device_id},
             status_code=202,
             headers={"Cache-Control": "no-store"},
         )
@@ -616,8 +620,8 @@ def create_app(
             pipeline=resolved_pipeline,
             conversations=conversations,
             active_device_sessions=active_device_sessions,
-            device_controls=resolved_device_controls,
             observability=resolved_observability,
+            device_controls=resolved_device_controls,
         )
 
     return app
@@ -630,8 +634,8 @@ async def _handle_device_stream(
     pipeline: ConversationPipeline,
     conversations: ConversationRegistry,
     active_device_sessions: ActiveDeviceSessionRegistry,
-    device_controls: DeviceControlRegistry,
     observability: ObservabilityStore,
+    device_controls: DeviceControlRegistry,
 ) -> None:
     await websocket.accept()
     session: DeviceSession | None = None
@@ -642,7 +646,6 @@ async def _handle_device_stream(
             conversations,
             active_device_sessions,
         )
-        await device_controls.register(websocket, session)
         observability.device_connected(device_id=session.device_id, session_id=session.session_id)
         await _send_control(
             websocket,
@@ -664,6 +667,7 @@ async def _handle_device_stream(
             session.conversation_id,
         )
         observability.session_ready(device_id=session.device_id, session_id=session.session_id)
+        await device_controls.register(websocket, session)
         await _receive_device_messages(websocket, session, pipeline, observability)
     except WebSocketDisconnect:
         return
@@ -677,8 +681,8 @@ async def _handle_device_stream(
             observability.device_disconnected(
                 device_id=session.device_id, session_id=session.session_id
             )
-            await active_device_sessions.release(session.device_id, session.session_id)
             await device_controls.unregister(session)
+            await active_device_sessions.release(session.device_id, session.session_id)
 
 
 async def _authenticate_session(
@@ -1172,21 +1176,24 @@ async def _handle_control_event(
                 "request_id": event.request_id,
                 "error_code": event.payload["error_code"],
             }
-            if event.turn_id is None:
-                observability.record_device_stage(
-                    device_id=session.device_id,
-                    stage="operator.control",
-                    status=str(event.payload["status"]),
-                    details=details,
-                    update_current_stage=False,
-                )
-            else:
+            if event.turn_id is not None:
                 observability.record_stage(
                     device_id=session.device_id,
                     turn_id=event.turn_id,
                     stage="action.execute",
                     status=str(event.payload["status"]),
                     details=details,
+                )
+            else:
+                # Local operator controls do not belong to a voice turn. Record
+                # their ESP32 acknowledgement as a device event so the control
+                # console can distinguish real execution feedback from HTTP 202.
+                observability.record_device_stage(
+                    device_id=session.device_id,
+                    stage="device.action",
+                    status=str(event.payload["status"]),
+                    details=details,
+                    update_current_stage=False,
                 )
         return
 

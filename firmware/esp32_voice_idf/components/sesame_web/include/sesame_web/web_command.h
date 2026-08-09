@@ -4,13 +4,11 @@
 #include <cstdint>
 #include <string_view>
 
+#include "sesame_robot/control_catalog.h"
+
 namespace sesame::web {
 
-inline constexpr std::array<std::string_view, 19> kLegacyActions{
-    "rest", "stand", "wave", "dance", "swim", "point", "pushup",
-    "bow", "cute", "freaky", "worm", "shake", "shrug", "dead",
-    "crab", "forward", "backward", "left", "right",
-};
+inline constexpr const auto& kLegacyActions = sesame::robot::kWebActions;
 
 enum class WebCommandKind : uint8_t {
   kRejected,

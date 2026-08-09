@@ -91,6 +91,13 @@ class Settings(BaseSettings):
     openclaw_retry_initial_delay_seconds: float = Field(default=0.25, gt=0, le=10)
     openclaw_retry_max_delay_seconds: float = Field(default=1.0, gt=0, le=10)
     openclaw_abort_timeout_seconds: float = Field(default=3.0, gt=0, le=10)
+    # If the WebSocket stream idles for this long without a single frame,
+    # the attempt is treated as hung.  None disables per-frame checking
+    # and relies solely on the per-attempt timeout.
+    openclaw_recv_timeout_seconds: float | None = Field(default=None, gt=0, le=300)
+    # The second OpenClaw call (synthesising web-search evidence) is
+    # typically faster than the first.  None means reuse timeout_seconds.
+    openclaw_synthesis_timeout_seconds: float | None = Field(default=None, gt=0, le=300)
 
     @model_validator(mode="after")
     def validate_provider_configuration(self) -> Settings:

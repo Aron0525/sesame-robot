@@ -20,7 +20,10 @@ class RobotDriver {
 class RobotAdapter {
  public:
   using EmergencyStopHook = void (*)(void* context);
-  using ActionExecutor = bool (*)(void* context, const char* action);
+  // The web runner owns all named motion sequences. Voice response plans use
+  // the same runner but retain their separately selected OLED expression.
+  using ActionExecutor = bool (*)(void* context, const char* action,
+                                  bool show_action_face);
   using MotionSettingsExecutor = bool (*)(void* context, int frame_delay_ms,
                                           int walk_cycles,
                                           int motor_current_delay_ms);
