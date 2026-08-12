@@ -1,264 +1,371 @@
-// Embedded 你好芝麻 TFLite WakeNet plus ESP-SR VAD.
+// ESP-SR AFE VAD plus XiaoZhi-style MultiNet custom command recognition.
 
 #include "sesame_voice/wake_vad_engine.h"
 
+#include <algorithm>
 #include <array>
-#include <cmath>
-#include <cstdint>
-#include <limits>
+#include <cstring>
 #include <new>
 
+#include "esp_afe_sr_models.h"
 #include "esp_err.h"
 #include "esp_log.h"
-#include "esp_timer.h"
-#include "esp_vad.h"
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/micro/micro_interpreter.h"
-#include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+#include "esp_mn_models.h"
+#include "esp_mn_speech_commands.h"
+#include "model_path.h"
 
-#include "sesame_voice/zhima_wakeword_config.h"
-#include "sesame_voice/zhima_wakeword_model_data.h"
+#include "sesame_voice/multinet_wakeword_config.h"
 
 namespace sesame::voice {
 namespace {
 
 constexpr char kTag[] = "wake_vad";
-constexpr size_t kTensorArenaBytes = 96 * 1024;
-constexpr size_t kExpectedInputBytes =
-    zhima::kFrameCount * zhima::kFeatureBins * sizeof(int8_t);
-// A wake word is a single utterance. One qualifying rolling window is enough;
-// VAD filtering protects the later recording transition from short noise.
-constexpr size_t kWakeConfirmationsRequired = 1;
-constexpr int kVadMode = VAD_MODE_3;
-constexpr int kVadSampleRateHz = 16000;
-constexpr int kVadFrameMs = 20;
+constexpr int kWakeCommandId = 1;
+constexpr size_t kRuntimeBufferSamples = 1024;
 constexpr int kVadMinimumSpeechMs = 60;
-constexpr int kVadMinimumNoiseMs = 40;
+constexpr int kVadMinimumNoiseMs = 100;
 
 }  // namespace
 
 struct WakeVadEngine::WakeWordRuntime {
+  ~WakeWordRuntime() { shutdown(); }
+
   bool initialize() {
-    model = tflite::GetModel(zhima::kModelData);
-    if (model == nullptr || model->version() != TFLITE_SCHEMA_VERSION) {
-      ESP_LOGE(kTag, "TFLite schema mismatch: model=%d runtime=%d",
-               model == nullptr ? -1 : model->version(), TFLITE_SCHEMA_VERSION);
-      return false;
-    }
-    if (resolver.AddConv2D() != kTfLiteOk ||
-        resolver.AddMaxPool2D() != kTfLiteOk ||
-        resolver.AddReshape() != kTfLiteOk ||
-        resolver.AddFullyConnected() != kTfLiteOk ||
-        resolver.AddSoftmax() != kTfLiteOk) {
-      ESP_LOGE(kTag, "register TFLite operators");
+    models = esp_srmodel_init("model");
+    if (models == nullptr || models->num <= 0) {
+      ESP_LOGE(kTag, "ESP-SR model partition is unavailable");
       return false;
     }
 
-    interpreter = new (std::nothrow)
-        tflite::MicroInterpreter(model, resolver, arena.data(), arena.size());
-    if (interpreter == nullptr || interpreter->AllocateTensors() != kTfLiteOk) {
-      ESP_LOGE(kTag, "allocate TFLite tensors");
-      return false;
-    }
-    input = interpreter->input(0);
-    output = interpreter->output(0);
-    if (input == nullptr || output == nullptr || input->type != kTfLiteInt8 ||
-        output->type != kTfLiteInt8 || input->bytes != kExpectedInputBytes ||
-        output->bytes != 2 * sizeof(int8_t)) {
-      ESP_LOGE(kTag, "unexpected TFLite tensor contract");
+    model_name = esp_srmodel_filter(models, ESP_MN_PREFIX, ESP_MN_CHINESE);
+    if (model_name == nullptr ||
+        std::strcmp(model_name, zhima::kMultinetModelName) != 0) {
+      ESP_LOGE(kTag, "required MultiNet model %s is not in model partition",
+               zhima::kMultinetModelName);
       return false;
     }
 
-    for (size_t sample = 0; sample < zhima::kFrameSize; ++sample) {
-      window[sample] = 0.5f - 0.5f * cosf(
-          2.0f * static_cast<float>(M_PI) * static_cast<float>(sample) /
-          static_cast<float>(zhima::kFrameSize - 1));
+    multinet = esp_mn_handle_from_name(model_name);
+    if (multinet == nullptr ||
+        (model_data = multinet->create(model_name, zhima::kDetectionDurationMs)) ==
+            nullptr) {
+      ESP_LOGE(kTag, "initialize MultiNet model %s", model_name);
+      return false;
     }
-    for (size_t bin = 0; bin < zhima::kFeatureBins; ++bin) {
-      coefficients[bin] = 2.0f * cosf(
-          2.0f * static_cast<float>(M_PI) * static_cast<float>(zhima::kDftBins[bin]) /
-          static_cast<float>(zhima::kFrameSize));
+    // ESP-SR MultiNet applies the threshold but does not expose a reliable
+    // status return across model versions; Xiaozhi likewise does not check it.
+    multinet->set_det_threshold(model_data, zhima::kWakeThreshold);
+    const esp_err_t allocate_result = esp_mn_commands_alloc(multinet, model_data);
+    if (allocate_result != ESP_OK) {
+      ESP_LOGE(kTag, "allocate MultiNet commands: %s", esp_err_to_name(allocate_result));
+      return false;
     }
+    commands_allocated = true;
+    const esp_err_t add_result =
+        esp_mn_commands_add(kWakeCommandId, zhima::kWakeWordPinyin);
+    if (add_result != ESP_OK) {
+      ESP_LOGE(kTag, "register MultiNet command %s: %s", zhima::kWakeWordPinyin,
+               esp_err_to_name(add_result));
+      return false;
+    }
+    esp_mn_error_t* command_errors = esp_mn_commands_update();
+    if (command_errors != nullptr) {
+      ESP_LOGE(kTag, "MultiNet rejected %d command(s)", command_errors->num);
+      for (int index = 0; index < command_errors->num; ++index) {
+        const esp_mn_phrase_t* phrase = command_errors->phrases[index];
+        ESP_LOGE(kTag, "rejected command: %s", phrase == nullptr ? "<unknown>" : phrase->string);
+      }
+      return false;
+    }
+    multinet->print_active_speech_commands(model_data);
+
+    afe_config_t* afe_config =
+        afe_config_init("M", models, AFE_TYPE_SR, AFE_MODE_HIGH_PERF);
+    if (afe_config == nullptr) {
+      ESP_LOGE(kTag, "create AFE configuration");
+      return false;
+    }
+    // INMP441 supplies one microphone channel and no playback reference, so
+    // AEC cannot be configured honestly. TTS is excluded by the controller.
+    afe_config->aec_init = false;
+    afe_config->se_init = false;
+    afe_config->ns_init = false;
+    afe_config->vad_init = true;
+    afe_config->vad_mode = VAD_MODE_0;
+    afe_config->vad_min_speech_ms = kVadMinimumSpeechMs;
+    afe_config->vad_min_noise_ms = kVadMinimumNoiseMs;
+    afe_config->wakenet_init = false;
+    afe_config->agc_init = false;
+    afe_config->memory_alloc_mode = AFE_MEMORY_ALLOC_MORE_PSRAM;
+
+    afe_iface = esp_afe_handle_from_config(afe_config);
+    if (afe_iface != nullptr) afe_data = afe_iface->create_from_config(afe_config);
+    afe_config_free(afe_config);
+    if (afe_iface == nullptr || afe_data == nullptr) {
+      ESP_LOGE(kTag, "initialize ESP-SR AFE");
+      return false;
+    }
+
+    afe_feed_samples = afe_iface->get_feed_chunksize(afe_data);
+    multinet_samples = multinet->get_samp_chunksize(model_data);
+    if (afe_feed_samples <= 0 || multinet_samples <= 0 ||
+        static_cast<size_t>(afe_feed_samples) > afe_input.size() ||
+        static_cast<size_t>(multinet_samples) > multinet_input.size()) {
+      ESP_LOGE(kTag, "unexpected AFE/MultiNet frame sizes: afe=%d mn=%d",
+               afe_feed_samples, multinet_samples);
+      return false;
+    }
+    afe_iface->print_pipeline(afe_data);
     ESP_LOGI(kTag,
-             "custom model ready: %s, %u bytes, threshold=%.2f, arena=%u bytes",
-             zhima::kModelName, static_cast<unsigned>(zhima::kModelDataLen),
-             zhima::kWakeThreshold, static_cast<unsigned>(arena.size()));
+             "MultiNet ready: model=%s phrase=%s threshold=%.2f duration=%d ms "
+             "AFE feed=%d MultiNet feed=%d",
+             model_name, zhima::kWakeWordPinyin, zhima::kWakeThreshold,
+             zhima::kDetectionDurationMs, afe_feed_samples, multinet_samples);
     return true;
   }
 
-  ~WakeWordRuntime() { delete interpreter; }
-
-  bool append_and_detect(const int16_t* pcm, size_t samples) {
-    if (pcm == nullptr || samples == 0) return false;
-    for (size_t sample = 0; sample < samples; ++sample) {
-      ring[write_index] = pcm[sample];
-      write_index = (write_index + 1) % ring.size();
-      if (filled_samples < ring.size()) ++filled_samples;
+  void shutdown() {
+    if (afe_iface != nullptr && afe_data != nullptr) {
+      afe_iface->destroy(afe_data);
     }
-    if (filled_samples != ring.size()) return false;
+    afe_data = nullptr;
+    afe_iface = nullptr;
+    if (commands_allocated) {
+      esp_mn_commands_free();
+      commands_allocated = false;
+    }
+    if (multinet != nullptr && model_data != nullptr) {
+      multinet->destroy(model_data);
+    }
+    model_data = nullptr;
+    multinet = nullptr;
+    model_name = nullptr;
+    if (models != nullptr) esp_srmodel_deinit(models);
+    models = nullptr;
+    afe_buffered = 0;
+    multinet_buffered = 0;
+  }
 
-    ++frames_since_inference;
-    constexpr size_t kFramesPerInference =
-        zhima::kInferenceStrideMs / 20;  // AudioHal provides 20 ms frames.
-    static_assert(zhima::kInferenceStrideMs % 20 == 0);
-    if (frames_since_inference < kFramesPerInference) return false;
-    frames_since_inference = 0;
+  void reset_detection() {
+    multinet_buffered = 0;
+    if (multinet != nullptr && model_data != nullptr) multinet->clean(model_data);
+  }
 
-    const float score = evaluate();
-    ESP_LOGD(kTag, "custom wake score=%.3f", score);
-    const int64_t now_us = esp_timer_get_time();
-    if (score < zhima::kWakeThreshold) {
-      consecutive_wake_scores = 0;
+  bool process_pcm(const int16_t* pcm, size_t samples, bool wake_enabled,
+                   WakeVadSignal* signal) {
+    if (pcm == nullptr || samples == 0 || signal == nullptr || afe_iface == nullptr ||
+        afe_data == nullptr || multinet == nullptr || model_data == nullptr) {
       return false;
     }
-    if (now_us - last_wake_us <
-        static_cast<int64_t>(zhima::kWakeCooldownMs) * 1000) {
-      consecutive_wake_scores = 0;
-      return false;
+    *signal = {};
+    bool produced_signal = false;
+    size_t offset = 0;
+    while (offset < samples) {
+      const size_t copied = std::min(
+          samples - offset,
+          static_cast<size_t>(afe_feed_samples) - afe_buffered);
+      std::memcpy(afe_input.data() + afe_buffered, pcm + offset,
+                  copied * sizeof(int16_t));
+      afe_buffered += copied;
+      offset += copied;
+      if (afe_buffered != static_cast<size_t>(afe_feed_samples)) continue;
+
+      afe_iface->feed(afe_data, afe_input.data());
+      afe_buffered = 0;
+      const afe_fetch_result_t* result =
+          afe_iface->fetch_with_delay(afe_data, 0);
+      if (result == nullptr || result->ret_value == ESP_FAIL ||
+          result->data == nullptr || result->data_size <= 0) {
+        continue;
+      }
+      produced_signal = true;
+      signal->vad_speech = result->vad_state == VAD_SPEECH;
+      if (wake_enabled &&
+          append_multinet(result->data,
+                          static_cast<size_t>(result->data_size) / sizeof(int16_t))) {
+        signal->wake_detected = true;
+      }
     }
-    if (consecutive_wake_scores < kWakeConfirmationsRequired) {
-      ++consecutive_wake_scores;
-    }
-    if (consecutive_wake_scores < kWakeConfirmationsRequired) {
-      ESP_LOGD(kTag, "WakeNet candidate (score=%.3f)", score);
-      return false;
-    }
-    consecutive_wake_scores = 0;
-    last_wake_us = now_us;
-    ESP_LOGI(kTag, "custom wake word confirmed (score=%.3f)", score);
-    return true;
+    return produced_signal;
   }
 
  private:
-  float evaluate() {
-    for (size_t frame = 0; frame < zhima::kFrameCount; ++frame) {
-      for (size_t bin = 0; bin < zhima::kFeatureBins; ++bin) {
-        const float coefficient = coefficients[bin];
-        float q1 = 0.0f;
-        float q2 = 0.0f;
-        for (size_t sample = 0; sample < zhima::kFrameSize; ++sample) {
-          const size_t position =
-              (write_index + frame * zhima::kFrameSize + sample) % ring.size();
-          const float normalized =
-              static_cast<float>(ring[position]) / 32768.0f * window[sample];
-          const float q0 = coefficient * q1 - q2 + normalized;
-          q2 = q1;
-          q1 = q0;
-        }
-        const float power =
-            (q1 * q1 + q2 * q2 - coefficient * q1 * q2) /
-            static_cast<float>(zhima::kFrameSize * zhima::kFrameSize);
-        float feature = (logf(fmaxf(power, 0.0f) + 1e-9f) -
-                         zhima::kFeatureMean) /
-                        zhima::kFeatureStd;
-        feature = fminf(6.0f, fmaxf(-6.0f, feature));
-        int value = static_cast<int>(lrintf(feature / zhima::kInputScale)) +
-                    zhima::kInputZeroPoint;
-        value = value < -128 ? -128 : (value > 127 ? 127 : value);
-        input->data.int8[frame * zhima::kFeatureBins + bin] =
-            static_cast<int8_t>(value);
+  bool append_multinet(const int16_t* pcm, size_t samples) {
+    size_t offset = 0;
+    while (offset < samples) {
+      const size_t copied = std::min(
+          samples - offset,
+          static_cast<size_t>(multinet_samples) - multinet_buffered);
+      std::memcpy(multinet_input.data() + multinet_buffered, pcm + offset,
+                  copied * sizeof(int16_t));
+      multinet_buffered += copied;
+      offset += copied;
+      if (multinet_buffered != static_cast<size_t>(multinet_samples)) continue;
+
+      const esp_mn_state_t state =
+          multinet->detect(model_data, multinet_input.data());
+      multinet_buffered = 0;
+      if (state == ESP_MN_STATE_TIMEOUT) {
+        multinet->clean(model_data);
+        continue;
       }
+      if (state != ESP_MN_STATE_DETECTED) continue;
+
+      const esp_mn_results_t* results = multinet->get_results(model_data);
+      bool target_detected = false;
+      if (results != nullptr) {
+        for (int index = 0; index < results->num; ++index) {
+          ESP_LOGI(kTag,
+                   "MultiNet result: command_id=%d text=%s probability=%.3f",
+                   results->command_id[index], results->string,
+                   results->prob[index]);
+          target_detected = target_detected ||
+                            results->command_id[index] == kWakeCommandId;
+        }
+      }
+      multinet->clean(model_data);
+      if (target_detected) {
+        ESP_LOGI(kTag, "MultiNet wake word detected: %s",
+                 zhima::kWakeWordText);
+      }
+      return target_detected;
     }
-    if (interpreter->Invoke() != kTfLiteOk) {
-      ESP_LOGW(kTag, "TFLite invocation failed");
-      return 0.0f;
-    }
-    return (static_cast<int>(output->data.int8[1]) - output->params.zero_point) *
-           output->params.scale;
+    return false;
   }
 
-  const tflite::Model* model{nullptr};
-  tflite::MicroMutableOpResolver<6> resolver;
-  alignas(16) std::array<uint8_t, kTensorArenaBytes> arena{};
-  std::array<float, zhima::kFrameSize> window{};
-  std::array<float, zhima::kFeatureBins> coefficients{};
-  std::array<int16_t, zhima::kClipSamples> ring{};
-  tflite::MicroInterpreter* interpreter{nullptr};
-  TfLiteTensor* input{nullptr};
-  TfLiteTensor* output{nullptr};
-  size_t write_index{0};
-  size_t filled_samples{0};
-  size_t frames_since_inference{0};
-  size_t consecutive_wake_scores{0};
-  int64_t last_wake_us{std::numeric_limits<int64_t>::min() / 2};
-};
-
-struct WakeVadEngine::SpeechVadRuntime {
-  ~SpeechVadRuntime() {
-    if (handle != nullptr) vad_destroy(handle);
-  }
-
-  bool initialize() {
-    handle = vad_create_with_param(static_cast<vad_mode_t>(kVadMode),
-                                   kVadSampleRateHz, kVadFrameMs,
-                                   kVadMinimumSpeechMs, kVadMinimumNoiseMs);
-    return handle != nullptr;
-  }
-
-  bool is_speech(const int16_t* pcm) const {
-    // ESP-SR's C API predates const-correctness; it reads this audio frame.
-    return vad_process(handle, const_cast<int16_t*>(pcm), kVadSampleRateHz,
-                       kVadFrameMs) == VAD_SPEECH;
-  }
-
-  vad_handle_t handle{nullptr};
+  srmodel_list_t* models{nullptr};
+  char* model_name{nullptr};
+  esp_mn_iface_t* multinet{nullptr};
+  model_iface_data_t* model_data{nullptr};
+  const esp_afe_sr_iface_t* afe_iface{nullptr};
+  esp_afe_sr_data_t* afe_data{nullptr};
+  std::array<int16_t, kRuntimeBufferSamples> afe_input{};
+  std::array<int16_t, kRuntimeBufferSamples> multinet_input{};
+  size_t afe_buffered{0};
+  size_t multinet_buffered{0};
+  int afe_feed_samples{0};
+  int multinet_samples{0};
+  bool commands_allocated{false};
 };
 
 WakeVadEngine::~WakeVadEngine() { stop(); }
 
 esp_err_t WakeVadEngine::start() {
   if (running_) return ESP_OK;
+
   wakeword_ = new (std::nothrow) WakeWordRuntime;
-  speech_vad_ = new (std::nothrow) SpeechVadRuntime;
-  if (wakeword_ == nullptr || speech_vad_ == nullptr ||
-      !wakeword_->initialize() || !speech_vad_->initialize()) {
+  if (wakeword_ == nullptr || !wakeword_->initialize()) {
     stop();
     return ESP_ERR_NO_MEM;
   }
-  signal_queue_ = xQueueCreate(16, sizeof(WakeVadSignal));
-  if (signal_queue_ == nullptr) {
+  audio_queue_ = xQueueCreate(kAudioQueueDepth, sizeof(WakeAudioFrame));
+  signal_queue_ = xQueueCreate(kSignalQueueDepth, sizeof(WakeVadSignal));
+  if (audio_queue_ == nullptr || signal_queue_ == nullptr) {
     stop();
     return ESP_ERR_NO_MEM;
   }
+
+  wake_enabled_ = true;
+  wake_reset_requested_ = true;
+  dropped_audio_frames_ = 0;
   running_ = true;
-  ESP_LOGI(kTag,
-           "custom TFLite wake word + ESP-SR VAD mode 3 ready (start=60 ms, continuation=40 ms)");
+  if (xTaskCreatePinnedToCore(processing_task_entry, "wake_vad_work", 12288,
+                              this, 5, &processing_task_, 1) != pdPASS) {
+    stop();
+    return ESP_ERR_NO_MEM;
+  }
+  ESP_LOGI(kTag, "ESP-SR AFE VAD + MultiNet wake detector ready");
   return ESP_OK;
 }
 
 void WakeVadEngine::stop() {
   running_ = false;
+  if (processing_task_ != nullptr) {
+    for (int attempt = 0; attempt < 50 && processing_task_ != nullptr;
+         ++attempt) {
+      vTaskDelay(pdMS_TO_TICKS(10));
+    }
+    if (processing_task_ != nullptr) {
+      vTaskDelete(processing_task_);
+      processing_task_ = nullptr;
+    }
+  }
   if (signal_queue_ != nullptr) {
     vQueueDelete(signal_queue_);
     signal_queue_ = nullptr;
   }
-  delete speech_vad_;
-  speech_vad_ = nullptr;
+  if (audio_queue_ != nullptr) {
+    vQueueDelete(audio_queue_);
+    audio_queue_ = nullptr;
+  }
   delete wakeword_;
   wakeword_ = nullptr;
+  wake_enabled_ = true;
+  wake_reset_requested_ = false;
+  dropped_audio_frames_ = 0;
+}
+
+void WakeVadEngine::set_wake_enabled(bool enabled) {
+  if (wake_enabled_.exchange(enabled) != enabled) {
+    wake_reset_requested_ = true;
+  }
 }
 
 esp_err_t WakeVadEngine::feed_pcm(const int16_t* pcm, size_t samples) {
-  if (!running_ || wakeword_ == nullptr || pcm == nullptr || samples == 0) {
+  if (!running_ || pcm == nullptr || wakeword_ == nullptr ||
+      audio_queue_ == nullptr) {
     return ESP_ERR_INVALID_STATE;
   }
+  if (samples != sesame::audio::kSamplesPerFrame) return ESP_ERR_INVALID_SIZE;
 
-  if (speech_vad_ == nullptr || samples != kVadSampleRateHz * kVadFrameMs / 1000) {
-    return ESP_ERR_INVALID_SIZE;
+  WakeAudioFrame frame{};
+  std::memcpy(frame.samples.data(), pcm, samples * sizeof(int16_t));
+  if (xQueueSend(audio_queue_, &frame, 0) != pdTRUE) {
+    const uint32_t dropped = dropped_audio_frames_.fetch_add(1) + 1;
+    if (dropped == 1 || (dropped & (dropped - 1)) == 0) {
+      ESP_LOGW(kTag, "AFE/MultiNet worker lagged; dropped %lu frame(s)",
+               static_cast<unsigned long>(dropped));
+    }
+    return ESP_ERR_TIMEOUT;
   }
-
-  const WakeVadSignal signal{
-      .wake_detected = wakeword_->append_and_detect(pcm, samples),
-      .vad_speech = speech_vad_->is_speech(pcm),
-  };
-  if (signal_queue_ != nullptr) xQueueSend(signal_queue_, &signal, 0);
   return ESP_OK;
 }
 
 bool WakeVadEngine::read_signal(WakeVadSignal* signal) {
   return signal != nullptr && signal_queue_ != nullptr &&
          xQueueReceive(signal_queue_, signal, 0) == pdTRUE;
+}
+
+void WakeVadEngine::processing_task_entry(void* context) {
+  auto* self = static_cast<WakeVadEngine*>(context);
+  self->processing_loop();
+  self->processing_task_ = nullptr;
+  vTaskDelete(nullptr);
+}
+
+void WakeVadEngine::processing_loop() {
+  while (running_) {
+    WakeAudioFrame frame{};
+    if (xQueueReceive(audio_queue_, &frame, pdMS_TO_TICKS(100)) != pdTRUE) {
+      continue;
+    }
+    if (!running_) return;
+    if (wake_reset_requested_.exchange(false)) wakeword_->reset_detection();
+
+    WakeVadSignal signal{};
+    if (!wakeword_->process_pcm(frame.samples.data(), frame.samples.size(),
+                                 wake_enabled_.load(), &signal)) {
+      continue;
+    }
+    if (signal.wake_detected) {
+      // Stop recognition at the model boundary. The controller re-arms only
+      // after it has returned to idle, preventing repeated detections of one
+      // utterance or a local TTS reply.
+      wake_enabled_ = false;
+      wake_reset_requested_ = true;
+    }
+    if (signal_queue_ != nullptr) xQueueSend(signal_queue_, &signal, 0);
+  }
 }
 
 }  // namespace sesame::voice

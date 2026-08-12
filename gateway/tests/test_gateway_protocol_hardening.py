@@ -114,6 +114,9 @@ def _hello(*, device_id: str, conversation_id: str | None, sequence: int = 0) ->
 
 
 def _control_event(event_type: str, *, sequence: int, payload: dict[str, object] | None = None) -> ControlEvent:
+    resolved_payload = (
+        {"trigger": "manual"} if event_type == "listen.start" and payload is None else payload or {}
+    )
     return ControlEvent(
         v=1,
         type=event_type,  # type: ignore[arg-type]
@@ -122,7 +125,7 @@ def _control_event(event_type: str, *, sequence: int, payload: dict[str, object]
         request_id="act_001" if event_type == "action.result" else None,
         sequence=sequence,
         timestamp_ms=1_000,
-        payload=payload or {},
+        payload=resolved_payload,
     )
 
 
@@ -316,6 +319,32 @@ class GatewayProtocolHardeningTest(unittest.IsolatedAsyncioTestCase):
                 _control_event("listen.stop", sequence=1),
             )
 
+    async def test_listen_start_requires_a_capture_trigger(self) -> None:
+        with self.assertRaises(ControlProtocolError):
+            parse_control_event(
+                serialize_control_event(
+                    _control_event("listen.start", sequence=1, payload={})
+                )
+            )
+
+        event = parse_control_event(
+            serialize_control_event(
+                _control_event(
+                    "listen.start", sequence=1, payload={"trigger": "manual"}
+                )
+            )
+        )
+        self.assertEqual(event.payload["trigger"], "manual")
+
+        followup = parse_control_event(
+            serialize_control_event(
+                _control_event(
+                    "listen.start", sequence=2, payload={"trigger": "followup"}
+                )
+            )
+        )
+        self.assertEqual(followup.payload["trigger"], "followup")
+
     async def test_audio_requires_opus_uplink_stream_one_and_single_generation(self) -> None:
         session = _session()
 
@@ -338,7 +367,7 @@ class GatewayProtocolHardeningTest(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(AudioProtocolError, "duration"):
             _receive_audio(session, _uplink_audio(sequence=1_500, payload=b"x"))
 
-    async def test_response_plan_deadline_uses_its_locked_send_timestamp(self) -> None:
+    async def test_response_plan_omits_an_agent_action_and_its_deadline(self) -> None:
         websocket = FakeWebSocket()
         session = _session(listening=False)
         result = TurnResult(
@@ -358,10 +387,10 @@ class GatewayProtocolHardeningTest(unittest.IsolatedAsyncioTestCase):
             await _send_turn_result(websocket, session, result)
 
         response_plan = parse_control_event(websocket.text_frames[0])
-        self.assertEqual(
-            response_plan.payload["action_deadline_ms"],
-            response_plan.timestamp_ms + 5_000,
-        )
+        self.assertIsNone(response_plan.payload["action_id"])
+        self.assertIsNone(response_plan.payload["action_request_id"])
+        self.assertIsNone(response_plan.payload["action_duration_ms"])
+        self.assertIsNone(response_plan.payload["action_deadline_ms"])
 
     async def test_unexpected_provider_error_returns_only_generic_error(self) -> None:
         websocket = FakeWebSocket()

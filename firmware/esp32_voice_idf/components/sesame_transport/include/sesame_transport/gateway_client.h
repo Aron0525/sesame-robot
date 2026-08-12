@@ -10,6 +10,7 @@
 #include "esp_netif.h"
 #include "esp_websocket_client.h"
 #include "freertos/event_groups.h"
+#include "freertos/semphr.h"
 
 #include "sesame_transport/device_config.h"
 
@@ -35,10 +36,14 @@ class GatewayClient {
   esp_err_t start(const StoredDeviceConfig& config, GatewayObserver* observer);
   void stop();
   bool connected() const;
-  esp_err_t send_text(const char* data, size_t size);
-  esp_err_t send_binary(const uint8_t* data, size_t size);
+  esp_err_t send_text(const char* data, size_t size,
+                      uint32_t timeout_ms = 2000);
+  esp_err_t send_binary(const uint8_t* data, size_t size,
+                        uint32_t timeout_ms = 2000);
 
  private:
+  static constexpr uint32_t kWebsocketTaskStackBytes = 8192;
+
   static void wifi_event(void* context, esp_event_base_t event_base,
                          int32_t event_id, void* event_data);
   static void websocket_event(void* handler_arg, esp_event_base_t event_base,
@@ -54,16 +59,21 @@ class GatewayClient {
                                   esp_netif_t* station);
   esp_err_t connect_wifi(const StoredDeviceConfig& config);
   esp_err_t discover_gateway(const StoredDeviceConfig& config);
+  esp_err_t ensure_client_mutex();
+  void stop_locked();
+  bool connected_locked() const;
 
   std::atomic<GatewayObserver*> observer_{nullptr};
   std::atomic<bool> disconnect_reported_{false};
   esp_websocket_client_handle_t client_{nullptr};
+  SemaphoreHandle_t client_mutex_{nullptr};
   std::array<char, 256> uri_{};
   std::array<char, 256> gateway_tls_name_{};
   std::array<char, 300> authorization_{};
   std::array<uint8_t, 2048> receive_buffer_{};
   size_t receive_size_{0};
   uint8_t receive_opcode_{0};
+  uint32_t receive_frame_count_{0};
   EventGroupHandle_t wifi_event_group_{nullptr};
   esp_event_handler_instance_t wifi_event_handler_{};
   esp_event_handler_instance_t ip_event_handler_{};

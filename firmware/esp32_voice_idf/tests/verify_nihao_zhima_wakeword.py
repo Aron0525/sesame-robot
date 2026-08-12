@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the embedded 你好芝麻 WakeNet asset and deployment contract."""
+"""Verify the embedded real-19 “你好，芝麻” model contract."""
 from __future__ import annotations
 
 import hashlib
@@ -7,17 +7,19 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MODEL = ROOT / "components/sesame_voice/models/zhima_wakeword_tts_v2_int8.tflite"
+MODEL = ROOT / "components/sesame_voice/models/nihao_zhima_real19_int8.tflite"
 EMBEDDED = ROOT / "components/sesame_voice/zhima_wakeword_model_data.cpp"
 CONFIG = ROOT / "components/sesame_voice/include/sesame_voice/zhima_wakeword_config.h"
 ENGINE = ROOT / "components/sesame_voice/wake_vad_engine.cpp"
-EXPECTED_SHA256 = "79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065"
+EXPECTED_SHA256 = "6771a84c417ace896a3257321b21d9ab1306a7d03e264c2ffb1a06dccac2dd1a"
 EXPECTED_CONFIG = (
-    "kFeatureMean = -17.3653469f",
-    "kFeatureStd = 2.71605949f",
-    "kInputScale = 0.0244557578f",
-    "kInputZeroPoint = -77",
-    "kWakeThreshold = 0.85f",
+    'kModelName[] = "nihao_zhima_real19_int8"',
+    "kModelBytes = 22456",
+    "kFeatureMean = -17.9795761f",
+    "kFeatureStd = 2.57871799f",
+    "kInputScale = 0.0263375342f",
+    "kInputZeroPoint = -88",
+    "kWakeThreshold = 0.92f",
     "kInferenceStrideMs = 200",
 )
 
@@ -36,8 +38,8 @@ def main() -> None:
     assert 'kWakeWordText[] = "你好芝麻"' in config
     engine = ENGINE.read_text(encoding="utf-8")
     assert "if (score < zhima::kWakeThreshold" in engine
-    assert "smoothed_score" not in engine
-    print(f"nihao-zhima WakeNet verified: bytes={len(model)} sha256={EXPECTED_SHA256}")
+    assert "smoothed_score = 0.65f * smoothed_score + 0.35f * raw_score;" in engine
+    print(f"nihao-zhima real-19 model verified: bytes={len(model)} sha256={EXPECTED_SHA256}")
 
 
 if __name__ == "__main__":

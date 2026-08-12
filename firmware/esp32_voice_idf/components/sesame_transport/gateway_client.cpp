@@ -11,6 +11,7 @@
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
+#include "freertos/task.h"
 #include "lwip/ip_addr.h"
 #include "mdns.h"
 
@@ -57,6 +58,10 @@ bool format_mdns_ipv4(const mdns_result_t* result, char* output,
 
 GatewayClient::~GatewayClient() {
   stop();
+  if (client_mutex_ != nullptr) {
+    vSemaphoreDelete(client_mutex_);
+    client_mutex_ = nullptr;
+  }
   if (wifi_handlers_registered_) {
     esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID,
                                           wifi_event_handler_);
@@ -445,20 +450,26 @@ esp_err_t GatewayClient::start(const StoredDeviceConfig& config,
   if (validate_device_config(config.view()) != ConfigError::kOk) {
     return ESP_ERR_INVALID_ARG;
   }
-  stop();
+  if (ensure_client_mutex() != ESP_OK ||
+      xSemaphoreTake(client_mutex_, portMAX_DELAY) != pdTRUE) {
+    return ESP_ERR_NO_MEM;
+  }
+  stop_locked();
   observer_.store(observer);
   disconnect_reported_.store(false);
 
   esp_err_t result = connect_wifi(config);
   if (result != ESP_OK) {
-    stop();
+    stop_locked();
+    xSemaphoreGive(client_mutex_);
     return result;
   }
   // VoiceController owns exponential retry so every retry starts with a new
   // mDNS query instead of blocking this task through nested retry loops.
   result = discover_gateway(config);
   if (result != ESP_OK) {
-    stop();
+    stop_locked();
+    xSemaphoreGive(client_mutex_);
     return result;
   }
 
@@ -467,7 +478,8 @@ esp_err_t GatewayClient::start(const StoredDeviceConfig& config,
       "Authorization: Bearer %s\r\n", config.device_token.data());
   if (header_size <= 0 ||
       static_cast<size_t>(header_size) >= authorization_.size()) {
-    stop();
+    stop_locked();
+    xSemaphoreGive(client_mutex_);
     return ESP_ERR_INVALID_SIZE;
   }
 
@@ -480,7 +492,7 @@ esp_err_t GatewayClient::start(const StoredDeviceConfig& config,
   websocket_config.user_context = this;
   websocket_config.task_prio = 6;
   websocket_config.task_name = "sesame_wss";
-  websocket_config.task_stack = 8192;
+  websocket_config.task_stack = kWebsocketTaskStackBytes;
   websocket_config.buffer_size = 2048;
   websocket_config.cert_pem = config.root_ca.data();
   websocket_config.headers = authorization_.data();
@@ -498,25 +510,38 @@ esp_err_t GatewayClient::start(const StoredDeviceConfig& config,
   websocket_config.ping_interval_sec = 10;
   client_ = esp_websocket_client_init(&websocket_config);
   if (client_ == nullptr) {
-    stop();
+    stop_locked();
+    xSemaphoreGive(client_mutex_);
     return ESP_ERR_NO_MEM;
   }
   result = esp_websocket_register_events(client_, WEBSOCKET_EVENT_ANY,
                                          websocket_event, this);
   if (result != ESP_OK) {
-    stop();
+    stop_locked();
+    xSemaphoreGive(client_mutex_);
     return result;
   }
   result = esp_websocket_client_start(client_);
   if (result != ESP_OK) {
-    stop();
+    stop_locked();
+    xSemaphoreGive(client_mutex_);
     return result;
   }
+  xSemaphoreGive(client_mutex_);
   ESP_LOGI(kTag, "P1 WSS starting; VoiceController owns rediscovery");
   return ESP_OK;
 }
 
 void GatewayClient::stop() {
+  if (client_mutex_ == nullptr ||
+      xSemaphoreTake(client_mutex_, portMAX_DELAY) != pdTRUE) {
+    return;
+  }
+  stop_locked();
+  xSemaphoreGive(client_mutex_);
+}
+
+void GatewayClient::stop_locked() {
   // Suppress callbacks before tearing down the client. Reconnect scheduling
   // belongs to VoiceController's task, never to the WebSocket event task.
   observer_.store(nullptr);
@@ -529,25 +554,59 @@ void GatewayClient::stop() {
 }
 
 bool GatewayClient::connected() const {
+  if (client_mutex_ == nullptr ||
+      xSemaphoreTake(client_mutex_, portMAX_DELAY) != pdTRUE) {
+    return false;
+  }
+  const bool result = connected_locked();
+  xSemaphoreGive(client_mutex_);
+  return result;
+}
+
+bool GatewayClient::connected_locked() const {
   return client_ != nullptr && esp_websocket_client_is_connected(client_);
 }
 
-esp_err_t GatewayClient::send_text(const char* data, size_t size) {
-  if (!connected()) return ESP_ERR_INVALID_STATE;
+esp_err_t GatewayClient::ensure_client_mutex() {
+  if (client_mutex_ != nullptr) return ESP_OK;
+  client_mutex_ = xSemaphoreCreateMutex();
+  return client_mutex_ == nullptr ? ESP_ERR_NO_MEM : ESP_OK;
+}
+
+esp_err_t GatewayClient::send_text(const char* data, size_t size,
+                                   uint32_t timeout_ms) {
   if (data == nullptr || size == 0 || size > 16384) return ESP_ERR_INVALID_ARG;
+  if (client_mutex_ == nullptr ||
+      xSemaphoreTake(client_mutex_, pdMS_TO_TICKS(timeout_ms)) != pdTRUE) {
+    return ESP_ERR_TIMEOUT;
+  }
+  if (!connected_locked()) {
+    xSemaphoreGive(client_mutex_);
+    return ESP_ERR_INVALID_STATE;
+  }
   const int sent = esp_websocket_client_send_text(
-      client_, data, static_cast<int>(size), pdMS_TO_TICKS(2000));
+      client_, data, static_cast<int>(size), pdMS_TO_TICKS(timeout_ms));
+  xSemaphoreGive(client_mutex_);
   return sent == static_cast<int>(size) ? ESP_OK : ESP_FAIL;
 }
 
-esp_err_t GatewayClient::send_binary(const uint8_t* data, size_t size) {
-  if (!connected()) return ESP_ERR_INVALID_STATE;
+esp_err_t GatewayClient::send_binary(const uint8_t* data, size_t size,
+                                     uint32_t timeout_ms) {
   if (data == nullptr || size == 0 || size > receive_buffer_.size()) {
     return ESP_ERR_INVALID_ARG;
   }
+  if (client_mutex_ == nullptr ||
+      xSemaphoreTake(client_mutex_, pdMS_TO_TICKS(timeout_ms)) != pdTRUE) {
+    return ESP_ERR_TIMEOUT;
+  }
+  if (!connected_locked()) {
+    xSemaphoreGive(client_mutex_);
+    return ESP_ERR_INVALID_STATE;
+  }
   const int sent = esp_websocket_client_send_bin(
       client_, reinterpret_cast<const char*>(data), static_cast<int>(size),
-      pdMS_TO_TICKS(2000));
+      pdMS_TO_TICKS(timeout_ms));
+  xSemaphoreGive(client_mutex_);
   return sent == static_cast<int>(size) ? ESP_OK : ESP_FAIL;
 }
 
@@ -565,6 +624,7 @@ void GatewayClient::handle_websocket_event(
   if (observer == nullptr) return;
   if (event_id == WEBSOCKET_EVENT_CONNECTED) {
     receive_size_ = 0;
+    receive_frame_count_ = 0;
     disconnect_reported_.store(false);
     ESP_LOGI(kTag, "P1 WSS transport connected");
     observer->on_gateway_connected();
@@ -607,6 +667,12 @@ void GatewayClient::handle_websocket_event(
     }
   } else if (receive_opcode_ == 0x2) {
     observer->on_gateway_binary(receive_buffer_.data(), receive_size_);
+  }
+  ++receive_frame_count_;
+  if (receive_frame_count_ == 1 || receive_frame_count_ % 100 == 0) {
+    ESP_LOGI(kTag, "WSS event task stack free=%u bytes after %lu frames",
+             static_cast<unsigned>(uxTaskGetStackHighWaterMark(nullptr)),
+             static_cast<unsigned long>(receive_frame_count_));
   }
   receive_size_ = 0;
 }

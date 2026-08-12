@@ -4,13 +4,16 @@
 #include <array>
 #include <cstdio>
 #include <cstring>
+#include <new>
 
 #include "cJSON.h"
 #include "driver/gpio.h"
 #include "esp_check.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_random.h"
 #include "esp_timer.h"
+#include "freertos/idf_additions.h"
 
 #include "sesame_protocol/audio_frame.h"
 #include "sesame_protocol/control_event.h"
@@ -24,6 +27,10 @@ constexpr char kTag[] = "sesame_voice";
 constexpr gpio_num_t kVoiceButton = GPIO_NUM_0;
 constexpr uint64_t kMaximumActionDeadlineLeadMs = 5000;
 constexpr uint64_t kGatewayConnectDeadlineMs = 15000;
+constexpr uint32_t kMaximumRecordingDurationMs = 10000;
+constexpr char kManualListenStartPayload[] = R"({"trigger":"manual"})";
+constexpr char kWakewordListenStartPayload[] = R"({"trigger":"wakeword"})";
+constexpr char kFollowupListenStartPayload[] = R"({"trigger":"followup"})";
 
 uint64_t now_ms() {
   return static_cast<uint64_t>(esp_timer_get_time()) / 1000ULL;
@@ -143,7 +150,7 @@ esp_err_t VoiceController::start() {
     return ESP_ERR_INVALID_STATE;
   }
   ESP_RETURN_ON_ERROR(codec_.initialize(), kTag, "initialize Opus codec");
-  ESP_RETURN_ON_ERROR(wake_vad_.start(), kTag, "initialize WakeNet + VAD");
+  ESP_RETURN_ON_ERROR(wake_vad_.start(), kTag, "initialize wake word + VAD");
   ESP_RETURN_ON_ERROR(load_device_config(&config_), kTag,
                       "load device configuration from NVS");
 
@@ -156,25 +163,105 @@ esp_err_t VoiceController::start() {
   };
   ESP_RETURN_ON_ERROR(gpio_config(&button_config), kTag,
                       "configure BOOT voice button");
+  ESP_LOGI(kTag,
+           "BOOT recording toggle ready: debounce=80 ms, maximum=10000 ms");
+
+  ESP_LOGI(kTag,
+           "voice allocation before queues: internal free=%lu largest=%lu; PSRAM free=%lu; "
+           "downlink=%u x 16; gateway=%u x %u; outbound=%u x %u",
+           static_cast<unsigned long>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL)),
+           static_cast<unsigned long>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL)),
+           static_cast<unsigned long>(heap_caps_get_free_size(MALLOC_CAP_SPIRAM)),
+           static_cast<unsigned>(sizeof(DownlinkPacket)),
+           static_cast<unsigned>(sizeof(GatewayEvent)),
+           static_cast<unsigned>(kGatewayEventQueueDepth),
+           static_cast<unsigned>(sizeof(OutboundFrame)),
+           static_cast<unsigned>(kOutboundQueueDepth));
 
   downlink_queue_ = xQueueCreate(16, sizeof(DownlinkPacket));
-  if (downlink_queue_ == nullptr) return ESP_ERR_NO_MEM;
-  gateway_event_queue_ =
-      xQueueCreate(kGatewayEventQueueDepth, sizeof(GatewayEvent));
+  if (downlink_queue_ == nullptr) {
+    ESP_LOGE(kTag, "allocate downlink queue in internal RAM");
+    return ESP_ERR_NO_MEM;
+  }
+  gateway_event_queue_ = xQueueCreate(kGatewayEventQueueDepth,
+                                      sizeof(GatewayEvent));
   if (gateway_event_queue_ == nullptr) {
+    ESP_LOGE(kTag, "allocate gateway event queue in internal RAM");
     vQueueDelete(downlink_queue_);
     downlink_queue_ = nullptr;
     return ESP_ERR_NO_MEM;
   }
 
+  outbound_queue_ = xQueueCreate(kOutboundQueueDepth, sizeof(OutboundFrame));
+  if (outbound_queue_ == nullptr) {
+    ESP_LOGE(kTag, "allocate outbound queue in internal RAM");
+    vQueueDelete(gateway_event_queue_);
+    gateway_event_queue_ = nullptr;
+    vQueueDelete(downlink_queue_);
+    downlink_queue_ = nullptr;
+    return ESP_ERR_NO_MEM;
+  }
+
+  const esp_err_t store_result = conversation_store_.start();
+  if (store_result != ESP_OK) {
+    vQueueDelete(outbound_queue_);
+    outbound_queue_ = nullptr;
+    vQueueDelete(gateway_event_queue_);
+    gateway_event_queue_ = nullptr;
+    vQueueDelete(downlink_queue_);
+    downlink_queue_ = nullptr;
+    return store_result;
+  }
+
+  void* preroll_storage = heap_caps_calloc(
+      1, sizeof(PcmPreRollBuffer), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (preroll_storage == nullptr) {
+    conversation_store_.stop();
+    vQueueDelete(outbound_queue_);
+    outbound_queue_ = nullptr;
+    vQueueDelete(gateway_event_queue_);
+    gateway_event_queue_ = nullptr;
+    vQueueDelete(downlink_queue_);
+    downlink_queue_ = nullptr;
+    return ESP_ERR_NO_MEM;
+  }
+  pcm_preroll_ = new (preroll_storage) PcmPreRollBuffer();
+
   gateway_reconnect_schedule_.reset();
-  gateway_connecting_ = false;
+  gateway_connection_.disconnected();
   gateway_connect_deadline_ms_ = 0;
   next_gateway_attempt_ms_ = 0;
   running_ = true;
-  if (xTaskCreatePinnedToCore(task_entry, "sesame_voice", 12288, this, 7,
-                              &task_, 1) != pdPASS) {
+  if (xTaskCreatePinnedToCore(outbound_task_entry, "sesame_uplink",
+                              kOutboundTaskStackBytes, this, 5,
+                              &outbound_task_, 0) != pdPASS) {
     running_ = false;
+    conversation_store_.stop();
+    pcm_preroll_->~PcmPreRollBuffer();
+    heap_caps_free(pcm_preroll_);
+    pcm_preroll_ = nullptr;
+    vQueueDelete(outbound_queue_);
+    outbound_queue_ = nullptr;
+    vQueueDelete(gateway_event_queue_);
+    gateway_event_queue_ = nullptr;
+    vQueueDelete(downlink_queue_);
+    downlink_queue_ = nullptr;
+    return ESP_ERR_NO_MEM;
+  }
+  if (xTaskCreatePinnedToCoreWithCaps(
+          task_entry, "sesame_voice", kVoiceTaskStackBytes, this, 7, &task_,
+          1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT) != pdPASS) {
+    running_ = false;
+    conversation_store_.stop();
+    pcm_preroll_->~PcmPreRollBuffer();
+    heap_caps_free(pcm_preroll_);
+    pcm_preroll_ = nullptr;
+    if (outbound_task_ != nullptr) {
+      vTaskDelete(outbound_task_);
+      outbound_task_ = nullptr;
+    }
+    vQueueDelete(outbound_queue_);
+    outbound_queue_ = nullptr;
     vQueueDelete(downlink_queue_);
     downlink_queue_ = nullptr;
     vQueueDelete(gateway_event_queue_);
@@ -188,17 +275,33 @@ esp_err_t VoiceController::start() {
 void VoiceController::stop() {
   running_ = false;
   wake_vad_.stop();
-  gateway_.stop();
   if (task_ != nullptr) {
     for (int attempt = 0; attempt < 50 && task_ != nullptr; ++attempt) {
       vTaskDelay(pdMS_TO_TICKS(10));
     }
     if (task_ != nullptr) {
-      vTaskDelete(task_);
+      vTaskDeleteWithCaps(task_);
       task_ = nullptr;
     }
   }
-  // The voice task is now stopped, so no I2S writer can race this final mute.
+  if (outbound_task_ != nullptr) {
+    for (int attempt = 0; attempt < 50 && outbound_task_ != nullptr;
+         ++attempt) {
+      vTaskDelay(pdMS_TO_TICKS(10));
+    }
+    if (outbound_task_ != nullptr) {
+      vTaskDelete(outbound_task_);
+      outbound_task_ = nullptr;
+    }
+  }
+  gateway_.stop();
+  conversation_store_.stop();
+  if (pcm_preroll_ != nullptr) {
+    pcm_preroll_->~PcmPreRollBuffer();
+    heap_caps_free(pcm_preroll_);
+    pcm_preroll_ = nullptr;
+  }
+  // The voice task is stopped, so no I2S writer can race this final mute.
   stop_wake_ack();
   if (downlink_queue_ != nullptr) {
     vQueueDelete(downlink_queue_);
@@ -208,6 +311,10 @@ void VoiceController::stop() {
     vQueueDelete(gateway_event_queue_);
     gateway_event_queue_ = nullptr;
   }
+  if (outbound_queue_ != nullptr) {
+    vQueueDelete(outbound_queue_);
+    outbound_queue_ = nullptr;
+  }
   codec_.shutdown();
 }
 
@@ -215,61 +322,127 @@ void VoiceController::task_entry(void* context) {
   auto* self = static_cast<VoiceController*>(context);
   self->run();
   self->task_ = nullptr;
+  vTaskDeleteWithCaps(nullptr);
+}
+
+void VoiceController::outbound_task_entry(void* context) {
+  auto* self = static_cast<VoiceController*>(context);
+  self->outbound_loop();
+  self->outbound_task_ = nullptr;
   vTaskDelete(nullptr);
+}
+
+void VoiceController::outbound_loop() {
+  while (running_) {
+    OutboundFrame& frame = outbound_work_frame_;
+    frame = {};
+    if (outbound_queue_ == nullptr ||
+        xQueueReceive(outbound_queue_, &frame, pdMS_TO_TICKS(100)) != pdTRUE) {
+      continue;
+    }
+    if (!running_ ||
+        frame.connection_epoch != outbound_connection_epoch_.load()) {
+      continue;
+    }
+
+    const esp_err_t result = frame.kind == OutboundFrameKind::kText
+                                 ? gateway_.send_text(
+                                       reinterpret_cast<const char*>(frame.data.data()),
+                                       frame.size, 2000)
+                                 : gateway_.send_binary(frame.data.data(), frame.size,
+                                                        2000);
+    if (result != ESP_OK) {
+      ESP_LOGW(kTag, "outbound WSS frame dropped: kind=%s result=%s",
+               frame.kind == OutboundFrameKind::kText ? "text" : "binary",
+               esp_err_to_name(result));
+      // A lost control frame or a sequence-bearing audio frame makes the
+      // current protocol session unrecoverable. Reconnect instead of sending
+      // later frames into a guaranteed sequence error.
+      transport_fault_requested_ = true;
+    } else if (frame.kind == OutboundFrameKind::kBinary &&
+               first_uplink_pending_.exchange(false)) {
+      ESP_LOGI(kTag, "first uplink frame sent; sender stack free=%u bytes",
+               static_cast<unsigned>(uxTaskGetStackHighWaterMark(nullptr)));
+    }
+  }
 }
 
 void VoiceController::run() {
   while (running_) {
     process_gateway_events();
     const uint64_t timestamp = now_ms();
+    if (downlink_fault_requested_.exchange(false)) {
+      fail_tts_playback("downlink queue overflow");
+    }
+    if (transport_fault_requested_.exchange(false)) {
+      ESP_LOGW(kTag, "WSS send failed; resetting protocol session");
+      gateway_.stop();
+      handle_gateway_disconnected();
+    }
     maintain_gateway_connection(timestamp);
     const bool pressed = gpio_get_level(kVoiceButton) == 0;
     handle_button(button_.update(pressed, timestamp), timestamp);
 
+    const VoiceTurnState local_voice_state = wake_turn_detector_.state();
+    const bool idle_wake =
+        !tts_active_ &&
+        turn_state_.state() == sesame::protocol::TurnState::kIdle &&
+        local_voice_state == VoiceTurnState::kIdleWakeListening;
+    const bool tts_barge_in =
+        tts_active_ && local_voice_state == VoiceTurnState::kTtsPlaying;
+    const bool wake_should_be_armed =
+        session_ready_ && !wake_ack_active_ && !capture_session_.active() &&
+        (idle_wake || tts_barge_in);
+    wake_vad_.set_wake_enabled(wake_should_be_armed);
+
     if (wake_ack_active_) {
-      // AEC is intentionally not enabled in this change. Keep the microphone
-      // off while the local acknowledgement plays, then open the 3-second
-      // first-speech window after its final audio frame.
+      // No AEC is active. Keep the microphone quiet during the local prompt,
+      // then start the three-second speech window only after it is audible.
       play_wake_ack_frame(timestamp);
-    } else if (should_capture_for_wake(tts_active_)) {
+    } else if (session_ready_) {
       std::array<int16_t, sesame::audio::kSamplesPerFrame> pcm{};
       if (audio_->read_microphone_frame(pcm.data(), pcm.size(), 100) == ESP_OK) {
-        if (wake_vad_.feed_pcm(pcm.data(), pcm.size()) != ESP_OK) {
-          ESP_LOGW(kTag, "WakeNet feed failed");
+        const VoiceTurnState state_before_feed = wake_turn_detector_.state();
+        const bool waiting_for_speech =
+            state_before_feed == VoiceTurnState::kWaitingForFirstSpeech ||
+            state_before_feed == VoiceTurnState::kWaitingForFollowupSpeech;
+        if (pcm_preroll_ != nullptr &&
+            (capture_session_.active() || waiting_for_speech)) {
+          pcm_preroll_->push(pcm.data(), pcm.size(), timestamp);
         }
-        if ((button_.recording() && session_ready_) || wake_listening_) {
-          capture_and_send(pcm.data(), timestamp);
+        if (capture_session_.active()) {
+          // Add one live frame and consume up to two, catching up the 500-ms
+          // pre-roll without interrupting the 20-ms microphone cadence.
+          drain_pcm_uplink(2);
+        }
+        if (!tts_active_ ||
+            should_capture_for_wake(tts_active_.load())) {
+          wake_vad_.feed_pcm(pcm.data(), pcm.size());
         }
         process_wake_vad_signals(timestamp);
       }
-    } else {
-      // The TTS barge-in transition is represented by VoiceTurnDetector, but
-      // remains unwired until AEC provides speech-safe microphone frames.
-      play_pending_audio();
-      complete_tts_if_drained();
-      vTaskDelay(pdMS_TO_TICKS(5));
     }
+    if (capture_session_.expired(timestamp, kMaximumRecordingDurationMs)) {
+      finish_listening("maximum-duration");
+    }
+    play_pending_audio();
+    complete_tts_if_drained();
+    if (!session_ready_) vTaskDelay(pdMS_TO_TICKS(5));
   }
 }
 
 void VoiceController::maintain_gateway_connection(uint64_t timestamp) {
-  // `esp_websocket_client_is_connected()` can briefly report false while the
-  // client dispatches a just-received control frame. A validated
-  // `session.ready` is stronger evidence that the active WSS session is
-  // usable. Do not destroy that session merely because of this transient;
-  // the actual disconnect callback clears `session_ready_` and schedules the
-  // next mDNS/WSS attempt.
-  if (session_ready_ || gateway_.connected()) {
-    gateway_connecting_ = false;
+  if (session_ready_) {
+    gateway_connection_.session_ready();
     gateway_reconnect_schedule_.reset();
     return;
   }
 
-  if (gateway_connecting_) {
+  if (gateway_connection_.awaiting_connection()) {
     if (timestamp < gateway_connect_deadline_ms_) return;
     ESP_LOGW(kTag, "WSS connection timed out; rediscovering Gateway");
     gateway_.stop();
-    gateway_connecting_ = false;
+    gateway_connection_.disconnected();
     schedule_gateway_retry(timestamp);
     return;
   }
@@ -287,7 +460,7 @@ void VoiceController::maintain_gateway_connection(uint64_t timestamp) {
     schedule_gateway_retry(timestamp);
     return;
   }
-  gateway_connecting_ = true;
+  gateway_connection_.start_attempt();
   gateway_connect_deadline_ms_ = timestamp + kGatewayConnectDeadlineMs;
 }
 
@@ -301,11 +474,11 @@ void VoiceController::schedule_gateway_retry(uint64_t timestamp) {
 void VoiceController::enqueue_gateway_event(GatewayEventKind kind,
                                              const void* data, size_t size) {
   if (!running_.load() || gateway_event_queue_ == nullptr ||
-      size > GatewayEvent{}.data.size() || (size > 0 && data == nullptr)) {
+      size > kMaxGatewayEventBytes || (size > 0 && data == nullptr)) {
     ESP_LOGW(kTag, "discarded invalid gateway callback metadata");
     return;
   }
-  GatewayEvent event{};
+  GatewayEvent& event = gateway_event_work_;
   event.kind = kind;
   event.size = static_cast<uint16_t>(size);
   if (size > 0) std::memcpy(event.data.data(), data, size);
@@ -340,28 +513,21 @@ void VoiceController::process_gateway_event(const GatewayEvent& event) {
       process_control_json(reinterpret_cast<const char*>(event.data.data()),
                            event.size);
       return;
-    case GatewayEventKind::kBinary:
-      process_gateway_binary(event.data.data(), event.size);
-      return;
   }
 }
 
 void VoiceController::handle_button(ButtonEvent event, uint64_t timestamp) {
-  if (!session_ready_) return;
-  if (event == ButtonEvent::kStartRecording) {
-    // BOOT retains priority over every local wake state, including the short
-    // acknowledgement and either three-second speech window.
-    if (wake_ack_active_) stop_wake_ack();
-    if (wake_listening_) {
-      wake_listening_ = false;
-      finish_listening("wakeword-interrupted");
-    }
-    wake_turn_detector_.reset();
-    start_listening(timestamp, "device_button");
-  } else if (event == ButtonEvent::kStopRecording ||
-             event == ButtonEvent::kMaximumDuration) {
+  if (!session_ready_ || event != ButtonEvent::kPressed) return;
+  if (capture_session_.active()) {
     finish_listening("device_button");
+    return;
   }
+  // BOOT is a peer wake source. It cancels a pending local acknowledgement,
+  // then enters the same capture lifecycle as a spoken wake word.
+  if (wake_ack_active_) stop_wake_ack();
+  if (pcm_preroll_ != nullptr) pcm_preroll_->clear();
+  wake_turn_detector_.reset();
+  start_listening(timestamp, CaptureSource::kManual);
 }
 
 void VoiceController::begin_wake_ack() {
@@ -391,8 +557,8 @@ void VoiceController::play_wake_ack_frame(uint64_t timestamp) {
   const size_t sample_count = wake_ack_audio_sample_count();
   if (wake_ack_offset_samples_ < sample_count) {
     std::array<int16_t, sesame::audio::kSamplesPerFrame> frame{};
-    const size_t samples_to_copy = std::min(
-        frame.size(), sample_count - wake_ack_offset_samples_);
+    const size_t samples_to_copy =
+        std::min(frame.size(), sample_count - wake_ack_offset_samples_);
     std::memcpy(frame.data(),
                 wake_ack_audio_samples() + wake_ack_offset_samples_,
                 samples_to_copy * sizeof(frame[0]));
@@ -403,13 +569,12 @@ void VoiceController::play_wake_ack_frame(uint64_t timestamp) {
       return;
     }
     wake_ack_offset_samples_ += samples_to_copy;
-    // Pace fixed 20-ms I2S frames. This prevents the initial DMA queue from
-    // making the first-speech timeout begin before the prompt is audible.
     vTaskDelay(pdMS_TO_TICKS(20));
     return;
   }
 
   stop_wake_ack();
+  if (pcm_preroll_ != nullptr) pcm_preroll_->clear();
   if (!wake_turn_detector_.start_first_speech_wait(timestamp)) {
     ESP_LOGW(kTag, "wake acknowledgement completed outside wake state");
     wake_turn_detector_.reset();
@@ -426,46 +591,67 @@ void VoiceController::process_wake_vad_signals(uint64_t timestamp) {
         wake_turn_detector_.update(timestamp, signal.wake_detected,
                                    signal.vad_speech);
     if (event == VoiceTurnEvent::kWakeDetected) {
-      if (!session_ready_ || button_.recording() || wake_listening_ ||
+      if (!session_ready_ || capture_session_.active() ||
           turn_state_.state() != sesame::protocol::TurnState::kIdle) {
         wake_turn_detector_.reset();
         continue;
       }
       begin_wake_ack();
     } else if (event == VoiceTurnEvent::kListenStarted) {
-      if (!session_ready_ || button_.recording() || wake_listening_ ||
+      if (!session_ready_ || capture_session_.active() ||
           turn_state_.state() != sesame::protocol::TurnState::kIdle) {
         wake_turn_detector_.reset();
         continue;
       }
-      wake_listening_ = true;
-      start_listening(timestamp,
-                      prior_state == VoiceTurnState::kWaitingForFollowupSpeech
-                          ? "tts-followup"
-                          : "wakeword");
+      const CaptureSource source =
+          prior_state == VoiceTurnState::kWaitingForFollowupSpeech
+              ? CaptureSource::kFollowup
+              : CaptureSource::kWakeword;
+      if (!start_listening(timestamp, source)) {
+        wake_turn_detector_.reset();
+      }
+    } else if (event == VoiceTurnEvent::kBargeInDetected) {
+      if (!session_ready_ || capture_session_.active()) {
+        wake_turn_detector_.reset();
+        continue;
+      }
+      if (!start_listening(timestamp, CaptureSource::kWakeword)) {
+        wake_turn_detector_.reset();
+      }
     } else if ((event == VoiceTurnEvent::kListenStopped ||
-                event == VoiceTurnEvent::kListenTimedOut) && wake_listening_) {
-      wake_listening_ = false;
+                event == VoiceTurnEvent::kListenTimedOut) &&
+               (capture_session_.source() == CaptureSource::kWakeword ||
+                capture_session_.source() == CaptureSource::kFollowup)) {
       finish_listening(event == VoiceTurnEvent::kListenStopped
-                           ? "wakeword-vad-endpoint"
-                           : "wakeword-max-duration");
-    } else if (event == VoiceTurnEvent::kWakeTimedOut ||
-               event == VoiceTurnEvent::kFollowupTimedOut) {
-      ESP_LOGI(kTag, "%s window expired without speech",
-               event == VoiceTurnEvent::kWakeTimedOut ? "wake" : "follow-up");
+                           ? "vad-endpoint"
+                           : "vad-max-duration");
+    } else if (event == VoiceTurnEvent::kWakeTimedOut) {
+      if (pcm_preroll_ != nullptr) pcm_preroll_->clear();
+      ESP_LOGI(kTag, "wake window expired without speech");
+    } else if (event == VoiceTurnEvent::kFollowupTimedOut) {
+      if (pcm_preroll_ != nullptr) pcm_preroll_->clear();
+      ESP_LOGI(kTag, "follow-up window expired; waiting for wake word");
     }
   }
 }
 
-void VoiceController::start_listening(uint64_t timestamp, const char* trigger) {
-  if (!session_ready_) return;
+bool VoiceController::start_listening(uint64_t timestamp,
+                                      CaptureSource source) {
+  if (!session_ready_ || capture_session_.active() ||
+      source == CaptureSource::kNone) {
+    return false;
+  }
   if (tts_active_ ||
       turn_state_.state() == sesame::protocol::TurnState::kThinking ||
       turn_state_.state() == sesame::protocol::TurnState::kSpeaking) {
     copy_identifier(&pending_interrupt_turn_id_, turn_id_.data());
     pending_interrupt_generation_ = active_generation_;
     interrupt_pending_ = pending_interrupt_turn_id_[0] != '\0';
-    send_control(sesame::protocol::ControlEventType::kInterrupt, "{}");
+    if (send_control(sesame::protocol::ControlEventType::kInterrupt, "{}") !=
+        ESP_OK) {
+      transport_fault_requested_ = true;
+      return false;
+    }
     flush_tts();
     if (robot_ != nullptr) robot_->emergency_stop();
     turn_state_.apply(sesame::protocol::TurnEvent::kInterrupted);
@@ -476,24 +662,72 @@ void VoiceController::start_listening(uint64_t timestamp, const char* trigger) {
                 static_cast<unsigned long>(turn_counter_));
   audio_sequence_ = 0;
   uplink_frame_count_ = 0;
-  codec_.reset();
-  turn_state_.apply(sesame::protocol::TurnEvent::kButtonPressed);
-  send_control(sesame::protocol::ControlEventType::kListenStart, "{}");
+  if (codec_.reset() != ESP_OK ||
+      !turn_state_.apply(sesame::protocol::TurnEvent::kButtonPressed)) {
+    turn_state_.apply(sesame::protocol::TurnEvent::kFailed);
+    turn_id_.fill('\0');
+    return false;
+  }
+  const char* payload = source == CaptureSource::kManual
+                            ? kManualListenStartPayload
+                        : source == CaptureSource::kFollowup
+                            ? kFollowupListenStartPayload
+                            : kWakewordListenStartPayload;
+  const uint32_t preroll_duration_ms =
+      source != CaptureSource::kManual && pcm_preroll_ != nullptr
+          ? pcm_preroll_->duration_ms()
+          : 0;
+  const uint64_t capture_started_ms =
+      timestamp >= preroll_duration_ms ? timestamp - preroll_duration_ms : 0;
+  if (send_control(sesame::protocol::ControlEventType::kListenStart, payload) !=
+          ESP_OK ||
+      !capture_session_.start(source, capture_started_ms)) {
+    turn_state_.apply(sesame::protocol::TurnEvent::kFailed);
+    turn_id_.fill('\0');
+    transport_fault_requested_ = true;
+    return false;
+  }
+  first_uplink_pending_ = true;
+  const char* trigger = source == CaptureSource::kManual
+                            ? "manual"
+                        : source == CaptureSource::kFollowup ? "followup"
+                                                             : "wakeword";
   ESP_LOGI(kTag, "listen start: trigger=%s turn=%lu", trigger,
            static_cast<unsigned long>(turn_counter_));
-  (void)timestamp;
+  return true;
 }
 
 void VoiceController::finish_listening(const char* trigger) {
+  if (pcm_preroll_ != nullptr) {
+    drain_pcm_uplink(PcmPreRollBuffer::kCapacityFrames);
+    pcm_preroll_->clear();
+  }
+  if (!capture_session_.stop()) return;
+  first_uplink_pending_ = false;
   if (!session_ready_ ||
       turn_state_.state() != sesame::protocol::TurnState::kListening) {
+    turn_state_.apply(sesame::protocol::TurnEvent::kFailed);
     return;
   }
-  send_control(sesame::protocol::ControlEventType::kListenStop, "{}");
+  if (send_control(sesame::protocol::ControlEventType::kListenStop, "{}") !=
+      ESP_OK) {
+    turn_state_.apply(sesame::protocol::TurnEvent::kFailed);
+    transport_fault_requested_ = true;
+    return;
+  }
   turn_state_.apply(sesame::protocol::TurnEvent::kButtonPressed);
   ESP_LOGI(kTag, "listen stop: trigger=%s turn=%lu uplink_frames=%lu", trigger,
            static_cast<unsigned long>(turn_counter_),
            static_cast<unsigned long>(uplink_frame_count_));
+}
+
+void VoiceController::drain_pcm_uplink(size_t maximum_frames) {
+  if (!capture_session_.active() || pcm_preroll_ == nullptr) return;
+  PcmPreRollBuffer::Frame frame{};
+  for (size_t count = 0;
+       count < maximum_frames && pcm_preroll_->pop_oldest(&frame); ++count) {
+    capture_and_send(frame.samples.data(), frame.timestamp_ms);
+  }
 }
 
 void VoiceController::capture_and_send(const int16_t* pcm, uint64_t timestamp) {
@@ -512,7 +746,7 @@ void VoiceController::capture_and_send(const int16_t* pcm, uint64_t timestamp) {
       .flags = 0,
       .stream_id = 1,
       .generation_id = turn_counter_,
-      .sequence = audio_sequence_++,
+      .sequence = audio_sequence_,
       .timestamp_ms = timestamp,
       .payload = opus.data(),
       .payload_size = opus_size,
@@ -521,31 +755,77 @@ void VoiceController::capture_and_send(const int16_t* pcm, uint64_t timestamp) {
   if (sesame::protocol::pack_audio_frame(
           frame, message.data(), message.size(), &message_size) ==
       sesame::protocol::AudioFrameError::kOk) {
-    if (gateway_.send_binary(message.data(), message_size) == ESP_OK) {
+    if (enqueue_outbound_binary(message.data(), message_size) == ESP_OK) {
+      ++audio_sequence_;
       ++uplink_frame_count_;
       if (uplink_frame_count_ % 50 == 0) {
-        ESP_LOGI(kTag, "P2 uplink progress: turn=%lu frames=%lu",
+        ESP_LOGI(kTag,
+                 "P2 uplink progress: turn=%lu frames=%lu voice stack free=%u bytes",
                  static_cast<unsigned long>(turn_counter_),
-                 static_cast<unsigned long>(uplink_frame_count_));
+                 static_cast<unsigned long>(uplink_frame_count_),
+                 static_cast<unsigned>(uxTaskGetStackHighWaterMark(nullptr)));
       }
+    } else {
+      ESP_LOGW(kTag, "uplink queue full; dropping 20-ms audio frame");
     }
   }
+}
+
+esp_err_t VoiceController::enqueue_outbound_text(const char* data, size_t size) {
+  return enqueue_outbound(OutboundFrameKind::kText, data, size,
+                          pdMS_TO_TICKS(100));
+}
+
+esp_err_t VoiceController::enqueue_outbound_binary(const uint8_t* data,
+                                                    size_t size) {
+  return enqueue_outbound(OutboundFrameKind::kBinary, data, size, 0);
+}
+
+esp_err_t VoiceController::enqueue_outbound(OutboundFrameKind kind,
+                                             const void* data, size_t size,
+                                             TickType_t wait_ticks) {
+  if (outbound_queue_ == nullptr || data == nullptr || size == 0 ||
+      size > OutboundFrame{}.data.size()) {
+    return ESP_ERR_INVALID_ARG;
+  }
+  OutboundFrame frame{};
+  frame.kind = kind;
+  frame.size = static_cast<uint16_t>(size);
+  frame.connection_epoch = outbound_connection_epoch_.load();
+  std::memcpy(frame.data.data(), data, size);
+  return xQueueSend(outbound_queue_, &frame, wait_ticks) == pdTRUE ? ESP_OK
+                                                                     : ESP_ERR_TIMEOUT;
+}
+
+void VoiceController::discard_outbound_frames() {
+  if (outbound_queue_ != nullptr) xQueueReset(outbound_queue_);
 }
 
 void VoiceController::play_pending_audio() {
   if (!tts_active_ || downlink_queue_ == nullptr) return;
   DownlinkPacket packet{};
-  if (xQueueReceive(downlink_queue_, &packet, 0) != pdTRUE) return;
-  if (packet.generation_id != active_generation_) return;
+  for (UBaseType_t inspected = 0; inspected < 16; ++inspected) {
+    if (xQueueReceive(downlink_queue_, &packet, 0) != pdTRUE) return;
+    // A new tts.start can be queued behind packets from an interrupted
+    // generation. Discard stale packets without resetting new-generation
+    // frames that arrived immediately after tts.start on the WSS task.
+    if (packet.generation_id != active_generation_) continue;
+    if (packet.sequence != expected_downlink_sequence_) {
+      fail_tts_playback("downlink sequence mismatch");
+      return;
+    }
+    ++expected_downlink_sequence_;
 
-  std::array<int16_t, sesame::audio::kSamplesPerFrame> pcm{};
-  size_t samples = 0;
-  if (codec_.decode(packet.data.data(), packet.size, pcm.data(), pcm.size(),
-                    &samples) != ESP_OK ||
-      samples != pcm.size()) {
+    std::array<int16_t, sesame::audio::kSamplesPerFrame> pcm{};
+    size_t samples = 0;
+    if (codec_.decode(packet.data.data(), packet.size, pcm.data(), pcm.size(),
+                      &samples) != ESP_OK ||
+        samples != pcm.size() ||
+        audio_->write_speaker_frame(pcm.data(), pcm.size(), 100) != ESP_OK) {
+      fail_tts_playback("downlink decode or playback failure");
+    }
     return;
   }
-  audio_->write_speaker_frame(pcm.data(), pcm.size(), 100);
 }
 
 esp_err_t VoiceController::send_control(
@@ -559,7 +839,7 @@ esp_err_t VoiceController::send_control(
                      ? turn_id_.data()
                      : nullptr,
       .request_id = request_id,
-      .sequence = control_sequence_++,
+      .sequence = control_sequence_,
       .timestamp_ms = now_ms(),
       .payload_json = payload_json,
   };
@@ -569,7 +849,10 @@ esp_err_t VoiceController::send_control(
   if (result != sesame::protocol::ControlEventError::kOk) {
     return ESP_ERR_INVALID_ARG;
   }
-  return gateway_.send_text(message.data(), message_size);
+  const esp_err_t enqueue_result =
+      enqueue_outbound_text(message.data(), message_size);
+  if (enqueue_result == ESP_OK) ++control_sequence_;
+  return enqueue_result;
 }
 
 void VoiceController::send_session_hello() {
@@ -609,7 +892,7 @@ void VoiceController::on_gateway_connected() {
 }
 
 void VoiceController::handle_gateway_connected() {
-  gateway_connecting_ = false;
+  gateway_connection_.transport_connected();
   gateway_reconnect_schedule_.reset();
   session_ready_ = false;
   session_id_.fill('\0');
@@ -631,13 +914,18 @@ void VoiceController::on_gateway_disconnected() {
 }
 
 void VoiceController::handle_gateway_disconnected() {
-  gateway_connecting_ = false;
+  gateway_connection_.disconnected();
+  outbound_connection_epoch_.fetch_add(1);
+  discard_outbound_frames();
   schedule_gateway_retry(now_ms());
   session_ready_ = false;
   button_.reset();
+  capture_session_.reset();
+  if (pcm_preroll_ != nullptr) pcm_preroll_->clear();
+  downlink_fault_requested_ = false;
+  first_uplink_pending_ = false;
   stop_wake_ack();
   wake_turn_detector_.reset();
-  wake_listening_ = false;
   flush_tts();
   turn_id_.fill('\0');
   pending_interrupt_turn_id_.fill('\0');
@@ -653,35 +941,29 @@ void VoiceController::on_gateway_text(const char* data, size_t size) {
 }
 
 void VoiceController::on_gateway_binary(const uint8_t* data, size_t size) {
-  enqueue_gateway_event(GatewayEventKind::kBinary, data, size);
+  enqueue_downlink_packet(data, size);
 }
 
-void VoiceController::process_gateway_binary(const uint8_t* data, size_t size) {
+void VoiceController::enqueue_downlink_packet(const uint8_t* data,
+                                               size_t size) {
+  if (!running_.load() || downlink_queue_ == nullptr) return;
   sesame::protocol::AudioFrame frame{};
   if (sesame::protocol::unpack_audio_frame(data, size, &frame) !=
           sesame::protocol::AudioFrameError::kOk ||
       frame.direction != sesame::protocol::AudioDirection::kDownlink ||
       frame.flags != 0 || frame.stream_id != 2 || frame.generation_id == 0 ||
-      frame.payload_size > sesame::audio::OpusCodec::kMaxPacketBytes ||
-      !tts_active_ || frame.generation_id != active_generation_) {
+      frame.payload_size > sesame::audio::OpusCodec::kMaxPacketBytes) {
     return;
   }
-  if (frame.sequence != expected_downlink_sequence_) {
-    flush_tts();
-    return;
-  }
-  ++expected_downlink_sequence_;
-  DownlinkPacket packet{
-      .generation_id = frame.generation_id,
-      .sequence = frame.sequence,
-      .size = static_cast<uint16_t>(frame.payload_size),
-      .data = {},
-  };
+  DownlinkPacket& packet = downlink_work_packet_;
+  packet.generation_id = frame.generation_id;
+  packet.sequence = frame.sequence;
+  packet.size = static_cast<uint16_t>(frame.payload_size);
   std::memcpy(packet.data.data(), frame.payload, frame.payload_size);
-  if (downlink_queue_ == nullptr ||
-      xQueueSend(downlink_queue_, &packet, 0) != pdTRUE) {
-    flush_tts();
-    ESP_LOGW(kTag, "P2 downlink queue overflow; playback flushed");
+  if (xQueueSend(downlink_queue_, &packet, 0) != pdTRUE) {
+    // The WebSocket task must never mutate playback/turn state. Ask the voice
+    // task to fail the generation closed on its next iteration.
+    downlink_fault_requested_ = true;
   }
 }
 
@@ -780,13 +1062,13 @@ void VoiceController::process_control_json(const char* data, size_t size) {
 
     copy_identifier(&session_id_, inbound_session);
     session_ready_ = true;
-    // Persist only after validating the value, then update the in-memory copy
-    // used by the next session. Without this second assignment a reconnect in
-    // the same boot would keep sending a stale conversation_id.
-    if (sesame::transport::save_conversation_id(conversation) == ESP_OK) {
-      copy_identifier(&config_.conversation_id, conversation);
-    } else {
-      ESP_LOGW(kTag, "could not persist validated conversation identifier");
+    gateway_connection_.session_ready();
+    // Update the live configuration immediately, but persist on a dedicated
+    // internal-RAM task. This voice task uses a PSRAM stack for Opus and must
+    // never invoke NVS, which temporarily disables the external-memory cache.
+    copy_identifier(&config_.conversation_id, conversation);
+    if (conversation_store_.enqueue(conversation) != ESP_OK) {
+      ESP_LOGW(kTag, "could not queue validated conversation identifier");
     }
     ESP_LOGI(kTag,
              "P1 session.ready accepted: protocol=1 codec=opus rate=16000 frame_ms=20");
@@ -1004,7 +1286,9 @@ void VoiceController::send_action_result(
 
 void VoiceController::begin_tts(uint32_t generation_id) {
   if (generation_id == 0) return;
-  flush_tts();
+  // Preserve packets already delivered immediately after tts.start. The
+  // playback consumer filters any stale generation itself.
+  flush_tts(false);
   if (!turn_state_.start_generation(generation_id)) return;
   active_generation_ = generation_id;
   expected_downlink_sequence_ = 0;
@@ -1043,23 +1327,43 @@ void VoiceController::complete_tts_if_drained() {
   tts_active_ = false;
   tts_stop_requested_ = false;
   turn_state_.stop_generation(generation_id);
+  // Keep the state machine's generation for monotonic validation, but clear
+  // the active playback binding. Otherwise BOOT pressed while the next turn
+  // is still thinking is incorrectly bound to the previous TTS generation.
+  active_generation_ = 0;
+  expected_downlink_sequence_ = 0;
   if (!interrupt_pending_) {
     turn_id_.fill('\0');
-    if (!wake_turn_detector_.start_followup_wait(now_ms())) {
-      ESP_LOGW(kTag, "follow-up wait skipped: TTS state was not active");
+    if (pcm_preroll_ != nullptr) pcm_preroll_->clear();
+    if (wake_turn_detector_.start_followup_wait(now_ms())) {
+      ESP_LOGI(kTag,
+               "P2 playback completed: generation=%lu; waiting 3000 ms for follow-up speech",
+               static_cast<unsigned long>(generation_id));
+    } else {
       wake_turn_detector_.reset();
+      ESP_LOGW(kTag,
+               "P2 playback completed outside TTS state; waiting for wake word");
     }
-    ESP_LOGI(kTag,
-             "P2 playback completed: generation=%lu; waiting 3000 ms for follow-up",
-             static_cast<unsigned long>(generation_id));
   } else {
     ESP_LOGI(kTag, "P2 playback completed: generation=%lu",
              static_cast<unsigned long>(generation_id));
   }
 }
 
-void VoiceController::flush_tts() {
-  if (downlink_queue_ != nullptr) xQueueReset(downlink_queue_);
+void VoiceController::fail_tts_playback(const char* reason) {
+  flush_tts();
+  turn_state_.apply(sesame::protocol::TurnEvent::kFailed);
+  turn_id_.fill('\0');
+  wake_turn_detector_.reset();
+  if (robot_ != nullptr) robot_->emergency_stop();
+  ESP_LOGW(kTag, "P2 playback failed closed: %s",
+           reason == nullptr ? "unknown" : reason);
+}
+
+void VoiceController::flush_tts(bool clear_downlink) {
+  if (clear_downlink && downlink_queue_ != nullptr) {
+    xQueueReset(downlink_queue_);
+  }
   if (audio_ != nullptr && audio_->initialized()) {
     audio_->set_amplifier_enabled(false);
   }

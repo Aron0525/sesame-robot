@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     save_test_recordings: bool = False
     test_recording_dir: Path = Path("test-recordings")
     test_recording_limit: int = Field(default=10, ge=1, le=100)
+    # Training samples must only come from an explicit BOOT-button capture;
+    # wakeword and ambient turns would contaminate the positive dataset.
+    test_recording_manual_only: bool = False
     # Optional direct USB serial observation for the ESP32 attached to this Mac.
     # The Gateway becomes the sole serial owner while this is enabled.
     serial_monitor_enabled: bool = False

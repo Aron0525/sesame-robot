@@ -7,6 +7,7 @@
 #include "esp_log.h"
 
 #include "sesame_robot/esp32_servo_driver.h"
+#include "sesame_robot/servo_calibration.h"
 #include "sesame_ui/oled_expression_display.h"
 
 // The migrated movement table was originally written for Arduino globals.
@@ -166,8 +167,11 @@ int LegacyMotionRunner::motor_current_delay_ms() const {
 }
 
 bool LegacyMotionRunner::set_servo_angle(uint8_t servo_index, uint8_t angle) {
+  const bool preserve_r3_l4_full_range =
+      robot::preserves_r3_l4_full_range_for_action(active_action());
   if (cancel_requested_.load() || servos_ == nullptr ||
-      !servos_->set_motion_angle(servo_index, angle)) {
+      !servos_->set_motion_angle(servo_index, angle,
+                                 preserve_r3_l4_full_range)) {
     return false;
   }
   // Preserve the verified Arduino timing: staggering each channel by this

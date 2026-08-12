@@ -59,28 +59,7 @@
       ],
       "properties": {
         "actions": {
-          "const": [
-            "stop",
-            "rest",
-            "stand",
-            "wave",
-            "dance",
-            "swim",
-            "point",
-            "pushup",
-            "bow",
-            "cute",
-            "freaky",
-            "worm",
-            "shake",
-            "shrug",
-            "dead",
-            "crab",
-            "forward",
-            "backward",
-            "left",
-            "right"
-          ]
+          "const": []
         },
         "expressions": {
           "const": [
@@ -122,7 +101,9 @@
           ]
         },
         "voices": {
-          "const": ["sesame_default"]
+          "const": [
+            "sesame_default"
+          ]
         }
       }
     }

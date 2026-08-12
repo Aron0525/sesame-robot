@@ -17,7 +17,6 @@ from jsonschema import Draft202012Validator
 from websockets.exceptions import WebSocketException
 
 from sesame_voice_gateway.providers.base import (
-    ActionSpec,
     AgentToolCall,
     AgentResult,
     ExpressionSpec,
@@ -26,28 +25,9 @@ from sesame_voice_gateway.providers.base import (
 from sesame_voice_gateway.schema_resources import load_schema
 
 OPENCLAW_PROTOCOL_VERSION = 4
-ALLOWED_ACTIONS = [
-    "stop",
-    "rest",
-    "stand",
-    "wave",
-    "dance",
-    "swim",
-    "point",
-    "pushup",
-    "bow",
-    "cute",
-    "freaky",
-    "worm",
-    "shake",
-    "shrug",
-    "dead",
-    "crab",
-    "forward",
-    "backward",
-    "left",
-    "right",
-]
+# OpenClaw does not control robot motion. Local operator controls retain their
+# separate action allowlist and event path.
+ALLOWED_ACTIONS: list[str] = []
 ALLOWED_EXPRESSIONS = [
     "walk",
     "rest",
@@ -212,11 +192,8 @@ def build_agent_prompt_with_tools(
         "每一次完成回复都必须选择一个非空的 expression；expression.name 只能使用 "
         "capabilities.expressions 中的值。中性、无法判断或不需要强烈情绪时使用 idle，"
         "不要输出 default。\n"
-        "actions 只能使用 capabilities.actions 中的值。必须根据用户意图、回复内容和当前"
-        "情绪选择匹配的动作与 expression；一个回复至多一个动作。用户明确点名某个动作时，"
-        "必须下发同名动作。没有明确且合适的动作时，必须输出 actions: []；不要为了填充"
-        "字段而虚构动作。\n"
-        "voice.style 应与 expression 的情绪一致；每个 action 必须带 100 到 5000 的 duration_ms。\n"
+        "不生成机器人动作；actions 必须始终输出 []，即使用户点名动作也保持为空。"
+        "只根据回复内容选择 expression 和 voice.style。\n"
         f"{tool_instruction}"
         "REQUEST_JSON:\n"
         f"{request_json}"
@@ -421,7 +398,10 @@ def parse_agent_result(
             name=expression_name,
             ttl_ms=data["expression"]["ttl_ms"],
         ),
-        actions=tuple(ActionSpec(**action) for action in data["actions"]),
+        # Keep accepting old action-bearing envelopes so their text and
+        # expression still reach the user, but remove motion before the result
+        # enters the Gateway pipeline.
+        actions=(),
     )
 
 

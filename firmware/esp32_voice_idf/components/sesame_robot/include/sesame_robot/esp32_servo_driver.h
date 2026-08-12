@@ -36,7 +36,8 @@ class Esp32ServoDriver final : public RobotDriver, public MotionOutput {
   bool begin_web_motion();
   bool begin_manual_control() override;
   void end_web_control(bool release_outputs);
-  bool set_motion_angle(uint8_t servo_index, uint8_t angle);
+  bool set_motion_angle(uint8_t servo_index, uint8_t angle,
+                        bool preserve_r3_l4_full_range = false);
   bool set_manual_angle(uint8_t servo_index, uint8_t angle) override;
 
   void apply_pose(const std::array<uint8_t, 8>& angles) override;
@@ -48,7 +49,8 @@ class Esp32ServoDriver final : public RobotDriver, public MotionOutput {
   static void task_entry(void* context);
   void run();
   void apply_manual_pose();
-  bool write_logical_angle(uint8_t servo_index, uint8_t logical_angle);
+  bool write_logical_angle(uint8_t servo_index, uint8_t logical_angle,
+                           bool preserve_r3_l4_full_range = false);
   static const char* action_name(MotionId action);
   static uint32_t duty_for_angle(uint8_t angle);
 

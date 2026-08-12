@@ -57,8 +57,8 @@ VoiceTurnEvent VoiceTurnDetector::update(uint64_t now_ms, bool wake_detected,
   switch (state_) {
     case VoiceTurnState::kIdleWakeListening:
       if (!wake_detected) return VoiceTurnEvent::kNone;
-      // Do not begin gateway capture yet: the controller must play the local
-      // acknowledgement before opening the first-speech window.
+      // The controller plays a local acknowledgement before opening the
+      // first-speech window, so a successful wake is observable to the user.
       state_ = VoiceTurnState::kWakeAcknowledging;
       return VoiceTurnEvent::kWakeDetected;
 
@@ -67,12 +67,9 @@ VoiceTurnEvent VoiceTurnDetector::update(uint64_t now_ms, bool wake_detected,
       return VoiceTurnEvent::kNone;
 
     case VoiceTurnState::kTtsPlaying:
-      // The controller will feed this state with AEC-clean VAD frames in the
-      // next change. Keeping the transition here makes barge-in deterministic
-      // without making raw microphone input interrupt TTS today.
-      if (!speech_confirmed(vad_speech, config_.speech_start_frames)) {
-        return VoiceTurnEvent::kNone;
-      }
+      // A reply can be interrupted only by another wake word. Raw VAD would
+      // treat the speaker's own playback as user speech without AEC.
+      if (!wake_detected) return VoiceTurnEvent::kNone;
       start_collecting(now_ms);
       return VoiceTurnEvent::kBargeInDetected;
 

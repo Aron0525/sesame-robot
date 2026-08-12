@@ -2,9 +2,9 @@
 
 namespace sesame::voice {
 
-// WakeNet needs a continuous microphone feed. Gateway readiness controls
-// whether a detected wake may start a cloud turn, not whether audio reaches
-// the local wake-word engine.
-constexpr bool should_capture_for_wake(bool tts_active) { return !tts_active; }
+// Continuous conversation permits the explicit wake phrase to interrupt TTS.
+// During playback the turn detector ignores raw VAD and accepts only a full
+// MultiNet command match, limiting speaker-echo sensitivity without AEC.
+constexpr bool should_capture_for_wake(bool) { return true; }
 
 }  // namespace sesame::voice

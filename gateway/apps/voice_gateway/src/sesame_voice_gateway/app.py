@@ -207,6 +207,7 @@ class DeviceSession:
     expected_incoming_sequence: int = 1
     is_listening: bool = False
     turn_id: str | None = None
+    capture_trigger: str = "unknown"
     opus_packets: list[bytes] = field(default_factory=list)
     last_audio_sequence: int = -1
     uplink_generation_id: int | None = None
@@ -449,6 +450,7 @@ def _build_pipeline(
         observer=observer,
         web_search=web_search,
         recording_store=recording_store,
+        manual_test_recordings_only=settings.test_recording_manual_only,
     )
 
 
@@ -1057,6 +1059,7 @@ async def _handle_control_event(
             )
         session.is_listening = True
         session.turn_id = event.turn_id
+        session.capture_trigger = str(event.payload["trigger"])
         _clear_captured_audio(session)
         if observability is not None:
             observability.record_stage(
@@ -1064,7 +1067,7 @@ async def _handle_control_event(
                 turn_id=event.turn_id,
                 stage="listen",
                 status="started",
-                details={"trigger": "device_button"},
+                details={"trigger": session.capture_trigger},
             )
         logger.info(
             "voice_listen_started device_id=%s session_id=%s turn_id=%s",
@@ -1084,6 +1087,7 @@ async def _handle_control_event(
             user_id=session.user_id,
             conversation_id=session.conversation_id,
             turn_id=turn_id or "",
+            capture_trigger=session.capture_trigger,
         )
         turn_epoch = session.turn_epoch + 1
         session.turn_epoch = turn_epoch
@@ -1093,6 +1097,7 @@ async def _handle_control_event(
         uplink_audio_bytes = session.uplink_audio_bytes
         _clear_captured_audio(session)
         session.turn_id = None
+        session.capture_trigger = "unknown"
         if observability is not None:
             observability.record_audio_progress(
                 device_id=session.device_id,
@@ -1212,8 +1217,10 @@ async def _send_turn_result(
     if turn_epoch is not None and not _turn_is_current(session, turn_epoch):
         return
     turn_id = session.turn_id if turn_id is None else turn_id
-    action = result.agent.actions[0] if result.agent.actions else None
-    action_request_id = f"act_{uuid.uuid4().hex}" if action is not None else None
+    # Defense in depth: OpenClaw output never becomes a physical action, even
+    # if a nonstandard provider bypasses the client-side response normalizer.
+    action = None
+    action_request_id = None
 
     def response_plan_payload(timestamp_ms: int) -> dict[str, Any]:
         return {

@@ -105,6 +105,7 @@ class ConversationContext:
     user_id: str
     conversation_id: str
     turn_id: str
+    capture_trigger: str = "unknown"
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,6 +128,7 @@ class ConversationPipeline:
         observer: TurnObserver | None = None,
         web_search: WebSearchProvider | None = None,
         recording_store: TestRecordingStore | None = None,
+        manual_test_recordings_only: bool = False,
     ) -> None:
         self._codec_factory = codec_factory
         self._asr = asr
@@ -136,6 +138,7 @@ class ConversationPipeline:
         self._observer = observer
         self._web_search = web_search
         self._recording_store = recording_store
+        self._manual_test_recordings_only = manual_test_recordings_only
         self._generation_id = 0
         self._generation_lock = asyncio.Lock()
 
@@ -201,7 +204,6 @@ class ConversationPipeline:
         if len(pcm) % self._audio_format.sample_width_bytes:
             raise ValueError("PCM audio must contain complete samples")
         validate_remote_pcm(pcm)
-        await self._save_test_recording(context=context, pcm=pcm)
         asr_started_at = time.perf_counter()
         self._record_stage(
             context=context,
@@ -220,6 +222,15 @@ class ConversationPipeline:
             raise
         if not transcript.text.strip():
             no_speech = True
+            transcript = AsrResult(text="")
+        else:
+            transcript = validate_asr_result(transcript)
+
+        await self._save_test_recording(
+            context=context,
+            pcm=pcm,
+            asr_text=transcript.text,
+        )
 
         if no_speech:
             self._record_stage(
@@ -241,7 +252,6 @@ class ConversationPipeline:
                 details={"reason": "no_speech", "reply_text": agent_result.text},
             )
         else:
-            transcript = validate_asr_result(transcript)
             self._record_stage(
                 context=context,
                 stage="asr",
@@ -348,8 +358,22 @@ class ConversationPipeline:
             opus_packets=opus_output,
         )
 
-    async def _save_test_recording(self, *, context: ConversationContext, pcm: bytes) -> None:
+    async def _save_test_recording(
+        self,
+        *,
+        context: ConversationContext,
+        pcm: bytes,
+        asr_text: str,
+    ) -> None:
         if self._recording_store is None:
+            return
+        if self._manual_test_recordings_only and context.capture_trigger != "manual":
+            self._record_stage(
+                context=context,
+                stage="test.recording",
+                status="skipped",
+                details={"trigger": context.capture_trigger},
+            )
             return
         try:
             artifact = await asyncio.to_thread(
@@ -358,6 +382,7 @@ class ConversationPipeline:
                 turn_id=context.turn_id,
                 pcm=pcm,
                 audio_format=self._audio_format,
+                asr_text=asr_text,
             )
         except Exception as exc:
             logger.warning(

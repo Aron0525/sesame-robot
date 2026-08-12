@@ -48,9 +48,12 @@ class TestRecordingStore:
         turn_id: str,
         pcm: bytes,
         audio_format: AudioFormat,
+        asr_text: str,
     ) -> RecordingArtifact | None:
         if not pcm:
             raise ValueError("test recording requires PCM audio")
+        if not isinstance(asr_text, str):
+            raise ValueError("test recording requires ASR text")
         bytes_per_sample = audio_format.channels * audio_format.sample_width_bytes
         if bytes_per_sample <= 0 or len(pcm) % bytes_per_sample:
             raise ValueError("PCM audio must contain complete samples")
@@ -70,6 +73,7 @@ class TestRecordingStore:
             )
             self._append_manifest(
                 {
+                    "asr_text": asr_text,
                     "device_id": device_id,
                     "duration_ms": duration_ms,
                     "file": filename,

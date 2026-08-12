@@ -4,19 +4,20 @@ import json
 import unittest
 
 from sesame_voice_gateway.openclaw.client import (
+    ALLOWED_ACTIONS as OPENCLAW_ALLOWED_ACTIONS,
     build_agent_prompt,
     build_agent_request,
     parse_agent_result,
 )
 from sesame_voice_gateway.policy import (
-    ALLOWED_ACTIONS,
+    ALLOWED_ACTIONS as POLICY_ALLOWED_ACTIONS,
     ALLOWED_EXPRESSIONS,
     validate_agent_result,
 )
 
 
 class DeviceCapabilityContractTest(unittest.TestCase):
-    def test_openclaw_receives_the_complete_web_action_and_expression_catalog(self) -> None:
+    def test_openclaw_receives_no_actions_and_the_expression_catalog(self) -> None:
         request = build_agent_request(
             request_id="req_001",
             conversation_id="conv_001",
@@ -24,28 +25,7 @@ class DeviceCapabilityContractTest(unittest.TestCase):
             text="测试",
         )
 
-        expected_actions = [
-            "stop",
-            "rest",
-            "stand",
-            "wave",
-            "dance",
-            "swim",
-            "point",
-            "pushup",
-            "bow",
-            "cute",
-            "freaky",
-            "worm",
-            "shake",
-            "shrug",
-            "dead",
-            "crab",
-            "forward",
-            "backward",
-            "left",
-            "right",
-        ]
+        expected_actions: list[str] = []
         expected_expressions = [
             "walk",
             "rest",
@@ -85,10 +65,11 @@ class DeviceCapabilityContractTest(unittest.TestCase):
         ]
         self.assertEqual(request["capabilities"]["actions"], expected_actions)
         self.assertEqual(request["capabilities"]["expressions"], expected_expressions)
-        self.assertEqual(ALLOWED_ACTIONS, frozenset(expected_actions))
+        self.assertEqual(OPENCLAW_ALLOWED_ACTIONS, expected_actions)
+        self.assertTrue(POLICY_ALLOWED_ACTIONS)
         self.assertEqual(ALLOWED_EXPRESSIONS, frozenset(expected_expressions))
 
-    def test_agent_prompt_requires_a_real_expression_and_allows_no_action(self) -> None:
+    def test_agent_prompt_requires_a_real_expression_and_forbids_actions(self) -> None:
         request = build_agent_request(
             request_id="req_001",
             conversation_id="conv_001",
@@ -99,7 +80,7 @@ class DeviceCapabilityContractTest(unittest.TestCase):
         prompt = build_agent_prompt(request)
 
         self.assertIn("每一次完成回复都必须选择一个非空的 expression", prompt)
-        self.assertIn('actions: []', prompt)
+        self.assertIn("actions 必须始终输出 []", prompt)
         self.assertNotIn('"default"', request["capabilities"]["expressions"])
 
     def test_legacy_default_expression_is_normalized_to_idle(self) -> None:
@@ -141,11 +122,10 @@ class DeviceCapabilityContractTest(unittest.TestCase):
 
         self.assertEqual(result.text, "状态正常")
 
-    def test_model_actions_match_the_web_action_catalog(self) -> None:
-        self.assertIn("dance", ALLOWED_ACTIONS)
-        self.assertIn("right", ALLOWED_ACTIONS)
+    def test_model_action_capability_is_empty(self) -> None:
+        self.assertEqual(OPENCLAW_ALLOWED_ACTIONS, [])
 
-    def test_every_advertised_action_and_expression_passes_the_output_contract(self) -> None:
+    def test_agent_actions_are_dropped_before_reaching_the_plan(self) -> None:
         request = build_agent_request(
             request_id="req_001",
             conversation_id="conv_001",
@@ -161,8 +141,8 @@ class DeviceCapabilityContractTest(unittest.TestCase):
             )
             self.assertIs(validate_agent_result(result), result)
 
-        for action in request["capabilities"]["actions"]:
-            parse(
+        result = parse_agent_result(
+            json.dumps(
                 {
                     "v": 1,
                     "request_id": "req_001",
@@ -175,9 +155,13 @@ class DeviceCapabilityContractTest(unittest.TestCase):
                         "speed": 1.0,
                     },
                     "expression": {"name": "idle", "ttl_ms": 1500},
-                    "actions": [{"name": action, "duration_ms": 1000}],
+                    "actions": [{"name": "wave", "duration_ms": 1000}],
                 }
-            )
+            ),
+            expected_request_id="req_001",
+            expected_turn_id="turn_001",
+        )
+        self.assertEqual(result.actions, ())
 
         for expression in request["capabilities"]["expressions"]:
             parse(
