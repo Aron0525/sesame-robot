@@ -4,5 +4,5 @@
 
 int main() {
   assert(sesame::voice::should_capture_for_wake(false));
-  assert(!sesame::voice::should_capture_for_wake(true));
+  assert(sesame::voice::should_capture_for_wake(true));
 }

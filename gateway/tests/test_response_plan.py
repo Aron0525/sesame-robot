@@ -28,7 +28,7 @@ class FakeWebSocket:
 
 
 class ResponsePlanProtocolTest(unittest.IsolatedAsyncioTestCase):
-    def test_response_plan_requires_one_safe_action_and_expression(self) -> None:
+    def test_response_plan_allows_expression_without_an_action(self) -> None:
         event = parse_control_event(
             json.dumps(
                 {
@@ -43,10 +43,10 @@ class ResponsePlanProtocolTest(unittest.IsolatedAsyncioTestCase):
                         "generation_id": 7,
                         "expression_id": "happy",
                         "expression_ttl_ms": 1200,
-                        "action_id": "wave",
-                        "action_request_id": "act_001",
-                        "action_duration_ms": 1200,
-                        "action_deadline_ms": 6000,
+                        "action_id": None,
+                        "action_request_id": None,
+                        "action_duration_ms": None,
+                        "action_deadline_ms": None,
                     },
                 }
             )
@@ -79,7 +79,7 @@ class ResponsePlanProtocolTest(unittest.IsolatedAsyncioTestCase):
                 )
             )
 
-    async def test_gateway_sends_one_plan_before_tts_opus(self) -> None:
+    async def test_gateway_drops_agent_action_before_sending_plan(self) -> None:
         websocket = FakeWebSocket()
         session = DeviceSession(
             device_id="device_001",
@@ -106,7 +106,10 @@ class ResponsePlanProtocolTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([event.type for event in controls], ["response.plan", "tts.start", "tts.stop"])
         self.assertEqual(controls[0].payload["generation_id"], 7)
         self.assertEqual(controls[0].payload["expression_id"], "happy")
-        self.assertEqual(controls[0].payload["action_id"], "wave")
+        self.assertIsNone(controls[0].payload["action_id"])
+        self.assertIsNone(controls[0].payload["action_request_id"])
+        self.assertIsNone(controls[0].payload["action_duration_ms"])
+        self.assertIsNone(controls[0].payload["action_deadline_ms"])
         self.assertEqual(len(websocket.binary_frames), 2)
 
 

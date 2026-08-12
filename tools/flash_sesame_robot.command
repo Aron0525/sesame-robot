@@ -7,10 +7,11 @@ setopt err_return no_unset pipe_fail
 
 SCRIPT_DIR="${0:A:h}"
 PROJECT_ROOT="${SCRIPT_DIR:h}"
-IDF_PROJECT="${PROJECT_ROOT}/firmware/esp32_voice_idf"
+IDF_PROJECT="${SESAME_IDF_PROJECT:-${PROJECT_ROOT}/firmware/esp32_voice_idf}"
 IDF_EXPORT="/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/export.sh"
 PORT="${SESAME_ESP32_PORT:-}"
-BUILD_DIR="build-p1"
+BUILD_DIR="${SESAME_BUILD_DIR:-build-p1}"
+APP_IMAGE="${SESAME_APP_IMAGE:-sesame_robot_v3.bin}"
 GATEWAY_LABEL="com.sesame.voice-gateway"
 GATEWAY_DOMAIN="gui/$(id -u)"
 GATEWAY_TARGET="${GATEWAY_DOMAIN}/${GATEWAY_LABEL}"
@@ -19,6 +20,12 @@ DRY_RUN=false
 GATEWAY_WAS_LOADED=false
 GATEWAY_STOPPED=false
 SERIAL_CANDIDATES=()
+FLASH_CHUNK_BYTES="${SESAME_FLASH_CHUNK_BYTES:-16384}"
+FLASH_MAX_RETRIES="${SESAME_FLASH_MAX_RETRIES:-5}"
+FLASH_CHUNK_FILE=""
+FLASH_DETAIL_LOG=""
+FLASH_VERIFIED_UNITS=0
+FLASH_RETRY_COUNT=0
 
 pause_before_exit() {
   # The app bundle keeps this terminal open after flashing.  Restoring only in
@@ -88,6 +95,18 @@ restore_gateway() {
   echo "launchctl bootstrap ${GATEWAY_DOMAIN} ${GATEWAY_PLIST}"
 }
 
+cleanup_flash_temp() {
+  if [[ -n "${FLASH_CHUNK_FILE}" && -f "${FLASH_CHUNK_FILE}" ]]; then
+    rm -f -- "${FLASH_CHUNK_FILE}"
+    FLASH_CHUNK_FILE=""
+  fi
+}
+
+cleanup() {
+  cleanup_flash_temp
+  restore_gateway
+}
+
 show_usage() {
   cat <<'EOF'
 用法：双击本文件，或在终端执行：
@@ -95,6 +114,8 @@ show_usage() {
 
 可选：
   SESAME_ESP32_PORT=/dev/cu.usbmodemXXXX ./flash_sesame_robot.command
+  SESAME_IDF_PROJECT=/path/to/idf-project SESAME_BUILD_DIR=build \\
+    SESAME_APP_IMAGE=app.bin ./flash_sesame_robot.command
   ./flash_sesame_robot.command --dry-run
 EOF
 }
@@ -181,6 +202,124 @@ select_esp32_port() {
   return 1
 }
 
+wait_for_download_port() {
+  local attempt
+  local -a available_ports
+
+  for (( attempt = 1; attempt <= 100; attempt++ )); do
+    if [[ -e "${PORT}" ]]; then
+      return 0
+    fi
+
+    # Native ESP32-S3 USB-Serial/JTAG can disappear briefly and return under a
+    # different suffix. Only switch automatically when exactly one USB serial
+    # endpoint is present, so another board is never selected by accident.
+    available_ports=(/dev/cu.usbmodem*(N) /dev/cu.SLAB_USBtoUART*(N) \
+      /dev/cu.wchusbserial*(N) /dev/cu.usbserial*(N))
+    if (( ${#available_ports} == 1 )); then
+      if [[ "${PORT}" != "${available_ports[1]}" ]]; then
+        echo "USB 串口重新枚举：${PORT} -> ${available_ports[1]}"
+      fi
+      PORT="${available_ports[1]}"
+      return 0
+    fi
+    sleep 0.1
+  done
+  return 1
+}
+
+flash_verified_unit() {
+  local address="$1"
+  local file="$2"
+  local after_reset="${3:-no_reset}"
+  local attempt rc=1
+
+  if [[ ! -s "${file}" ]]; then
+    echo "错误：待烧录文件不存在或为空：${file}" >&2
+    return 1
+  fi
+
+  for (( attempt = 1; attempt <= FLASH_MAX_RETRIES; attempt++ )); do
+    if ! wait_for_download_port; then
+      echo "错误：等待 ESP32-S3 USB 串口重新出现超时。" >&2
+      return 1
+    fi
+
+    print -r -- "BEGIN address=${address} file=${file} attempt=${attempt}" \
+      >> "${FLASH_DETAIL_LOG}"
+    if esptool.py --chip esp32s3 --port "${PORT}" --baud 115200 \
+      --before default_reset --after "${after_reset}" \
+      write_flash --flash_mode keep --flash_freq keep --flash_size keep \
+      --no-compress --verify "${address}" "${file}" \
+      >> "${FLASH_DETAIL_LOG}" 2>&1; then
+      print -r -- "PASS address=${address} attempt=${attempt}" \
+        >> "${FLASH_DETAIL_LOG}"
+      FLASH_VERIFIED_UNITS=$(( FLASH_VERIFIED_UNITS + 1 ))
+      return 0
+    else
+      rc=$?
+    fi
+
+    FLASH_RETRY_COUNT=$(( FLASH_RETRY_COUNT + 1 ))
+    print -r -- "RETRY address=${address} attempt=${attempt} rc=${rc}" \
+      >> "${FLASH_DETAIL_LOG}"
+    if (( attempt < FLASH_MAX_RETRIES )); then
+      echo "USB 连接在 ${address} 处中断；重连后重试当前块（${attempt}/${FLASH_MAX_RETRIES}）..."
+      sleep 0.4
+    fi
+  done
+
+  echo "错误：地址 ${address} 连续 ${FLASH_MAX_RETRIES} 次写入失败。" >&2
+  tail -n 35 "${FLASH_DETAIL_LOG}" >&2
+  return "${rc}"
+}
+
+flash_app_in_verified_chunks() {
+  local app_file="$1"
+  local base_address="$2"
+  local app_size total_chunks index address address_hex
+
+  app_size="$(stat -f %z "${app_file}")"
+  total_chunks=$(( (app_size + FLASH_CHUNK_BYTES - 1) / FLASH_CHUNK_BYTES ))
+  FLASH_CHUNK_FILE="$(mktemp -t sesame-flash-chunk.XXXXXX)"
+
+  echo "分块写入主程序：${total_chunks} 块，每块 ${FLASH_CHUNK_BYTES} bytes。"
+  index=0
+  while (( index < total_chunks )); do
+    dd if="${app_file}" of="${FLASH_CHUNK_FILE}" bs="${FLASH_CHUNK_BYTES}" \
+      skip="${index}" count=1 status=none
+    address=$(( base_address + index * FLASH_CHUNK_BYTES ))
+    printf -v address_hex '0x%x' "${address}"
+    flash_verified_unit "${address_hex}" "${FLASH_CHUNK_FILE}"
+    index=$(( index + 1 ))
+    if (( index == 1 || index % 10 == 0 || index == total_chunks )); then
+      echo "  主程序已写入并校验：${index}/${total_chunks}"
+    fi
+  done
+  cleanup_flash_temp
+}
+
+flash_built_images_resiliently() {
+  local build_root="${IDF_PROJECT}/${BUILD_DIR}"
+
+  FLASH_DETAIL_LOG="${build_root}/segmented-flash.log"
+  : > "${FLASH_DETAIL_LOG}"
+  FLASH_VERIFIED_UNITS=0
+  FLASH_RETRY_COUNT=0
+
+  echo "[1/4] 写入并校验 Bootloader..."
+  flash_verified_unit 0x0 "${build_root}/bootloader/bootloader.bin"
+  echo "[2/4] 写入并校验分区表..."
+  flash_verified_unit 0x8000 "${build_root}/partition_table/partition-table.bin"
+  echo "[3/4] 写入并校验主程序..."
+  flash_app_in_verified_chunks "${build_root}/${APP_IMAGE}" 0x10000
+  echo "[4/4] 写入并校验模型分区，然后重启..."
+  flash_verified_unit 0x410000 "${build_root}/srmodels/srmodels.bin" hard_reset
+
+  echo "分块烧录校验完成：${FLASH_VERIFIED_UNITS} 个单元，USB 重试 ${FLASH_RETRY_COUNT} 次。"
+  echo "详细日志：${FLASH_DETAIL_LOG}"
+}
+
 if (( $# > 1 )) || [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
   show_usage
   pause_before_exit
@@ -206,6 +345,7 @@ echo "项目：${IDF_PROJECT}"
 if [[ "${DRY_RUN}" == true ]]; then
   echo "发现的候选串口："
   find_serial_candidates
+  echo "正式烧录模式：${FLASH_CHUNK_BYTES}-byte 分块校验，单块最多重试 ${FLASH_MAX_RETRIES} 次。"
   echo "检查完成：未执行芯片探测、构建、烧录或停止 Gateway。"
   pause_before_exit
   exit 0
@@ -216,7 +356,7 @@ if launchctl print "${GATEWAY_TARGET}" >/dev/null 2>&1; then
   echo "暂时停止 Gateway，释放 ESP32 串口..."
   launchctl bootout "${GATEWAY_TARGET}"
   GATEWAY_STOPPED=true
-  trap restore_gateway EXIT INT TERM
+  trap cleanup EXIT INT TERM
 fi
 
 echo "加载 ESP-IDF 环境..."
@@ -241,14 +381,22 @@ if lsof "${PORT}" >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "开始构建并以稳定的 115200 波特率烧录。请不要拔掉 USB，也不要按住 BOOT。"
+if [[ "${FLASH_CHUNK_BYTES}" != <1-> || "${FLASH_MAX_RETRIES}" != <1-> ]]; then
+  echo "错误：分块大小和重试次数必须是正整数。" >&2
+  pause_before_exit
+  exit 1
+fi
+
+echo "开始构建。请不要拔掉 USB，也不要按住 BOOT。"
 cd "${IDF_PROJECT}"
-# The ESP32-S3 USB-Serial/JTAG interface on this Mac disconnects during the
-# 460800-baud switch, so retain the verified 115200-baud rate for flashing.
-idf.py -p "${PORT}" -b 115200 -B "${BUILD_DIR}" build flash
+# A single 1.5 MB transfer repeatedly loses this board's native USB connection.
+# Build first, then use short verified writes so only the interrupted block is
+# retried after USB-Serial/JTAG re-enumerates.
+idf.py -B "${BUILD_DIR}" build
+flash_built_images_resiliently
 
 echo "烧录完成：ESP32 已自动重启。"
-echo "等待 Gateway 重连后，按 BOOT 一次开始录音、再按一次结束。"
+echo "等待 Gateway 重连。按 BOOT 一次开始录音，再按一次结束。"
 # Restore before the terminal's optional Enter prompt, rather than holding the
 # local web console offline while the user reads this success message.
 restore_gateway

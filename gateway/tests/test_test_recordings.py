@@ -59,6 +59,7 @@ class TestRecordingStoreTest(unittest.TestCase):
                 turn_id="turn-001",
                 pcm=pcm,
                 audio_format=AudioFormat(),
+                asr_text="芝麻兵",
             )
 
             self.assertIsNotNone(artifact)
@@ -79,6 +80,7 @@ class TestRecordingStoreTest(unittest.TestCase):
                 entries,
                 [
                     {
+                        "asr_text": "芝麻兵",
                         "device_id": "sesame-v3-001",
                         "duration_ms": 20,
                         "file": "001_turn-001.wav",
@@ -99,12 +101,14 @@ class TestRecordingStoreTest(unittest.TestCase):
                 turn_id="turn-001",
                 pcm=pcm,
                 audio_format=AudioFormat(),
+                asr_text="第一段",
             )
             second = store.save(
                 device_id="device",
                 turn_id="turn-002",
                 pcm=pcm,
                 audio_format=AudioFormat(),
+                asr_text="第二段",
             )
 
             self.assertIsNotNone(first)
@@ -169,6 +173,33 @@ class TestRecordingPipelineTest(unittest.IsolatedAsyncioTestCase):
 
             with wave.open(str(output_directory / "001_turn-001.wav"), "rb") as recorded:
                 self.assertEqual(recorded.readframes(recorded.getnframes()), b"\x01\x00" * 320)
+            entry = json.loads((output_directory / "manifest.jsonl").read_text(encoding="utf-8"))
+            self.assertEqual(entry.get("asr_text"), "测试")
+
+    async def test_pipeline_skips_wakeword_turns_in_manual_only_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_directory = Path(temporary_directory)
+            pipeline = ConversationPipeline(
+                codec_factory=_Codec,
+                asr=_Asr(),
+                agent=_Agent(),
+                tts=_Tts(),
+                recording_store=TestRecordingStore(output_directory=output_directory, limit=10),
+                manual_test_recordings_only=True,
+            )
+
+            await pipeline.process_turn(
+                context=ConversationContext(
+                    device_id="device",
+                    user_id="user",
+                    conversation_id="conversation",
+                    turn_id="turn-wakeword",
+                    capture_trigger="wakeword",
+                ),
+                opus_packets=[b"uplink-opus"],
+            )
+
+            self.assertEqual(list(output_directory.glob("*.wav")), [])
 
 
 if __name__ == "__main__":

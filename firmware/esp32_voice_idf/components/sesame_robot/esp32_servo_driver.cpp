@@ -162,12 +162,14 @@ bool Esp32ServoDriver::set_manual_angle(uint8_t servo_index, uint8_t angle) {
   return write_logical_angle(servo_index, angle);
 }
 
-bool Esp32ServoDriver::set_motion_angle(uint8_t servo_index, uint8_t angle) {
+bool Esp32ServoDriver::set_motion_angle(uint8_t servo_index, uint8_t angle,
+                                        bool preserve_r3_l4_full_range) {
   if (!web_control_active_.load() || manual_control_active_.load() ||
       servo_index >= kServoPins.size() || angle > 180) {
     return false;
   }
-  return write_logical_angle(servo_index, angle);
+  return write_logical_angle(servo_index, angle,
+                             preserve_r3_l4_full_range);
 }
 
 void Esp32ServoDriver::apply_pose(
@@ -240,14 +242,16 @@ const char* Esp32ServoDriver::action_name(MotionId action) {
 }
 
 bool Esp32ServoDriver::write_logical_angle(uint8_t servo_index,
-                                           uint8_t logical_angle) {
+                                           uint8_t logical_angle,
+                                           bool preserve_r3_l4_full_range) {
   if (!pwm_configured_.load() || servo_index >= kServoPins.size() ||
       logical_angle > 180) {
     return false;
   }
   const auto channel = static_cast<ledc_channel_t>(servo_index);
   const uint8_t physical_angle =
-      physical_angle_for_servo(servo_index, logical_angle);
+      physical_angle_for_servo(servo_index, logical_angle,
+                               preserve_r3_l4_full_range);
   ledc_set_duty(LEDC_LOW_SPEED_MODE, channel, duty_for_angle(physical_angle));
   return ledc_update_duty(LEDC_LOW_SPEED_MODE, channel) == ESP_OK;
 }

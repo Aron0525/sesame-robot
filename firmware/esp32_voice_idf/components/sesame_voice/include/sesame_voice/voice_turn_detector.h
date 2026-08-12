@@ -38,8 +38,8 @@ class VoiceTurnDetector {
  public:
   explicit VoiceTurnDetector(VoiceTurnDetectorConfig config) : config_(config) {}
 
-  // BOOT starts a manual turn immediately. Wake-word turns first enter
-  // kWakeAcknowledging and wait for the local "我在" prompt to finish.
+  // BOOT starts a manual turn immediately. A wake word opens the three-second
+  // first-speech window without a local acknowledgement prompt.
   VoiceTurnEvent start_from_button(uint64_t now_ms);
   VoiceTurnEvent update(uint64_t now_ms, bool wake_detected, bool vad_speech);
   bool start_first_speech_wait(uint64_t now_ms);

@@ -110,6 +110,13 @@ class ObservabilityStore:
         device = self._device(device_id, timestamp_ms)
         if session_id is not None and device.session_id not in {None, session_id}:
             return
+        active_turn_id = device.current_turn_id
+        if active_turn_id is not None:
+            turn = self._turns.get((device_id, active_turn_id))
+            if turn is not None and turn.status == "running":
+                turn.status = "failed"
+                turn.current_stage = "wss"
+                turn.updated_at_ms = timestamp_ms
         device.online = False
         device.session_id = None
         device.current_turn_id = None
@@ -120,7 +127,10 @@ class ObservabilityStore:
             turn_id=None,
             stage="wss",
             status="disconnected",
-            details={"transport": "wss"},
+            details={
+                "transport": "wss",
+                "active_turn_id": active_turn_id,
+            },
         )
 
     def session_ready(self, *, device_id: str, session_id: str) -> None:

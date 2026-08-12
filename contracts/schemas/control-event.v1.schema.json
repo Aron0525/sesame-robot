@@ -63,8 +63,23 @@
       "if": {
         "properties": {
           "type": {
+            "const": "listen.start"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/listenStartPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
             "enum": [
-              "listen.start",
               "listen.stop",
               "interrupt"
             ]
@@ -411,6 +426,23 @@
       "type": "object",
       "additionalProperties": false,
       "maxProperties": 0
+    },
+    "listenStartPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trigger"
+      ],
+      "properties": {
+        "trigger": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "wakeword",
+            "followup"
+          ]
+        }
+      }
     },
     "asrPayload": {
       "type": "object",

@@ -5,7 +5,35 @@ project_root=$(cd "$(dirname "$0")/.." && pwd)
 build_dir=${TMPDIR:-/tmp}/sesame-v3-host-tests
 mkdir -p "$build_dir"
 
-python3 "$project_root/tests/verify_nihao_zhima_wakeword.py"
+python3 "$project_root/tests/verify_wakenet_removed.py"
+python3 "$project_root/tests/verify_multinet_nihao_zhima.py"
+python3 "$project_root/tests/verify_nihao_zhima_real19_dataset.py"
+python3 "$project_root/tests/verify_manual_button_recording.py"
+python3 "$project_root/tests/verify_voice_queue_memory.py"
+python3 "$project_root/tests/verify_outbound_transport.py"
+python3 "$project_root/tests/verify_downlink_transport.py"
+python3 "$project_root/tests/verify_opus_voice_stack.py"
+python3 "$project_root/tests/verify_continuous_conversation.py"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_gateway_connection_state.cpp" \
+  -o "$build_dir/test_gateway_connection_state"
+"$build_dir/test_gateway_connection_state"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_recording_button.cpp" \
+  "$project_root/components/sesame_voice/recording_button.cpp" \
+  -o "$build_dir/test_recording_button"
+"$build_dir/test_recording_button"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_capture_session.cpp" \
+  "$project_root/components/sesame_voice/capture_session.cpp" \
+  -o "$build_dir/test_capture_session"
+"$build_dir/test_capture_session"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_voice/include" \
@@ -13,6 +41,20 @@ c++ -std=c++20 -Wall -Wextra -Werror \
   "$project_root/components/sesame_voice/voice_turn_detector.cpp" \
   -o "$build_dir/test_voice_turn_detector"
 "$build_dir/test_voice_turn_detector"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_wake_capture_policy.cpp" \
+  -o "$build_dir/test_wake_capture_policy"
+"$build_dir/test_wake_capture_policy"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_audio/include" \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_pcm_preroll_buffer.cpp" \
+  "$project_root/components/sesame_voice/pcm_preroll_buffer.cpp" \
+  -o "$build_dir/test_pcm_preroll_buffer"
+"$build_dir/test_pcm_preroll_buffer"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_robot/include" \

@@ -1,11 +1,15 @@
 # Runtime secrets and generated files
 gateway/.env
+**/.env
 gateway/.venv/
 gateway/test-recordings/
 gateway/__pycache__/
 gateway/**/__pycache__/
 gateway/**/.pytest_cache/
 gateway/**/.ruff_cache/
+gateway/.codex-backups/
+gateway/mic-diagnostics-*/
+gateway/wakeword-*/
 
 # ESP-IDF generated dependencies and build outputs
 firmware/esp32_voice_idf/build*/
@@ -13,6 +17,7 @@ firmware/esp32_voice_idf/managed_components/
 firmware/esp32_voice_idf/*.bin
 firmware/esp32_voice_idf/device-nvs.bin
 firmware/esp32_voice_idf/components/sesame_transport/include/sesame_transport/local-device-config.h
+firmware/esp32_voice_idf/diagnostics/multinet_real19_eval/
 
 # Arduino and diagnostic generated outputs
 firmware/arduino/**/build/
@@ -22,6 +27,15 @@ firmware/esp32_voice_idf/diagnostics/**/build*/
 **/.venv/
 **/__pycache__/
 **/.pytest_cache/
+
+# Local workspaces, private training data, and release artifacts
+/.internal/
+/.vscode/
+/.workbuddy/
+/endpoint-gateway/
+/output/
+/training/
+/tools/*real19*.py
 
 # macOS metadata
 .DS_Store
