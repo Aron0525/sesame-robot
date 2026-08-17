@@ -9,7 +9,6 @@ namespace sesame::voice {
 enum class VoiceTurnEvent {
   kNone,
   kWakeDetected,
-  kBargeInDetected,
   kListenStarted,
   kListenStopped,
   kWakeTimedOut,

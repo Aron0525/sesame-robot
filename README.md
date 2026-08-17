@@ -38,3 +38,10 @@ ops/openclaw/              固定版本的 OpenClaw 安装入口
 - **仍需现场配置**：真实硬件的 I2S 接线、TLS 证书、云端 ASR/TTS 凭据与 OpenClaw token 需要按设备在本机完成配置和联调。
 
 硬件模块、GPIO 和供电关系见 [硬件模块清单](docs/hardware_modules.md)。
+
+## 项目说明与迁移文档
+
+- [项目概览与当前边界](docs/project-overview.md)：功能、组件职责、OpenClaw 的位置与当前限制。
+- [GitHub 范围与跨设备复现](docs/setup/github-scope-and-replication-guide.md)：仓库包含什么、不包含什么，以及换设备时应迁移哪些内容。
+- [换电脑后的搭建指南](docs/setup/new-machine-setup-guide.md)：写给开发者的本地搭建顺序。
+- [给 AI 的新电脑搭建交接文档](docs/setup/ai-agent-new-machine-handoff.md)：在新电脑交给 AI 执行配置时使用。

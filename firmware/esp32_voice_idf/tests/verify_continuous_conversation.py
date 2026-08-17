@@ -43,16 +43,16 @@ def main() -> None:
         "void VoiceController::run()",
         "void VoiceController::maintain_gateway_connection",
     )
-    assert "VoiceTurnState::kTtsPlaying" in run
+    assert "session_ready_ && !tts_active_" in run
+    assert "tts_barge_in" not in run
     assert "pcm_preroll_->push" in run
     assert "drain_pcm_uplink" in run
-    assert "session_ready_ && !tts_active_" not in run
 
     assert 'kFollowupListenStartPayload[] = R"({"trigger":"followup"})"' in source
     assert "kFollowup," in capture
     assert "PcmPreRollBuffer* pcm_preroll_" in header
     assert "MALLOC_CAP_SPIRAM" in source
-    print("TTS follow-up, 500-ms pre-roll, and barge-in wiring verified")
+    print("TTS follow-up, 500-ms pre-roll, and half-duplex wiring verified")
 
 
 if __name__ == "__main__":

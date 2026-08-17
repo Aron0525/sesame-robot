@@ -4,7 +4,11 @@ import unittest
 
 from sesame_voice_gateway.config import Settings
 from sesame_voice_gateway.observability import ObservabilityStore
-from sesame_voice_gateway.pipeline import ConversationContext, ConversationPipeline
+from sesame_voice_gateway.pipeline import (
+    ConversationContext,
+    ConversationPipeline,
+    SilentDiscard,
+)
 from sesame_voice_gateway.privacy import PrivacyPolicyViolation, validate_remote_pcm
 from sesame_voice_gateway.providers.base import (
     AgentToolCall,
@@ -42,6 +46,12 @@ class SilentAsr:
     async def transcribe(self, pcm: bytes, audio_format: object) -> AsrResult:
         del pcm, audio_format
         return AsrResult(text="")
+
+
+class FillerAsr:
+    async def transcribe(self, pcm: bytes, audio_format: object) -> AsrResult:
+        del pcm, audio_format
+        return AsrResult(text="嗯嗯，那个就是")
 
 
 class FakeAgent:
@@ -244,7 +254,7 @@ class PrivacyAndPipelineTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.agent.text, "深圳明天多云，气温 25°C。")
         self.assertIn("UNTRUSTED_WEB_SEARCH_RESULT", agent.prompts[1])
 
-    async def test_pipeline_replies_when_asr_returns_no_speech(self) -> None:
+    async def test_pipeline_silently_discards_when_asr_returns_no_speech(self) -> None:
         tts = RecordingTts()
         pipeline = ConversationPipeline(
             codec_factory=FakeCodec,
@@ -263,10 +273,34 @@ class PrivacyAndPipelineTest(unittest.IsolatedAsyncioTestCase):
             opus_packets=[b"uplink-opus"],
         )
 
+        self.assertIsInstance(result, SilentDiscard)
         self.assertEqual(result.transcript.text, "")
-        self.assertEqual(result.agent.text, "抱歉，我没有听清，请再说一遍。")
-        self.assertEqual(tts.texts, ["抱歉，我没有听清，请再说一遍。"])
-        self.assertEqual(result.opus_packets, (b"downlink-opus",))
+        self.assertEqual(result.reason, "blank")
+        self.assertEqual(tts.texts, [])
+
+    async def test_pipeline_silently_discards_filler_only_asr_text(self) -> None:
+        tts = RecordingTts()
+        pipeline = ConversationPipeline(
+            codec_factory=FakeCodec,
+            asr=FillerAsr(),
+            agent=FailIfCalledAgent(),
+            tts=tts,
+        )
+
+        result = await pipeline.process_turn(
+            context=ConversationContext(
+                device_id="device",
+                user_id="user",
+                conversation_id="conversation",
+                turn_id="turn",
+            ),
+            opus_packets=[b"uplink-opus"],
+        )
+
+        self.assertIsInstance(result, SilentDiscard)
+        self.assertEqual(result.transcript.text, "嗯嗯，那个就是")
+        self.assertEqual(result.reason, "filler_only")
+        self.assertEqual(tts.texts, [])
 
     async def test_each_turn_gets_a_fresh_opus_codec(self) -> None:
         created_codecs: list[FakeCodec] = []

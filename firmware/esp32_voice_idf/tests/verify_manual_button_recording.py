@@ -16,7 +16,7 @@ def main() -> None:
     run_end = source.index("void VoiceController::maintain_gateway_connection", run_start)
     run_loop = source[run_start:run_end]
     button_poll = run_loop.index("gpio_get_level(kVoiceButton)")
-    session_gate = run_loop.index("else if (session_ready_)")
+    session_gate = run_loop.index("else if (session_ready_ && !tts_active_)")
     microphone_read = run_loop.index("audio_->read_microphone_frame")
     wake_feed = run_loop.index("wake_vad_.feed_pcm")
     wake_process = run_loop.index("process_wake_vad_signals")
@@ -29,6 +29,7 @@ def main() -> None:
     assert "button_.recording()" not in run_loop
     assert "wake_listening_" not in run_loop
     assert "if (wake_ack_active_)" in run_loop
+    assert "session_ready_ && !tts_active_" in run_loop
 
     # The Gateway must be able to retain only user-marked training samples.
     # Therefore ESP32 labels the source of every listen.start event.

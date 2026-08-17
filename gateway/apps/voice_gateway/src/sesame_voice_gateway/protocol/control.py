@@ -20,6 +20,7 @@ ControlEventType = Literal[
     "asr.final",
     "agent.reply",
     "response.plan",
+    "turn.complete",
     "tts.start",
     "tts.stop",
     "tts.flush",

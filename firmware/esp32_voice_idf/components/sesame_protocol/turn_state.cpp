@@ -4,7 +4,7 @@ namespace sesame::protocol {
 
 bool TurnStateMachine::apply(TurnEvent event) {
   if (event == TurnEvent::kConnectionLost || event == TurnEvent::kInterrupted ||
-      event == TurnEvent::kFailed) {
+      event == TurnEvent::kFailed || event == TurnEvent::kDiscarded) {
     state_ = TurnState::kIdle;
     generation_id_ = 0;
     return true;

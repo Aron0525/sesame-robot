@@ -71,7 +71,14 @@ void runTurnRight();
 inline void runRestPose() { 
   Serial.println(F("REST")); 
   setFaceWithMode("rest", FACE_ANIM_BOOMERANG); 
-  for (int i = 0; i < 8; i++) setServoAngle(i, 90); 
+  setServoAngle(R1, 90);
+  setServoAngle(R2, 90);
+  setServoAngle(L1, 90);
+  setServoAngle(L2, 90);
+  setServoAngle(R4, 90);
+  setServoAngle(R3, 60);
+  setServoAngle(L3, 90);
+  setServoAngle(L4, 60);
 }
 
 inline void runStandPose(int face) { 
@@ -82,9 +89,9 @@ inline void runStandPose(int face) {
   setServoAngle(L1, 45); 
   setServoAngle(L2, 135);
   setServoAngle(R4, 30);
-  setServoAngle(R3, 150);
+  setServoAngle(R3, 120);
   setServoAngle(L3, 30);
-  setServoAngle(L4, 150);
+  setServoAngle(L4, 120);
   if (face == 1) enterIdle();
 }
 
@@ -301,7 +308,7 @@ inline void runDeadPose() {
   runStandPose(0);
   setFaceWithMode("dead", FACE_ANIM_BOOMERANG);
   delayWithFace(200);
-  setServoAngle(R3, 90); setServoAngle(R4, 90); setServoAngle(L3, 90); setServoAngle(L4, 90);
+  setServoAngle(R3, 60); setServoAngle(R4, 90); setServoAngle(L3, 90); setServoAngle(L4, 60);
   if (currentCommand == "dead") currentCommand = "";
 }
 
@@ -323,26 +330,28 @@ inline void runCrabPose() {
 }
 
 // --- MOVEMENT ANIMATIONS ---
+// All gait servos use a 45-degree range. Absolute endpoints differ because the
+// left/right joints are mounted with different mechanical zero positions.
 inline void runWalkPose() {
   Serial.println(F("WALK FWD"));
   setFaceWithMode("walk", FACE_ANIM_ONCE);
   // Initial Step
-  setServoAngle(R3, 135); setServoAngle(L3, 45);
-  setServoAngle(R2, 100); setServoAngle(L1, 25);
+  setServoAngle(R3, 105); setServoAngle(L3, 45);
+  setServoAngle(R2, 90); setServoAngle(L1, 45);
   if (!pressingCheck("forward", frameDelay)) return;
   
   for (int i = 0; i < walkCycles; i++) {
-    setServoAngle(R3, 135); setServoAngle(L3, 0);
+    setServoAngle(R3, 105); setServoAngle(L3, 0);
     if (!pressingCheck("forward", frameDelay)) return;
-    setServoAngle(L4, 135); setServoAngle(L2, 90);
-    setServoAngle(R4, 0); setServoAngle(R1, 180);
+    setServoAngle(L4, 105); setServoAngle(L2, 90);
+    setServoAngle(R4, 0); setServoAngle(R1, 135);
     if (!pressingCheck("forward", frameDelay)) return;    
     setServoAngle(R2, 45); setServoAngle(L1, 90);
     if (!pressingCheck("forward", frameDelay)) return;
-    setServoAngle(R4, 45); setServoAngle(L4, 180);
+    setServoAngle(R4, 45); setServoAngle(L4, 150);
     if (!pressingCheck("forward", frameDelay)) return;
-    setServoAngle(R3, 180); setServoAngle(L3, 45);
-    setServoAngle(R2, 90); setServoAngle(L1, 0);
+    setServoAngle(R3, 150); setServoAngle(L3, 45);
+    setServoAngle(R2, 90); setServoAngle(L1, 45);
     if (!pressingCheck("forward", frameDelay)) return;  
     setServoAngle(L2, 135); setServoAngle(R1, 90);
     if (!pressingCheck("forward", frameDelay)) return;
@@ -357,19 +366,19 @@ inline void runWalkBackward() {
   if (!pressingCheck("backward", frameDelay)) return;
   
   for (int i = 0; i < walkCycles; i++) {
-    setServoAngle(R3, 135); setServoAngle(L3, 0);
+    setServoAngle(R3, 105); setServoAngle(L3, 0);
     if (!pressingCheck("backward", frameDelay)) return;
-    setServoAngle(L4, 135); setServoAngle(L2, 135);
+    setServoAngle(L4, 105); setServoAngle(L2, 135);
     setServoAngle(R4, 0); setServoAngle(R1, 90);
     if (!pressingCheck("backward", frameDelay)) return;    
-    setServoAngle(R2, 90); setServoAngle(L1, 0);
+    setServoAngle(R2, 90); setServoAngle(L1, 45);
     if (!pressingCheck("backward", frameDelay)) return;
-    setServoAngle(R4, 45); setServoAngle(L4, 180);
+    setServoAngle(R4, 45); setServoAngle(L4, 150);
     if (!pressingCheck("backward", frameDelay)) return;
-    setServoAngle(R3, 180); setServoAngle(L3, 45);
+    setServoAngle(R3, 150); setServoAngle(L3, 45);
     setServoAngle(R2, 45); setServoAngle(L1, 90);
     if (!pressingCheck("backward", frameDelay)) return;  
-    setServoAngle(L2, 90); setServoAngle(R1, 180);
+    setServoAngle(L2, 90); setServoAngle(R1, 135);
     if (!pressingCheck("backward", frameDelay)) return;
   }
   runStandPose(1);
@@ -381,13 +390,13 @@ inline void runTurnLeft() {
   setFaceWithMode("walk", FACE_ANIM_ONCE);
   for (int i = 0; i < walkCycles; i++) {
     //legset 1 (R1 L2)
-    setServoAngle(R3, 135); setServoAngle(L4, 135); 
-    if (!pressingCheck("left", frameDelay)) return;
-    setServoAngle(R1, 180); setServoAngle(L2, 180); 
-    if (!pressingCheck("left", frameDelay)) return;
-    setServoAngle(R3, 180); setServoAngle(L4, 180); 
+    setServoAngle(R3, 105); setServoAngle(L4, 105);
     if (!pressingCheck("left", frameDelay)) return;
     setServoAngle(R1, 135); setServoAngle(L2, 135);
+    if (!pressingCheck("left", frameDelay)) return;
+    setServoAngle(R3, 150); setServoAngle(L4, 150);
+    if (!pressingCheck("left", frameDelay)) return;
+    setServoAngle(R1, 90); setServoAngle(L2, 90);
     if (!pressingCheck("left", frameDelay)) return;
       //legset 2 (R2 L1)
     setServoAngle(R4, 45); setServoAngle(L3, 45); 
@@ -409,18 +418,18 @@ inline void runTurnRight() {
     //legset 2 (R2 L1)
     setServoAngle(R4, 45); setServoAngle(L3, 45); 
     if (!pressingCheck("right", frameDelay)) return;
-    setServoAngle(R2, 0); setServoAngle(L1, 0); 
+    setServoAngle(R2, 45); setServoAngle(L1, 45);
     if (!pressingCheck("right", frameDelay)) return;
     setServoAngle(R4, 0); setServoAngle(L3, 0); 
     if (!pressingCheck("right", frameDelay)) return;
-    setServoAngle(R2, 45); setServoAngle(L1, 45);
+    setServoAngle(R2, 90); setServoAngle(L1, 90);
     if (!pressingCheck("right", frameDelay)) return;  
     //legset 1 (R1 L2)
-    setServoAngle(R3, 135); setServoAngle(L4, 135); 
+    setServoAngle(R3, 105); setServoAngle(L4, 105);
     if (!pressingCheck("right", frameDelay)) return;
     setServoAngle(R1, 90); setServoAngle(L2, 90); 
     if (!pressingCheck("right", frameDelay)) return;
-    setServoAngle(R3, 180); setServoAngle(L4, 180); 
+    setServoAngle(R3, 150); setServoAngle(L4, 150);
     if (!pressingCheck("right", frameDelay)) return;
     setServoAngle(R1, 135); setServoAngle(L2, 135);
     if (!pressingCheck("right", frameDelay)) return;

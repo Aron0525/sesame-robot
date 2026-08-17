@@ -151,6 +151,12 @@ struct WakeVadEngine::WakeWordRuntime {
     if (multinet != nullptr && model_data != nullptr) multinet->clean(model_data);
   }
 
+  void set_detection_threshold(float threshold) {
+    if (multinet != nullptr && model_data != nullptr) {
+      multinet->set_det_threshold(model_data, threshold);
+    }
+  }
+
   bool process_pcm(const int16_t* pcm, size_t samples, bool wake_enabled,
                    WakeVadSignal* signal) {
     if (pcm == nullptr || samples == 0 || signal == nullptr || afe_iface == nullptr ||
@@ -311,6 +317,13 @@ void WakeVadEngine::set_wake_enabled(bool enabled) {
   }
 }
 
+bool WakeVadEngine::set_detection_threshold_hundredths(uint8_t hundredths) {
+  if (hundredths < 5 || hundredths > 95) return false;
+  wake_threshold_hundredths_ = hundredths;
+  threshold_update_requested_ = true;
+  return true;
+}
+
 esp_err_t WakeVadEngine::feed_pcm(const int16_t* pcm, size_t samples) {
   if (!running_ || pcm == nullptr || wakeword_ == nullptr ||
       audio_queue_ == nullptr) {
@@ -351,6 +364,10 @@ void WakeVadEngine::processing_loop() {
     }
     if (!running_) return;
     if (wake_reset_requested_.exchange(false)) wakeword_->reset_detection();
+    if (threshold_update_requested_.exchange(false)) {
+      wakeword_->set_detection_threshold(
+          static_cast<float>(wake_threshold_hundredths_.load()) / 100.0f);
+    }
 
     WakeVadSignal signal{};
     if (!wakeword_->process_pcm(frame.samples.data(), frame.samples.size(),

@@ -156,6 +156,23 @@ is_esp32s3() {
   [[ "${probe_output}" == *"ESP32-S3"* ]]
 }
 
+retry_manual_download_mode() {
+  local candidate="$1"
+
+  if [[ ! -t 0 ]]; then
+    return 1
+  fi
+
+  echo
+  echo "检测到唯一的 USB 串口：${candidate}，但它没有自动进入下载模式。"
+  echo "请按以下顺序操作："
+  echo "  1. 按住开发板 BOOT；"
+  echo "  2. 短按并松开 RESET/EN；"
+  echo "  3. 松开 BOOT，等待约 1 秒；"
+  read -r "?完成后按 Enter，让脚本重新探测下载模式..."
+  is_esp32s3 "${candidate}"
+}
+
 select_esp32_port() {
   local candidate
   local -a candidates matches
@@ -165,10 +182,11 @@ select_esp32_port() {
       echo "错误：指定的串口不存在：${PORT}" >&2
       return 1
     fi
-    if ! is_esp32s3 "${PORT}"; then
-      echo "错误：${PORT} 不是可连接的 ESP32-S3 下载端口。" >&2
+    if ! is_esp32s3 "${PORT}" && ! retry_manual_download_mode "${PORT}"; then
+      echo "错误：${PORT} 没有响应 ESP32-S3 下载模式。" >&2
       return 1
     fi
+    echo "已实时识别 ESP32-S3 串口：${PORT}"
     return 0
   fi
 
@@ -196,9 +214,15 @@ select_esp32_port() {
     return 1
   fi
 
-  echo "错误：发现了串口，但没有任何一个响应为 ESP32-S3 下载端口：" >&2
+  if (( ${#candidates} == 1 )) && retry_manual_download_mode "${candidates[1]}"; then
+    PORT="${candidates[1]}"
+    echo "已通过手动下载模式识别 ESP32-S3 串口：${PORT}"
+    return 0
+  fi
+
+  echo "错误：发现了串口，但没有任何一个响应为 ESP32-S3 下载模式：" >&2
   print -l -- "${candidates[@]}" >&2
-  echo "请确认 USB 线支持数据；如有需要，按住 BOOT 后短按 RESET/EN 再重试。" >&2
+  echo "请确认 USB 线支持数据，并按住 BOOT 后短按 RESET/EN 再重试。" >&2
   return 1
 }
 

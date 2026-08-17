@@ -21,7 +21,7 @@ from sesame_voice_gateway.conversations import (
     ConversationRegistry,
 )
 from sesame_voice_gateway.observability import ObservabilityStore
-from sesame_voice_gateway.pipeline import ConversationContext, TurnResult
+from sesame_voice_gateway.pipeline import ConversationContext, SilentDiscard, TurnResult
 from sesame_voice_gateway.protocol.audio import (
     AUDIO_FLAG_PCM_S16LE,
     AudioDirection,
@@ -72,6 +72,11 @@ class FakeWebSocket:
 class BrokenPipeline:
     async def process_turn(self, **_: object) -> TurnResult:
         raise KeyError("private user audio or transcript")
+
+
+class SilentDiscardPipeline:
+    async def process_turn(self, **_: object) -> SilentDiscard:
+        return SilentDiscard(transcript=AsrResult(text="嗯嗯"), reason="filler_only")
 
 
 def _settings(*, device_tokens: dict[str, str], device_users: dict[str, str]) -> Settings:
@@ -418,6 +423,32 @@ class GatewayProtocolHardeningTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(event.type, "error")
         self.assertEqual(event.payload["code"], "voice_pipeline_failed")
         self.assertNotIn("private", event.payload["message"])
+
+    async def test_silent_discard_sends_turn_complete_without_tts(self) -> None:
+        websocket = FakeWebSocket()
+        session = _session(listening=False)
+        context = ConversationContext(
+            device_id=session.device_id,
+            user_id=session.user_id,
+            conversation_id=session.conversation_id,
+            turn_id="turn_001",
+        )
+
+        session.active_turn_task = asyncio.current_task()
+        await _run_turn(
+            websocket=websocket,
+            session=session,
+            pipeline=SilentDiscardPipeline(),  # type: ignore[arg-type]
+            context=context,
+            opus_packets=[b"opus"],
+            turn_epoch=session.turn_epoch,
+        )
+
+        self.assertEqual(len(websocket.text_frames), 1)
+        event = parse_control_event(websocket.text_frames[0])
+        self.assertEqual(event.type, "turn.complete")
+        self.assertEqual(event.turn_id, "turn_001")
+        self.assertEqual(event.payload, {"outcome": "discard", "reason": "filler_only"})
 
     async def test_operator_control_ack_is_visible_without_a_voice_turn(self) -> None:
         websocket = FakeWebSocket()

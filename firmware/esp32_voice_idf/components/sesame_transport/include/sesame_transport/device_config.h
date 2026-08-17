@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 
 #include "esp_err.h"
 
@@ -27,5 +28,7 @@ struct StoredDeviceConfig {
 
 esp_err_t load_device_config(StoredDeviceConfig* output);
 esp_err_t save_conversation_id(const char* conversation_id);
+esp_err_t load_wake_threshold_hundredths(uint8_t* output);
+esp_err_t save_wake_threshold_hundredths(uint8_t value);
 
 }  // namespace sesame::transport

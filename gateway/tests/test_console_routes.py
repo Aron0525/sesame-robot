@@ -85,6 +85,7 @@ class ConsoleRoutesTest(unittest.TestCase):
                         "frame_delay_ms": None,
                         "walk_cycles": None,
                         "motor_current_delay_ms": None,
+                        "wake_threshold_hundredths": None,
                     },
                 )
             ],
@@ -131,6 +132,7 @@ class ConsoleRoutesTest(unittest.TestCase):
                         "frame_delay_ms": None,
                         "walk_cycles": None,
                         "motor_current_delay_ms": None,
+                        "wake_threshold_hundredths": None,
                     },
                 ),
                 (
@@ -144,9 +146,40 @@ class ConsoleRoutesTest(unittest.TestCase):
                         "frame_delay_ms": 100,
                         "walk_cycles": 10,
                         "motor_current_delay_ms": 20,
+                        "wake_threshold_hundredths": None,
                     },
                 ),
             ],
+        )
+
+    def test_console_accepts_a_hundredth_precision_wake_threshold(self) -> None:
+        with TestClient(self.app, client=("127.0.0.1", 4321)) as client:
+            console = client.get("/console")
+            response = client.post(
+                "/api/local-control/dev_001",
+                json={"kind": "wakeword_settings", "wake_threshold_hundredths": 31},
+            )
+
+        self.assertIn('id="wake-threshold"', console.text)
+        self.assertIn('id="wake-threshold-slider"', console.text)
+        self.assertIn('step="0.01"', console.text)
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(
+            self.controls.commands[-1],
+            (
+                "dev_001",
+                {
+                    "kind": "wakeword_settings",
+                    "action": None,
+                    "expression": None,
+                    "servo": None,
+                    "angle": None,
+                    "frame_delay_ms": None,
+                    "walk_cycles": None,
+                    "motor_current_delay_ms": None,
+                    "wake_threshold_hundredths": 31,
+                },
+            ),
         )
 
     def test_device_dispatch_uses_the_existing_control_protocol(self) -> None:

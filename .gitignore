@@ -36,6 +36,9 @@ firmware/esp32_voice_idf/diagnostics/**/build*/
 /output/
 /training/
 /tools/*real19*.py
+# Personal speaker-embedding image and its embedded biometric template.
+/firmware/speaker_embedding_s3/
+/\.r3_l4_action_artifact_dir
 
 # macOS metadata
 .DS_Store

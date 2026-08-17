@@ -24,6 +24,7 @@
 #include "sesame_voice/recording_button.h"
 #include "sesame_voice/voice_turn_detector.h"
 #include "sesame_voice/wake_vad_engine.h"
+#include "sesame_voice/wake_threshold_store.h"
 
 namespace sesame::voice {
 
@@ -141,6 +142,7 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   sesame::robot::RobotAdapter* robot_;
   sesame::audio::OpusCodec codec_;
   ConversationStore conversation_store_;
+  WakeThresholdStore wake_threshold_store_;
   sesame::transport::StoredDeviceConfig config_{};
   sesame::transport::GatewayClient gateway_;
   sesame::protocol::TurnStateMachine turn_state_;

@@ -67,11 +67,9 @@ VoiceTurnEvent VoiceTurnDetector::update(uint64_t now_ms, bool wake_detected,
       return VoiceTurnEvent::kNone;
 
     case VoiceTurnState::kTtsPlaying:
-      // A reply can be interrupted only by another wake word. Raw VAD would
-      // treat the speaker's own playback as user speech without AEC.
-      if (!wake_detected) return VoiceTurnEvent::kNone;
-      start_collecting(now_ms);
-      return VoiceTurnEvent::kBargeInDetected;
+      // The controller does not feed microphone data while TTS is active.
+      // Keep this state inert as a defense in depth against a stale signal.
+      return VoiceTurnEvent::kNone;
 
     case VoiceTurnState::kWaitingForFirstSpeech:
     case VoiceTurnState::kWaitingForFollowupSpeech: {

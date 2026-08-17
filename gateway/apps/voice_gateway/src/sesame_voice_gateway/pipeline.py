@@ -17,12 +17,11 @@ from sesame_voice_gateway.providers.base import (
     AsrProvider,
     AsrResult,
     AudioFormat,
-    ExpressionSpec,
     NoSpeechDetected,
     TtsProvider,
-    VoiceSpec,
 )
 from sesame_voice_gateway.recordings import TestRecordingStore
+from sesame_voice_gateway.text_validity import TranscriptDisposition, classify_transcript
 from sesame_voice_gateway.tools.web_search import (
     WebSearchPolicyError,
     WebSearchProvider,
@@ -32,7 +31,6 @@ from sesame_voice_gateway.tools.web_search import (
 )
 
 MAX_UPLINK_PACKETS = 1_500
-NO_SPEECH_REPLY = "抱歉，我没有听清，请再说一遍。"
 logger = logging.getLogger(__name__)
 
 
@@ -116,6 +114,17 @@ class TurnResult:
     opus_packets: tuple[bytes, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class SilentDiscard:
+    """A completed turn that must leave the device idle without a reply."""
+
+    transcript: AsrResult
+    reason: str
+
+
+TurnOutcome = TurnResult | SilentDiscard
+
+
 class ConversationPipeline:
     def __init__(
         self,
@@ -147,7 +156,7 @@ class ConversationPipeline:
         *,
         context: ConversationContext,
         opus_packets: list[bytes],
-    ) -> TurnResult:
+    ) -> TurnOutcome:
         if not opus_packets:
             raise ValueError("a turn requires at least one Opus packet")
         if len(opus_packets) > MAX_UPLINK_PACKETS:
@@ -185,7 +194,7 @@ class ConversationPipeline:
         *,
         context: ConversationContext,
         pcm: bytes,
-    ) -> TurnResult:
+    ) -> TurnOutcome:
         return await self._process_pcm_turn(
             context=context,
             pcm=pcm,
@@ -198,7 +207,7 @@ class ConversationPipeline:
         context: ConversationContext,
         pcm: bytes,
         codec: TurnCodec,
-    ) -> TurnResult:
+    ) -> TurnOutcome:
         if not pcm:
             raise ValueError("a turn requires PCM audio")
         if len(pcm) % self._audio_format.sample_width_bytes:
@@ -211,19 +220,17 @@ class ConversationPipeline:
             status="started",
             details={"pcm_bytes": len(pcm)},
         )
-        no_speech = False
+        provider_reported_no_speech = False
         try:
             transcript = await self._asr.transcribe(pcm, self._audio_format)
         except NoSpeechDetected:
             transcript = AsrResult(text="")
-            no_speech = True
+            provider_reported_no_speech = True
         except Exception as exc:
             self._record_failure(context=context, stage="asr", started_at=asr_started_at, exc=exc)
             raise
-        if not transcript.text.strip():
-            no_speech = True
-            transcript = AsrResult(text="")
-        else:
+        disposition = classify_transcript(transcript.text)
+        if disposition == TranscriptDisposition.VALID:
             transcript = validate_asr_result(transcript)
 
         await self._save_test_recording(
@@ -232,70 +239,81 @@ class ConversationPipeline:
             asr_text=transcript.text,
         )
 
-        if no_speech:
+        if disposition != TranscriptDisposition.VALID:
+            reason = (
+                "asr_no_speech"
+                if provider_reported_no_speech
+                else disposition.value
+            )
             self._record_stage(
                 context=context,
                 stage="asr",
-                status="no_speech",
+                status="discarded",
                 elapsed_ms=self._elapsed_ms(asr_started_at),
-                details={"transcript": "", "transcript_chars": 0},
-            )
-            agent_result = AgentResult(
-                text=NO_SPEECH_REPLY,
-                voice=VoiceSpec(),
-                expression=ExpressionSpec(name="idle", ttl_ms=3_000),
+                details={
+                    "transcript": transcript.text,
+                    "transcript_chars": len(transcript.text),
+                    "reason": reason,
+                },
             )
             self._record_stage(
                 context=context,
                 stage="openclaw",
                 status="skipped",
-                details={"reason": "no_speech", "reply_text": agent_result.text},
+                details={"reason": reason},
             )
-        else:
             self._record_stage(
                 context=context,
-                stage="asr",
-                status="completed",
-                elapsed_ms=self._elapsed_ms(asr_started_at),
-                details={"transcript": transcript.text, "transcript_chars": len(transcript.text)},
+                stage="tts.synthesis",
+                status="skipped",
+                details={"reason": reason},
             )
+            return SilentDiscard(transcript=transcript, reason=reason)
 
-            agent_started_at = time.perf_counter()
-            self._record_stage(context=context, stage="openclaw", status="started")
-            try:
-                agent_reply = await self._agent.reply(
-                    text=transcript.text,
-                    device_id=context.device_id,
-                    user_id=context.user_id,
-                    conversation_id=context.conversation_id,
-                    turn_id=context.turn_id,
-                    allow_web_search=self._web_search is not None,
-                )
-                agent_result = await self._resolve_agent_tool_call(
-                    agent_reply=agent_reply,
-                    original_text=transcript.text,
-                    context=context,
-                )
-            except Exception as exc:
-                self._record_failure(
-                    context=context,
-                    stage="openclaw",
-                    started_at=agent_started_at,
-                    exc=exc,
-                )
-                raise
-            self._record_stage(
+        self._record_stage(
+            context=context,
+            stage="asr",
+            status="completed",
+            elapsed_ms=self._elapsed_ms(asr_started_at),
+            details={"transcript": transcript.text, "transcript_chars": len(transcript.text)},
+        )
+
+        agent_started_at = time.perf_counter()
+        self._record_stage(context=context, stage="openclaw", status="started")
+        try:
+            agent_reply = await self._agent.reply(
+                text=transcript.text,
+                device_id=context.device_id,
+                user_id=context.user_id,
+                conversation_id=context.conversation_id,
+                turn_id=context.turn_id,
+                allow_web_search=self._web_search is not None,
+            )
+            agent_result = await self._resolve_agent_tool_call(
+                agent_reply=agent_reply,
+                original_text=transcript.text,
+                context=context,
+            )
+        except Exception as exc:
+            self._record_failure(
                 context=context,
                 stage="openclaw",
-                status="completed",
-                elapsed_ms=self._elapsed_ms(agent_started_at),
-                details={
-                    "reply_text": agent_result.text,
-                    "reply_chars": len(agent_result.text),
-                    "expression": agent_result.expression.name,
-                    "actions": [action.name for action in agent_result.actions],
-                },
+                started_at=agent_started_at,
+                exc=exc,
             )
+            raise
+        self._record_stage(
+            context=context,
+            stage="openclaw",
+            status="completed",
+            elapsed_ms=self._elapsed_ms(agent_started_at),
+            details={
+                "reply_text": agent_result.text,
+                "reply_chars": len(agent_result.text),
+                "expression": agent_result.expression.name,
+                "actions": [action.name for action in agent_result.actions],
+            },
+        )
 
         validate_agent_result(agent_result)
         validate_remote_tts_text(agent_result.text)

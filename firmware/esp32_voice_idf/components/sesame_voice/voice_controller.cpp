@@ -153,6 +153,24 @@ esp_err_t VoiceController::start() {
   ESP_RETURN_ON_ERROR(wake_vad_.start(), kTag, "initialize wake word + VAD");
   ESP_RETURN_ON_ERROR(load_device_config(&config_), kTag,
                       "load device configuration from NVS");
+  uint8_t stored_wake_threshold = 20;
+  ESP_RETURN_ON_ERROR(
+      sesame::transport::load_wake_threshold_hundredths(
+          &stored_wake_threshold),
+      kTag, "load wake threshold from NVS");
+  // set_detection_threshold_hundredths() returns bool, not esp_err_t. Passing
+  // true to ESP_RETURN_ON_ERROR would treat the successful value 1 as an
+  // error, aborting the complete voice runtime before Wi-Fi/WSS can start.
+  if (!wake_vad_.set_detection_threshold_hundredths(stored_wake_threshold)) {
+    ESP_LOGW(kTag,
+             "stored wake threshold is invalid; falling back to default 0.20");
+    if (!wake_vad_.set_detection_threshold_hundredths(20)) {
+      return ESP_ERR_INVALID_ARG;
+    }
+    stored_wake_threshold = 20;
+  }
+  ESP_LOGI(kTag, "wake threshold restored: %.2f",
+           stored_wake_threshold / 100.0f);
 
   const gpio_config_t button_config{
       .pin_bit_mask = 1ULL << kVoiceButton,
@@ -212,10 +230,22 @@ esp_err_t VoiceController::start() {
     downlink_queue_ = nullptr;
     return store_result;
   }
+  const esp_err_t wake_threshold_store_result = wake_threshold_store_.start();
+  if (wake_threshold_store_result != ESP_OK) {
+    conversation_store_.stop();
+    vQueueDelete(outbound_queue_);
+    outbound_queue_ = nullptr;
+    vQueueDelete(gateway_event_queue_);
+    gateway_event_queue_ = nullptr;
+    vQueueDelete(downlink_queue_);
+    downlink_queue_ = nullptr;
+    return wake_threshold_store_result;
+  }
 
   void* preroll_storage = heap_caps_calloc(
       1, sizeof(PcmPreRollBuffer), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
   if (preroll_storage == nullptr) {
+    wake_threshold_store_.stop();
     conversation_store_.stop();
     vQueueDelete(outbound_queue_);
     outbound_queue_ = nullptr;
@@ -236,6 +266,7 @@ esp_err_t VoiceController::start() {
                               kOutboundTaskStackBytes, this, 5,
                               &outbound_task_, 0) != pdPASS) {
     running_ = false;
+    wake_threshold_store_.stop();
     conversation_store_.stop();
     pcm_preroll_->~PcmPreRollBuffer();
     heap_caps_free(pcm_preroll_);
@@ -252,6 +283,7 @@ esp_err_t VoiceController::start() {
           task_entry, "sesame_voice", kVoiceTaskStackBytes, this, 7, &task_,
           1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT) != pdPASS) {
     running_ = false;
+    wake_threshold_store_.stop();
     conversation_store_.stop();
     pcm_preroll_->~PcmPreRollBuffer();
     heap_caps_free(pcm_preroll_);
@@ -295,6 +327,7 @@ void VoiceController::stop() {
     }
   }
   gateway_.stop();
+  wake_threshold_store_.stop();
   conversation_store_.stop();
   if (pcm_preroll_ != nullptr) {
     pcm_preroll_->~PcmPreRollBuffer();
@@ -388,18 +421,16 @@ void VoiceController::run() {
         !tts_active_ &&
         turn_state_.state() == sesame::protocol::TurnState::kIdle &&
         local_voice_state == VoiceTurnState::kIdleWakeListening;
-    const bool tts_barge_in =
-        tts_active_ && local_voice_state == VoiceTurnState::kTtsPlaying;
     const bool wake_should_be_armed =
         session_ready_ && !wake_ack_active_ && !capture_session_.active() &&
-        (idle_wake || tts_barge_in);
+        idle_wake;
     wake_vad_.set_wake_enabled(wake_should_be_armed);
 
     if (wake_ack_active_) {
       // No AEC is active. Keep the microphone quiet during the local prompt,
       // then start the three-second speech window only after it is audible.
       play_wake_ack_frame(timestamp);
-    } else if (session_ready_) {
+    } else if (session_ready_ && !tts_active_) {
       std::array<int16_t, sesame::audio::kSamplesPerFrame> pcm{};
       if (audio_->read_microphone_frame(pcm.data(), pcm.size(), 100) == ESP_OK) {
         const VoiceTurnState state_before_feed = wake_turn_detector_.state();
@@ -415,8 +446,7 @@ void VoiceController::run() {
           // pre-roll without interrupting the 20-ms microphone cadence.
           drain_pcm_uplink(2);
         }
-        if (!tts_active_ ||
-            should_capture_for_wake(tts_active_.load())) {
+        if (should_capture_for_wake(tts_active_.load())) {
           wake_vad_.feed_pcm(pcm.data(), pcm.size());
         }
         process_wake_vad_signals(timestamp);
@@ -608,14 +638,6 @@ void VoiceController::process_wake_vad_signals(uint64_t timestamp) {
               ? CaptureSource::kFollowup
               : CaptureSource::kWakeword;
       if (!start_listening(timestamp, source)) {
-        wake_turn_detector_.reset();
-      }
-    } else if (event == VoiceTurnEvent::kBargeInDetected) {
-      if (!session_ready_ || capture_session_.active()) {
-        wake_turn_detector_.reset();
-        continue;
-      }
-      if (!start_listening(timestamp, CaptureSource::kWakeword)) {
         wake_turn_detector_.reset();
       }
     } else if ((event == VoiceTurnEvent::kListenStopped ||
@@ -1102,6 +1124,14 @@ void VoiceController::process_control_json(const char* data, size_t size) {
                                    &motor_current_delay_ms) &&
             robot_->configure_motion(frame_delay_ms, walk_cycles,
                                      motor_current_delay_ms);
+      } else if (std::strcmp(kind, "wakeword_settings") == 0) {
+        int threshold_hundredths = 0;
+        accepted = integer_field_in_range(payload, "wake_threshold_hundredths",
+                                          5, 95, &threshold_hundredths) &&
+                   wake_threshold_store_.enqueue(
+                       static_cast<uint8_t>(threshold_hundredths)) == ESP_OK &&
+                   wake_vad_.set_detection_threshold_hundredths(
+                       static_cast<uint8_t>(threshold_hundredths));
       } else if (std::strcmp(kind, "stop") == 0) {
         robot_->emergency_stop();
         accepted = true;
@@ -1110,6 +1140,28 @@ void VoiceController::process_control_json(const char* data, size_t size) {
     send_operator_result(accepted, request_id);
     ESP_LOGI(kTag, "operator.control handled: kind=%s accepted=%s",
              kind == nullptr ? "invalid" : kind, accepted ? "true" : "false");
+  } else if (std::strcmp(type, "turn.complete") == 0) {
+    const char* outcome = string_field(payload, "outcome");
+    const char* reason = string_field(payload, "reason");
+    const bool valid_reason = reason != nullptr &&
+        (std::strcmp(reason, "asr_no_speech") == 0 ||
+         std::strcmp(reason, "blank") == 0 ||
+         std::strcmp(reason, "filler_only") == 0);
+    if (!matches_active_turn(inbound_turn) ||
+        turn_state_.state() != sesame::protocol::TurnState::kThinking ||
+        outcome == nullptr || std::strcmp(outcome, "discard") != 0 ||
+        !valid_reason) {
+      ESP_LOGW(kTag, "discarded invalid turn.complete outside its active turn");
+      cJSON_Delete(root);
+      return;
+    }
+    planned_generation_ = 0;
+    active_generation_ = 0;
+    turn_state_.apply(sesame::protocol::TurnEvent::kDiscarded);
+    turn_id_.fill('\0');
+    if (pcm_preroll_ != nullptr) pcm_preroll_->clear();
+    wake_turn_detector_.reset();
+    ESP_LOGI(kTag, "P2 turn discarded silently: reason=%s", reason);
   } else if (std::strcmp(type, "response.plan") == 0 && robot_ != nullptr) {
     const uint32_t generation_id = uint_field(payload, "generation_id");
     const char* expression_id = string_field(payload, "expression_id");

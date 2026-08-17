@@ -16,6 +16,20 @@
 namespace sesame::transport {
 namespace {
 
+constexpr uint8_t kDefaultWakeThresholdHundredths = 20;
+constexpr uint8_t kMinimumWakeThresholdHundredths = 5;
+constexpr uint8_t kMaximumWakeThresholdHundredths = 95;
+
+bool is_valid_wake_threshold_hundredths(uint8_t value) {
+  return value >= kMinimumWakeThresholdHundredths &&
+         value <= kMaximumWakeThresholdHundredths;
+}
+
+esp_err_t ensure_nvs_initialized() {
+  const esp_err_t result = nvs_flash_init();
+  return result == ESP_ERR_INVALID_STATE ? ESP_OK : result;
+}
+
 template <size_t Capacity>
 esp_err_t read_string(nvs_handle_t handle, const char* key,
                       std::array<char, Capacity>* output, bool required) {
@@ -155,6 +169,41 @@ esp_err_t save_conversation_id(const char* conversation_id) {
   nvs_close(handle);
   return result;
 #endif
+}
+
+esp_err_t load_wake_threshold_hundredths(uint8_t* output) {
+  if (output == nullptr) return ESP_ERR_INVALID_ARG;
+  *output = kDefaultWakeThresholdHundredths;
+  const esp_err_t init_result = ensure_nvs_initialized();
+  if (init_result != ESP_OK) return init_result;
+
+  nvs_handle_t handle = 0;
+  esp_err_t result = nvs_open("sesame", NVS_READONLY, &handle);
+  if (result == ESP_ERR_NVS_NOT_FOUND) return ESP_OK;
+  if (result != ESP_OK) return result;
+
+  uint8_t saved_value = kDefaultWakeThresholdHundredths;
+  result = nvs_get_u8(handle, "wake_threshold", &saved_value);
+  nvs_close(handle);
+  if (result == ESP_ERR_NVS_NOT_FOUND) return ESP_OK;
+  if (result != ESP_OK) return result;
+  if (!is_valid_wake_threshold_hundredths(saved_value)) return ESP_OK;
+  *output = saved_value;
+  return ESP_OK;
+}
+
+esp_err_t save_wake_threshold_hundredths(uint8_t value) {
+  if (!is_valid_wake_threshold_hundredths(value)) return ESP_ERR_INVALID_ARG;
+  const esp_err_t init_result = ensure_nvs_initialized();
+  if (init_result != ESP_OK) return init_result;
+
+  nvs_handle_t handle = 0;
+  esp_err_t result = nvs_open("sesame", NVS_READWRITE, &handle);
+  if (result != ESP_OK) return result;
+  result = nvs_set_u8(handle, "wake_threshold", value);
+  if (result == ESP_OK) result = nvs_commit(handle);
+  nvs_close(handle);
+  return result;
 }
 
 }  // namespace sesame::transport

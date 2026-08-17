@@ -14,6 +14,7 @@ python3 "$project_root/tests/verify_outbound_transport.py"
 python3 "$project_root/tests/verify_downlink_transport.py"
 python3 "$project_root/tests/verify_opus_voice_stack.py"
 python3 "$project_root/tests/verify_continuous_conversation.py"
+python3 "$project_root/tests/verify_silent_discard.py"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_voice/include" \
@@ -47,6 +48,19 @@ c++ -std=c++20 -Wall -Wextra -Werror \
   "$project_root/tests/test_wake_capture_policy.cpp" \
   -o "$build_dir/test_wake_capture_policy"
 "$build_dir/test_wake_capture_policy"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_wake_threshold_store.cpp" \
+  -o "$build_dir/test_wake_threshold_store"
+"$build_dir/test_wake_threshold_store"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_protocol/include" \
+  "$project_root/tests/test_turn_state.cpp" \
+  "$project_root/components/sesame_protocol/turn_state.cpp" \
+  -o "$build_dir/test_turn_state"
+"$build_dir/test_turn_state"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_audio/include" \
@@ -86,6 +100,8 @@ c++ -std=c++20 -Wall -Wextra -Werror \
 
 node "$project_root/tests/test_web_control_page.cjs"
 node "$project_root/tests/test_stand_pose_sources.cjs"
+node "$project_root/tests/test_r3_l4_offset_actions.cjs"
+node "$project_root/tests/test_forward_pose_sources.cjs"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_robot/include" \

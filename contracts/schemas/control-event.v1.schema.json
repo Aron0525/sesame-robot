@@ -149,6 +149,22 @@
       "if": {
         "properties": {
           "type": {
+            "const": "turn.complete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/turnCompletePayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
             "enum": [
               "tts.start",
               "tts.flush"
@@ -284,6 +300,7 @@
         "asr.final",
         "agent.reply",
         "response.plan",
+        "turn.complete",
         "tts.start",
         "tts.stop",
         "tts.flush",
@@ -608,6 +625,27 @@
         }
       }
     },
+    "turnCompletePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "reason"
+      ],
+      "properties": {
+        "outcome": {
+          "const": "discard"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "asr_no_speech",
+            "blank",
+            "filler_only"
+          ]
+        }
+      }
+    },
     "ttsStopPayload": {
       "type": "object",
       "additionalProperties": false,
@@ -705,6 +743,7 @@
             "expression",
             "servo",
             "settings",
+            "wakeword_settings",
             "stop"
           ]
         },
@@ -740,6 +779,11 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 500
+        },
+        "wake_threshold_hundredths": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 95
         }
       },
       "allOf": [
@@ -764,6 +808,10 @@
               "motor_current_delay_ms"
             ]
           }
+        },
+        {
+          "if": {"properties": {"kind": {"const": "wakeword_settings"}}},
+          "then": {"required": ["wake_threshold_hundredths"]}
         }
       ]
     },

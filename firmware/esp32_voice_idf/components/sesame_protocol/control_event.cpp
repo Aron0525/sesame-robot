@@ -22,6 +22,7 @@ constexpr TypeName kTypeNames[] = {
     {ControlEventType::kAsrFinal, "asr.final"},
     {ControlEventType::kAgentReply, "agent.reply"},
     {ControlEventType::kResponsePlan, "response.plan"},
+    {ControlEventType::kTurnComplete, "turn.complete"},
     {ControlEventType::kTtsStart, "tts.start"},
     {ControlEventType::kTtsStop, "tts.stop"},
     {ControlEventType::kTtsFlush, "tts.flush"},

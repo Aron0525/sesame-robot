@@ -59,12 +59,14 @@ int main() {
   }
   assert(detector.update(18140, false, true) == VoiceTurnEvent::kListenTimedOut);
 
-  // Only the wake word interrupts a reply; ordinary VAD activity must not.
+  // TTS is strictly half-duplex: neither wake words nor VAD activity may
+  // begin capture while the speaker is playing. BOOT is handled by the
+  // controller outside this detector.
   assert(detector.start_tts_playback());
   assert(detector.state() == VoiceTurnState::kTtsPlaying);
   assert(detector.update(20000, false, true) == VoiceTurnEvent::kNone);
-  assert(detector.update(20020, true, false) == VoiceTurnEvent::kBargeInDetected);
-  assert(detector.state() == VoiceTurnState::kCollectingUserSpeech);
+  assert(detector.update(20020, true, false) == VoiceTurnEvent::kNone);
+  assert(detector.state() == VoiceTurnState::kTtsPlaying);
 
   // A completed reply opens the same three-second first-speech gate without
   // requiring another wake word. Three VAD frames start a follow-up turn.

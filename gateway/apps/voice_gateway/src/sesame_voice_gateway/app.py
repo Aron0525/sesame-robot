@@ -32,6 +32,7 @@ from sesame_voice_gateway.pipeline import (
     MAX_UPLINK_PACKETS,
     ConversationContext,
     ConversationPipeline,
+    SilentDiscard,
     TurnResult,
 )
 from sesame_voice_gateway.policy import PolicyViolation
@@ -224,7 +225,7 @@ class RemoteControlRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    kind: Literal["action", "expression", "servo", "settings", "stop"]
+    kind: Literal["action", "expression", "servo", "settings", "wakeword_settings", "stop"]
     action: str | None = None
     expression: str | None = None
     servo: int | None = None
@@ -232,6 +233,7 @@ class RemoteControlRequest(BaseModel):
     frame_delay_ms: int | None = None
     walk_cycles: int | None = None
     motor_current_delay_ms: int | None = None
+    wake_threshold_hundredths: int | None = None
 
     @model_validator(mode="after")
     def validate_shape(self) -> RemoteControlRequest:
@@ -288,6 +290,16 @@ class RemoteControlRequest(BaseModel):
                 or not 0 <= self.motor_current_delay_ms <= 500
             ):
                 raise ValueError("settings command must contain valid motion settings")
+        elif self.kind == "wakeword_settings":
+            if (
+                self.action is not None or self.expression is not None or
+                self.servo is not None or self.angle is not None or
+                self.frame_delay_ms is not None or self.walk_cycles is not None or
+                self.motor_current_delay_ms is not None or
+                self.wake_threshold_hundredths is None or
+                not 5 <= self.wake_threshold_hundredths <= 95
+            ):
+                raise ValueError("wakeword_settings requires threshold 0.05-0.95")
         elif any(
             value is not None
             for value in (
@@ -298,6 +310,7 @@ class RemoteControlRequest(BaseModel):
                 self.frame_delay_ms,
                 self.walk_cycles,
                 self.motor_current_delay_ms,
+                self.wake_threshold_hundredths,
             )
         ):
             raise ValueError("stop command cannot contain parameters")
@@ -362,7 +375,7 @@ class DeviceControlRegistry:
             await _send_control(
                 websocket,
                 session,
-                "operator.control",
+    "operator.control",
                 turn_id=None,
                 request_id=f"ctl_{uuid.uuid4().hex}",
                 payload=command.payload(),
@@ -1007,14 +1020,32 @@ async def _run_turn(
             )
     else:
         if _turn_is_current(session, turn_epoch):
-            await _send_turn_result(
-                websocket,
-                session,
-                result,
-                turn_id=context.turn_id,
-                turn_epoch=turn_epoch,
-                observability=observability,
-            )
+            if isinstance(result, SilentDiscard):
+                await _send_control(
+                    websocket,
+                    session,
+                    "turn.complete",
+                    turn_id=context.turn_id,
+                    request_id=None,
+                    payload={"outcome": "discard", "reason": result.reason},
+                )
+                if observability is not None:
+                    observability.record_stage(
+                        device_id=session.device_id,
+                        turn_id=context.turn_id,
+                        stage="turn.complete",
+                        status="discarded",
+                        details={"reason": result.reason},
+                    )
+            else:
+                await _send_turn_result(
+                    websocket,
+                    session,
+                    result,
+                    turn_id=context.turn_id,
+                    turn_epoch=turn_epoch,
+                    observability=observability,
+                )
     finally:
         if session.active_turn_task is asyncio.current_task():
             session.active_turn_task = None

@@ -15,6 +15,7 @@ enum class TurnEvent {
   kButtonPressed,
   kTtsStarted,
   kTtsStopped,
+  kDiscarded,
   kInterrupted,
   kConnectionLost,
   kFailed,

@@ -21,6 +21,7 @@ enum class ControlEventType {
   kAsrFinal,
   kAgentReply,
   kResponsePlan,
+  kTurnComplete,
   kTtsStart,
   kTtsStop,
   kTtsFlush,

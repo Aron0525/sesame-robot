@@ -49,16 +49,16 @@ def main() -> None:
     assert "packet.sequence != expected_downlink_sequence_" in playback
     assert "packet.generation_id != active_generation_" in playback
 
-    # TTS keeps microphone input active only so a full MultiNet wake phrase can
-    # interrupt playback; raw VAD is ignored in kTtsPlaying.
+    # TTS is strictly half-duplex: the audio loop must not read microphone
+    # frames or feed VAD/MultiNet while playback is active. BOOT is processed
+    # before this block and remains the only playback interrupt path.
     run = section(
         source,
         "void VoiceController::run()",
         "void VoiceController::maintain_gateway_connection",
     )
-    assert "else if (session_ready_)" in run
-    assert "VoiceTurnState::kTtsPlaying" in run
-    assert "tts_barge_in" in run
+    assert "else if (session_ready_ && !tts_active_)" in run
+    assert "tts_barge_in" not in run
     # A finished generation is historical state, not an active interrupt
     # target. Leaving it non-zero misbinds a BOOT interrupt during thinking.
     assert "active_generation_ = 0" in completion

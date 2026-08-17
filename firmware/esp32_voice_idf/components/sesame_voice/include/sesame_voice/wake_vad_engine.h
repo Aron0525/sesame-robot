@@ -20,7 +20,7 @@ struct WakeVadSignal {
 };
 
 // Runs XiaoZhi-style ESP-SR AFE VAD plus MultiNet command recognition. The
-// `ni hao zhi ma` phrase is provided to MultiNet at startup; no user PCM is
+// `zhi ma a qi` phrase is provided to MultiNet at startup; no user PCM is
 // used to train or embed a custom neural model in the application binary.
 class WakeVadEngine final {
  public:
@@ -32,9 +32,10 @@ class WakeVadEngine final {
 
   esp_err_t start();
   void stop();
-  // MultiNet is armed while idle and during TTS barge-in. VAD continues while
-  // it is disarmed so endpoints and the follow-up gate remain independent.
+  // MultiNet is armed only in idle wake listening. VAD remains available for
+  // the follow-up gate, but the controller feeds neither during TTS playback.
   void set_wake_enabled(bool enabled);
+  bool set_detection_threshold_hundredths(uint8_t hundredths);
   esp_err_t feed_pcm(const int16_t* pcm, size_t samples);
   bool read_signal(WakeVadSignal* signal);
 
@@ -56,6 +57,8 @@ class WakeVadEngine final {
   std::atomic<bool> running_{false};
   std::atomic<bool> wake_enabled_{true};
   std::atomic<bool> wake_reset_requested_{false};
+  std::atomic<uint8_t> wake_threshold_hundredths_{20};
+  std::atomic<bool> threshold_update_requested_{false};
   std::atomic<uint32_t> dropped_audio_frames_{0};
   WakeWordRuntime* wakeword_{nullptr};
 };
