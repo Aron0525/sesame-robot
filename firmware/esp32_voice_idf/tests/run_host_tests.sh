@@ -15,6 +15,7 @@ python3 "$project_root/tests/verify_downlink_transport.py"
 python3 "$project_root/tests/verify_opus_voice_stack.py"
 python3 "$project_root/tests/verify_continuous_conversation.py"
 python3 "$project_root/tests/verify_silent_discard.py"
+python3 "$project_root/tests/verify_owner_voice_gate_integration.py"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_voice/include" \
@@ -69,6 +70,14 @@ c++ -std=c++20 -Wall -Wextra -Werror \
   "$project_root/components/sesame_voice/pcm_preroll_buffer.cpp" \
   -o "$build_dir/test_pcm_preroll_buffer"
 "$build_dir/test_pcm_preroll_buffer"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_audio/include" \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_owner_voice_gate.cpp" \
+  "$project_root/components/sesame_voice/owner_voice_gate.cpp" \
+  -o "$build_dir/test_owner_voice_gate"
+"$build_dir/test_owner_voice_gate"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_robot/include" \

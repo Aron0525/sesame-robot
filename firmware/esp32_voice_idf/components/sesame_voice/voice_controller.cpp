@@ -19,6 +19,7 @@
 #include "sesame_protocol/control_event.h"
 #include "sesame_voice/wake_ack_audio.h"
 #include "sesame_voice/wake_capture_policy.h"
+#include "owner_voiceprint_template.h"
 
 namespace sesame::voice {
 namespace {
@@ -257,6 +258,28 @@ esp_err_t VoiceController::start() {
   }
   pcm_preroll_ = new (preroll_storage) PcmPreRollBuffer();
 
+  void* owner_voice_gate_storage = heap_caps_calloc(
+      1, sizeof(OwnerVoiceGate), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (owner_voice_gate_storage == nullptr) {
+    pcm_preroll_->~PcmPreRollBuffer();
+    heap_caps_free(pcm_preroll_);
+    pcm_preroll_ = nullptr;
+    wake_threshold_store_.stop();
+    conversation_store_.stop();
+    vQueueDelete(outbound_queue_);
+    outbound_queue_ = nullptr;
+    vQueueDelete(gateway_event_queue_);
+    gateway_event_queue_ = nullptr;
+    vQueueDelete(downlink_queue_);
+    downlink_queue_ = nullptr;
+    return ESP_ERR_NO_MEM;
+  }
+  owner_voice_gate_ = new (owner_voice_gate_storage)
+      OwnerVoiceGate(owner_voiceprint::kTemplate);
+  ESP_LOGI(kTag, "owner voice gate loaded: enrolled_samples=%d threshold=%.3f",
+           owner_voiceprint::kEnrollmentSampleCount,
+           owner_voiceprint::kTemplate.threshold);
+
   gateway_reconnect_schedule_.reset();
   gateway_connection_.disconnected();
   gateway_connect_deadline_ms_ = 0;
@@ -268,6 +291,9 @@ esp_err_t VoiceController::start() {
     running_ = false;
     wake_threshold_store_.stop();
     conversation_store_.stop();
+    owner_voice_gate_->~OwnerVoiceGate();
+    heap_caps_free(owner_voice_gate_);
+    owner_voice_gate_ = nullptr;
     pcm_preroll_->~PcmPreRollBuffer();
     heap_caps_free(pcm_preroll_);
     pcm_preroll_ = nullptr;
@@ -285,6 +311,9 @@ esp_err_t VoiceController::start() {
     running_ = false;
     wake_threshold_store_.stop();
     conversation_store_.stop();
+    owner_voice_gate_->~OwnerVoiceGate();
+    heap_caps_free(owner_voice_gate_);
+    owner_voice_gate_ = nullptr;
     pcm_preroll_->~PcmPreRollBuffer();
     heap_caps_free(pcm_preroll_);
     pcm_preroll_ = nullptr;
@@ -329,6 +358,11 @@ void VoiceController::stop() {
   gateway_.stop();
   wake_threshold_store_.stop();
   conversation_store_.stop();
+  if (owner_voice_gate_ != nullptr) {
+    owner_voice_gate_->~OwnerVoiceGate();
+    heap_caps_free(owner_voice_gate_);
+    owner_voice_gate_ = nullptr;
+  }
   if (pcm_preroll_ != nullptr) {
     pcm_preroll_->~PcmPreRollBuffer();
     heap_caps_free(pcm_preroll_);
@@ -425,6 +459,9 @@ void VoiceController::run() {
         session_ready_ && !wake_ack_active_ && !capture_session_.active() &&
         idle_wake;
     wake_vad_.set_wake_enabled(wake_should_be_armed);
+    if (!wake_should_be_armed && owner_voice_gate_ != nullptr) {
+      owner_voice_gate_->clear();
+    }
 
     if (wake_ack_active_) {
       // No AEC is active. Keep the microphone quiet during the local prompt,
@@ -445,6 +482,9 @@ void VoiceController::run() {
           // Add one live frame and consume up to two, catching up the 500-ms
           // pre-roll without interrupting the 20-ms microphone cadence.
           drain_pcm_uplink(2);
+        }
+        if (wake_should_be_armed && owner_voice_gate_ != nullptr) {
+          owner_voice_gate_->feed_pcm(pcm.data(), pcm.size());
         }
         if (should_capture_for_wake(tts_active_.load())) {
           wake_vad_.feed_pcm(pcm.data(), pcm.size());
@@ -626,6 +666,23 @@ void VoiceController::process_wake_vad_signals(uint64_t timestamp) {
         wake_turn_detector_.reset();
         continue;
       }
+      if (owner_voice_gate_ == nullptr) {
+        ESP_LOGE(kTag, "owner voice gate unavailable; rejecting spoken wake");
+        wake_turn_detector_.reset();
+        continue;
+      }
+      const OwnerVoiceprintDecision decision = owner_voice_gate_->verify_latest();
+      owner_voice_gate_->clear();
+      if (!decision.accepted) {
+        ESP_LOGI(kTag,
+                 "spoken wake rejected by owner voice gate: template=%d audio=%d score=%.3f",
+                 decision.template_available, decision.has_sufficient_audio,
+                 decision.score);
+        wake_turn_detector_.reset();
+        continue;
+      }
+      ESP_LOGI(kTag, "spoken wake accepted by owner voice gate: score=%.3f",
+               decision.score);
       begin_wake_ack();
     } else if (event == VoiceTurnEvent::kListenStarted) {
       if (!session_ready_ || capture_session_.active() ||

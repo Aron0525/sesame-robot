@@ -20,6 +20,7 @@
 #include "sesame_voice/capture_session.h"
 #include "sesame_voice/conversation_store.h"
 #include "sesame_voice/gateway_connection_state.h"
+#include "sesame_voice/owner_voice_gate.h"
 #include "sesame_voice/pcm_preroll_buffer.h"
 #include "sesame_voice/recording_button.h"
 #include "sesame_voice/voice_turn_detector.h"
@@ -154,6 +155,9 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   // The 16-KiB PCM history lives in PSRAM so it cannot consume the internal
   // contiguous heap required by Wi-Fi and mbedTLS.
   PcmPreRollBuffer* pcm_preroll_{nullptr};
+  // The enrolled owner template itself lives in a Git-ignored private header;
+  // this 1.5-second runtime ring is allocated in PSRAM at startup.
+  OwnerVoiceGate* owner_voice_gate_{nullptr};
   bool wake_ack_active_{false};
   size_t wake_ack_offset_samples_{0};
   QueueHandle_t downlink_queue_{nullptr};

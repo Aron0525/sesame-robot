@@ -40,5 +40,9 @@ firmware/esp32_voice_idf/diagnostics/**/build*/
 /firmware/speaker_embedding_s3/
 /\.r3_l4_action_artifact_dir
 
+# Local owner-voiceprint enrollment artifacts. These are biometric data.
+/firmware/esp32_voice_idf/components/sesame_voice/private/owner_voiceprint_template.h
+/training/nihao_zhima_real19_20260810/owner_voiceprint_report.json
+
 # macOS metadata
 .DS_Store

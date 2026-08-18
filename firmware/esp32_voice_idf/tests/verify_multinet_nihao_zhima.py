@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the XiaoZhi-style MultiNet “芝麻阿奇” firmware contract."""
+"""Verify the XiaoZhi-style MultiNet “你好，芝麻” firmware contract."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -24,8 +24,8 @@ def main() -> None:
     config = CONFIG.read_text(encoding="utf-8")
     for value in (
         'kMultinetModelName[] = "mn7_cn"',
-        'kWakeWordText[] = "芝麻阿奇"',
-        'kWakeWordPinyin[] = "zhi ma a qi"',
+        'kWakeWordText[] = "你好，芝麻"',
+        'kWakeWordPinyin[] = "ni hao zhi ma"',
         "kWakeThreshold = 0.20f",
         "kDetectionDurationMs = 3000",
     ):
@@ -48,7 +48,7 @@ def main() -> None:
     cmake = CMAKE.read_text(encoding="utf-8")
     assert "zhima_wakeword_model_data.cpp" not in cmake
     assert "espressif__esp-tflite-micro" not in cmake
-    print("XiaoZhi-style MultiNet zhima-aqi contract verified")
+    print("XiaoZhi-style MultiNet nihao-zhima contract verified")
 
 
 if __name__ == "__main__":

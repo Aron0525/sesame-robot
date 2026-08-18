@@ -20,7 +20,7 @@ struct WakeVadSignal {
 };
 
 // Runs XiaoZhi-style ESP-SR AFE VAD plus MultiNet command recognition. The
-// `zhi ma a qi` phrase is provided to MultiNet at startup; no user PCM is
+// `ni hao zhi ma` phrase is provided to MultiNet at startup; no user PCM is
 // used to train or embed a custom neural model in the application binary.
 class WakeVadEngine final {
  public:

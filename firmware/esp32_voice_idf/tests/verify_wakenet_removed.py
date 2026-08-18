@@ -22,7 +22,7 @@ def main() -> None:
     assert "tensorflow/lite" not in engine
     assert "zhima_wakeword_model_data" not in engine
     assert "WakeWordRuntime" in engine
-    assert 'kWakeWordPinyin[] = "zhi ma a qi"' in config
+    assert 'kWakeWordPinyin[] = "ni hao zhi ma"' in config
     assert 'kMultinetModelName[] = "mn7_cn"' in config
     assert "kWakeThreshold = 0.20f" in config
     assert '"esp_mn_models.h"' in engine
