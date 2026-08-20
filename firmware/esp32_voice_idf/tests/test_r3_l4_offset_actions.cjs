@@ -25,6 +25,22 @@ function directAngle(body, channel) {
   return Number(matches[0][1]);
 }
 
+function allDirectAngles(body, channel) {
+  return [...body.matchAll(
+    new RegExp(`setServoAngle\\(${channel},\\s*(\\d+)\\)`, 'g'),
+  )].map(([, angle]) => Number(angle));
+}
+
+function assertAngleCurve(source, relativePath, action, nextAction, channel,
+                          expectedAngles) {
+  const body = functionBody(source, `${action}()`, nextAction);
+  assert.deepEqual(
+    allDirectAngles(body, channel),
+    expectedAngles,
+    `${relativePath}: ${action} ${channel} calibration curve changed`,
+  );
+}
+
 for (const relativePath of sources) {
   const source = fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
 
@@ -45,6 +61,23 @@ for (const relativePath of sources) {
                `${relativePath}: dead R3 must be 90 - 30 = 60`);
   assert.equal(directAngle(dead, 'L4'), 60,
                `${relativePath}: dead L4 must be 90 - 30 = 60`);
+
+  // These seven actions have no R3/L4 command below 30 degrees, so applying
+  // the historical R3/L4 -30-degree calibration keeps every command valid.
+  assertAngleCurve(source, relativePath, 'runSwimPose', 'runPointPose', 'R3', [60]);
+  assertAngleCurve(source, relativePath, 'runSwimPose', 'runPointPose', 'L4', [60]);
+  assertAngleCurve(source, relativePath, 'runPointPose', 'runPushupPose', 'R3', [140]);
+  assertAngleCurve(source, relativePath, 'runPointPose', 'runPushupPose', 'L4', [150]);
+  assertAngleCurve(source, relativePath, 'runPushupPose', 'runBowPose', 'R3', [60, 150, 60]);
+  assertAngleCurve(source, relativePath, 'runBowPose', 'runCutePose', 'R3', [150, 60]);
+  assertAngleCurve(source, relativePath, 'runBowPose', 'runCutePose', 'L4', [150]);
+  assertAngleCurve(source, relativePath, 'runWormPose', 'runShakePose', 'R3', [60, 15, 105]);
+  assertAngleCurve(source, relativePath, 'runWormPose', 'runShakePose', 'L4', [60, 105, 15]);
+  assertAngleCurve(source, relativePath, 'runShakePose', 'runShrugPose', 'R3', [60]);
+  assertAngleCurve(source, relativePath, 'runShakePose', 'runShrugPose', 'L4', [105, 150]);
+  assertAngleCurve(source, relativePath, 'runCrabPose', 'runWalkPose', 'R3', [150, 105, 150]);
+  assertAngleCurve(source, relativePath, 'runCrabPose', 'runWalkPose', 'L4', [105, 150, 105]);
+
 }
 
-console.log('PASS: rest, stand, and dead apply the R3/L4 30-degree reduction');
+console.log('PASS: selected actions apply the R3/L4 30-degree reduction');
