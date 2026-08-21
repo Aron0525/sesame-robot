@@ -11,7 +11,7 @@
 ## 启动
 
 ```bash
-cd "/Users/mac/Desktop/1/SesameV3_语音机器人项目/gateway"
+cd "/Users/mac/Desktop/2/gateway"
 cp .env.example .env
 # 填入真实配置，不要提交 .env
 make sync
@@ -21,15 +21,15 @@ make run
 检查网关是否启动：
 
 ```bash
-curl http://127.0.0.1:8765/healthz
+curl -k https://127.0.0.1:8766/healthz
 ```
 
-若启用 TLS，健康检查地址按你配置的证书和主机名访问；ESP32 的设备连接地址由 mDNS `_sesame-gw._tcp.local.` 自动发现。
+若启用 TLS，健康检查地址按你配置的证书和主机名访问；ESP32 的设备连接地址由 mDNS `_sesame-streamgw._tcp.local.` 自动发现。
 
 ## 地址和自启动
 
 - Gateway 的 LAN IPv4、ESP32 的网页 IPv4 都可能变化；不要把它们写死在固件或浏览器书签中。
-- 对 ESP32 → Gateway，固定的是 `gateway_id`、`sesame-gateway.local` 和 TLS 身份，不是 DHCP IP。固件会在断线后重新发现 mDNS。
+- 对 ESP32 → Gateway，固定的是 `gateway_id`、`sesame-stream-gateway.local` 和 TLS 身份，不是 DHCP IP。固件会在断线后重新发现 mDNS。
 - `127.0.0.1:18789` 是 OpenClaw 的回环地址，不受 Wi‑Fi/DHCP 影响；但 OpenClaw 进程本身必须由服务管理器保持运行。
 - 先执行 `ops/openclaw/install_openclaw.sh` 安装并启动 OpenClaw 的系统服务。Gateway 自身可使用 `ops/macos/install_voice_gateway_launchd.sh` 安装 macOS `launchd` 自启动服务。
 

@@ -2,8 +2,8 @@
 
 ## Transport
 
-- 服务类型：`_sesame-gw._tcp.local.`
-- 接口路径：`/v1/device-stream`
+- 服务类型：`_sesame-streamgw._tcp.local.`（`sesame-streamgw` 恰为 mDNS label 的 15 字节上限）
+- 接口路径：`/v2/device-stream`
 - 开发环境：可信局域网中的 WS
 - 生产环境：WSS + 设备鉴权
 - 一台设备维持一条全双工长连接
@@ -59,12 +59,19 @@ response.plan
 tts.start
 tts.stop
 tts.flush
+tts.pause
+tts.resume
 operator.control
 error
 ```
 
 `operator.control` 是本机统一控制台下发的带 `request_id` 命令，`turn_id` 固定为
 `null`。它与模型生成的 `response.plan` 分开，不扩大模型动作白名单。
+
+`tts.pause` 和 `tts.resume` 仅由本机 Gateway 控制台发起，必须携带当前
+`turn_id` 与 `generation_id`。暂停时 ESP32 保留已收到的 Opus 抖动缓冲、停止
+I2S 消费并关闭功放；Gateway 同时暂停补包。继续时先按 WebSocket 顺序发送
+`tts.resume`，再恢复 Opus 下行，避免音频帧越过恢复控制帧。
 
 ### Control sequence
 

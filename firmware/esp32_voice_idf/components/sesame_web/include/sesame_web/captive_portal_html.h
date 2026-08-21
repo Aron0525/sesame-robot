@@ -608,8 +608,10 @@ async function initializeControlPage() {
 }
 
 const DIRECTION_ACTIONS = new Set(['forward', 'backward', 'left', 'right']);
+const CONTROL_LABELS = { proud: '得意' };
 
 function controlLabel(name) {
+  if (CONTROL_LABELS[name]) return CONTROL_LABELS[name];
   return name.split('_').map((part) =>
     part.charAt(0).toUpperCase() + part.slice(1),
   ).join(' ');
@@ -1082,9 +1084,7 @@ const buttonBindings = {
   1: () => pose('wave'),    // B / Circle
   2: () => pose('dance'),   // X / Square
   3: () => pose('swim'),    // Y / Triangle
-  4: () => pose('point'),   // LB / L1
   5: () => pose('pushup'),  // RB / R1
-  6: () => pose('bow'),     // LT / L2
   7: () => pose('shake'),   // RT / R2
   8: () => stop(),          // Back / Share
   9: () => pose('rest'),    // Start / Options

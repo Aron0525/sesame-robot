@@ -206,4 +206,38 @@ esp_err_t save_wake_threshold_hundredths(uint8_t value) {
   return result;
 }
 
+esp_err_t load_speaker_verification_enabled(bool* output) {
+  if (output == nullptr) return ESP_ERR_INVALID_ARG;
+  *output = false;
+  const esp_err_t init_result = ensure_nvs_initialized();
+  if (init_result != ESP_OK) return init_result;
+
+  nvs_handle_t handle = 0;
+  esp_err_t result = nvs_open("sesame", NVS_READONLY, &handle);
+  if (result == ESP_ERR_NVS_NOT_FOUND) return ESP_OK;
+  if (result != ESP_OK) return result;
+
+  uint8_t saved_value = 0;
+  result = nvs_get_u8(handle, "speaker_verify", &saved_value);
+  nvs_close(handle);
+  if (result == ESP_ERR_NVS_NOT_FOUND) return ESP_OK;
+  if (result != ESP_OK) return result;
+  if (saved_value > 1) return ESP_OK;
+  *output = saved_value == 1;
+  return ESP_OK;
+}
+
+esp_err_t save_speaker_verification_enabled(bool enabled) {
+  const esp_err_t init_result = ensure_nvs_initialized();
+  if (init_result != ESP_OK) return init_result;
+
+  nvs_handle_t handle = 0;
+  esp_err_t result = nvs_open("sesame", NVS_READWRITE, &handle);
+  if (result != ESP_OK) return result;
+  result = nvs_set_u8(handle, "speaker_verify", enabled ? 1 : 0);
+  if (result == ESP_OK) result = nvs_commit(handle);
+  nvs_close(handle);
+  return result;
+}
+
 }  // namespace sesame::transport

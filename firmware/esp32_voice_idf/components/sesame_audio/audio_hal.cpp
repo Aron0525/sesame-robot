@@ -1,9 +1,9 @@
 #include "sesame_audio/audio_hal.h"
+#include "sesame_audio/audio_volume.h"
 
 #include <array>
 #include <limits>
 
-#include "driver/gpio.h"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -37,48 +37,11 @@ esp_err_t AudioHal::initialize() {
     return ESP_OK;
   }
 
-  const gpio_config_t amplifier_config = {
-      .pin_bit_mask = 1ULL << kAmplifierEnablePin,
-      .mode = GPIO_MODE_OUTPUT,
-      .pull_up_en = GPIO_PULLUP_DISABLE,
-      .pull_down_en = GPIO_PULLDOWN_ENABLE,
-      .intr_type = GPIO_INTR_DISABLE,
-  };
-  ESP_RETURN_ON_ERROR(gpio_config(&amplifier_config), kTag,
-                      "configure amplifier enable");
-  ESP_RETURN_ON_ERROR(set_amplifier_enabled(false), kTag,
-                      "mute amplifier before I2S init");
-
-  const i2s_chan_config_t channel_config =
+  const i2s_chan_config_t microphone_channel_config =
       I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
   ESP_RETURN_ON_ERROR(
-      i2s_new_channel(&channel_config, &tx_channel_, &rx_channel_), kTag,
-      "create full-duplex I2S channels");
-
-  i2s_std_config_t tx_config = {
-      .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(kSampleRateHz),
-      .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(
-          I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_STEREO),
-      .gpio_cfg =
-          {
-              .mclk = I2S_GPIO_UNUSED,
-              .bclk = kI2sBclkPin,
-              .ws = kI2sWsPin,
-              .dout = kSpeakerDataPin,
-              .din = I2S_GPIO_UNUSED,
-              .invert_flags =
-                  {
-                      .mclk_inv = false,
-                      .bclk_inv = false,
-                      .ws_inv = false,
-                  },
-          },
-  };
-  esp_err_t result = i2s_channel_init_std_mode(tx_channel_, &tx_config);
-  if (result != ESP_OK) {
-    shutdown();
-    return result;
-  }
+      i2s_new_channel(&microphone_channel_config, nullptr, &rx_channel_),
+      kTag, "create I2S0 microphone RX channel");
 
   i2s_std_config_t rx_config = {
       .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(kSampleRateHz),
@@ -87,8 +50,8 @@ esp_err_t AudioHal::initialize() {
       .gpio_cfg =
           {
               .mclk = I2S_GPIO_UNUSED,
-              .bclk = kI2sBclkPin,
-              .ws = kI2sWsPin,
+              .bclk = kMicrophoneBclkPin,
+              .ws = kMicrophoneWsPin,
               .dout = I2S_GPIO_UNUSED,
               .din = kMicrophoneDataPin,
               .invert_flags =
@@ -99,18 +62,56 @@ esp_err_t AudioHal::initialize() {
                   },
           },
   };
-  result = i2s_channel_init_std_mode(rx_channel_, &rx_config);
+  esp_err_t result = i2s_channel_init_std_mode(rx_channel_, &rx_config);
   if (result != ESP_OK) {
     shutdown();
     return result;
   }
 
-  result = i2s_channel_enable(tx_channel_);
+  i2s_chan_config_t speaker_channel_config =
+      I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_1, I2S_ROLE_MASTER);
+  // These settings reproduce the known-good Arduino MAX98357A test while
+  // retaining I2S1 for the speaker because I2S0 is dedicated to INMP441 RX.
+  speaker_channel_config.dma_desc_num = kSpeakerDmaDescriptorCount;
+  speaker_channel_config.dma_frame_num = kSpeakerDmaFramesPerDescriptor;
+  speaker_channel_config.auto_clear_after_cb = kSpeakerDmaAutoClear;
+  result = i2s_new_channel(&speaker_channel_config, &tx_channel_, nullptr);
   if (result != ESP_OK) {
     shutdown();
     return result;
   }
+
+  i2s_std_config_t tx_config = {
+      .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(kSampleRateHz),
+      .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(
+          I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO),
+      .gpio_cfg =
+          {
+              .mclk = I2S_GPIO_UNUSED,
+              .bclk = kSpeakerBclkPin,
+              .ws = kSpeakerWsPin,
+              .dout = kSpeakerDataPin,
+              .din = I2S_GPIO_UNUSED,
+              .invert_flags =
+                  {
+                      .mclk_inv = false,
+                      .bclk_inv = false,
+                      .ws_inv = false,
+                  },
+          },
+  };
+  result = i2s_channel_init_std_mode(tx_channel_, &tx_config);
+  if (result != ESP_OK) {
+    shutdown();
+    return result;
+  }
+
   result = i2s_channel_enable(rx_channel_);
+  if (result != ESP_OK) {
+    shutdown();
+    return result;
+  }
+  result = i2s_channel_enable(tx_channel_);
   if (result != ESP_OK) {
     shutdown();
     return result;
@@ -118,13 +119,11 @@ esp_err_t AudioHal::initialize() {
 
   initialized_ = true;
   ESP_LOGI(kTag,
-           "I2S ready: 16 kHz, 32-bit stereo bus, mic left slot, 20 ms frame");
+           "I2S ready: I2S0 RX mic 14/47/48 (32-bit), I2S1 TX SPK2 1/2/3 (16-bit)");
   return ESP_OK;
 }
 
 esp_err_t AudioHal::shutdown() {
-  set_amplifier_enabled(false);
-
   if (tx_channel_ != nullptr) {
     i2s_channel_disable(tx_channel_);
     i2s_del_channel(tx_channel_);
@@ -176,11 +175,11 @@ esp_err_t AudioHal::write_speaker_frame(const int16_t* input,
     return ESP_ERR_INVALID_ARG;
   }
 
-  std::array<int32_t, kRawSamplesPerFrame> raw{};
+  std::array<int16_t, kRawSamplesPerFrame> raw{};
   for (size_t frame = 0; frame < kSamplesPerFrame; ++frame) {
-    const int32_t expanded = static_cast<int32_t>(input[frame]) << 16;
-    raw[frame * kI2sSlotsPerFrame] = expanded;
-    raw[frame * kI2sSlotsPerFrame + 1] = expanded;
+    const int16_t adjusted = scale_speaker_pcm16(input[frame]);
+    raw[frame * kI2sSlotsPerFrame] = adjusted;
+    raw[frame * kI2sSlotsPerFrame + 1] = adjusted;
   }
 
   size_t bytes_written = 0;
@@ -191,8 +190,11 @@ esp_err_t AudioHal::write_speaker_frame(const int16_t* input,
   return bytes_written == sizeof(raw) ? ESP_OK : ESP_ERR_INVALID_SIZE;
 }
 
-esp_err_t AudioHal::set_amplifier_enabled(bool enabled) {
-  return gpio_set_level(kAmplifierEnablePin, enabled ? 1 : 0);
+esp_err_t AudioHal::set_amplifier_enabled(bool /*enabled*/) {
+  // Hat SPK2 exposes BCLK/LRCK/SDATA only. Keep this lifecycle hook so the
+  // voice controller need not special-case the old bare amplifier, but never
+  // drive a separate enable GPIO because Hat SPK2 exposes no such pin.
+  return ESP_OK;
 }
 
 }  // namespace sesame::audio

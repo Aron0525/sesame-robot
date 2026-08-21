@@ -51,10 +51,10 @@ for (const relativePath of sources) {
                `${relativePath}: rest L4 must be 90 - 30 = 60`);
 
   const stand = functionBody(source, 'runStandPose', 'runWavePose');
-  assert.equal(directAngle(stand, 'R3'), 120,
-               `${relativePath}: stand R3 retains the prior 120-degree calibration`);
-  assert.equal(directAngle(stand, 'L4'), 120,
-               `${relativePath}: stand L4 retains the prior 120-degree calibration`);
+  assert.equal(directAngle(stand, 'R3'), 113,
+               `${relativePath}: stand R3 must match the calibrated 113-degree position`);
+  assert.equal(directAngle(stand, 'L4'), 112,
+               `${relativePath}: stand L4 must match the calibrated 112-degree position`);
 
   const dead = functionBody(source, 'runDeadPose()', 'runCrabPose');
   assert.equal(directAngle(dead, 'R3'), 60,
@@ -62,15 +62,11 @@ for (const relativePath of sources) {
   assert.equal(directAngle(dead, 'L4'), 60,
                `${relativePath}: dead L4 must be 90 - 30 = 60`);
 
-  // These seven actions have no R3/L4 command below 30 degrees, so applying
+  // These remaining actions have no R3/L4 command below 30 degrees, so applying
   // the historical R3/L4 -30-degree calibration keeps every command valid.
-  assertAngleCurve(source, relativePath, 'runSwimPose', 'runPointPose', 'R3', [60]);
-  assertAngleCurve(source, relativePath, 'runSwimPose', 'runPointPose', 'L4', [60]);
-  assertAngleCurve(source, relativePath, 'runPointPose', 'runPushupPose', 'R3', [140]);
-  assertAngleCurve(source, relativePath, 'runPointPose', 'runPushupPose', 'L4', [150]);
-  assertAngleCurve(source, relativePath, 'runPushupPose', 'runBowPose', 'R3', [60, 150, 60]);
-  assertAngleCurve(source, relativePath, 'runBowPose', 'runCutePose', 'R3', [150, 60]);
-  assertAngleCurve(source, relativePath, 'runBowPose', 'runCutePose', 'L4', [150]);
+  assertAngleCurve(source, relativePath, 'runSwimPose', 'runPushupPose', 'R3', [60]);
+  assertAngleCurve(source, relativePath, 'runSwimPose', 'runPushupPose', 'L4', [60]);
+  assertAngleCurve(source, relativePath, 'runPushupPose', 'runCutePose', 'R3', [60, 150, 60]);
   assertAngleCurve(source, relativePath, 'runWormPose', 'runShakePose', 'R3', [60, 15, 105]);
   assertAngleCurve(source, relativePath, 'runWormPose', 'runShakePose', 'L4', [60, 105, 15]);
   assertAngleCurve(source, relativePath, 'runShakePose', 'runShrugPose', 'R3', [60]);

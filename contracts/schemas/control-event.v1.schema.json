@@ -167,7 +167,9 @@
           "type": {
             "enum": [
               "tts.start",
-              "tts.flush"
+              "tts.flush",
+              "tts.pause",
+              "tts.resume"
             ]
           }
         }
@@ -271,6 +273,22 @@
       "if": {
         "properties": {
           "type": {
+            "const": "playback.stats"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/playbackStatsPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
             "const": "error"
           }
         }
@@ -304,10 +322,13 @@
         "tts.start",
         "tts.stop",
         "tts.flush",
+        "tts.pause",
+        "tts.resume",
         "expression.set",
         "action.execute",
         "operator.control",
         "action.result",
+        "playback.stats",
         "error"
       ]
     },
@@ -842,6 +863,56 @@
           ],
           "maxLength": 100
         }
+      }
+    },
+    "playbackStatsPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generation_id",
+        "buffered_packets",
+        "buffered_ms",
+        "startup_packets",
+        "low_watermark_packets",
+        "high_watermark_packets",
+        "min_buffered_packets",
+        "max_buffered_packets",
+        "underflow_count",
+        "dropped_packet_count",
+        "stale_generation_count",
+        "out_of_order_count",
+        "sequence_discontinuity_count",
+        "playback_started",
+        "paused",
+        "decode_last_us",
+        "decode_max_us",
+        "decode_avg_us",
+        "i2s_last_us",
+        "i2s_max_us",
+        "i2s_avg_us"
+      ],
+      "properties": {
+        "generation_id": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+        "buffered_packets": {"type": "integer", "minimum": 0, "maximum": 60},
+        "buffered_ms": {"type": "integer", "minimum": 0, "maximum": 1200},
+        "startup_packets": {"type": "integer", "minimum": 1, "maximum": 60},
+        "low_watermark_packets": {"type": "integer", "minimum": 1, "maximum": 60},
+        "high_watermark_packets": {"type": "integer", "minimum": 1, "maximum": 60},
+        "min_buffered_packets": {"type": "integer", "minimum": 0, "maximum": 60},
+        "max_buffered_packets": {"type": "integer", "minimum": 0, "maximum": 60},
+        "underflow_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "dropped_packet_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "stale_generation_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "out_of_order_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "sequence_discontinuity_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "playback_started": {"type": "boolean"},
+        "paused": {"type": "boolean"},
+        "decode_last_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "decode_max_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "decode_avg_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "i2s_last_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "i2s_max_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "i2s_avg_us": {"type": "integer", "minimum": 0, "maximum": 4294967295}
       }
     },
     "errorPayload": {

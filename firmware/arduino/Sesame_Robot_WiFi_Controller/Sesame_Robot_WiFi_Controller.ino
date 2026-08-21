@@ -206,6 +206,16 @@ void handleGetStatus();
 void handleApiCommand();
 void updateWifiInfoScroll();
 void recordInput();
+bool isSupportedAction(const String& action);
+
+bool isSupportedAction(const String& action) {
+  return action == "rest" || action == "stand" || action == "wave" ||
+         action == "dance" || action == "proud" || action == "swim" || action == "pushup" ||
+         action == "cute" || action == "freaky" || action == "worm" ||
+         action == "shake" || action == "shrug" || action == "dead" ||
+         action == "crab" || action == "forward" || action == "backward" ||
+         action == "left" || action == "right";
+}
 
 void handleRoot() {
   server.send(200, "text/html", index_html);
@@ -214,13 +224,23 @@ void handleRoot() {
 void handleCommandWeb() {
   // We send 200 OK immediately so the web browser doesn't hang waiting for animation to finish
   if (server.hasArg("pose")) {
-    currentCommand = server.arg("pose");
+    const String action = server.arg("pose");
+    if (!isSupportedAction(action)) {
+      server.send(400, "text/plain", "Unsupported action");
+      return;
+    }
+    currentCommand = action;
     recordInput();
     exitIdle();
     server.send(200, "text/plain", "OK"); 
-  } 
+  }
   else if (server.hasArg("go")) {
-    currentCommand = server.arg("go");
+    const String action = server.arg("go");
+    if (!isSupportedAction(action)) {
+      server.send(400, "text/plain", "Unsupported action");
+      return;
+    }
+    currentCommand = action;
     recordInput();
     exitIdle();
     server.send(200, "text/plain", "OK");
@@ -362,6 +382,8 @@ void handleApiCommand() {
     currentCommand = "";
     recordInput();
     server.send(200, "application/json", "{\"status\":\"ok\",\"message\":\"Command stopped\"}");
+  } else if (!isSupportedAction(command)) {
+    server.send(400, "application/json", "{\"error\":\"Unsupported action\"}");
   } else {
     currentCommand = command;
     recordInput();
@@ -510,10 +532,9 @@ void loop() {
     else if (cmd == "stand") { runStandPose(1); if (currentCommand == "stand") currentCommand = ""; }
     else if (cmd == "wave") runWavePose();
     else if (cmd == "dance") runDancePose();
+    else if (cmd == "proud") runProudPose();
     else if (cmd == "swim") runSwimPose();
-    else if (cmd == "point") runPointPose();
     else if (cmd == "pushup") runPushupPose();
-    else if (cmd == "bow") runBowPose();
     else if (cmd == "cute") runCutePose();
     else if (cmd == "freaky") runFreakyPose();
     else if (cmd == "worm") runWormPose();
@@ -541,10 +562,9 @@ void loop() {
         else if(strcmp(command_buffer, "run stand") == 0 || strcmp(command_buffer, "rn st") == 0) runStandPose(1);
         else if(strcmp(command_buffer, "rn wv") == 0) { currentCommand = "wave"; runWavePose(); }
         else if(strcmp(command_buffer, "rn dn") == 0) { currentCommand = "dance"; runDancePose(); }
+        else if(strcmp(command_buffer, "rn pr") == 0) { currentCommand = "proud"; runProudPose(); }
         else if(strcmp(command_buffer, "rn sw") == 0) { currentCommand = "swim"; runSwimPose(); }
-        else if(strcmp(command_buffer, "rn pt") == 0) { currentCommand = "point"; runPointPose(); }
         else if(strcmp(command_buffer, "rn pu") == 0) { currentCommand = "pushup"; runPushupPose(); }
-        else if(strcmp(command_buffer, "rn bw") == 0) { currentCommand = "bow"; runBowPose(); }
         else if(strcmp(command_buffer, "rn ct") == 0) { currentCommand = "cute"; runCutePose(); }
         else if(strcmp(command_buffer, "rn fk") == 0) { currentCommand = "freaky"; runFreakyPose(); }
         else if(strcmp(command_buffer, "rn wm") == 0) { currentCommand = "worm"; runWormPose(); }

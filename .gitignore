@@ -21,6 +21,7 @@ firmware/esp32_voice_idf/diagnostics/multinet_real19_eval/
 
 # Arduino and diagnostic generated outputs
 firmware/arduino/**/build/
+firmware/arduino/**/local-config.h
 firmware/esp32_voice_idf/diagnostics/**/build*/
 
 # Local Python environments and caches
@@ -43,6 +44,8 @@ firmware/esp32_voice_idf/diagnostics/**/build*/
 # Local owner-voiceprint enrollment artifacts. These are biometric data.
 /firmware/esp32_voice_idf/components/sesame_voice/private/owner_voiceprint_template.h
 /training/nihao_zhima_real19_20260810/owner_voiceprint_report.json
+/firmware/esp32_voice_idf/components/sesame_voice/private/speaker_verification_template.h
+/training/nihao_zhima_real19_20260810/speaker_verification_report.json
 
 # macOS metadata
 .DS_Store

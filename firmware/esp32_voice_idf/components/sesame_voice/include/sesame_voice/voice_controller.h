@@ -20,9 +20,10 @@
 #include "sesame_voice/capture_session.h"
 #include "sesame_voice/conversation_store.h"
 #include "sesame_voice/gateway_connection_state.h"
-#include "sesame_voice/owner_voice_gate.h"
 #include "sesame_voice/pcm_preroll_buffer.h"
 #include "sesame_voice/recording_button.h"
+#include "sesame_voice/speaker_verification.h"
+#include "sesame_voice/speaker_verification_store.h"
 #include "sesame_voice/voice_turn_detector.h"
 #include "sesame_voice/wake_vad_engine.h"
 #include "sesame_voice/wake_threshold_store.h"
@@ -124,6 +125,10 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   void drain_pcm_uplink(size_t maximum_frames);
   void capture_and_send(const int16_t* pcm, uint64_t now_ms);
   void play_pending_audio();
+  void reset_downlink_diagnostics(uint32_t generation_id);
+  void record_downlink_arrival(uint32_t generation_id, uint32_t arrival_ms);
+  void record_downlink_queue_depth(uint32_t generation_id, UBaseType_t depth);
+  void record_downlink_playout();
   esp_err_t send_control(sesame::protocol::ControlEventType type,
                          const char* payload_json,
                          const char* request_id = nullptr,
@@ -144,6 +149,7 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   sesame::audio::OpusCodec codec_;
   ConversationStore conversation_store_;
   WakeThresholdStore wake_threshold_store_;
+  SpeakerVerificationStore speaker_verification_store_;
   sesame::transport::StoredDeviceConfig config_{};
   sesame::transport::GatewayClient gateway_;
   sesame::protocol::TurnStateMachine turn_state_;
@@ -155,9 +161,10 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   // The 16-KiB PCM history lives in PSRAM so it cannot consume the internal
   // contiguous heap required by Wi-Fi and mbedTLS.
   PcmPreRollBuffer* pcm_preroll_{nullptr};
-  // The enrolled owner template itself lives in a Git-ignored private header;
-  // this 1.5-second runtime ring is allocated in PSRAM at startup.
-  OwnerVoiceGate* owner_voice_gate_{nullptr};
+  // The 48-KiB fixed capture ring lives in PSRAM. Its feature extraction uses
+  // bounded arrays only and is suitable for the ESP32-S3 runtime.
+  SpeakerVerification* speaker_verification_{nullptr};
+  bool speaker_verification_enabled_{false};
   bool wake_ack_active_{false};
   size_t wake_ack_offset_samples_{0};
   QueueHandle_t downlink_queue_{nullptr};
@@ -176,6 +183,16 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   std::atomic<bool> transport_fault_requested_{false};
   std::atomic<bool> downlink_fault_requested_{false};
   std::atomic<bool> first_uplink_pending_{false};
+  // WSS callbacks update arrival and queue measurements; the voice task adds
+  // playout measurements. These counters diagnose timing without changing
+  // codec, queue, or I2S behaviour.
+  std::atomic<uint32_t> downlink_diagnostic_generation_{0};
+  std::atomic<uint32_t> downlink_received_packet_count_{0};
+  std::atomic<uint32_t> downlink_last_arrival_ms_{0};
+  std::atomic<uint32_t> downlink_max_arrival_gap_ms_{0};
+  std::atomic<uint32_t> downlink_arrival_gaps_over_25ms_{0};
+  std::atomic<uint32_t> downlink_queue_high_watermark_{0};
+  std::atomic<uint32_t> downlink_played_without_buffer_count_{0};
   uint32_t control_sequence_{0};
   uint32_t expected_control_sequence_{0};
   uint32_t audio_sequence_{0};

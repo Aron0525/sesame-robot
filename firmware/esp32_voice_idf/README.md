@@ -6,29 +6,38 @@
 
 - 设备与电脑之间：Opus VOIP，16 kHz，mono，20 ms/packet。
 - ASR/TTS 边界：PCM S16LE，16 kHz，mono。
-- I2S 物理总线：16 kHz，32-bit stereo slots。INMP441 使用 left slot，
-  MAX98357A 同时接收复制到左右 slot 的 mono PCM。
+- I2S0（录音）：16 kHz，32-bit stereo slots。INMP441 使用 left slot。
+- I2S1（播放）：16 kHz，16-bit stereo slots。M5Stack Hat SPK2 接收复制到
+  左右 slot 的 mono PCM。
+- SPK2 音量：采用 ESP32-audioI2S 的 `0…21` 对数音量曲线，当前固定为等级
+  `21`（最大音量）。
 
-之所以 I2S 总线使用 32-bit stereo，而网络仍是 mono，是因为 INMP441
-在一个 32-bit slot 中输出 24-bit 麦克风样本；麦克风和功放又共用 BCLK/WS。
-固件读取 left slot 后转换为 mono PCM，播放时将 mono 样本复制到两个 slot。
+INMP441 在一个 32-bit slot 中输出 24-bit 麦克风样本，固件读取 left slot
+后转换为 mono PCM；播放时再把 mono 样本复制到 SPK2 的两个 16-bit slot。
+两条 I2S 总线互不共用 BCLK 或 WS。
 
 ## 固定引脚
 
 | 信号 | GPIO |
 |---|---:|
-| I2S BCLK / INMP441 SCK | 14 |
-| I2S WS / LRCLK | 47 |
+| INMP441 SCK / I2S0 BCLK | 14 |
+| INMP441 WS / I2S0 WS | 47 |
 | INMP441 SD | 48 |
-| MAX98357A DIN | 2 |
-| MAX98357A SD/EN | 1 |
+| Hat SPK2 BCLK（Hat G26） | 1 |
+| Hat SPK2 LRCK（Hat G0） | 2 |
+| Hat SPK2 SDATA（Hat G25） | 3 |
 | S0–S7 servo PWM | 4, 5, 6, 7, 10, 11, 12, 13 |
 | OLED SDA / SCL | 8 / 9 |
 
-INMP441 的 L/R 接 GND，因此麦克风数据位于 left slot。
+INMP441 的 L/R 接 GND，因此麦克风数据位于 left slot。Hat SPK2 的 `3V3`
+接 ESP32 的 `3V3`、`G` 接公共 `GND`；不接 Hat 的 `5VI`、`BAT`、`5VO`。
 
 ## 语音链路
 
+- “你好芝麻”由 ESP-SR MultiNet 7 在 ESP32-S3 本地识别。可选的说话人验证使用
+  最近 1.5 秒 PCM 的固定内存特征比对，默认关闭；本机 Gateway 控制台可立即开启
+  或关闭，设置写入 NVS。开启后模板缺失或比对失败会拒绝语音唤醒，BOOT 手动入口
+  始终绕过验证。该功能不能防录音回放或合成语音，不属于安全级身份认证。
 - 不生成 WAV，也不把录音写入 Flash 或文件系统。
 - 上行链路为 `I2S PCM → 固定 RAM 帧 → raw Opus → SSM1 → WSS`。
 - 下行链路为 `WSS → SSM1 → raw Opus → 固定 RAM 帧 → I2S`。

@@ -432,10 +432,9 @@ const char index_html[] PROGMEM = R"rawliteral(
           <button class="btn-pose" onclick="pose('stand')">Stand</button>
           <button class="btn-pose" onclick="pose('wave')">Wave</button>
           <button class="btn-pose" onclick="pose('dance')">Dance</button>
+          <button class="btn-pose" onclick="pose('proud')">得意</button>
           <button class="btn-pose" onclick="pose('swim')">Swim</button>
-          <button class="btn-pose" onclick="pose('point')">Point</button>
           <button class="btn-pose" onclick="pose('pushup')">Pushup</button>
-          <button class="btn-pose" onclick="pose('bow')">Bow</button>
           <button class="btn-pose" onclick="pose('cute')">Cute</button>
           <button class="btn-pose" onclick="pose('freaky')">Freaky</button>
           <button class="btn-pose" onclick="pose('worm')">Worm</button>
@@ -846,9 +845,7 @@ const buttonBindings = {
   1: () => pose('wave'),    // B / Circle
   2: () => pose('dance'),   // X / Square
   3: () => pose('swim'),    // Y / Triangle
-  4: () => pose('point'),   // LB / L1
   5: () => pose('pushup'),  // RB / R1
-  6: () => pose('bow'),     // LT / L2
   7: () => pose('shake'),   // RT / R2
   8: () => stop(),          // Back / Share
   9: () => pose('rest'),    // Start / Options

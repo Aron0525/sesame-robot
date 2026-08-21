@@ -18,6 +18,11 @@ class ConsoleRenderBudgetTest(unittest.TestCase):
         self.assertIn("function scheduleRender()", html)
         self.assertIn("requestAnimationFrame(() => {", html)
         self.assertIn("mergeEvent(JSON.parse(event.data)); scheduleRender();", html)
+        self.assertIn('id="voice-text"', html)
+        self.assertIn("function latestTraceText(stageKey, detailKey)", html)
+        self.assertIn("latestTraceText('asr', 'transcript')", html)
+        self.assertIn("latestTraceText('openclaw', 'reply_text')", html)
+        self.assertIn("item.status==='streaming'||item.status==='completed'", html)
 
 
 if __name__ == "__main__":

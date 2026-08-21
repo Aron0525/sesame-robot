@@ -82,7 +82,7 @@ class SilentDiscardPipeline:
 def _settings(*, device_tokens: dict[str, str], device_users: dict[str, str]) -> Settings:
     return Settings(
         _env_file=None,
-        gateway_id="gw_test",
+        gateway_id="gw_stream_lab",
         device_tokens=device_tokens,
         device_users=device_users,
         allow_remote_speech=True,
@@ -104,7 +104,7 @@ def _hello(*, device_id: str, conversation_id: str | None, sequence: int = 0) ->
             timestamp_ms=1_000,
             payload={
                 "device_id": device_id,
-                "gateway_id": "gw_test",
+                "gateway_id": "gw_stream_lab",
                 "conversation_id": conversation_id,
                 "protocol_version": 1,
                 "audio": {
@@ -323,6 +323,61 @@ class GatewayProtocolHardeningTest(unittest.IsolatedAsyncioTestCase):
                 BrokenPipeline(),
                 _control_event("listen.stop", sequence=1),
             )
+
+    async def test_playback_stats_keep_generation_and_turn_validation(self) -> None:
+        websocket = FakeWebSocket()
+        session = _session(listening=False)
+        session.playback_stats_generation = 7
+        session.playback_stats_turn_id = "turn_001"
+        payload = {
+            "generation_id": 7,
+            "buffered_packets": 25,
+            "buffered_ms": 500,
+            "startup_packets": 30,
+            "low_watermark_packets": 20,
+            "high_watermark_packets": 40,
+            "min_buffered_packets": 20,
+            "max_buffered_packets": 40,
+            "underflow_count": 0,
+            "dropped_packet_count": 0,
+            "stale_generation_count": 0,
+            "out_of_order_count": 0,
+            "sequence_discontinuity_count": 0,
+            "playback_started": True,
+            "paused": True,
+            "decode_last_us": 100,
+            "decode_max_us": 150,
+            "decode_avg_us": 110,
+            "i2s_last_us": 200,
+            "i2s_max_us": 250,
+            "i2s_avg_us": 210,
+        }
+        event = parse_control_event(
+            serialize_control_event(
+                ControlEvent(
+                    v=1,
+                    type="playback.stats",
+                    session_id="ses_001",
+                    turn_id="turn_001",
+                    request_id=None,
+                    sequence=1,
+                    timestamp_ms=1_000,
+                    payload=payload,
+                )
+            )
+        )
+        observability = ObservabilityStore(max_events=20)
+        await _handle_control_event(
+            websocket, session, BrokenPipeline(), event, observability
+        )
+        self.assertEqual(session.playback_stats, payload)
+        self.assertEqual(observability.snapshot()["events"][-1]["status"], "paused")
+
+        invalid = event.model_copy(
+            update={"sequence": 2, "payload": {**payload, "generation_id": 8}}
+        )
+        with self.assertRaisesRegex(ControlProtocolError, "generation"):
+            await _handle_control_event(websocket, session, BrokenPipeline(), invalid)
 
     async def test_listen_start_requires_a_capture_trigger(self) -> None:
         with self.assertRaises(ControlProtocolError):

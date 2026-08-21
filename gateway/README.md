@@ -1,13 +1,14 @@
-# Sesame Voice Gateway
+# Sesame Streaming Lab Gateway
 
-`gateway` 是电脑端唯一的语音编排服务：它接收 ESP32 的 Opus 音频，完成 ASR → OpenClaw（LLM）→ TTS，再把语音、表情与动作下发给 ESP32。
+`gateway` 是 Streaming Lab 的电脑端语音编排服务：它接收 ESP32 的 Opus 音频，在 ASR final 后先下发安全默认计划，再把 OpenClaw SSE 的完整句子逐句送入 TTS，立即编码为 Opus 并下发给 ESP32。
 
 ## 启动
 
 ```bash
-cd "/Users/mac/Desktop/1/SesameV3_语音机器人项目/gateway"
-cp .env.example .env
-# 填写设备 token、DashScope API Key、OpenClaw token 和 TLS 文件路径
+cd /Users/mac/Desktop/2
+./ops/macos/bootstrap_streaming_lab_runtime.sh
+cd gateway
+# 填写 DashScope API Key；确认后才启用远程语音处理。
 make sync
 make run
 ```
@@ -19,7 +20,7 @@ make run
 网关启动后，在**运行网关的这台电脑**浏览器打开：
 
 ```text
-https://sesame-gateway.local:8765/console
+https://sesame-stream-gateway.local:8766/console
 ```
 
 控制台把原机器人控制页和 Voice Trace 合并在一起：可执行动作、OLED 表情、8 路舵机、
@@ -45,7 +46,7 @@ Opus 上行、`response.plan`、TTS 和播放完成日志为监控台事件。�
 - Python 3.12、`uv`、系统 `libopus`。
 - 同一局域网内的 ESP32-S3。
 - DashScope ASR/TTS。
-- 本机回环地址上的 OpenClaw Gateway（只接收 ASR 文本）。
+- 本机回环地址上的 OpenClaw SSE bridge（只接收已脱敏的文本请求）。
 
 ## 联网搜索
 
@@ -61,4 +62,4 @@ SESAME_WEB_SEARCH_TIMEOUT_SECONDS=15
 每轮最多执行一次搜索。Gateway 会校验查询长度与可选时效参数，向 OpenClaw 返回有界、
 不可信的搜索证据，再要求它生成最终回复。搜索失败时本轮安全失败，不会回退到任意网页抓取。
 
-协议和设备能力的唯一来源在项目根目录的 [`contracts`](../contracts)。部署与安全说明在 [`docs`](../docs)。
+SSE 事件与安全边界见项目根目录的 [`contracts/protocols/voice-gateway-openclaw-sse.md`](../contracts/protocols/voice-gateway-openclaw-sse.md)。设备协议与部署说明在 [`contracts`](../contracts) 和 [`docs`](../docs)。

@@ -60,6 +60,25 @@ class DashScopeTtsStreamTest(unittest.TestCase):
 
         self.assertEqual(audio, b"terminal-audio")
 
+    def test_exposes_non_cumulative_chunks_for_immediate_pcm_framing(self) -> None:
+        stream = [_Chunk(b"first"), _Chunk(b"second"), _Chunk(b"firstsecond")]
+        with patch(
+            "sesame_voice_gateway.providers.dashscope.HttpSpeechSynthesizer.call",
+            return_value=stream,
+        ):
+            chunks = list(
+                self.client.synthesize_chunks(
+                    text="测试",
+                    model="qwen-audio-3.0-tts-flash",
+                    voice_id="longanhuan_v3.6",
+                    sample_rate=16_000,
+                    speed=1.0,
+                    instruction=None,
+                )
+            )
+
+        self.assertEqual(chunks, [b"first", b"second"])
+
 
 if __name__ == "__main__":
     unittest.main()

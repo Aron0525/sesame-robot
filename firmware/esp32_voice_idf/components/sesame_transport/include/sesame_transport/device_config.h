@@ -30,5 +30,7 @@ esp_err_t load_device_config(StoredDeviceConfig* output);
 esp_err_t save_conversation_id(const char* conversation_id);
 esp_err_t load_wake_threshold_hundredths(uint8_t* output);
 esp_err_t save_wake_threshold_hundredths(uint8_t value);
+esp_err_t load_speaker_verification_enabled(bool* output);
+esp_err_t save_speaker_verification_enabled(bool enabled);
 
 }  // namespace sesame::transport

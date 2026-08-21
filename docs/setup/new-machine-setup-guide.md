@@ -74,10 +74,10 @@ make run
 健康检查：
 
 ```bash
-curl http://127.0.0.1:8765/healthz
+curl -k https://127.0.0.1:8766/healthz
 ```
 
-实际启用 TLS 时，按配置的主机名和证书访问控制台，例如 `https://sesame-gateway.local:8765/console`。控制台仅允许在运行 Gateway 的本机浏览器中访问。若 TLS 或端口配置不同，以 `.env` 和 Gateway 启动日志为准。
+实际启用 TLS 时，按配置的主机名和证书访问控制台，例如 `https://sesame-stream-gateway.local:8766/console`。控制台仅允许在运行 Gateway 的本机浏览器中访问。若 TLS 或端口配置不同，以 `.env` 和 Gateway 启动日志为准。
 
 如果要让 Gateway 在登录后自动恢复，参见 [`ops/macos/README.md`](../../ops/macos/README.md)。在 Gateway 直接占用 ESP32 USB 串口时，不要并行运行 `idf.py monitor`、Arduino Serial Monitor 或 `screen`。
 
@@ -99,13 +99,19 @@ idf.py build
 
 | 信号 | GPIO |
 | --- | ---: |
-| INMP441 SCK / I2S BCLK | 14 |
-| INMP441 WS / I2S WS | 47 |
+| INMP441 SCK / I2S0 BCLK | 14 |
+| INMP441 WS / I2S0 WS | 47 |
 | INMP441 SD | 48 |
-| MAX98357A DIN | 2 |
-| MAX98357A SD/EN | 1 |
+| Hat SPK2 BCLK（Hat G26） | 1 |
+| Hat SPK2 LRCK（Hat G0） | 2 |
+| Hat SPK2 SDATA（Hat G25） | 3 |
 | 舵机 S0–S7 | 4、5、6、7、10、11、12、13 |
 | OLED SDA / SCL | 8 / 9 |
+
+INMP441 接 ESP32 的 `3V3/GND`，并将 `L/R` 接 `GND`。Hat SPK2 的 `3V3` 接
+ESP32 `3V3`、`G` 接公共 `GND`；不接 `5VI`、`BAT`、`5VO`。两者使用独立的 I2S
+时钟线，不能把 GPIO14 或 GPIO47 再接至 Hat SPK2。
+Hat 的 `G0/G25/G26` 是模块针名，分别接这块 ESP32-S3 的 GPIO2/3/1。
 
 ## 6. 为每台设备生成私密 NVS
 

@@ -8,6 +8,7 @@ from sesame_voice_gateway.discovery import (
     MdnsAdvertiser,
     NonUniqueNameException,
     _resolve_advertised_ipv4,
+    build_service_info,
 )
 
 
@@ -108,6 +109,19 @@ class MdnsRefreshTest(unittest.TestCase):
                 return_value=_FakeRouteProbe(),
             ):
                 self.assertEqual(_resolve_advertised_ipv4(_settings()), "192.168.88.21")
+
+    def test_lab_advertises_only_its_own_service_identity(self) -> None:
+        with patch(
+            "sesame_voice_gateway.discovery._resolve_advertised_ipv4",
+            return_value="192.168.88.21",
+        ):
+            service = build_service_info(_settings())
+
+        self.assertEqual(service.type, "_sesame-streamgw._tcp.local.")
+        self.assertEqual(service.port, 8766)
+        self.assertEqual(service.server, "sesame-stream-gateway.local.")
+        self.assertEqual(service.properties[b"gateway_id"], b"gw_stream_lab")
+        self.assertEqual(service.properties[b"path"], b"/v2/device-stream")
 
 
 if __name__ == "__main__":

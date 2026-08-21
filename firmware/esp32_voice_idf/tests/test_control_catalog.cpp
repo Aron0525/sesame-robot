@@ -21,4 +21,17 @@ int main() {
   // Keep the legacy input alias while exposing only real web faces.
   assert(sesame::robot::validate_expression("default", 1'000) ==
          sesame::robot::ExpressionDecision::kAllowed);
+
+  // Pointing and bowing are still valid face names, but they must no longer
+  // be executable robot actions.
+  assert(!sesame::robot::is_web_action("point"));
+  assert(!sesame::robot::is_web_action("bow"));
+  assert(sesame::robot::validate_action(
+             {"req_removed", "point", 1'000, kNowMs}, kNowMs, true) ==
+         sesame::robot::ActionDecision::kUnknownAction);
+  assert(sesame::robot::validate_action(
+             {"req_removed", "bow", 1'000, kNowMs}, kNowMs, true) ==
+         sesame::robot::ActionDecision::kUnknownAction);
+  assert(sesame::robot::is_web_expression("point"));
+  assert(sesame::robot::is_web_expression("bow"));
 }

@@ -24,10 +24,13 @@ ControlEventType = Literal[
     "tts.start",
     "tts.stop",
     "tts.flush",
+    "tts.pause",
+    "tts.resume",
     "expression.set",
     "action.execute",
     "operator.control",
     "action.result",
+    "playback.stats",
     "error",
 ]
 

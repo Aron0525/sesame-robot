@@ -16,17 +16,19 @@ from typing import Any, Literal, Protocol
 
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, StrictBool, model_validator
 
 from sesame_voice_gateway.audio.opus import OpusCodec
 from sesame_voice_gateway.config import Settings, get_settings
 from sesame_voice_gateway.conversations import ConversationRegistry
 from sesame_voice_gateway.discovery import MdnsAdvertiser
+from sesame_voice_gateway.local_pcm_test import LocalPcmTestError, LocalPcmTestQueue
 from sesame_voice_gateway.openclaw.client import (
     OpenClawAgentProvider,
     OpenClawUnavailableError,
     build_openclaw_session_key,
 )
+from sesame_voice_gateway.openclaw.sse_client import OpenClawSseAgentProvider
 from sesame_voice_gateway.observability import ObservabilityStore
 from sesame_voice_gateway.pipeline import (
     MAX_UPLINK_PACKETS,
@@ -52,7 +54,14 @@ from sesame_voice_gateway.protocol.control import (
     parse_control_event,
     serialize_control_event,
 )
-from sesame_voice_gateway.providers.base import AgentProvider, AsrProvider, AudioFormat, TtsProvider
+from sesame_voice_gateway.providers.base import (
+    AgentProvider,
+    AgentResult,
+    AsrProvider,
+    AsrResult,
+    AudioFormat,
+    TtsProvider,
+)
 from sesame_voice_gateway.providers.dashscope import (
     DashScopeAsrProvider,
     DashScopeAudioClient,
@@ -61,11 +70,21 @@ from sesame_voice_gateway.providers.dashscope import (
 from sesame_voice_gateway.recordings import create_test_recording_store
 from sesame_voice_gateway.sandbox_cleanup import OpenClawSandboxReaper
 from sesame_voice_gateway.serial_monitor import FirmwareSerialMonitor
+from sesame_voice_gateway.streaming import (
+    StreamAudio,
+    StreamFinished,
+    StreamOutput,
+    StreamStart,
+    StreamingConversationPipeline,
+)
 from sesame_voice_gateway.tools.web_search import DashScopeWebSearchProvider, WebSearchProvider
 
 logger = logging.getLogger(__name__)
 
+VoicePipeline = ConversationPipeline | StreamingConversationPipeline
+
 MAX_UPLINK_OPUS_BYTES = MAX_UPLINK_PACKETS * MAX_OPUS_PACKET_BYTES
+OPERATOR_CONTROL_ACK_TIMEOUT_SECONDS = 3.0
 REMOTE_ACTIONS = frozenset(
     {
         "rest",
@@ -73,9 +92,7 @@ REMOTE_ACTIONS = frozenset(
         "wave",
         "dance",
         "swim",
-        "point",
         "pushup",
-        "bow",
         "cute",
         "freaky",
         "worm",
@@ -218,6 +235,18 @@ class DeviceSession:
     active_generation: int = 0
     turn_epoch: int = 0
     send_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    # The ESP32 reports this optional, authenticated control-plane telemetry
+    # while a downlink is active. Audio remains WSS binary Opus.
+    playback_stats: dict[str, Any] | None = None
+    playback_stats_generation: int = 0
+    playback_stats_turn_id: str | None = None
+    playback_stats_revision: int = 0
+    playback_stats_event: asyncio.Event = field(default_factory=asyncio.Event)
+    # Local pause/resume is deliberately separate from telemetry: the
+    # Gateway must stop producing packets immediately after it accepts a
+    # pause request, rather than waiting for a round trip to ESP32.
+    playback_paused: bool = False
+    playback_pause_event: asyncio.Event = field(default_factory=asyncio.Event)
 
 
 class RemoteControlRequest(BaseModel):
@@ -225,7 +254,15 @@ class RemoteControlRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    kind: Literal["action", "expression", "servo", "settings", "wakeword_settings", "stop"]
+    kind: Literal[
+        "action",
+        "expression",
+        "servo",
+        "settings",
+        "wakeword_settings",
+        "speaker_verification_settings",
+        "stop",
+    ]
     action: str | None = None
     expression: str | None = None
     servo: int | None = None
@@ -234,6 +271,7 @@ class RemoteControlRequest(BaseModel):
     walk_cycles: int | None = None
     motor_current_delay_ms: int | None = None
     wake_threshold_hundredths: int | None = None
+    speaker_verification_enabled: StrictBool | None = None
 
     @model_validator(mode="after")
     def validate_shape(self) -> RemoteControlRequest:
@@ -247,6 +285,7 @@ class RemoteControlRequest(BaseModel):
                     self.frame_delay_ms,
                     self.walk_cycles,
                     self.motor_current_delay_ms,
+                    self.speaker_verification_enabled,
                 )
             ):
                 raise ValueError("action command must contain one supported action")
@@ -260,6 +299,7 @@ class RemoteControlRequest(BaseModel):
                     self.frame_delay_ms,
                     self.walk_cycles,
                     self.motor_current_delay_ms,
+                    self.speaker_verification_enabled,
                 )
             ):
                 raise ValueError("expression command must contain one supported expression")
@@ -274,6 +314,7 @@ class RemoteControlRequest(BaseModel):
                 or self.frame_delay_ms is not None
                 or self.walk_cycles is not None
                 or self.motor_current_delay_ms is not None
+                or self.speaker_verification_enabled is not None
             ):
                 raise ValueError("servo command must contain servo 1-8 and angle 0-180")
         elif self.kind == "settings":
@@ -288,6 +329,7 @@ class RemoteControlRequest(BaseModel):
                 or not 1 <= self.walk_cycles <= 50
                 or self.motor_current_delay_ms is None
                 or not 0 <= self.motor_current_delay_ms <= 500
+                or self.speaker_verification_enabled is not None
             ):
                 raise ValueError("settings command must contain valid motion settings")
         elif self.kind == "wakeword_settings":
@@ -296,10 +338,23 @@ class RemoteControlRequest(BaseModel):
                 self.servo is not None or self.angle is not None or
                 self.frame_delay_ms is not None or self.walk_cycles is not None or
                 self.motor_current_delay_ms is not None or
+                self.speaker_verification_enabled is not None or
                 self.wake_threshold_hundredths is None or
                 not 5 <= self.wake_threshold_hundredths <= 95
             ):
                 raise ValueError("wakeword_settings requires threshold 0.05-0.95")
+        elif self.kind == "speaker_verification_settings":
+            if (
+                self.action is not None or self.expression is not None or
+                self.servo is not None or self.angle is not None or
+                self.frame_delay_ms is not None or self.walk_cycles is not None or
+                self.motor_current_delay_ms is not None or
+                self.wake_threshold_hundredths is not None or
+                self.speaker_verification_enabled is None
+            ):
+                raise ValueError(
+                    "speaker_verification_settings requires a boolean enabled value"
+                )
         elif any(
             value is not None
             for value in (
@@ -311,6 +366,7 @@ class RemoteControlRequest(BaseModel):
                 self.walk_cycles,
                 self.motor_current_delay_ms,
                 self.wake_threshold_hundredths,
+                self.speaker_verification_enabled,
             )
         ):
             raise ValueError("stop command cannot contain parameters")
@@ -342,22 +398,90 @@ class ActiveDeviceSessionRegistry:
             return True
 
 
+@dataclass(frozen=True)
+class OperatorControlAcknowledgement:
+    """The ESP32 result bound to one operator-issued control request."""
+
+    request_id: str
+    status: str
+    error_code: str | None
+
+
 class DeviceControlRegistry:
     """Routes local-dashboard controls over the ESP32's authenticated WSS link."""
 
     def __init__(self) -> None:
         self._connections: dict[str, tuple[WebSocket, DeviceSession]] = {}
         self._lock = asyncio.Lock()
+        self._test_play_lock = asyncio.Lock()
+        self._playback_control_lock = asyncio.Lock()
+        self._pending_operator_controls: dict[
+            tuple[str, str], asyncio.Future[OperatorControlAcknowledgement]
+        ] = {}
 
     async def register(self, websocket: WebSocket, session: DeviceSession) -> None:
         async with self._lock:
             self._connections[session.device_id] = (websocket, session)
 
     async def unregister(self, session: DeviceSession) -> None:
+        session.playback_paused = False
+        session.playback_pause_event.set()
         async with self._lock:
             current = self._connections.get(session.device_id)
             if current is not None and current[1].session_id == session.session_id:
                 del self._connections[session.device_id]
+            pending_keys = [
+                key
+                for key in self._pending_operator_controls
+                if key[0] == session.session_id
+            ]
+            for key in pending_keys:
+                pending = self._pending_operator_controls.pop(key)
+                if not pending.done():
+                    pending.set_exception(RuntimeError("ESP32 control connection closed"))
+
+    async def set_playback_paused(
+        self, device_id: str, *, paused: bool
+    ) -> tuple[str, int]:
+        """Pause/resume an authenticated active TTS generation in place."""
+        async with self._playback_control_lock:
+            async with self._lock:
+                connection = self._connections.get(device_id)
+            if connection is None:
+                raise RuntimeError("device is offline")
+            websocket, session = connection
+            generation_id = session.active_generation
+            turn_id = session.playback_stats_turn_id
+            if generation_id == 0 or turn_id is None:
+                raise RuntimeError("device has no active audio playback")
+            if session.playback_paused == paused:
+                return turn_id, generation_id
+
+            # For pause, close Gateway's sending gate first. For resume, send
+            # the ordered WSS control frame first, then release the gate, so a
+            # new Opus frame can never overtake tts.resume on the socket.
+            if paused:
+                session.playback_paused = True
+                session.playback_pause_event.clear()
+            try:
+                await _send_control(
+                    websocket,
+                    session,
+                    "tts.pause" if paused else "tts.resume",
+                    turn_id=turn_id,
+                    request_id=None,
+                    payload={"generation_id": generation_id},
+                )
+            except Exception as exc:
+                if paused:
+                    session.playback_paused = False
+                    session.playback_pause_event.set()
+                await self.unregister(session)
+                raise RuntimeError("playback control delivery failed") from exc
+            if not paused:
+                session.playback_paused = False
+                session.playback_pause_event.set()
+            return turn_id, generation_id
 
     async def dispatch(self, device_id: str, command: RemoteControlRequest) -> None:
         async with self._lock:
@@ -384,13 +508,143 @@ class DeviceControlRegistry:
             await self.unregister(session)
             raise RuntimeError("device control delivery failed") from exc
 
+    async def dispatch_and_confirm(
+        self, device_id: str, command: RemoteControlRequest
+    ) -> OperatorControlAcknowledgement:
+        """Deliver a browser control and wait for its matching ESP32 receipt."""
+        request_id = f"ctl_{uuid.uuid4().hex}"
+        loop = asyncio.get_running_loop()
+        acknowledgement = loop.create_future()
+        async with self._lock:
+            connection = self._connections.get(device_id)
+            if connection is None:
+                raise RuntimeError("device is offline")
+            websocket, session = connection
+            if command.kind != "stop" and (
+                session.is_listening
+                or session.active_generation != 0
+                or (
+                    session.active_turn_task is not None
+                    and not session.active_turn_task.done()
+                )
+            ):
+                raise RuntimeError("device is busy with a voice turn")
+            self._pending_operator_controls[(session.session_id, request_id)] = acknowledgement
+        try:
+            await _send_control(
+                websocket,
+                session,
+                "operator.control",
+                turn_id=None,
+                request_id=request_id,
+                payload=command.payload(),
+            )
+            return await asyncio.wait_for(
+                asyncio.shield(acknowledgement),
+                timeout=OPERATOR_CONTROL_ACK_TIMEOUT_SECONDS,
+            )
+        except TimeoutError as exc:
+            async with self._lock:
+                current = self._pending_operator_controls.get(
+                    (session.session_id, request_id)
+                )
+                if current is acknowledgement:
+                    del self._pending_operator_controls[(session.session_id, request_id)]
+            raise RuntimeError("ESP32 did not acknowledge the control command") from exc
+        except Exception as exc:
+            async with self._lock:
+                current = self._pending_operator_controls.get(
+                    (session.session_id, request_id)
+                )
+                if current is acknowledgement:
+                    del self._pending_operator_controls[(session.session_id, request_id)]
+            if isinstance(exc, RuntimeError):
+                raise
+            await self.unregister(session)
+            raise RuntimeError("device control delivery failed") from exc
+
+    def complete_operator_control(
+        self,
+        session: DeviceSession,
+        *,
+        request_id: str | None,
+        status: str,
+        error_code: str | None,
+    ) -> None:
+        """Resolve only the browser request acknowledged by this ESP32 session."""
+        if request_id is None:
+            return
+        acknowledgement = self._pending_operator_controls.pop(
+            (session.session_id, request_id), None
+        )
+        if acknowledgement is not None and not acknowledgement.done():
+            acknowledgement.set_result(
+                OperatorControlAcknowledgement(
+                    request_id=request_id,
+                    status=status,
+                    error_code=error_code,
+                )
+            )
+
+    async def play_local_pcm_test(
+        self,
+        device_id: str,
+        pcm: bytes,
+        pipeline: VoicePipeline,
+        observability: ObservabilityStore,
+    ) -> tuple[int, int]:
+        """Deliver a local PCM fixture through the production WSS downlink.
+
+        The test firmware recognizes only the Gateway-created `test_` turn
+        prefix, then validates the same response-plan, Opus, and TTS controls
+        used for a regular device-initiated turn.
+        """
+        async with self._test_play_lock:
+            async with self._lock:
+                connection = self._connections.get(device_id)
+            if connection is None:
+                raise RuntimeError("device is offline")
+            websocket, session = connection
+            if (
+                session.is_listening
+                or session.active_generation != 0
+                or (session.active_turn_task is not None and not session.active_turn_task.done())
+            ):
+                raise RuntimeError("device is busy with a voice turn")
+            try:
+                result = await _build_local_pcm_test_result(pipeline, pcm)
+                turn_id = f"test_{uuid.uuid4().hex}"
+                observability.record_stage(
+                    device_id=device_id,
+                    turn_id=turn_id,
+                    stage="local_pcm_test",
+                    status="started",
+                    details={
+                        "pcm_bytes": len(pcm),
+                        "frame_count": len(result.opus_packets),
+                        "generation_id": result.generation_id,
+                    },
+                )
+                await _send_turn_result(
+                    websocket,
+                    session,
+                    result,
+                    turn_id=turn_id,
+                    observability=observability,
+                )
+            except Exception as exc:
+                await self.unregister(session)
+                raise RuntimeError("local PCM test delivery failed") from exc
+        return result.generation_id, len(result.opus_packets)
+
 
 def _build_pipeline(
     settings: Settings, *, observer: ObservabilityStore | None = None
-) -> ConversationPipeline:
+) -> ConversationPipeline | StreamingConversationPipeline:
     audio_format = AudioFormat()
     asr: AsrProvider
-    agent: AgentProvider
+    agent: AgentProvider | None = None
+    streaming_agent: OpenClawSseAgentProvider | None = None
     tts: TtsProvider
     web_search: WebSearchProvider | None = None
 
@@ -416,19 +670,28 @@ def _build_pipeline(
 
     if settings.openclaw_token is None or settings.openclaw_session_key_secret is None:
         raise ValueError("OpenClaw token and session key secret are required")
-    agent = OpenClawAgentProvider(
-        url=settings.openclaw_url,
-        token=settings.openclaw_token.get_secret_value(),
-        agent_id=settings.openclaw_agent_id,
-        session_key_secret=settings.openclaw_session_key_secret.get_secret_value(),
-        timeout_seconds=settings.openclaw_timeout_seconds,
-        max_attempts=settings.openclaw_max_attempts,
-        retry_initial_delay_seconds=settings.openclaw_retry_initial_delay_seconds,
-        retry_max_delay_seconds=settings.openclaw_retry_max_delay_seconds,
-        abort_timeout_seconds=settings.openclaw_abort_timeout_seconds,
-        recv_timeout_seconds=settings.openclaw_recv_timeout_seconds,
-        synthesis_timeout_seconds=settings.openclaw_synthesis_timeout_seconds,
-    )
+    if settings.provider_mode == "openclaw_sse":
+        streaming_agent = OpenClawSseAgentProvider(
+            url=settings.openclaw_sse_url,
+            token=settings.openclaw_token.get_secret_value(),
+            agent_id=settings.openclaw_agent_id,
+            session_key_secret=settings.openclaw_session_key_secret.get_secret_value(),
+            timeout_seconds=settings.openclaw_timeout_seconds,
+        )
+    else:
+        agent = OpenClawAgentProvider(
+            url=settings.openclaw_url,
+            token=settings.openclaw_token.get_secret_value(),
+            agent_id=settings.openclaw_agent_id,
+            session_key_secret=settings.openclaw_session_key_secret.get_secret_value(),
+            timeout_seconds=settings.openclaw_timeout_seconds,
+            max_attempts=settings.openclaw_max_attempts,
+            retry_initial_delay_seconds=settings.openclaw_retry_initial_delay_seconds,
+            retry_max_delay_seconds=settings.openclaw_retry_max_delay_seconds,
+            abort_timeout_seconds=settings.openclaw_abort_timeout_seconds,
+            recv_timeout_seconds=settings.openclaw_recv_timeout_seconds,
+            synthesis_timeout_seconds=settings.openclaw_synthesis_timeout_seconds,
+        )
 
     tts = DashScopeTtsProvider(
         client=dashscope_client,
@@ -454,6 +717,17 @@ def _build_pipeline(
         limit=settings.test_recording_limit,
     )
 
+    if streaming_agent is not None:
+        return StreamingConversationPipeline(
+            codec_factory=lambda: OpusCodec(audio_format),
+            asr=asr,
+            agent=streaming_agent,
+            tts=tts,
+            audio_format=audio_format,
+            observer=observer,
+        )
+    if agent is None:
+        raise ValueError("OpenClaw provider is not configured")
     return ConversationPipeline(
         codec_factory=lambda: OpusCodec(audio_format),
         asr=asr,
@@ -480,11 +754,12 @@ def _provider_status(settings: Settings) -> dict[str, str]:
 def create_app(
     settings: Settings | None = None,
     *,
-    pipeline: ConversationPipeline | None = None,
+    pipeline: VoicePipeline | None = None,
     sandbox_reaper: SandboxReaper | None = None,
     mdns_advertiser: ServiceAdvertiser | None = None,
     observability: ObservabilityStore | None = None,
     device_controls: DeviceControlRegistry | None = None,
+    local_pcm_tests: LocalPcmTestQueue | None = None,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
     resolved_observability = observability or ObservabilityStore(
@@ -498,6 +773,8 @@ def create_app(
     conversations = ConversationRegistry(ttl_seconds=resolved_settings.conversation_ttl_seconds)
     active_device_sessions = ActiveDeviceSessionRegistry()
     resolved_device_controls = device_controls or DeviceControlRegistry()
+    resolved_local_pcm_tests = local_pcm_tests or LocalPcmTestQueue()
+    local_pcm_test_fixture_path = resolved_settings.local_pcm_test_fixture_path
     resolved_reaper = sandbox_reaper
     if resolved_reaper is None and resolved_settings.openclaw_sandbox_cleanup_enabled:
         resolved_reaper = OpenClawSandboxReaper()
@@ -567,6 +844,7 @@ def create_app(
 
     app = FastAPI(title="Sesame Voice Gateway", version="0.1.0", lifespan=lifespan)
     app.state.observability = resolved_observability
+    app.state.local_pcm_tests = resolved_local_pcm_tests
 
     @app.get("/healthz")
     async def health() -> dict[str, Any]:
@@ -592,6 +870,14 @@ def create_app(
         )
         return HTMLResponse(html, headers={"Cache-Control": "no-store"})
 
+    @app.get("/test-console", response_class=HTMLResponse, include_in_schema=False)
+    async def test_console(request: Request) -> HTMLResponse:
+        _require_loopback_dashboard_access(request)
+        html = files("sesame_voice_gateway").joinpath("test_console.html").read_text(
+            encoding="utf-8"
+        )
+        return HTMLResponse(html, headers={"Cache-Control": "no-store"})
+
     @app.post(
         "/api/local-control/{device_id}",
         include_in_schema=False,
@@ -604,14 +890,153 @@ def create_app(
     ) -> JSONResponse:
         _require_loopback_dashboard_access(request)
         try:
-            await resolved_device_controls.dispatch(device_id, command)
+            acknowledgement = await resolved_device_controls.dispatch_and_confirm(
+                device_id, command
+            )
         except RuntimeError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         return JSONResponse(
-            {"status": "accepted", "device_id": device_id},
+            {
+                "status": acknowledgement.status,
+                "device_id": device_id,
+                "request_id": acknowledgement.request_id,
+                "error_code": acknowledgement.error_code,
+            },
+            status_code=200 if acknowledgement.status == "accepted" else 409,
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @app.put(
+        "/api/local-pcm-test/{device_id}",
+        include_in_schema=False,
+        status_code=202,
+    )
+    async def arm_local_pcm_test(device_id: str, request: Request) -> JSONResponse:
+        """Arm one local 16 kHz mono S16LE fixture for the next device turn."""
+        _require_loopback_dashboard_access(request)
+        try:
+            frame_count = await resolved_local_pcm_tests.arm(
+                device_id, await request.body()
+            )
+        except LocalPcmTestError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return JSONResponse(
+            {
+                "status": "armed",
+                "device_id": device_id,
+                "frame_count": frame_count,
+                "duration_ms": frame_count * AudioFormat().frame_duration_ms,
+            },
             status_code=202,
             headers={"Cache-Control": "no-store"},
         )
+
+    async def play_armed_local_pcm_test(
+        device_id: str, *, fixture: str | None = None
+    ) -> JSONResponse:
+        pcm = await resolved_local_pcm_tests.consume(device_id)
+        if pcm is None:
+            raise HTTPException(status_code=409, detail="no local PCM test is armed")
+        try:
+            generation_id, packet_count = await resolved_device_controls.play_local_pcm_test(
+                device_id,
+                pcm,
+                resolved_pipeline,
+                resolved_observability,
+            )
+        except RuntimeError as exc:
+            await resolved_local_pcm_tests.arm(device_id, pcm)
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        response: dict[str, Any] = {
+            "status": "playing",
+            "device_id": device_id,
+            "generation_id": generation_id,
+            "packet_count": packet_count,
+            "duration_ms": packet_count * AudioFormat().frame_duration_ms,
+        }
+        if fixture is not None:
+            response["fixture"] = fixture
+        return JSONResponse(
+            response,
+            status_code=202,
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @app.post(
+        "/api/local-pcm-test/{device_id}/play",
+        include_in_schema=False,
+        status_code=202,
+    )
+    async def play_local_pcm_test(device_id: str, request: Request) -> JSONResponse:
+        """Play the armed fixture without a device BOOT-button event."""
+        _require_loopback_dashboard_access(request)
+        return await play_armed_local_pcm_test(device_id)
+
+    @app.post(
+        "/api/local-pcm-test/{device_id}/beijing-welcome/play",
+        include_in_schema=False,
+        status_code=202,
+    )
+    async def play_beijing_welcome_fixture(device_id: str, request: Request) -> JSONResponse:
+        """Play the configured local fixture without a browser file upload."""
+        _require_loopback_dashboard_access(request)
+        if local_pcm_test_fixture_path is None:
+            raise HTTPException(status_code=404, detail="the local test fixture is not configured")
+        try:
+            pcm = await asyncio.to_thread(local_pcm_test_fixture_path.read_bytes)
+        except OSError as exc:
+            raise HTTPException(
+                status_code=503, detail="the local test fixture cannot be read"
+            ) from exc
+        try:
+            await resolved_local_pcm_tests.arm(device_id, pcm)
+        except LocalPcmTestError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return await play_armed_local_pcm_test(device_id, fixture="beijing-welcome")
+
+    async def set_local_playback_pause(
+        device_id: str, request: Request, *, paused: bool
+    ) -> JSONResponse:
+        _require_loopback_dashboard_access(request)
+        try:
+            turn_id, generation_id = await resolved_device_controls.set_playback_paused(
+                device_id, paused=paused
+            )
+        except RuntimeError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        resolved_observability.record_stage(
+            device_id=device_id,
+            turn_id=turn_id,
+            stage="tts.playback.control",
+            status="paused" if paused else "resumed",
+            details={"generation_id": generation_id},
+        )
+        return JSONResponse(
+            {
+                "status": "paused" if paused else "playing",
+                "device_id": device_id,
+                "turn_id": turn_id,
+                "generation_id": generation_id,
+            },
+            status_code=202,
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @app.post(
+        "/api/local-pcm-test/{device_id}/pause",
+        include_in_schema=False,
+        status_code=202,
+    )
+    async def pause_local_pcm_test(device_id: str, request: Request) -> JSONResponse:
+        return await set_local_playback_pause(device_id, request, paused=True)
+
+    @app.post(
+        "/api/local-pcm-test/{device_id}/resume",
+        include_in_schema=False,
+        status_code=202,
+    )
+    async def resume_local_pcm_test(device_id: str, request: Request) -> JSONResponse:
+        return await set_local_playback_pause(device_id, request, paused=False)
 
     @app.get("/api/observability/snapshot", include_in_schema=False)
     async def observability_snapshot(request: Request) -> JSONResponse:
@@ -627,7 +1052,7 @@ def create_app(
             headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
         )
 
-    @app.websocket("/v1/device-stream")
+    @app.websocket(resolved_settings.device_stream_path)
     async def device_stream(websocket: WebSocket) -> None:
         await _handle_device_stream(
             websocket=websocket,
@@ -637,6 +1062,7 @@ def create_app(
             active_device_sessions=active_device_sessions,
             observability=resolved_observability,
             device_controls=resolved_device_controls,
+            local_pcm_tests=resolved_local_pcm_tests,
         )
 
     return app
@@ -646,11 +1072,12 @@ async def _handle_device_stream(
     *,
     websocket: WebSocket,
     settings: Settings,
-    pipeline: ConversationPipeline,
+    pipeline: VoicePipeline,
     conversations: ConversationRegistry,
     active_device_sessions: ActiveDeviceSessionRegistry,
     observability: ObservabilityStore,
     device_controls: DeviceControlRegistry,
+    local_pcm_tests: LocalPcmTestQueue,
 ) -> None:
     await websocket.accept()
     session: DeviceSession | None = None
@@ -683,7 +1110,14 @@ async def _handle_device_stream(
         )
         observability.session_ready(device_id=session.device_id, session_id=session.session_id)
         await device_controls.register(websocket, session)
-        await _receive_device_messages(websocket, session, pipeline, observability)
+        await _receive_device_messages(
+            websocket,
+            session,
+            pipeline,
+            observability,
+            device_controls,
+            local_pcm_tests,
+        )
     except WebSocketDisconnect:
         return
     except (ControlProtocolError, AudioProtocolError, ValueError) as exc:
@@ -792,7 +1226,7 @@ def _require_loopback_dashboard_access(request: Request) -> None:
 def _local_interface_addresses() -> set[str]:
     """Return IP addresses owned by this computer, including its active LAN IP.
 
-    A browser opening `https://sesame-gateway.local` reaches the computer through
+    A browser opening `https://sesame-stream-gateway.local` reaches the computer through
     its LAN address rather than 127.0.0.1. Checking only loopback would therefore
     reject the owner while not adding meaningful protection.
     """
@@ -841,8 +1275,10 @@ async def _stream_observability_events(
 async def _receive_device_messages(
     websocket: WebSocket,
     session: DeviceSession,
-    pipeline: ConversationPipeline,
+    pipeline: VoicePipeline,
     observability: ObservabilityStore,
+    device_controls: DeviceControlRegistry,
+    local_pcm_tests: LocalPcmTestQueue | None = None,
 ) -> None:
     while True:
         message = await websocket.receive()
@@ -855,7 +1291,15 @@ async def _receive_device_messages(
         if raw_text is None:
             raise ControlProtocolError("WebSocket frame must contain JSON text or binary audio")
         event = parse_control_event(raw_text)
-        await _handle_control_event(websocket, session, pipeline, event, observability)
+        await _handle_control_event(
+            websocket,
+            session,
+            pipeline,
+            event,
+            observability,
+            device_controls,
+            local_pcm_tests,
+        )
 
 
 def _receive_audio(
@@ -928,18 +1372,67 @@ def _turn_is_current(session: DeviceSession, turn_epoch: int) -> bool:
     )
 
 
+async def _build_local_pcm_test_result(
+    pipeline: VoicePipeline, pcm: bytes
+) -> TurnResult:
+    """Encode an already-validated local fixture through the production codec."""
+    audio_format = AudioFormat()
+    frame_size = audio_format.pcm_bytes_per_frame
+    codec = OpusCodec(audio_format)
+    opus_packets = tuple(
+        codec.encode_frame(pcm[offset : offset + frame_size])
+        for offset in range(0, len(pcm), frame_size)
+    )
+    return TurnResult(
+        transcript=AsrResult(text="local PCM transport test"),
+        agent=AgentResult(text="local PCM transport test"),
+        generation_id=await pipeline.next_generation_id(),
+        opus_packets=opus_packets,
+    )
+
+
 async def _run_turn(
     *,
     websocket: WebSocket,
     session: DeviceSession,
-    pipeline: ConversationPipeline,
+    pipeline: VoicePipeline,
     context: ConversationContext,
     opus_packets: list[bytes],
     turn_epoch: int,
     observability: ObservabilityStore | None = None,
+    local_pcm_tests: LocalPcmTestQueue | None = None,
 ) -> None:
     try:
-        result = await pipeline.process_turn(context=context, opus_packets=opus_packets)
+        test_pcm = (
+            await local_pcm_tests.consume(context.device_id)
+            if local_pcm_tests is not None
+            else None
+        )
+        if test_pcm is not None:
+            result = await _build_local_pcm_test_result(pipeline, test_pcm)
+            if observability is not None:
+                observability.record_stage(
+                    device_id=session.device_id,
+                    turn_id=context.turn_id,
+                    stage="local_pcm_test",
+                    status="completed",
+                    details={
+                        "pcm_bytes": len(test_pcm),
+                        "frame_count": len(test_pcm) // AudioFormat().pcm_bytes_per_frame,
+                    },
+                )
+        elif isinstance(pipeline, StreamingConversationPipeline):
+            await _send_stream_outputs(
+                websocket,
+                session,
+                pipeline.stream_turn(context=context, opus_packets=opus_packets),
+                turn_id=context.turn_id,
+                turn_epoch=turn_epoch,
+                observability=observability,
+            )
+            return
+        else:
+            result = await pipeline.process_turn(context=context, opus_packets=opus_packets)
     except asyncio.CancelledError:
         logger.info("voice turn cancelled before a response was sent")
         raise
@@ -953,6 +1446,7 @@ async def _run_turn(
                 details={"error_code": "agent_output_rejected"},
             )
         if _turn_is_current(session, turn_epoch):
+            await _flush_failed_stream(websocket, session, turn_id=context.turn_id)
             await _send_control(
                 websocket,
                 session,
@@ -976,6 +1470,7 @@ async def _run_turn(
                 details={"error_code": "openclaw_unavailable"},
             )
         if _turn_is_current(session, turn_epoch):
+            await _flush_failed_stream(websocket, session, turn_id=context.turn_id)
             await _send_control(
                 websocket,
                 session,
@@ -1006,6 +1501,7 @@ async def _run_turn(
                 details={"error_type": type(exc).__name__},
             )
         if _turn_is_current(session, turn_epoch):
+            await _flush_failed_stream(websocket, session, turn_id=context.turn_id)
             await _send_control(
                 websocket,
                 session,
@@ -1051,6 +1547,23 @@ async def _run_turn(
             session.active_turn_task = None
 
 
+async def _flush_failed_stream(
+    websocket: WebSocket, session: DeviceSession, *, turn_id: str
+) -> None:
+    generation_id = session.active_generation
+    if generation_id == 0:
+        return
+    await _send_control(
+        websocket,
+        session,
+        "tts.flush",
+        turn_id=turn_id,
+        request_id=None,
+        payload={"generation_id": generation_id},
+    )
+    session.active_generation = 0
+
+
 def _validate_incoming_control_sequence(
     session: DeviceSession, event: ControlEvent
 ) -> None:
@@ -1066,9 +1579,11 @@ def _validate_incoming_control_sequence(
 async def _handle_control_event(
     websocket: WebSocket,
     session: DeviceSession,
-    pipeline: ConversationPipeline,
+    pipeline: VoicePipeline,
     event: ControlEvent,
     observability: ObservabilityStore | None = None,
+    device_controls: DeviceControlRegistry | None = None,
+    local_pcm_tests: LocalPcmTestQueue | None = None,
 ) -> None:
     if event.session_id != session.session_id:
         raise ControlProtocolError("session_id does not match active connection")
@@ -1162,6 +1677,7 @@ async def _handle_control_event(
                 opus_packets=opus_packets,
                 turn_epoch=turn_epoch,
                 observability=observability,
+                local_pcm_tests=local_pcm_tests,
             ),
             name=f"sesame-turn-{turn_id}",
         )
@@ -1207,6 +1723,13 @@ async def _handle_control_event(
             event.payload["status"],
             event.payload["error_code"] is not None,
         )
+        if event.turn_id is None and device_controls is not None:
+            device_controls.complete_operator_control(
+                session,
+                request_id=event.request_id,
+                status=str(event.payload["status"]),
+                error_code=event.payload["error_code"],
+            )
         if observability is not None:
             details = {
                 "request_id": event.request_id,
@@ -1233,7 +1756,228 @@ async def _handle_control_event(
                 )
         return
 
+    if event.type == "playback.stats":
+        generation_id = int(event.payload["generation_id"])
+        if (
+            event.turn_id is None
+            or event.turn_id != session.playback_stats_turn_id
+            or generation_id != session.playback_stats_generation
+        ):
+            raise ControlProtocolError(
+                "playback.stats does not match the active downlink generation"
+            )
+        session.playback_stats = dict(event.payload)
+        session.playback_stats_revision += 1
+        session.playback_stats_event.set()
+        logger.info(
+            "playback_stats device_id=%s session_id=%s turn_id=%s generation_id=%d buffered_packets=%s underflows=%s",
+            session.device_id,
+            session.session_id,
+            event.turn_id,
+            generation_id,
+            event.payload["buffered_packets"],
+            event.payload["underflow_count"],
+        )
+        if observability is not None:
+            observability.record_stage(
+                device_id=session.device_id,
+                turn_id=event.turn_id,
+                stage="tts.playback.buffer",
+                status=(
+                    "paused"
+                    if event.payload["paused"]
+                    else "playing"
+                    if event.payload["playback_started"]
+                    else "buffering"
+                ),
+                details=dict(event.payload),
+            )
+        return
+
     raise ControlProtocolError(f"event is not allowed from device: {event.type}")
+
+
+@dataclass(slots=True)
+class _DownlinkFlowControl:
+    """Apply the ESP32's 20/40 packet watermarks without changing audio wire data."""
+
+    generation_id: int
+    bootstrap_packets: int
+    high_watermark_packets: int = 40
+    packets_sent: int = 0
+    telemetry_seen: bool = False
+    bootstrap_confirmed: bool = False
+    low_watermark_packets: int = 20
+    _last_revision: int = -1
+    _send_credit: int = 0
+
+    def _refresh(self, session: DeviceSession) -> bool:
+        if (
+            session.playback_stats_generation != self.generation_id
+            or session.playback_stats is None
+            or session.playback_stats_revision == self._last_revision
+        ):
+            return False
+        self._last_revision = session.playback_stats_revision
+        self.telemetry_seen = True
+        buffered_packets = int(session.playback_stats["buffered_packets"])
+        max_buffered_packets = int(session.playback_stats["max_buffered_packets"])
+        reported_low = int(session.playback_stats["low_watermark_packets"])
+        reported_high = int(session.playback_stats["high_watermark_packets"])
+        self.low_watermark_packets = reported_low
+        self.high_watermark_packets = reported_high
+        # A telemetry sample can arrive while WSS still has many bootstrap
+        # frames in flight. Do not treat e.g. "4 packets received" as room to
+        # send another 36 when 50 have already left Gateway. The ESP32's
+        # monotonic max value is the acknowledgement that its jitter buffer
+        # has actually received the complete startup lead.
+        self.bootstrap_confirmed = (
+            self.bootstrap_confirmed
+            or max_buffered_packets >= self.bootstrap_packets
+        )
+        if not self.bootstrap_confirmed:
+            self._send_credit = 0
+            return True
+        # Stats arrive every 100 ms and WSS frames already in flight are not
+        # visible in their sample. Limit a single acknowledgement to a small
+        # refill burst: 5 normal frames, or 10 below low water. This still
+        # prioritizes recovery below 400 ms but leaves headroom for the next
+        # delayed measurement instead of overshooting the 60-frame buffer.
+        refill_burst = 10 if buffered_packets < reported_low else 5
+        self._send_credit = min(
+            max(0, reported_high - buffered_packets), refill_burst
+        )
+        return True
+
+    async def wait_before_send(
+        self, session: DeviceSession, *, fallback_deadline: float
+    ) -> None:
+        while session.playback_paused:
+            session.playback_pause_event.clear()
+            # Re-check after clearing so a resume that arrives between the
+            # loop condition and clear cannot be lost.
+            if not session.playback_paused:
+                break
+            await session.playback_pause_event.wait()
+        if self.packets_sent < self.bootstrap_packets:
+            return
+
+        self._refresh(session)
+        if not self.telemetry_seen:
+            # The bootstrap burst is bounded below the ESP32's 60-frame
+            # capacity. Wait briefly for its first measurement instead of
+            # sleeping until the old absolute 20-ms deadline and needlessly
+            # draining that fresh lead before Gateway can react.
+            session.playback_stats_event.clear()
+            self._refresh(session)
+            if not self.telemetry_seen:
+                try:
+                    await asyncio.wait_for(
+                        session.playback_stats_event.wait(), timeout=0.15
+                    )
+                except TimeoutError:
+                    pass
+                self._refresh(session)
+        while self.telemetry_seen and self._send_credit <= 0:
+            session.playback_stats_event.clear()
+            # Re-check after clearing to avoid losing a just-arrived report.
+            self._refresh(session)
+            if self._send_credit > 0:
+                break
+            try:
+                await asyncio.wait_for(session.playback_stats_event.wait(), timeout=0.25)
+            except TimeoutError:
+                # Do not deadlock if a legacy or temporarily busy device does
+                # not publish telemetry. Absolute pacing retains the old safe
+                # compatibility behavior while it recovers.
+                break
+            self._refresh(session)
+
+        if self.telemetry_seen and self.bootstrap_confirmed and self._send_credit > 0:
+            return
+        remaining_seconds = fallback_deadline - time.perf_counter()
+        if remaining_seconds > 0:
+            await asyncio.sleep(remaining_seconds)
+
+    def record_sent(self) -> None:
+        self.packets_sent += 1
+        if self.telemetry_seen and self.bootstrap_confirmed and self._send_credit > 0:
+            self._send_credit -= 1
+
+
+def _begin_downlink_flow(
+    session: DeviceSession, *, generation_id: int, turn_id: str | None, fixed_music: bool
+) -> _DownlinkFlowControl:
+    session.playback_stats = None
+    session.playback_stats_generation = generation_id
+    session.playback_stats_turn_id = turn_id
+    session.playback_stats_revision = 0
+    session.playback_stats_event.clear()
+    session.playback_paused = False
+    session.playback_pause_event.set()
+    # Music fixtures trade a known, fixed one-second start delay for a larger
+    # initial safety margin. Real-time speech starts from 600 ms and then
+    # stays within the ESP32's 400–800 ms low/high watermarks.
+    return _DownlinkFlowControl(
+        generation_id=generation_id,
+        bootstrap_packets=50 if fixed_music else 40,
+    )
+
+
+@dataclass(slots=True)
+class _DownlinkTiming:
+    """Measure the actual cadence delivered to a device without changing it."""
+
+    first_sent_at: float | None = None
+    last_sent_at: float | None = None
+    packet_count: int = 0
+    last_interval_ms: int = 0
+    interval_total_ms: int = 0
+    max_interval_ms: int = 0
+    max_lateness_ms: int = 0
+
+    def record_packet_sent(self, sent_at: float) -> None:
+        if self.first_sent_at is None:
+            self.first_sent_at = sent_at
+        elif self.last_sent_at is not None:
+            self.last_interval_ms = max(
+                0, round((sent_at - self.last_sent_at) * 1_000)
+            )
+            self.interval_total_ms += self.last_interval_ms
+            self.max_interval_ms = max(self.max_interval_ms, self.last_interval_ms)
+
+        expected_elapsed_ms = self.packet_count * 20
+        actual_elapsed_ms = max(0, round((sent_at - self.first_sent_at) * 1_000))
+        self.max_lateness_ms = max(
+            self.max_lateness_ms,
+            max(0, actual_elapsed_ms - expected_elapsed_ms),
+        )
+        self.last_sent_at = sent_at
+        self.packet_count += 1
+
+    def as_details(self) -> dict[str, int]:
+        elapsed_ms = (
+            0
+            if self.first_sent_at is None or self.last_sent_at is None
+            else max(0, round((self.last_sent_at - self.first_sent_at) * 1_000))
+        )
+        expected_elapsed_ms = max(0, self.packet_count - 1) * 20
+        cumulative_drift_ms = elapsed_ms - expected_elapsed_ms
+        return {
+            "packet_count": self.packet_count,
+            "elapsed_ms": elapsed_ms,
+            "expected_elapsed_ms": expected_elapsed_ms,
+            # Keep the legacy non-negative field and publish the signed value
+            # used by the diagnostic page to expose early/late pacing alike.
+            "drift_ms": max(0, cumulative_drift_ms),
+            "cumulative_drift_ms": cumulative_drift_ms,
+            "last_interval_ms": self.last_interval_ms,
+            "average_interval_ms": (
+                0 if self.packet_count <= 1 else round(self.interval_total_ms / (self.packet_count - 1))
+            ),
+            "max_interval_ms": self.max_interval_ms,
+            "max_lateness_ms": self.max_lateness_ms,
+        }
 
 
 async def _send_turn_result(
@@ -1267,6 +2011,12 @@ async def _send_turn_result(
         }
 
     session.active_generation = result.generation_id
+    flow = _begin_downlink_flow(
+        session,
+        generation_id=result.generation_id,
+        turn_id=turn_id,
+        fixed_music=turn_id is not None and turn_id.startswith("test_"),
+    )
     await _send_control(
         websocket,
         session,
@@ -1320,10 +2070,18 @@ async def _send_turn_result(
         len(result.opus_packets),
     )
     started_at = _timestamp_ms()
+    downlink_started_at = time.perf_counter()
+    downlink_frame_interval_seconds = AudioFormat().frame_duration_ms / 1_000
     downlink_bytes = 0
+    downlink_timing = _DownlinkTiming()
     for sequence, packet in enumerate(result.opus_packets):
         if turn_epoch is not None and not _turn_is_current(session, turn_epoch):
             return
+        # Bootstrap into the ESP32's bounded Opus buffer, then let its real
+        # 20/40 watermarks govern replenishment. If telemetry disappears, the
+        # fallback remains an absolute (not cumulative sleep) timeline.
+        deadline = downlink_started_at + sequence * downlink_frame_interval_seconds
+        await flow.wait_before_send(session, fallback_deadline=deadline)
         await _send_binary(
             websocket,
             session,
@@ -1339,6 +2097,8 @@ async def _send_turn_result(
                 )
             ),
         )
+        downlink_timing.record_packet_sent(time.perf_counter())
+        flow.record_sent()
         downlink_bytes += len(packet)
         if observability is not None and turn_id is not None and (
             sequence == 0 or (sequence + 1) % 10 == 0
@@ -1350,8 +2110,6 @@ async def _send_turn_result(
                 packet_count=sequence + 1,
                 byte_count=downlink_bytes,
             )
-        if sequence + 1 < len(result.opus_packets):
-            await asyncio.sleep(0.02)
     if turn_epoch is not None and not _turn_is_current(session, turn_epoch):
         return
     await _send_control(
@@ -1376,17 +2134,256 @@ async def _send_turn_result(
             stage="tts.downlink",
             status="completed",
             elapsed_ms=len(result.opus_packets) * 20,
-            details={"generation_id": result.generation_id},
+            details={
+                "generation_id": result.generation_id,
+                "transport_timing": downlink_timing.as_details(),
+            },
         )
     logger.info(
-        "tts_completed device_id=%s session_id=%s generation_id=%d opus_packets=%d",
+        "tts_completed device_id=%s session_id=%s generation_id=%d opus_packets=%d transport_timing=%s",
         session.device_id,
         session.session_id,
         result.generation_id,
         len(result.opus_packets),
+        downlink_timing.as_details(),
     )
     if turn_epoch is None or _turn_is_current(session, turn_epoch):
         session.active_generation = 0
+
+
+@dataclass(slots=True)
+class _StreamingDownlink:
+    generation_id: int
+    next_sequence: int = 0
+    started_at_ms: int = field(default_factory=lambda: _timestamp_ms())
+    packet_count: int = 0
+    byte_count: int = 0
+    timing: _DownlinkTiming = field(default_factory=_DownlinkTiming)
+    started_at_monotonic: float = field(default_factory=time.perf_counter)
+    flow: _DownlinkFlowControl | None = None
+
+
+async def _send_stream_outputs(
+    websocket: WebSocket,
+    session: DeviceSession,
+    outputs: AsyncIterator[StreamOutput],
+    *,
+    turn_id: str,
+    turn_epoch: int | None = None,
+    observability: ObservabilityStore | None = None,
+) -> None:
+    """Send an already-validated stream without changing the v1 device wire format."""
+    downlink: _StreamingDownlink | None = None
+    async for output in outputs:
+        if turn_epoch is not None and not _turn_is_current(session, turn_epoch):
+            return
+        if isinstance(output, SilentDiscard):
+            if downlink is not None:
+                raise RuntimeError("streaming output discarded after TTS started")
+            await _send_control(
+                websocket,
+                session,
+                "turn.complete",
+                turn_id=turn_id,
+                request_id=None,
+                payload={"outcome": "discard", "reason": output.reason},
+            )
+            return
+        if isinstance(output, StreamStart):
+            if downlink is not None:
+                raise RuntimeError("streaming output started more than once")
+            downlink = await _start_stream_downlink(
+                websocket,
+                session,
+                output,
+                turn_id=turn_id,
+                observability=observability,
+            )
+            continue
+        if isinstance(output, StreamAudio):
+            if downlink is None:
+                raise RuntimeError("streaming audio arrived before response.plan")
+            await _send_stream_audio(
+                websocket,
+                session,
+                downlink,
+                output,
+                turn_id=turn_id,
+                turn_epoch=turn_epoch,
+                observability=observability,
+            )
+            continue
+        if isinstance(output, StreamFinished):
+            if downlink is None:
+                raise RuntimeError("streaming reply finished before response.plan")
+            await _finish_stream_downlink(
+                websocket,
+                session,
+                downlink,
+                turn_id=turn_id,
+                final_expression=output.expression,
+                observability=observability,
+            )
+            session.active_generation = 0
+            return
+        raise RuntimeError("streaming pipeline produced an unsupported output")
+    if downlink is not None:
+        raise RuntimeError("streaming reply ended without reply.final")
+
+
+async def _start_stream_downlink(
+    websocket: WebSocket,
+    session: DeviceSession,
+    output: StreamStart,
+    *,
+    turn_id: str,
+    observability: ObservabilityStore | None,
+) -> _StreamingDownlink:
+    # `neutral` is the Gateway's semantic default. The unchanged v1 ESP32
+    # catalog calls that safe idle face `idle`; no model value is applied here.
+    expression_id = "idle"
+    session.active_generation = output.generation_id
+    flow = _begin_downlink_flow(
+        session,
+        generation_id=output.generation_id,
+        turn_id=turn_id,
+        fixed_music=False,
+    )
+    await _send_control(
+        websocket,
+        session,
+        "response.plan",
+        turn_id=turn_id,
+        request_id=None,
+        payload={
+            "generation_id": output.generation_id,
+            "expression_id": expression_id,
+            "expression_ttl_ms": 3_000,
+            "action_id": None,
+            "action_request_id": None,
+            "action_duration_ms": None,
+            "action_deadline_ms": None,
+        },
+    )
+    await _send_control(
+        websocket,
+        session,
+        "tts.start",
+        turn_id=turn_id,
+        request_id=None,
+        payload={"generation_id": output.generation_id},
+    )
+    if observability is not None:
+        observability.record_stage(
+            device_id=session.device_id,
+            turn_id=turn_id,
+            stage="response.plan",
+            status="completed",
+            details={"generation_id": output.generation_id, "expression": "neutral", "action": None},
+        )
+        observability.record_stage(
+            device_id=session.device_id,
+            turn_id=turn_id,
+            stage="tts.downlink",
+            status="started",
+            details={"generation_id": output.generation_id, "streaming": True},
+        )
+    return _StreamingDownlink(generation_id=output.generation_id, flow=flow)
+
+
+async def _send_stream_audio(
+    websocket: WebSocket,
+    session: DeviceSession,
+    downlink: _StreamingDownlink,
+    output: StreamAudio,
+    *,
+    turn_id: str,
+    turn_epoch: int | None,
+    observability: ObservabilityStore | None,
+) -> None:
+    for packet in output.opus_packets:
+        if turn_epoch is not None and not _turn_is_current(session, turn_epoch):
+            return
+        deadline = downlink.started_at_monotonic + (
+            downlink.next_sequence * AudioFormat().frame_duration_ms / 1_000
+        )
+        if downlink.flow is not None:
+            await downlink.flow.wait_before_send(
+                session, fallback_deadline=deadline
+            )
+        else:
+            remaining_seconds = deadline - time.perf_counter()
+            if remaining_seconds > 0:
+                await asyncio.sleep(remaining_seconds)
+        await _send_binary(
+            websocket,
+            session,
+            pack_audio_frame(
+                AudioFrame(
+                    direction=AudioDirection.DOWNLINK,
+                    flags=0,
+                    stream_id=2,
+                    generation_id=downlink.generation_id,
+                    sequence=downlink.next_sequence,
+                    timestamp_ms=downlink.started_at_ms + downlink.next_sequence * 20,
+                    payload=packet,
+                )
+            ),
+        )
+        downlink.timing.record_packet_sent(time.perf_counter())
+        if downlink.flow is not None:
+            downlink.flow.record_sent()
+        downlink.next_sequence += 1
+        downlink.packet_count += 1
+        downlink.byte_count += len(packet)
+    if observability is not None and downlink.packet_count:
+        observability.record_audio_progress(
+            device_id=session.device_id,
+            turn_id=turn_id,
+            direction="down",
+            packet_count=downlink.packet_count,
+            byte_count=downlink.byte_count,
+        )
+
+
+async def _finish_stream_downlink(
+    websocket: WebSocket,
+    session: DeviceSession,
+    downlink: _StreamingDownlink,
+    *,
+    turn_id: str,
+    final_expression: str,
+    observability: ObservabilityStore | None,
+) -> None:
+    await _send_control(
+        websocket,
+        session,
+        "tts.stop",
+        turn_id=turn_id,
+        request_id=None,
+        payload={"generation_id": downlink.generation_id, "reason": "completed"},
+    )
+    if observability is not None:
+        observability.record_stage(
+            device_id=session.device_id,
+            turn_id=turn_id,
+            stage="tts.downlink",
+            status="completed",
+            elapsed_ms=downlink.packet_count * 20,
+            details={
+                "generation_id": downlink.generation_id,
+                "streaming": True,
+                "transport_timing": downlink.timing.as_details(),
+            },
+        )
+    logger.info(
+        "tts_stream_completed device_id=%s session_id=%s generation_id=%d opus_packets=%d transport_timing=%s",
+        session.device_id,
+        session.session_id,
+        downlink.generation_id,
+        downlink.packet_count,
+        downlink.timing.as_details(),
+    )
 
 
 async def _send_binary(

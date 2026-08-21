@@ -8,29 +8,32 @@ int main() {
   using sesame::transport::ReconnectSchedule;
   using sesame::transport::format_device_mdns_hostname;
   using sesame::transport::format_gateway_uri;
+  using sesame::transport::validate_candidate;
 
   const GatewayCandidate candidate{
-      "sesame-gateway",
-      8765,
-      "gw_001",
+      "sesame-stream-gateway",
+      8766,
+      "gw_stream_lab",
       "1",
       "1",
-      "/v1/device-stream",
+      "/v2/device-stream",
   };
+  assert(validate_candidate(candidate, "gw_stream_lab") ==
+         sesame::transport::CandidateError::kOk);
   char uri[128]{};
   assert(format_gateway_uri(candidate, uri, sizeof(uri)));
-  assert(std::strcmp(uri, "wss://sesame-gateway.local:8765/v1/device-stream") ==
+  assert(std::strcmp(uri, "wss://sesame-stream-gateway.local:8766/v2/device-stream") ==
          0);
 
   char tls_hostname[128]{};
   assert(format_gateway_tls_hostname(candidate, tls_hostname,
                                      sizeof(tls_hostname)));
-  assert(std::strcmp(tls_hostname, "sesame-gateway.local") == 0);
+  assert(std::strcmp(tls_hostname, "sesame-stream-gateway.local") == 0);
 
   char ipv4_uri[128]{};
   assert(format_gateway_ipv4_uri(candidate, "192.168.88.21", ipv4_uri,
                                  sizeof(ipv4_uri)));
-  assert(std::strcmp(ipv4_uri, "wss://192.168.88.21:8765/v1/device-stream") ==
+  assert(std::strcmp(ipv4_uri, "wss://192.168.88.21:8766/v2/device-stream") ==
          0);
   assert(!format_gateway_ipv4_uri(candidate, "not-an-ip", ipv4_uri,
                                   sizeof(ipv4_uri)));

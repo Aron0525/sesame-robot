@@ -232,14 +232,12 @@ void LegacyMotionRunner::execute(std::string_view action) {
     runWavePose();
   } else if (action == "dance") {
     runDancePose();
+  } else if (action == "proud") {
+    runProudPose();
   } else if (action == "swim") {
     runSwimPose();
-  } else if (action == "point") {
-    runPointPose();
   } else if (action == "pushup") {
     runPushupPose();
-  } else if (action == "bow") {
-    runBowPose();
   } else if (action == "cute") {
     runCutePose();
   } else if (action == "freaky") {

@@ -95,13 +95,13 @@ SESAME_DASHSCOPE_TTS_VOICE_ID=返回的_voice_id
 uv run uvicorn sesame_voice_gateway.app:app \
   --app-dir apps/voice_gateway/src \
   --host 0.0.0.0 \
-  --port 8765
+  --port 8766
 ```
 
 健康检查：
 
 ```bash
-curl http://127.0.0.1:8765/healthz
+curl -k https://127.0.0.1:8766/healthz
 ```
 
 启用云端后应看到：

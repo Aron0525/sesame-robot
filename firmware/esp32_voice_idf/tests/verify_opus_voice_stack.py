@@ -36,6 +36,14 @@ def main() -> None:
     assert "vTaskDeleteWithCaps(nullptr)" in stop
     assert "voice stack free=" in source
 
+    # First-boot Wi-Fi initialization may persist driver defaults in NVS.
+    # It must finish on app_main's internal-RAM stack before the PSRAM-backed
+    # voice task is created, or disabling the flash cache asserts at runtime.
+    assert "gateway_.prepare_network(config_)" in start
+    assert start.index("gateway_.prepare_network(config_)") < start.index(
+        "xTaskCreatePinnedToCoreWithCaps("
+    )
+
     # A PSRAM-backed task must never call an API that disables the flash
     # cache. The session-ready path therefore hands NVS persistence to a
     # small internal-RAM worker rather than writing flash on the voice stack.

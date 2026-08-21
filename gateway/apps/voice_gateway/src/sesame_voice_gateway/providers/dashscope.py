@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from collections.abc import Iterator
 from typing import Any, Protocol
 
 import dashscope  # type: ignore[import-untyped]
@@ -57,6 +58,17 @@ class DashScopeAudioClientProtocol(Protocol):
         speed: float,
         instruction: str | None,
     ) -> bytes: ...
+
+    def synthesize_chunks(
+        self,
+        *,
+        text: str,
+        model: str,
+        voice_id: str,
+        sample_rate: int,
+        speed: float,
+        instruction: str | None,
+    ) -> Iterator[bytes]: ...
 
 
 class _RecognitionCollector(RecognitionCallback):  # type: ignore[misc]
@@ -148,6 +160,27 @@ class DashScopeAudioClient:
         speed: float,
         instruction: str | None,
     ) -> bytes:
+        return b"".join(
+            self.synthesize_chunks(
+                text=text,
+                model=model,
+                voice_id=voice_id,
+                sample_rate=sample_rate,
+                speed=speed,
+                instruction=instruction,
+            )
+        )
+
+    def synthesize_chunks(
+        self,
+        *,
+        text: str,
+        model: str,
+        voice_id: str,
+        sample_rate: int,
+        speed: float,
+        instruction: str | None,
+    ) -> Iterator[bytes]:
         validate_remote_tts_text(text)
         self._configure_sdk()
         stream_result = HttpSpeechSynthesizer.call(
@@ -161,7 +194,6 @@ class DashScopeAudioClient:
             stream=True,
             api_key=self._api_key,
         )
-        chunks: list[bytes] = []
         emitted_audio = bytearray()
         for chunk in stream_result:
             if not chunk.audio_url and chunk.audio_data:
@@ -171,9 +203,9 @@ class DashScopeAudioClient:
                 # identical to what has already been emitted.
                 if emitted_audio and chunk.audio_data == bytes(emitted_audio):
                     continue
-                chunks.append(chunk.audio_data)
-                emitted_audio.extend(chunk.audio_data)
-        return b"".join(chunks)
+                audio = bytes(chunk.audio_data)
+                emitted_audio.extend(audio)
+                yield audio
 
     def _configure_sdk(self) -> None:
         dashscope.base_http_api_url = self._http_base_url
@@ -259,6 +291,38 @@ class DashScopeTtsProvider:
             raise RuntimeError("DashScope TTS returned sample-misaligned PCM audio")
         return _pad_to_complete_frames(raw_pcm, self.audio_format)
 
+    async def stream_synthesize(self, text: str, voice: VoiceSpec):
+        if not text.strip():
+            raise ValueError("TTS input text must not be empty")
+        validate_remote_tts_text(text)
+        voice_id = (
+            self.default_voice_id
+            if voice.voice_id in {"", "sesame_default"}
+            else voice.voice_id
+        )
+        stream = self.client.synthesize_chunks(
+            text=text,
+            model=self.model,
+            voice_id=voice_id,
+            sample_rate=self.audio_format.sample_rate,
+            speed=voice.speed,
+            instruction=_STYLE_INSTRUCTIONS.get(voice.style),
+        )
+        emitted = False
+        while (
+            chunk := await asyncio.wait_for(
+                asyncio.to_thread(_next_chunk, stream), self.timeout_seconds
+            )
+        ) is not None:
+            if not chunk:
+                continue
+            if len(chunk) % self.audio_format.sample_width_bytes:
+                raise RuntimeError("DashScope TTS returned sample-misaligned PCM audio")
+            emitted = True
+            yield chunk
+        if not emitted:
+            raise RuntimeError("DashScope TTS returned empty PCM audio")
+
 
 def _pad_to_complete_frames(pcm: bytes, audio_format: AudioFormat) -> bytes:
     frame_size = audio_format.pcm_bytes_per_frame
@@ -266,3 +330,10 @@ def _pad_to_complete_frames(pcm: bytes, audio_format: AudioFormat) -> bytes:
     if remainder == 0:
         return pcm
     return pcm + b"\x00" * (frame_size - remainder)
+
+
+def _next_chunk(stream: Iterator[bytes]) -> bytes | None:
+    try:
+        return next(stream)
+    except StopIteration:
+        return None

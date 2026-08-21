@@ -31,7 +31,7 @@ def _hello(device_id: str) -> str:
       "timestamp_ms": 1000,
       "payload": {{
         "device_id": "{device_id}",
-        "gateway_id": "gw_test",
+        "gateway_id": "gw_stream_lab",
         "conversation_id": null,
         "protocol_version": 1,
         "audio": {{"codec": "opus", "sample_rate": 16000, "channels": 1, "frame_duration_ms": 20}}

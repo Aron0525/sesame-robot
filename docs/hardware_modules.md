@@ -10,7 +10,7 @@
 |---|---|---:|---|---|---|
 | M01 | ESP32-S3 开发板 | 1 | 内置 Wi-Fi/BLE、USB Serial/JTAG | 主控、网页、WSS、音频与舵机控制 | 已由实机日志确认：16 MB Flash、8 MB OPI PSRAM |
 | M02 | INMP441 数字麦克风 | 1 | BCLK=14、WS=47、SD=48、L/R→GND | 录音输入 | 正式固件已配置；需以实机录音链路确认接线 |
-| M03 | MAX98357A I2S 数字功放 | 1 | BCLK=14、LRC=47、DIN=2、SD/EN=1 | 将 TTS 音频放大输出 | 用户此前说明功放/扬声器未安装，当前不能完成实际播放验收 |
+| M03 | M5Stack Hat SPK2 I2S 数字扬声器 | 1 | Hat G26/G0/G25 → ESP32 GPIO 1/2/3、3V3/GND | 将 TTS 音频放大输出 | 与 INMP441 使用两条独立 I2S 总线；仍需实机播放验收 |
 | M04 | 扬声器 | 1 | 接 MAX98357A 的扬声器输出端 | 播放 TTS | 随 M03 未安装 |
 | M05 | SSD1306 兼容 I2C OLED，128×64 | 1 | SDA=8、SCL=9、地址 `0x3C`、400 kHz | 表情与状态显示 | 固件已配置；本轮尚未完成修正版实机显示验证 |
 | M06 | SG90S 舵机 S0–S7 | 8 | GPIO 4、5、6、7、10、11、12、13 | 姿态、动作、网页调平 | 用户已确认实际型号为 SG90S；上游 BOM 默认 MG90S，不能混用电流参数 |
@@ -23,8 +23,9 @@
 | ESP32-S3 GPIO | 去向 | 信号 |
 |---:|---|---|
 | 0 | 板载 BOOT 按键 | 录音按钮 / 下载模式 |
-| 1 | MAX98357A | SD/EN，功放使能 |
-| 2 | MAX98357A | DIN，I2S 音频数据输出 |
+| 1 | Hat SPK2（Hat G26） | BCLK，I2S1 音频时钟输出 |
+| 2 | Hat SPK2（Hat G0） | LRCK，I2S1 左右声道时钟输出 |
+| 3 | Hat SPK2（Hat G25） | SDATA，I2S1 音频数据输出 |
 | 4 | S0 | 舵机 PWM |
 | 5 | S1 | 舵机 PWM |
 | 6 | S2 | 舵机 PWM |
@@ -35,8 +36,8 @@
 | 11 | S5 | 舵机 PWM |
 | 12 | S6 | 舵机 PWM |
 | 13 | S7 | 舵机 PWM |
-| 14 | INMP441、MAX98357A | I2S BCLK / SCK |
-| 47 | INMP441、MAX98357A | I2S WS / LRCLK |
+| 14 | INMP441 | I2S0 BCLK / SCK |
+| 47 | INMP441 | I2S0 WS / LRCLK |
 | 48 | INMP441 | SD，I2S 音频数据输入 |
 
 ## 电源与总线关系
@@ -44,24 +45,29 @@
 ```text
 7.4 V 电池 / USB-C PD → LTC4416 电源选择 → VSYS
                                           ├─ SY8120B1 → 3V3 → ESP32-S3
-                                          │                  ├─ I2S → INMP441
+                                          │                  ├─ I2S0 → INMP441（14/47/48）
+                                          │                  ├─ I2S1 → Hat SPK2（ESP GPIO 1/2/3）
                                           │                  ├─ I2C → SSD1306 OLED
                                           │                  └─ PWM → S0–S7 信号
                                           └─ TPS54531 → 5V_SERVO → S0–S7 电源
 
-MAX98357A 的最终供电轨和扬声器规格仍需按实物接线补录。
+Hat SPK2 的 `3V3` 接 ESP32 的 `3V3`，`G` 接公共 `GND`；`5VI`、`BAT`、`5VO`
+不接。其 `G0`、`G25`、`G26` 分别接 ESP32 GPIO 2、3、1。
 ```
 
 ## 关键约束
 
 - INMP441 的 `L/R` 必须接 GND；固件只从左声道读取数据。
-- MAX98357A 和 INMP441 共用 `BCLK`、`WS`，但各自使用不同数据线，因此可同时录音和播放。
+- INMP441 使用 I2S0（14/47/48），Hat SPK2 使用 I2S1（ESP GPIO 1/2/3）；两者不共用
+  `BCLK`、`WS` 或数据线。
+- Hat 上的 `G0/G25/G26` 是模块针名，不等于这块 ESP32-S3 的 GPIO 编号；实机日志
+  已确认 ESP32-S3 GPIO25 不可用、GPIO26 与 Flash/PSRAM 冲突。
 - OLED 使用 I2C 内部弱上拉；若显示不稳定，应确认模块自带或外接 SDA/SCL 上拉电阻。
 - 舵机由 ESP32-S3 直接输出 50 Hz PWM，没有 PCA9685 或其他外置舵机驱动板。
 - `5V_SERVO` 由板载 TPS54531 生成，芯片最大连续输出 5 A；这不是 8 路 SG90S 同时堵转的保证值。
 - 当前 V3 原理图的 `5V_SERVO` 反馈电阻给出的典型电压约为 5.76 V，不应按精确 5.0 V 处理。
 - 上电时固件将舵机 PWM 保持释放状态，不应自动摆动；网页动作与语音动作会互斥占用 PWM。
-- `GPIO0` 同时是 BOOT 与录音按键。正常运行时不要长期拉低；烧录时按住 BOOT、短按 EN/RST、再松开 BOOT。
+- `GPIO0` 是 BOOT 与录音按键。正常运行时不要长期拉低；烧录时按住 BOOT、短按 EN/RST、再松开 BOOT。
 
 ## 未纳入当前硬件的项目
 

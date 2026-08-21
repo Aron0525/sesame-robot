@@ -33,6 +33,9 @@ class GatewayClient {
   GatewayClient(const GatewayClient&) = delete;
   GatewayClient& operator=(const GatewayClient&) = delete;
 
+  // Call from an internal-RAM task before a PSRAM-backed caller can reach
+  // start(). ESP-IDF may persist first-boot Wi-Fi defaults while initializing.
+  esp_err_t prepare_network(const StoredDeviceConfig& config);
   esp_err_t start(const StoredDeviceConfig& config, GatewayObserver* observer);
   void stop();
   bool connected() const;

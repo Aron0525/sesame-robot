@@ -99,7 +99,7 @@ make run
 另开终端检查：
 
 ```bash
-curl http://127.0.0.1:8765/healthz
+curl -k https://127.0.0.1:8766/healthz
 ```
 
 如果 TLS 已启用，以 `.env` 中配置的证书主机名确认控制台；不要忽略浏览器证书错误，也不要通过关闭 TLS 来让 ESP32 连通。

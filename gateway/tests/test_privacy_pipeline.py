@@ -143,6 +143,7 @@ class PrivacyAndPipelineTest(unittest.IsolatedAsyncioTestCase):
             Settings(
                 _env_file=None,
                 dashscope_api_key="test-key",
+                allow_remote_speech=False,
                 openclaw_token="test-token",
                 openclaw_session_key_secret="test-secret",
                 device_tokens={"device": "token"},

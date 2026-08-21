@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Sesame 音频链路测试台</title>
+  <style>
+    :root { --ink:#081112; --panel:#102021; --line:#305052; --text:#e9f3ed; --muted:#8fa9a2; --signal:#c9ff46; --warn:#ffcb67; --bad:#ff8076; --shadow:rgba(0,0,0,.3); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--text); background:radial-gradient(circle at 88% 3%,#214d43 0,transparent 25rem),linear-gradient(135deg,#071011,#0d1b1c 57%,#081314); font-family:"Avenir Next","PingFang SC",sans-serif; }
+    body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.22; background-image:linear-gradient(rgba(201,255,70,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(201,255,70,.08) 1px,transparent 1px); background-size:26px 26px; mask-image:linear-gradient(to bottom,black,transparent 72%); }
+    main { position:relative; max-width:1120px; margin:auto; padding:32px 20px 56px; }
+    header { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; border-bottom:1px solid var(--line); padding-bottom:24px; }
+    .eyebrow,.label { font:700 11px/1.2 "SF Mono",Menlo,monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--signal); }
+    h1 { margin:7px 0 5px; font-size:clamp(28px,5vw,48px); line-height:.96; letter-spacing:-.055em; }
+    .subtitle { margin:0; color:var(--muted); max-width:600px; font-size:14px; line-height:1.6; }
+    .live { flex:0 0 auto; display:flex; align-items:center; gap:8px; margin-top:4px; padding:8px 10px; border:1px solid var(--line); font:700 11px/1 "SF Mono",Menlo,monospace; color:var(--muted); }
+    .dot { width:8px; height:8px; border-radius:50%; background:var(--warn); box-shadow:0 0 0 4px rgba(255,203,103,.14); }
+    .dot.online { background:var(--signal); box-shadow:0 0 0 4px rgba(201,255,70,.13); }
+    .dot.offline { background:var(--bad); box-shadow:0 0 0 4px rgba(255,128,118,.13); }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:24px 0; }
+    .metric,.panel { background:linear-gradient(145deg,rgba(21,43,44,.94),rgba(10,24,25,.96)); border:1px solid var(--line); box-shadow:12px 12px 30px var(--shadow); }
+    .metric { min-height:112px; padding:17px; position:relative; overflow:hidden; }
+    .metric::after { content:""; width:44px; height:44px; position:absolute; right:-16px; bottom:-16px; border:1px solid var(--signal); transform:rotate(45deg); opacity:.38; }
+    .value { margin-top:13px; overflow-wrap:anywhere; font:600 18px/1.16 "SF Mono",Menlo,monospace; }
+    .detail { margin-top:8px; color:var(--muted); font-size:12px; line-height:1.45; }
+    .workbench { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr); gap:14px; }
+    .panel { padding:22px; }
+    h2 { margin:7px 0 5px; font-size:23px; letter-spacing:-.035em; }
+    .copy { margin:0 0 19px; color:var(--muted); font-size:13px; line-height:1.6; }
+    .route { display:block; padding:12px; margin:15px 0 18px; border-left:2px solid var(--signal); background:rgba(201,255,70,.055); color:#d7f2b2; overflow-wrap:anywhere; font:12px/1.5 "SF Mono",Menlo,monospace; }
+    .field { display:grid; gap:7px; margin:14px 0; }
+    select,input[type=file] { width:100%; background:#071314; border:1px solid #3d6262; color:var(--text); padding:12px; font:13px "SF Mono",Menlo,monospace; }
+    input[type=file]::file-selector-button { margin-right:12px; border:0; padding:7px 10px; background:#d5f678; color:#12201c; font-weight:800; cursor:pointer; }
+    .file-info { min-height:19px; color:var(--muted); font-size:12px; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+    button { border:1px solid var(--signal); padding:12px 16px; background:var(--signal); color:#102018; cursor:pointer; font:800 12px "SF Mono",Menlo,monospace; letter-spacing:.06em; text-transform:uppercase; }
+    button.secondary { border-color:#4e7774; background:transparent; color:#c2d7d2; }
+    button:disabled { cursor:not-allowed; opacity:.42; }
+    .command-state { min-height:40px; margin-top:17px; padding:11px 12px; border:1px solid #3b5e5d; background:#081617; color:#c3dad4; font:12px/1.5 "SF Mono",Menlo,monospace; }
+    .command-state.error { border-color:#8d504b; color:#ffb3ac; }
+    .flow { display:grid; gap:0; margin-top:17px; }
+    .flow div { position:relative; padding:11px 0 11px 19px; border-left:1px solid #51726d; color:var(--muted); font-size:12px; }
+    .flow div::before { content:""; width:7px; height:7px; border-radius:50%; position:absolute; left:-4px; top:15px; background:#63837e; }
+    .flow div.active { color:var(--text); } .flow div.active::before { background:var(--signal); box-shadow:0 0 12px var(--signal); }
+    .flow code { color:#e1f5b7; }
+    .footer { margin-top:15px; color:#76918b; font-size:12px; line-height:1.55; }
+    @media (max-width:740px) { main { padding:22px 14px 42px; } header,.workbench { display:block; } .live { margin-top:20px; width:max-content; } .grid { grid-template-columns:1fr; } .panel + .panel { margin-top:14px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <div class="eyebrow">Sesame / local gateway diagnostic</div>
+        <h1>音频链路测试台</h1>
+        <p class="subtitle">从本机浏览器选择 PCM，经过 Gateway 的 WSS、Opus 编码与 ESP32 I2S 输出。页面只在运行 Gateway 的这台电脑上可访问。</p>
+      </div>
+      <div class="live"><i id="live-dot" class="dot"></i><span id="live-text">监控流连接中</span></div>
+    </header>
+
+    <section class="grid" aria-label="链路状态">
+      <article class="metric"><div class="label">Gateway HTTP</div><div id="gateway-status" class="value">检查中</div><div id="gateway-detail" class="detail">等待 healthz</div></article>
+      <article class="metric"><div class="label">ESP32 WSS</div><div id="device-status" class="value">未发现设备</div><div id="device-detail" class="detail">等待 session.ready</div></article>
+      <article class="metric"><div class="label">Latest Downlink</div><div id="audio-status" class="value">—</div><div id="audio-detail" class="detail">尚未下发测试音频</div></article>
+      <article class="metric"><div class="label">ESP32 Jitter Buffer</div><div id="buffer-status" class="value">—</div><div id="buffer-detail" class="detail">等待 playback.stats</div></article>
+      <article class="metric"><div class="label">Loss Protection</div><div id="loss-status" class="value">—</div><div id="loss-detail" class="detail">underflow / 丢包 / 乱序</div></article>
+      <article class="metric"><div class="label">ESP32 Render Cost</div><div id="render-status" class="value">—</div><div id="render-detail" class="detail">Opus 解码 / I2S 写入</div></article>
+    </section>
+
+    <section class="workbench">
+      <article class="panel">
+        <div class="eyebrow">Play fixture</div>
+        <h2>WSS / OPUS / I2S</h2>
+        <p class="copy">“北京欢迎你”已配置为本机固定的 <code>16 kHz、单声道、S16LE</code> 测试片段。点击后由 Gateway 读取本机文件、编码为 Opus，并立即下发到 ESP32；文件不会被打包或上传到外部服务。</p>
+        <span class="route">POST /api/local-pcm-test/{device_id}/beijing-welcome/play</span>
+        <label class="field"><span class="label">Target ESP32</span><select id="device-select" aria-label="目标 ESP32"></select></label>
+        <div class="actions"><button id="play-beijing" type="button" disabled>直接播放《北京欢迎你》</button><button id="pause" class="secondary" type="button" disabled>暂停播放</button><button id="resume" class="secondary" type="button" disabled>继续播放</button><button id="refresh" class="secondary" type="button">刷新状态</button></div>
+        <div id="command-state" class="command-state" role="status">等待 ESP32 WSS 在线后，点击“直接播放《北京欢迎你》”。</div>
+        <p class="copy" style="margin-top:24px">也可以手选其他 PCM 片段，格式同上。</p>
+        <label class="field"><span class="label">PCM fixture</span><input id="pcm-file" type="file" accept=".pcm,application/octet-stream,audio/pcm"></label>
+        <div id="file-info" class="file-info">未选择文件</div>
+        <div class="actions"><button id="play" class="secondary" type="button" disabled>播放所选 PCM</button></div>
+      </article>
+      <article class="panel">
+        <div class="eyebrow">Transport trace</div>
+        <h2>实时监控</h2>
+        <div class="flow">
+          <div id="step-browser">浏览器：PCM 已选择</div>
+          <div id="step-gateway">Gateway：等待本机指令</div>
+          <div id="step-wss">WSS：等待在线设备</div>
+          <div id="step-opus">Opus：等待编码</div>
+          <div id="step-i2s">I2S：等待播放完成</div>
+        </div>
+        <p class="footer">“已完成”表示 Gateway 已按 20 ms 节拍发送完所有 Opus 包。设备是否实际出声仍以 ESP32 串口日志与现场听感为准。</p>
+      </article>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const kFrameBytes = 640;
+      const kMaxBytes = 640000;
+      const $ = id => document.getElementById(id);
+      let state = {devices:[],events:[]};
+      let health = null;
+      let selectedFile = null;
+      const displayTime = value => value ? new Date(value).toLocaleTimeString('zh-CN',{hour12:false}) : '—';
+      const fileSize = value => value >= 1024 ? `${(value / 1024).toFixed(1)} KB` : `${value} B`;
+      const setStatus = (message, error=false) => { const node=$('command-state'); node.textContent=message; node.classList.toggle('error',error); };
+      const latest = (deviceId, stages) => [...state.events].reverse().find(event => event.device_id===deviceId && stages.includes(event.stage));
+      const onlineDevices = () => (state.devices || []).filter(device => device.online);
+      function selectedDevice() { return (state.devices || []).find(device => device.device_id === $('device-select').value) || null; }
+      function setStep(id, text, active) { const node=$(id); node.textContent=text; node.classList.toggle('active',active); }
+      function render() {
+        const select=$('device-select'); const previous=select.value; const devices=state.devices || [];
+        select.replaceChildren();
+        if (!devices.length) { const option=document.createElement('option'); option.value=''; option.textContent='等待设备连接'; select.append(option); }
+        for (const device of devices) { const option=document.createElement('option'); option.value=device.device_id; option.textContent=`${device.online ? '●' : '○'} ${device.device_id}`; if (!device.online) option.disabled=true; select.append(option); }
+        const next=onlineDevices().find(device=>device.device_id===previous) || onlineDevices()[0] || devices[0]; if (next) select.value=next.device_id;
+        const device=selectedDevice(); const isOnline=Boolean(device?.online);
+        $('gateway-status').textContent=health?.status === 'ok' ? 'ONLINE' : '离线';
+        $('gateway-detail').textContent=health ? `${health.gateway_id} · Opus ${health.providers?.opus || '—'}` : '无法读取 /healthz';
+        $('device-status').textContent=isOnline ? 'WSS ONLINE' : 'OFFLINE';
+        $('device-detail').textContent=device ? `${device.device_id} · ${device.current_stage || '—'} · ${device.session_id || '—'}` : '等待 ESP32 建立会话';
+        const downlink=latest(device?.device_id,['tts.downlink','audio.down','local_pcm_test']); const details=downlink?.details || {};
+        $('audio-status').textContent=downlink ? `${downlink.status || '—'} · ${details.packet_count ?? details.frame_count ?? 0} 包` : '—';
+        const timing=details.transport_timing || {};
+        $('audio-detail').textContent=downlink ? `${downlink.stage} · ${details.duration_ms ?? '—'} ms · max 间隔 ${timing.max_interval_ms ?? '—'} ms · 累计漂移 ${timing.cumulative_drift_ms ?? timing.drift_ms ?? '—'} ms` : '尚未下发测试音频';
+        const playback=latest(device?.device_id,['tts.playback.buffer']); const buffer=playback?.details || {};
+        $('buffer-status').textContent=playback ? `${buffer.buffered_packets ?? 0} 包 · ${buffer.buffered_ms ?? 0} ms` : '—';
+        $('buffer-detail').textContent=playback ? `min ${buffer.min_buffered_packets ?? 0} · max ${buffer.max_buffered_packets ?? 0} · ${buffer.paused ? '已暂停' : (buffer.playback_started ? '播放中' : '预缓冲中')}` : '等待 ESP32 playback.stats';
+        $('loss-status').textContent=playback ? `underflow ${buffer.underflow_count ?? 0}` : '—';
+        $('loss-detail').textContent=playback ? `丢弃 ${buffer.dropped_packet_count ?? 0} · 乱序 ${buffer.out_of_order_count ?? 0} · 序号缺口 ${buffer.sequence_discontinuity_count ?? 0}` : 'underflow / 丢包 / 乱序';
+        $('render-status').textContent=playback ? `decode ${buffer.decode_avg_us ?? 0} µs · I2S ${buffer.i2s_avg_us ?? 0} µs` : '—';
+        $('render-detail').textContent=playback ? `decode max ${buffer.decode_max_us ?? 0} µs · I2S max ${buffer.i2s_max_us ?? 0} µs` : 'Opus 解码 / I2S 写入';
+        $('live-dot').className=`dot ${isOnline ? 'online' : 'offline'}`; $('live-text').textContent=isOnline ? '监控流已连接' : '等待 ESP32 WSS';
+        setStep('step-browser', selectedFile ? `浏览器：已选择 ${selectedFile.name}` : '浏览器：PCM 未选择', Boolean(selectedFile));
+        setStep('step-gateway', health?.status === 'ok' ? 'Gateway：HTTP 与 Opus 就绪' : 'Gateway：等待 healthz', health?.status === 'ok');
+        setStep('step-wss', isOnline ? `WSS：${device.device_id} 已连接` : 'WSS：等待在线设备', isOnline);
+        setStep('step-opus', downlink?.stage === 'tts.downlink' || downlink?.stage === 'audio.down' ? `Opus：${details.packet_count ?? 0} 个包已发送` : 'Opus：等待编码', Boolean(downlink));
+        setStep('step-i2s', buffer.paused ? 'I2S：已暂停，缓冲已保留' : (downlink?.stage === 'tts.downlink' && downlink.status === 'completed' ? 'I2S：Gateway 下发已完成' : 'I2S：等待播放完成'), buffer.paused || (downlink?.stage === 'tts.downlink' && downlink.status === 'completed'));
+        $('play-beijing').disabled=!isOnline; $('play').disabled=!(selectedFile && isOnline); $('pause').disabled=!isOnline; $('resume').disabled=!isOnline;
+      }
+      async function refresh() {
+        try { const [healthResponse,snapshotResponse]=await Promise.all([fetch('/healthz',{cache:'no-store'}),fetch('/api/observability/snapshot',{cache:'no-store'})]); if(!healthResponse.ok||!snapshotResponse.ok) throw new Error('Gateway 状态读取失败'); health=await healthResponse.json(); state=await snapshotResponse.json(); render(); }
+        catch (error) { health=null; render(); setStatus(error instanceof Error ? error.message : 'Gateway 状态读取失败',true); }
+      }
+      async function play() {
+        const device=selectedDevice(); if (!selectedFile || !device?.online) { setStatus('请先选择 PCM 文件，并等待 ESP32 在线。',true); return; }
+        $('play').disabled=true; setStatus('正在把 PCM 交给 Gateway…');
+        try { const payload=await selectedFile.arrayBuffer(); const encodedId=encodeURIComponent(device.device_id); const arm=await fetch(`/api/local-pcm-test/${encodedId}`,{method:'PUT',headers:{'content-type':'application/octet-stream'},body:payload}); const armResult=await arm.json().catch(()=>({})); if(!arm.ok) throw new Error(armResult.detail || 'PCM 格式不符合要求'); setStatus(`PCM 已装载：${armResult.frame_count} 帧；正在下发播放指令…`); const result=await fetch(`/api/local-pcm-test/${encodedId}/play`,{method:'POST'}); const playResult=await result.json().catch(()=>({})); if(!result.ok) throw new Error(playResult.detail || '播放指令被拒绝'); setStatus(`已下发：generation ${playResult.generation_id} · ${playResult.packet_count} 个 Opus 包 · ${playResult.duration_ms} ms`); await refresh(); }
+        catch (error) { setStatus(error instanceof Error ? error.message : '播放指令失败',true); }
+        finally { render(); }
+      }
+      async function playBeijing() {
+        const device=selectedDevice(); if (!device?.online) { setStatus('等待 ESP32 WSS 在线后再播放。',true); return; }
+        $('play-beijing').disabled=true; setStatus('正在让 Gateway 读取《北京欢迎你》并下发…');
+        try { const encodedId=encodeURIComponent(device.device_id); const response=await fetch(`/api/local-pcm-test/${encodedId}/beijing-welcome/play`,{method:'POST'}); const result=await response.json().catch(()=>({})); if(!response.ok) throw new Error(result.detail || '播放指令被拒绝'); setStatus(`《北京欢迎你》已下发：generation ${result.generation_id} · ${result.packet_count} 个 Opus 包 · ${result.duration_ms} ms`); await refresh(); }
+        catch (error) { setStatus(error instanceof Error ? error.message : '播放指令失败',true); }
+        finally { render(); }
+      }
+      async function controlPlayback(action) {
+        const device=selectedDevice(); if (!device?.online) { setStatus('等待 ESP32 WSS 在线后再控制播放。',true); return; }
+        const button=$(action); button.disabled=true; setStatus(action==='pause' ? '正在下发暂停指令…' : '正在下发继续指令…');
+        try { const encodedId=encodeURIComponent(device.device_id); const response=await fetch(`/api/local-pcm-test/${encodedId}/${action}`,{method:'POST'}); const result=await response.json().catch(()=>({})); if(!response.ok) throw new Error(result.detail || '播放控制被拒绝'); setStatus(`${action==='pause' ? '暂停' : '继续'}指令已按 WSS 顺序下发：generation ${result.generation_id}`); await refresh(); }
+        catch (error) { setStatus(error instanceof Error ? error.message : '播放控制失败',true); }
+        finally { render(); }
+      }
+      function mergeTrace(event) { if (!event || typeof event !== 'object') return; const index=(state.events || []).findIndex(entry=>entry.id===event.id); if(index>=0) state.events[index]=event; else state.events=[...(state.events || []),event].slice(-500); if(event.device_id) { const devices=[...(state.devices || [])]; let device=devices.find(item=>item.device_id===event.device_id); if(!device) { device={device_id:event.device_id,online:false,session_id:null,current_stage:'offline'}; devices.push(device); } if(event.stage==='wss'&&event.status==='connected') device.online=true; if(event.stage==='session'&&event.status==='ready') { device.online=true; device.current_stage='ready'; } if(event.stage==='wss'&&event.status==='disconnected') { device.online=false; device.current_stage='offline'; } if(event.stage && event.status!=='disconnected') device.current_stage=event.stage; state.devices=devices; } render(); }
+      function connectStream() { const stream=new EventSource('/api/observability/stream'); stream.addEventListener('snapshot',event=>{ state=JSON.parse(event.data); render(); }); stream.addEventListener('trace',event=>mergeTrace(JSON.parse(event.data))); stream.addEventListener('error',()=>{ $('live-dot').className='dot offline'; $('live-text').textContent='监控流重连中'; }); }
+      $('pcm-file').addEventListener('change',event=>{ const file=event.target.files?.[0] || null; if(!file) { selectedFile=null; $('file-info').textContent='未选择文件'; render(); return; } if(file.size===0 || file.size%kFrameBytes!==0 || file.size>kMaxBytes) { selectedFile=null; event.target.value=''; $('file-info').textContent='文件必须是 640 bytes 的整数倍，且不超过 20 秒。'; setStatus('PCM 文件不符合 16 kHz 单声道 S16LE 测试格式。',true); render(); return; } selectedFile=file; $('file-info').textContent=`${file.name} · ${fileSize(file.size)} · ${file.size/kFrameBytes} 帧 · ${(file.size/kFrameBytes)*20} ms`; setStatus('PCM 已准备好。可下发到在线 ESP32。'); render(); });
+      $('device-select').addEventListener('change',render); $('refresh').addEventListener('click',()=>void refresh()); $('play-beijing').addEventListener('click',()=>void playBeijing()); $('pause').addEventListener('click',()=>void controlPlayback('pause')); $('resume').addEventListener('click',()=>void controlPlayback('resume')); $('play').addEventListener('click',()=>void play());
+      void refresh(); connectStream();
+    })();
+  </script>
+</body>
+</html>

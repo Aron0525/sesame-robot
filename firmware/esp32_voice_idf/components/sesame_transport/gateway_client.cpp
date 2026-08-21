@@ -402,7 +402,7 @@ esp_err_t GatewayClient::discover_gateway(
     const StoredDeviceConfig& config) {
   mdns_result_t* results = nullptr;
   const esp_err_t result =
-      mdns_query_ptr("_sesame-gw", "_tcp", 5000, 8, &results);
+      mdns_query_ptr("_sesame-streamgw", "_tcp", 5000, 8, &results);
   if (result != ESP_OK) return result;
 
   esp_err_t selected = ESP_ERR_NOT_FOUND;
@@ -442,6 +442,10 @@ esp_err_t GatewayClient::discover_gateway(
   }
   mdns_query_results_free(results);
   return selected;
+}
+
+esp_err_t GatewayClient::prepare_network(const StoredDeviceConfig& config) {
+  return connect_wifi(config);
 }
 
 esp_err_t GatewayClient::start(const StoredDeviceConfig& config,

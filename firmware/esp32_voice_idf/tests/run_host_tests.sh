@@ -12,10 +12,24 @@ python3 "$project_root/tests/verify_manual_button_recording.py"
 python3 "$project_root/tests/verify_voice_queue_memory.py"
 python3 "$project_root/tests/verify_outbound_transport.py"
 python3 "$project_root/tests/verify_downlink_transport.py"
+python3 "$project_root/tests/verify_downlink_diagnostics.py"
 python3 "$project_root/tests/verify_opus_voice_stack.py"
 python3 "$project_root/tests/verify_continuous_conversation.py"
 python3 "$project_root/tests/verify_silent_discard.py"
-python3 "$project_root/tests/verify_owner_voice_gate_integration.py"
+python3 "$project_root/tests/verify_speaker_verification_integration.py"
+python3 "$project_root/tests/verify_independent_audio_buses.py"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_audio/include" \
+  "$project_root/tests/test_speaker_i2s_config.cpp" \
+  -o "$build_dir/test_speaker_i2s_config"
+"$build_dir/test_speaker_i2s_config"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_audio/include" \
+  "$project_root/tests/test_speaker_volume.cpp" \
+  -o "$build_dir/test_speaker_volume"
+"$build_dir/test_speaker_volume"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_voice/include" \
@@ -74,10 +88,10 @@ c++ -std=c++20 -Wall -Wextra -Werror \
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_audio/include" \
   -I"$project_root/components/sesame_voice/include" \
-  "$project_root/tests/test_owner_voice_gate.cpp" \
-  "$project_root/components/sesame_voice/owner_voice_gate.cpp" \
-  -o "$build_dir/test_owner_voice_gate"
-"$build_dir/test_owner_voice_gate"
+  "$project_root/tests/test_speaker_verification.cpp" \
+  "$project_root/components/sesame_voice/speaker_verification.cpp" \
+  -o "$build_dir/test_speaker_verification"
+"$build_dir/test_speaker_verification"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_robot/include" \
@@ -108,7 +122,10 @@ c++ -std=c++20 -Wall -Wextra -Werror \
 "$build_dir/test_web_command"
 
 node "$project_root/tests/test_web_control_page.cjs"
+node "$project_root/tests/test_removed_motion_actions.cjs"
 node "$project_root/tests/test_stand_pose_sources.cjs"
+node "$project_root/tests/test_dance_pose_sources.cjs"
+node "$project_root/tests/test_proud_action_sources.cjs"
 node "$project_root/tests/test_r3_l4_offset_actions.cjs"
 node "$project_root/tests/test_forward_pose_sources.cjs"
 

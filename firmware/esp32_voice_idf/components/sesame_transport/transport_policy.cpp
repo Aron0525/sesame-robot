@@ -90,7 +90,7 @@ CandidateError validate_candidate(const GatewayCandidate& candidate,
   }
   if (candidate.protocol != "1") return CandidateError::kProtocolMismatch;
   if (candidate.tls != "1") return CandidateError::kTlsRequired;
-  if (candidate.path != "/v1/device-stream") {
+  if (candidate.path != "/v2/device-stream") {
     return CandidateError::kPathMismatch;
   }
   return CandidateError::kOk;

@@ -24,6 +24,7 @@ dependencies = [
 
 [project.scripts]
 sesame-voice-gateway = "sesame_voice_gateway.server_cli:main"
+sesame-openclaw-sse-bridge = "sesame_voice_gateway.openclaw.sse_bridge:main"
 sesame-enroll-voice = "sesame_voice_gateway.voice_enrollment_cli:main"
 
 [tool.hatch.build.targets.wheel]
@@ -33,3 +34,4 @@ packages = ["apps/voice_gateway/src/sesame_voice_gateway"]
 "../contracts/schemas" = "sesame_voice_gateway/_schemas"
 "apps/voice_gateway/src/sesame_voice_gateway/dashboard.html" = "sesame_voice_gateway/dashboard.html"
 "apps/voice_gateway/src/sesame_voice_gateway/console.html" = "sesame_voice_gateway/console.html"
+"apps/voice_gateway/src/sesame_voice_gateway/test_console.html" = "sesame_voice_gateway/test_console.html"

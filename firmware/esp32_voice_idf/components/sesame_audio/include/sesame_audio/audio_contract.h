@@ -12,11 +12,19 @@ inline constexpr size_t kSamplesPerFrame =
 inline constexpr size_t kPcmBytesPerFrame =
     kSamplesPerFrame * sizeof(int16_t);
 
-inline constexpr int kI2sBclkGpio = 14;
-inline constexpr int kI2sWsGpio = 47;
+// I2S0 RX: INMP441. This bus is intentionally independent from the speaker.
+inline constexpr int kMicrophoneBclkGpio = 14;
+inline constexpr int kMicrophoneWsGpio = 47;
 inline constexpr int kMicrophoneDataGpio = 48;
-inline constexpr int kSpeakerDataGpio = 2;
-inline constexpr int kAmplifierEnableGpio = 1;
+
+// I2S1 TX: M5Stack Hat SPK2. The Hat has no host-controlled SD/EN signal.
+inline constexpr int kSpeakerBclkGpio = 1;
+inline constexpr int kSpeakerWsGpio = 2;
+inline constexpr int kSpeakerDataGpio = 3;
+// Match the working MAX98357A I2S configuration validated on this board.
+inline constexpr uint32_t kSpeakerDmaDescriptorCount = 8;
+inline constexpr uint32_t kSpeakerDmaFramesPerDescriptor = 128;
+inline constexpr bool kSpeakerDmaAutoClear = true;
 inline constexpr int kVoiceButtonGpio = 0;
 
 static_assert(kSamplesPerFrame == 320);

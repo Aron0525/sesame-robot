@@ -19,7 +19,15 @@
 #include "sesame_protocol/control_event.h"
 #include "sesame_voice/wake_ack_audio.h"
 #include "sesame_voice/wake_capture_policy.h"
-#include "owner_voiceprint_template.h"
+
+#if __has_include("speaker_verification_template.h")
+#include "speaker_verification_template.h"
+#else
+namespace sesame::voice::speaker_verification_template {
+inline constexpr SpeakerVerificationTemplate kTemplate{};
+inline constexpr int kEnrollmentSampleCount = 0;
+}  // namespace sesame::voice::speaker_verification_template
+#endif
 
 namespace sesame::voice {
 namespace {
@@ -29,12 +37,21 @@ constexpr gpio_num_t kVoiceButton = GPIO_NUM_0;
 constexpr uint64_t kMaximumActionDeadlineLeadMs = 5000;
 constexpr uint64_t kGatewayConnectDeadlineMs = 15000;
 constexpr uint32_t kMaximumRecordingDurationMs = 10000;
+constexpr uint32_t kDownlinkArrivalGapWarnMs = 25;
 constexpr char kManualListenStartPayload[] = R"({"trigger":"manual"})";
 constexpr char kWakewordListenStartPayload[] = R"({"trigger":"wakeword"})";
 constexpr char kFollowupListenStartPayload[] = R"({"trigger":"followup"})";
 
 uint64_t now_ms() {
   return static_cast<uint64_t>(esp_timer_get_time()) / 1000ULL;
+}
+
+void update_atomic_max(std::atomic<uint32_t>* target, uint32_t candidate) {
+  if (target == nullptr) return;
+  uint32_t current = target->load();
+  while (current < candidate &&
+         !target->compare_exchange_weak(current, candidate)) {
+  }
 }
 
 const cJSON* payload_of(const cJSON* root) {
@@ -77,6 +94,13 @@ bool integer_field_in_range(const cJSON* object, const char* key, int minimum,
     return false;
   }
   if (output != nullptr) *output = static_cast<int>(value->valuedouble);
+  return true;
+}
+
+bool boolean_field(const cJSON* object, const char* key, bool* output) {
+  const cJSON* value = cJSON_GetObjectItemCaseSensitive(object, key);
+  if (!cJSON_IsBool(value) || output == nullptr) return false;
+  *output = cJSON_IsTrue(value);
   return true;
 }
 
@@ -154,6 +178,16 @@ esp_err_t VoiceController::start() {
   ESP_RETURN_ON_ERROR(wake_vad_.start(), kTag, "initialize wake word + VAD");
   ESP_RETURN_ON_ERROR(load_device_config(&config_), kTag,
                       "load device configuration from NVS");
+  // esp_wifi_init() can write driver defaults into a freshly provisioned NVS
+  // partition. Do that here on app_main's internal-RAM stack; the voice task
+  // created below lives in PSRAM and must never disable the flash cache.
+  const esp_err_t network_prepare_result = gateway_.prepare_network(config_);
+  if (network_prepare_result != ESP_OK &&
+      network_prepare_result != ESP_ERR_TIMEOUT) {
+    ESP_LOGE(kTag, "prepare Wi-Fi runtime: %s",
+             esp_err_to_name(network_prepare_result));
+    return network_prepare_result;
+  }
   uint8_t stored_wake_threshold = 20;
   ESP_RETURN_ON_ERROR(
       sesame::transport::load_wake_threshold_hundredths(
@@ -172,6 +206,12 @@ esp_err_t VoiceController::start() {
   }
   ESP_LOGI(kTag, "wake threshold restored: %.2f",
            stored_wake_threshold / 100.0f);
+  ESP_RETURN_ON_ERROR(
+      sesame::transport::load_speaker_verification_enabled(
+          &speaker_verification_enabled_),
+      kTag, "load speaker verification setting from NVS");
+  ESP_LOGI(kTag, "speaker verification restored: %s",
+           speaker_verification_enabled_ ? "enabled" : "disabled");
 
   const gpio_config_t button_config{
       .pin_bit_mask = 1ULL << kVoiceButton,
@@ -242,10 +282,23 @@ esp_err_t VoiceController::start() {
     downlink_queue_ = nullptr;
     return wake_threshold_store_result;
   }
+  const esp_err_t speaker_store_result = speaker_verification_store_.start();
+  if (speaker_store_result != ESP_OK) {
+    wake_threshold_store_.stop();
+    conversation_store_.stop();
+    vQueueDelete(outbound_queue_);
+    outbound_queue_ = nullptr;
+    vQueueDelete(gateway_event_queue_);
+    gateway_event_queue_ = nullptr;
+    vQueueDelete(downlink_queue_);
+    downlink_queue_ = nullptr;
+    return speaker_store_result;
+  }
 
   void* preroll_storage = heap_caps_calloc(
       1, sizeof(PcmPreRollBuffer), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
   if (preroll_storage == nullptr) {
+    speaker_verification_store_.stop();
     wake_threshold_store_.stop();
     conversation_store_.stop();
     vQueueDelete(outbound_queue_);
@@ -258,12 +311,13 @@ esp_err_t VoiceController::start() {
   }
   pcm_preroll_ = new (preroll_storage) PcmPreRollBuffer();
 
-  void* owner_voice_gate_storage = heap_caps_calloc(
-      1, sizeof(OwnerVoiceGate), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-  if (owner_voice_gate_storage == nullptr) {
+  void* verification_storage = heap_caps_calloc(
+      1, sizeof(SpeakerVerification), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (verification_storage == nullptr) {
     pcm_preroll_->~PcmPreRollBuffer();
     heap_caps_free(pcm_preroll_);
     pcm_preroll_ = nullptr;
+    speaker_verification_store_.stop();
     wake_threshold_store_.stop();
     conversation_store_.stop();
     vQueueDelete(outbound_queue_);
@@ -274,11 +328,15 @@ esp_err_t VoiceController::start() {
     downlink_queue_ = nullptr;
     return ESP_ERR_NO_MEM;
   }
-  owner_voice_gate_ = new (owner_voice_gate_storage)
-      OwnerVoiceGate(owner_voiceprint::kTemplate);
-  ESP_LOGI(kTag, "owner voice gate loaded: enrolled_samples=%d threshold=%.3f",
-           owner_voiceprint::kEnrollmentSampleCount,
-           owner_voiceprint::kTemplate.threshold);
+  speaker_verification_ = new (verification_storage)
+      SpeakerVerification(speaker_verification_template::kTemplate);
+  speaker_verification_->set_enabled(speaker_verification_enabled_);
+  ESP_LOGI(kTag,
+           "speaker verification module ready: enabled=%s samples=%d template=%s",
+           speaker_verification_enabled_ ? "true" : "false",
+           speaker_verification_template::kEnrollmentSampleCount,
+           speaker_verification_template::kTemplate.available ? "available"
+                                                               : "missing");
 
   gateway_reconnect_schedule_.reset();
   gateway_connection_.disconnected();
@@ -289,11 +347,12 @@ esp_err_t VoiceController::start() {
                               kOutboundTaskStackBytes, this, 5,
                               &outbound_task_, 0) != pdPASS) {
     running_ = false;
+    speaker_verification_store_.stop();
     wake_threshold_store_.stop();
     conversation_store_.stop();
-    owner_voice_gate_->~OwnerVoiceGate();
-    heap_caps_free(owner_voice_gate_);
-    owner_voice_gate_ = nullptr;
+    speaker_verification_->~SpeakerVerification();
+    heap_caps_free(speaker_verification_);
+    speaker_verification_ = nullptr;
     pcm_preroll_->~PcmPreRollBuffer();
     heap_caps_free(pcm_preroll_);
     pcm_preroll_ = nullptr;
@@ -309,11 +368,12 @@ esp_err_t VoiceController::start() {
           task_entry, "sesame_voice", kVoiceTaskStackBytes, this, 7, &task_,
           1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT) != pdPASS) {
     running_ = false;
+    speaker_verification_store_.stop();
     wake_threshold_store_.stop();
     conversation_store_.stop();
-    owner_voice_gate_->~OwnerVoiceGate();
-    heap_caps_free(owner_voice_gate_);
-    owner_voice_gate_ = nullptr;
+    speaker_verification_->~SpeakerVerification();
+    heap_caps_free(speaker_verification_);
+    speaker_verification_ = nullptr;
     pcm_preroll_->~PcmPreRollBuffer();
     heap_caps_free(pcm_preroll_);
     pcm_preroll_ = nullptr;
@@ -356,12 +416,13 @@ void VoiceController::stop() {
     }
   }
   gateway_.stop();
+  speaker_verification_store_.stop();
   wake_threshold_store_.stop();
   conversation_store_.stop();
-  if (owner_voice_gate_ != nullptr) {
-    owner_voice_gate_->~OwnerVoiceGate();
-    heap_caps_free(owner_voice_gate_);
-    owner_voice_gate_ = nullptr;
+  if (speaker_verification_ != nullptr) {
+    speaker_verification_->~SpeakerVerification();
+    heap_caps_free(speaker_verification_);
+    speaker_verification_ = nullptr;
   }
   if (pcm_preroll_ != nullptr) {
     pcm_preroll_->~PcmPreRollBuffer();
@@ -459,8 +520,9 @@ void VoiceController::run() {
         session_ready_ && !wake_ack_active_ && !capture_session_.active() &&
         idle_wake;
     wake_vad_.set_wake_enabled(wake_should_be_armed);
-    if (!wake_should_be_armed && owner_voice_gate_ != nullptr) {
-      owner_voice_gate_->clear();
+    if ((!wake_should_be_armed || !speaker_verification_enabled_) &&
+        speaker_verification_ != nullptr) {
+      speaker_verification_->clear();
     }
 
     if (wake_ack_active_) {
@@ -483,8 +545,9 @@ void VoiceController::run() {
           // pre-roll without interrupting the 20-ms microphone cadence.
           drain_pcm_uplink(2);
         }
-        if (wake_should_be_armed && owner_voice_gate_ != nullptr) {
-          owner_voice_gate_->feed_pcm(pcm.data(), pcm.size());
+        if (wake_should_be_armed && speaker_verification_enabled_ &&
+            speaker_verification_ != nullptr) {
+          speaker_verification_->feed_pcm(pcm.data(), pcm.size());
         }
         if (should_capture_for_wake(tts_active_.load())) {
           wake_vad_.feed_pcm(pcm.data(), pcm.size());
@@ -666,23 +729,27 @@ void VoiceController::process_wake_vad_signals(uint64_t timestamp) {
         wake_turn_detector_.reset();
         continue;
       }
-      if (owner_voice_gate_ == nullptr) {
-        ESP_LOGE(kTag, "owner voice gate unavailable; rejecting spoken wake");
-        wake_turn_detector_.reset();
-        continue;
-      }
-      const OwnerVoiceprintDecision decision = owner_voice_gate_->verify_latest();
-      owner_voice_gate_->clear();
-      if (!decision.accepted) {
-        ESP_LOGI(kTag,
-                 "spoken wake rejected by owner voice gate: template=%d audio=%d score=%.3f",
-                 decision.template_available, decision.has_sufficient_audio,
+      if (speaker_verification_enabled_) {
+        if (speaker_verification_ == nullptr) {
+          ESP_LOGE(kTag, "speaker verification unavailable; rejecting wake");
+          wake_turn_detector_.reset();
+          continue;
+        }
+        const SpeakerVerificationDecision decision =
+            speaker_verification_->verify_latest();
+        speaker_verification_->clear();
+        if (!decision.accepted) {
+          ESP_LOGI(kTag,
+                   "speaker verification rejected wake: template=%d audio=%d score=%.3f",
+                   decision.template_available, decision.has_sufficient_audio,
+                   decision.score);
+          wake_turn_detector_.reset();
+          continue;
+        }
+        ESP_LOGI(kTag, "speaker verification accepted wake: score=%.3f",
                  decision.score);
-        wake_turn_detector_.reset();
-        continue;
       }
-      ESP_LOGI(kTag, "spoken wake accepted by owner voice gate: score=%.3f",
-               decision.score);
+      ESP_LOGI(kTag, "spoken wake phrase accepted");
       begin_wake_ack();
     } else if (event == VoiceTurnEvent::kListenStarted) {
       if (!session_ready_ || capture_session_.active() ||
@@ -880,6 +947,49 @@ void VoiceController::discard_outbound_frames() {
   if (outbound_queue_ != nullptr) xQueueReset(outbound_queue_);
 }
 
+void VoiceController::reset_downlink_diagnostics(uint32_t generation_id) {
+  downlink_received_packet_count_ = 0;
+  downlink_last_arrival_ms_ = 0;
+  downlink_max_arrival_gap_ms_ = 0;
+  downlink_arrival_gaps_over_25ms_ = 0;
+  downlink_queue_high_watermark_ = 0;
+  downlink_played_without_buffer_count_ = 0;
+  downlink_diagnostic_generation_ = generation_id;
+}
+
+void VoiceController::record_downlink_arrival(uint32_t generation_id,
+                                               uint32_t arrival_ms) {
+  if (generation_id == 0 ||
+      generation_id != downlink_diagnostic_generation_.load()) {
+    return;
+  }
+  const uint32_t previous = downlink_last_arrival_ms_.exchange(arrival_ms);
+  ++downlink_received_packet_count_;
+  if (previous == 0) return;
+  const uint32_t gap_ms = arrival_ms - previous;
+  update_atomic_max(&downlink_max_arrival_gap_ms_, gap_ms);
+  if (gap_ms > kDownlinkArrivalGapWarnMs) {
+    ++downlink_arrival_gaps_over_25ms_;
+  }
+}
+
+void VoiceController::record_downlink_queue_depth(uint32_t generation_id,
+                                                   UBaseType_t depth) {
+  if (generation_id == 0 ||
+      generation_id != downlink_diagnostic_generation_.load()) {
+    return;
+  }
+  update_atomic_max(&downlink_queue_high_watermark_,
+                    static_cast<uint32_t>(depth));
+}
+
+void VoiceController::record_downlink_playout() {
+  if (downlink_queue_ != nullptr &&
+      uxQueueMessagesWaiting(downlink_queue_) == 0) {
+    ++downlink_played_without_buffer_count_;
+  }
+}
+
 void VoiceController::play_pending_audio() {
   if (!tts_active_ || downlink_queue_ == nullptr) return;
   DownlinkPacket packet{};
@@ -902,6 +1012,8 @@ void VoiceController::play_pending_audio() {
         samples != pcm.size() ||
         audio_->write_speaker_frame(pcm.data(), pcm.size(), 100) != ESP_OK) {
       fail_tts_playback("downlink decode or playback failure");
+    } else {
+      record_downlink_playout();
     }
     return;
   }
@@ -1039,10 +1151,15 @@ void VoiceController::enqueue_downlink_packet(const uint8_t* data,
   packet.sequence = frame.sequence;
   packet.size = static_cast<uint16_t>(frame.payload_size);
   std::memcpy(packet.data.data(), frame.payload, frame.payload_size);
+  record_downlink_arrival(frame.generation_id,
+                          static_cast<uint32_t>(now_ms()));
   if (xQueueSend(downlink_queue_, &packet, 0) != pdTRUE) {
     // The WebSocket task must never mutate playback/turn state. Ask the voice
     // task to fail the generation closed on its next iteration.
     downlink_fault_requested_ = true;
+  } else {
+    record_downlink_queue_depth(frame.generation_id,
+                                uxQueueMessagesWaiting(downlink_queue_));
   }
 }
 
@@ -1189,6 +1306,16 @@ void VoiceController::process_control_json(const char* data, size_t size) {
                        static_cast<uint8_t>(threshold_hundredths)) == ESP_OK &&
                    wake_vad_.set_detection_threshold_hundredths(
                        static_cast<uint8_t>(threshold_hundredths));
+      } else if (std::strcmp(kind, "speaker_verification_settings") == 0) {
+        bool enabled = false;
+        accepted = boolean_field(payload, "speaker_verification_enabled",
+                                 &enabled) &&
+                   speaker_verification_ != nullptr &&
+                   speaker_verification_store_.enqueue(enabled) == ESP_OK;
+        if (accepted) {
+          speaker_verification_enabled_ = enabled;
+          speaker_verification_->set_enabled(enabled);
+        }
       } else if (std::strcmp(kind, "stop") == 0) {
         robot_->emergency_stop();
         accepted = true;
@@ -1401,6 +1528,7 @@ void VoiceController::begin_tts(uint32_t generation_id) {
   if (!turn_state_.start_generation(generation_id)) return;
   active_generation_ = generation_id;
   expected_downlink_sequence_ = 0;
+  reset_downlink_diagnostics(generation_id);
   tts_stop_requested_ = false;
   if (!wake_turn_detector_.start_tts_playback()) {
     ESP_LOGW(kTag, "resetting unexpected local wake state before TTS");
@@ -1430,6 +1558,15 @@ void VoiceController::complete_tts_if_drained() {
     return;
   }
   const uint32_t generation_id = active_generation_;
+  ESP_LOGI(
+      kTag,
+      "P2 downlink diagnostics: generation=%lu packets=%lu max_arrival_gap_ms=%lu gaps_over_25ms=%lu queue_high_watermark=%lu played_without_buffer=%lu",
+      static_cast<unsigned long>(generation_id),
+      static_cast<unsigned long>(downlink_received_packet_count_.load()),
+      static_cast<unsigned long>(downlink_max_arrival_gap_ms_.load()),
+      static_cast<unsigned long>(downlink_arrival_gaps_over_25ms_.load()),
+      static_cast<unsigned long>(downlink_queue_high_watermark_.load()),
+      static_cast<unsigned long>(downlink_played_without_buffer_count_.load()));
   std::array<int16_t, sesame::audio::kSamplesPerFrame> silence{};
   audio_->write_speaker_frame(silence.data(), silence.size(), 100);
   audio_->set_amplifier_enabled(false);

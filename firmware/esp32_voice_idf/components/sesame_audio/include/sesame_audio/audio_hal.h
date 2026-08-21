@@ -26,6 +26,7 @@ class AudioHal {
   esp_err_t write_speaker_frame(const int16_t* input, size_t input_samples,
                                 uint32_t timeout_ms);
 
+  // Hat SPK2 has no separate SD/EN line; retained as a no-op lifecycle hook.
   esp_err_t set_amplifier_enabled(bool enabled);
   bool initialized() const { return initialized_; }
 

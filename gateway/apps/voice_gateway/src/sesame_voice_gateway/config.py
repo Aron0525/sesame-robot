@@ -25,15 +25,20 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    gateway_id: str = Field(default="gw_local_dev", min_length=1, max_length=100)
+    # This lab's network identity is intentionally fixed.  A configuration
+    # copied from the stable project must fail rather than bind TCP/8765 or
+    # advertise the stable mDNS service by accident.
+    gateway_id: Literal["gw_stream_lab"] = "gw_stream_lab"
     host: str = "0.0.0.0"
-    port: int = Field(default=8765, ge=1, le=65_535)
+    port: int = Field(default=8766, ge=1, le=65_535)
     tls_enabled: bool = False
     tls_cert_file: Path | None = None
     tls_key_file: Path | None = None
     enable_mdns: bool = False
-    mdns_instance_name: str = "Sesame Voice Gateway"
-    mdns_hostname: str = "sesame-gateway"
+    mdns_instance_name: str = "Sesame Streaming Lab Gateway"
+    mdns_hostname: Literal["sesame-stream-gateway"] = "sesame-stream-gateway"
+    mdns_service_type: Literal["_sesame-streamgw._tcp.local."] = "_sesame-streamgw._tcp.local."
+    device_stream_path: Literal["/v2/device-stream"] = "/v2/device-stream"
     mdns_refresh_interval_seconds: int = Field(default=30, ge=5, le=3_600)
     # Only set this for a router-reserved/static address. Leaving it unset
     # lets the mDNS record follow DHCP and network changes automatically.
@@ -49,8 +54,12 @@ class Settings(BaseSettings):
     dashboard_debug_content: bool = True
     # Test recordings are opt-in so normal conversations are never persisted.
     save_test_recordings: bool = False
-    test_recording_dir: Path = Path("test-recordings")
+    test_recording_dir: Path = Path("runtime/test-recordings")
     test_recording_limit: int = Field(default=10, ge=1, le=100)
+    # A local, fixed PCM fixture for the browser audio diagnostic page.  It is
+    # intentionally an absolute operator-provided path, never a web request
+    # parameter and never bundled into the Gateway package.
+    local_pcm_test_fixture_path: Path | None = None
     # Training samples must only come from an explicit BOOT-button capture;
     # wakeword and ambient turns would contaminate the positive dataset.
     test_recording_manual_only: bool = False
@@ -66,7 +75,7 @@ class Settings(BaseSettings):
 
     asr_provider: Literal["dashscope"] = "dashscope"
     tts_provider: Literal["dashscope"] = "dashscope"
-    provider_mode: Literal["openclaw"] = "openclaw"
+    provider_mode: Literal["openclaw", "openclaw_sse"] = "openclaw_sse"
     allow_remote_speech: bool = False
 
     dashscope_api_key: SecretStr | None = None
@@ -84,6 +93,11 @@ class Settings(BaseSettings):
     web_search_timeout_seconds: float = Field(default=15.0, gt=0, le=60)
 
     openclaw_url: str = "ws://127.0.0.1:18789"
+    openclaw_sse_url: str = "http://127.0.0.1:18790/v1/sesame/reply-stream"
+    openclaw_sse_bridge_port: int = Field(default=18_790, ge=1_024, le=65_535)
+    openclaw_gateway_config_file: Path = Field(
+        default_factory=lambda: Path.home() / ".openclaw" / "openclaw.json"
+    )
     openclaw_agent_id: str = Field(default="sesame", pattern=r"^[a-z0-9][a-z0-9_-]{0,63}$")
     openclaw_token: SecretStr | None = None
     openclaw_session_key_secret: SecretStr | None = None
@@ -104,6 +118,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_provider_configuration(self) -> Settings:
+        if self.port != 8766:
+            raise ValueError("SESAME_PORT must remain 8766 for the streaming lab")
         if self.tls_enabled and (self.tls_cert_file is None or self.tls_key_file is None):
             raise ValueError(
                 "SESAME_TLS_CERT_FILE and SESAME_TLS_KEY_FILE are required when TLS is enabled"
@@ -118,13 +134,15 @@ class Settings(BaseSettings):
                 "SESAME_ALLOW_REMOTE_SPEECH=true is required before audio or TTS text "
                 "may leave this computer"
             )
-        if self.provider_mode == "openclaw" and (
+        if self.provider_mode in {"openclaw", "openclaw_sse"} and (
             self.openclaw_token is None or self.openclaw_session_key_secret is None
         ):
             raise ValueError(
                 "SESAME_OPENCLAW_TOKEN and SESAME_OPENCLAW_SESSION_KEY_SECRET "
                 "are required in openclaw mode"
             )
+        if self.openclaw_sse_bridge_port != 18_790:
+            raise ValueError("SESAME_OPENCLAW_SSE_BRIDGE_PORT must remain 18790 for the lab")
         if self.serial_monitor_enabled and (
             self.serial_monitor_device_id is None
             or self.serial_monitor_device_id not in self.device_tokens
@@ -133,6 +151,11 @@ class Settings(BaseSettings):
                 "SESAME_SERIAL_MONITOR_DEVICE_ID must name a configured device when "
                 "serial monitoring is enabled"
             )
+        if (
+            self.local_pcm_test_fixture_path is not None
+            and not self.local_pcm_test_fixture_path.is_file()
+        ):
+            raise ValueError("SESAME_LOCAL_PCM_TEST_FIXTURE_PATH must name a readable file")
         canonical_device_ids: dict[str, str] = {}
         for device_id in sorted(set(self.device_tokens) | set(self.device_users)):
             if _DEVICE_ID_PATTERN.fullmatch(device_id) is None:
@@ -154,6 +177,13 @@ class Settings(BaseSettings):
             "localhost",
         }:
             raise ValueError("SESAME_OPENCLAW_URL must remain on the local loopback interface")
+        parsed_openclaw_sse_url = urlparse(self.openclaw_sse_url)
+        if (
+            parsed_openclaw_sse_url.scheme != "http"
+            or parsed_openclaw_sse_url.hostname not in {"127.0.0.1", "::1", "localhost"}
+            or not parsed_openclaw_sse_url.path
+        ):
+            raise ValueError("SESAME_OPENCLAW_SSE_URL must remain on local loopback HTTP")
         return self
 
     @property

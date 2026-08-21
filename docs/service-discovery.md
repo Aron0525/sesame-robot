@@ -5,7 +5,7 @@
 电脑局域网 IP 可能因 DHCP、切换 Wi‑Fi 或睡眠恢复而改变。Voice Gateway 发布 mDNS 服务后，ESP32-S3 通过固定服务类型找到**当前**主机名、IP 和端口：
 
 ```text
-_sesame-gw._tcp.local.
+_sesame-streamgw._tcp.local.
 ```
 
 mDNS 返回 SRV、A/AAAA 和 TXT 记录，但不证明该服务属于正确用户。
@@ -13,18 +13,18 @@ mDNS 返回 SRV、A/AAAA 和 TXT 记录，但不证明该服务属于正确用�
 ## 服务记录
 
 ```text
-服务类型：_sesame-gw._tcp.local.
-实例名称：Sesame Voice Gateway
-端口：8765
+服务类型：_sesame-streamgw._tcp.local.
+实例名称：Sesame Streaming Lab Gateway
+端口：8766
 ```
 
 TXT 只放非秘密信息：
 
 ```text
-gateway_id=gw_xxx
+gateway_id=gw_stream_lab
 protocol=1
 tls=1
-path=/v1/device-stream
+path=/v2/device-stream
 ```
 
 禁止放入 token、WiFi 密码、设备密钥或用户信息。
@@ -41,10 +41,10 @@ mDNS 发现地址
 + 协议版本兼容
 ```
 
-`gateway_id` 在 Voice Gateway 首次安装时随机生成并持久化。实例名称可以重复，`gateway_id` 不可重复。
+当前 Streaming Lab 的 `gateway_id` 固定为 `gw_stream_lab`；实例名称可以重复，`gateway_id` 不可重复。
 
 固件将 mDNS 返回的裸主机名规范成 `<hostname>.local` 后再建立
-`wss://<hostname>.local:<port>/v1/device-stream`。TLS 证书的 DNS SAN 必须包含这个 `.local` 名称；不要为绕过 DHCP 或证书问题关闭主机名校验。
+`wss://<hostname>.local:<port>/v2/device-stream`。TLS 证书的 DNS SAN 必须包含这个 `.local` 名称；不要为绕过 DHCP 或证书问题关闭主机名校验。
 
 ## DHCP 与地址刷新
 
