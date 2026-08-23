@@ -1,0 +1,43 @@
+OpenClaw Sesame latency tuning — verification record
+
+Baseline
+- Gateway was running and reachable.
+- Workspace bootstrap: 9,355 B; AGENTS.md: 6,233 B.
+- 105/106 earlier traces used thinkLevel=high; maximum observed system prompt: 15,743 chars.
+
+Applied configuration
+- thinkingDefault=low
+- contextInjection=continuation-skip
+- bootstrapMaxChars=3500; bootstrapTotalMaxChars=5500
+- contextTokens=32768; contextLimits.postCompactionMaxChars=1200
+- memorySearch remains limited to [memory], so session transcripts are not a recall source.
+- tools allowlists reduced to [read]; group:web remains denied. Web Search is therefore not enabled.
+
+Applied workspace compaction
+- AGENTS.md=2743 B; SOUL.md=218 B; TOOLS.md=270 B; USER.md=290 B; MEMORY.md=225 B.
+- Full bootstrap=4027 B, below the 5,500 B guard.
+- The long-lived-memory rule now permits at most 12 explicit, non-sensitive, durable facts; full conversation history is excluded from long-term memory and memory retrieval. The 32,768-token Sesame context cap triggers summarization when its context budget is approached. OpenClaw still retains diagnostic trajectory files by default.
+
+Verification commands and literal results
+1. openclaw config set --batch-file config-set.batch.json --dry-run
+   -> Dry run successful: 8 update(s) validated against ~/.openclaw/openclaw.json.
+2. openclaw config set --batch-file config-set.batch.json
+   -> Updated 8 config paths. Change will apply without restarting the gateway.
+3. ./verify.sh
+   -> verification: PASS
+4. ./rollback.sh --check
+   -> original config and all original workspace files: OK; rollback snapshot: READY.
+5. openclaw agent --agent sesame --session-key <unique> ... --json (two turns)
+   -> both calls exited 0; both replies passed exact agent-response.v1 top-level and nested-field assertions.
+6. OpenClaw trace metadata for both smoke-test turns
+   -> thinkLevel=low, reasoningLevel=off, fastMode=false.
+7. openclaw gateway status
+   -> runtime running; connectivity probe ok.
+
+Runtime observation
+- Previous short draft produced a malformed nested reply object in one smoke test. The output template was expanded while keeping AGENTS.md within the requested 2.0–3.5 KB range; the second two-turn smoke test passed the exact schema assertions.
+- The earlier continuation smoke test showed cacheRead=4,224 with only 42 uncached input tokens, confirming that follow-up context can use the provider cache.
+
+Web-search decision
+- No active Web Search provider or configuration exists in the running Sesame agent, and the policy removes web_search/web_fetch. It remains off rather than adding a slow, unconfigured route.
+- The compact Agent rule now permits one search only if a functional tool is later exposed and the request requires changing facts (weather, news, quote, schedule, realtime status, or explicit verification). It rejects search for casual conversation, creation, explanation, or context already present.

@@ -1,0 +1,120 @@
+--- /Users/mac/Documents/sesame robot/output/20260810-openclaw-disable-motion-feedback-v2/originals/workspace-sesame-AGENTS.md	2026-08-10 02:45:08
++++ /Users/mac/.openclaw/workspace-sesame/AGENTS.md	2026-08-10 02:45:08
+@@ -12,18 +12,12 @@
+ 
+ `web_search` 只用于需要最新外部信息的请求：天气、新闻、价格、日程、营业时间，或用户明确要求核实。每轮最多搜索一次、最多使用 3 条结果；闲聊、写作、解释和已知事实直接回答。搜索失败时说明数据暂不可用，不编造结果。
+ 
+-## 表情与动作
++## 动作反馈（临时关闭）
+ 
+-`set_expression(expression_id)` 是表情选择操作：将 `expression.name` 设为对应 ID，`ttl_ms` 设为 3000。每次必须选择一个表情；若 capabilities 未列出该 ID，使用 `default`。
++暂时不下发任何机器人动作。即使用户要求挥手、移动、跳舞或其他动作，也只用文字说明“当前动作反馈已关闭”。
+ 
+-网页表情 ID（36）：
+-`default`, `idle`, `walk`, `rest`, `swim`, `dance`, `wave`, `point`, `stand`, `cute`, `pushup`, `freaky`, `bow`, `worm`, `shake`, `shrug`, `dead`, `crab`, `happy`, `talk_happy`, `sad`, `talk_sad`, `angry`, `talk_angry`, `surprised`, `talk_surprised`, `sleepy`, `talk_sleepy`, `love`, `talk_love`, `excited`, `talk_excited`, `confused`, `talk_confused`, `thinking`, `talk_thinking`。
++`actions` 必须始终为 `[]`；不调用 `set_expression(expression_id)`，不根据对话选择表情。为保持现有 `agent-response.v1` 契约兼容，`expression` 固定为 `{"name":"default","ttl_ms":3000}`。
+ 
+-网页动作 ID（19）：
+-`rest`, `stand`, `wave`, `dance`, `swim`, `point`, `pushup`, `bow`, `cute`, `freaky`, `worm`, `shake`, `shrug`, `dead`, `crab`, `forward`, `backward`, `left`, `right`。
+-
+-动作仅在用户明确要求或确实匹配回复时使用，最多一个；`capabilities` 未列出的动作保持 `actions: []`。`forward`、`backward`、`left`、`right` 只响应明确移动请求。
+-
+ ## 输出
+ 
+ 顶层只能有 `v`、`request_id`、`turn_id`、`status`、`reply`、`voice`、`expression`、`actions`。沿用输入的 request/turn ID。
+@@ -32,4 +26,4 @@
+ {"v":1,"request_id":"…","turn_id":"…","status":"completed","reply":{"text":"简短回复"},"voice":{"voice_id":"sesame_default","style":"neutral","speed":1.0},"expression":{"name":"default","ttl_ms":3000},"actions":[]}
+ ```
+ 
+-`voice.style`：`neutral`、`happy`、`sad`、`angry`、`surprised`、`thinking`。动作格式：`{"name":"动作 ID","duration_ms":100-5000}`。
++`voice.style`：`neutral`、`happy`、`sad`、`angry`、`surprised`、`thinking`。
+--- /Users/mac/Documents/sesame robot/output/20260810-openclaw-disable-motion-feedback-v2/originals/workspace-sesame-learning-AGENTS.md	2026-08-10 02:45:08
++++ /Users/mac/.openclaw/workspace-sesame-learning/AGENTS.md	2026-08-10 02:45:08
+@@ -12,18 +12,12 @@
+ 
+ `web_search` 只用于需要最新外部信息的请求：天气、新闻、价格、日程、营业时间，或用户明确要求核实。每轮最多搜索一次、最多使用 3 条结果；闲聊、写作、解释和已知事实直接回答。搜索失败时说明数据暂不可用，不编造结果。
+ 
+-## 表情与动作
++## 动作反馈（临时关闭）
+ 
+-`set_expression(expression_id)` 是表情选择操作：将 `expression.name` 设为对应 ID，`ttl_ms` 设为 3000。每次必须选择一个表情；若 capabilities 未列出该 ID，使用 `default`。
++暂时不下发任何机器人动作。即使用户要求挥手、移动、跳舞或其他动作，也只用文字说明“当前动作反馈已关闭”。
+ 
+-网页表情 ID（36）：
+-`default`, `idle`, `walk`, `rest`, `swim`, `dance`, `wave`, `point`, `stand`, `cute`, `pushup`, `freaky`, `bow`, `worm`, `shake`, `shrug`, `dead`, `crab`, `happy`, `talk_happy`, `sad`, `talk_sad`, `angry`, `talk_angry`, `surprised`, `talk_surprised`, `sleepy`, `talk_sleepy`, `love`, `talk_love`, `excited`, `talk_excited`, `confused`, `talk_confused`, `thinking`, `talk_thinking`。
++`actions` 必须始终为 `[]`；不调用 `set_expression(expression_id)`，不根据对话选择表情。为保持现有 `agent-response.v1` 契约兼容，`expression` 固定为 `{"name":"default","ttl_ms":3000}`。
+ 
+-网页动作 ID（19）：
+-`rest`, `stand`, `wave`, `dance`, `swim`, `point`, `pushup`, `bow`, `cute`, `freaky`, `worm`, `shake`, `shrug`, `dead`, `crab`, `forward`, `backward`, `left`, `right`。
+-
+-动作仅在用户明确要求或确实匹配回复时使用，最多一个；`capabilities` 未列出的动作保持 `actions: []`。`forward`、`backward`、`left`、`right` 只响应明确移动请求。
+-
+ ## 输出
+ 
+ 顶层只能有 `v`、`request_id`、`turn_id`、`status`、`reply`、`voice`、`expression`、`actions`。沿用输入的 request/turn ID。
+@@ -32,4 +26,4 @@
+ {"v":1,"request_id":"…","turn_id":"…","status":"completed","reply":{"text":"简短回复"},"voice":{"voice_id":"sesame_default","style":"neutral","speed":1.0},"expression":{"name":"default","ttl_ms":3000},"actions":[]}
+ ```
+ 
+-`voice.style`：`neutral`、`happy`、`sad`、`angry`、`surprised`、`thinking`。动作格式：`{"name":"动作 ID","duration_ms":100-5000}`。
++`voice.style`：`neutral`、`happy`、`sad`、`angry`、`surprised`、`thinking`。
+--- /Users/mac/Documents/sesame robot/output/20260810-openclaw-disable-motion-feedback-v2/originals/workspace-sesame-children-AGENTS.md	2026-08-10 02:45:08
++++ /Users/mac/.openclaw/workspace-sesame-children/AGENTS.md	2026-08-10 02:45:08
+@@ -12,18 +12,12 @@
+ 
+ `web_search` 只用于需要最新外部信息的请求：天气、新闻、价格、日程、营业时间，或用户明确要求核实。每轮最多搜索一次、最多使用 3 条结果；闲聊、写作、解释和已知事实直接回答。搜索失败时说明数据暂不可用，不编造结果。
+ 
+-## 表情与动作
++## 动作反馈（临时关闭）
+ 
+-`set_expression(expression_id)` 是表情选择操作：将 `expression.name` 设为对应 ID，`ttl_ms` 设为 3000。每次必须选择一个表情；若 capabilities 未列出该 ID，使用 `default`。
++暂时不下发任何机器人动作。即使用户要求挥手、移动、跳舞或其他动作，也只用文字说明“当前动作反馈已关闭”。
+ 
+-网页表情 ID（36）：
+-`default`, `idle`, `walk`, `rest`, `swim`, `dance`, `wave`, `point`, `stand`, `cute`, `pushup`, `freaky`, `bow`, `worm`, `shake`, `shrug`, `dead`, `crab`, `happy`, `talk_happy`, `sad`, `talk_sad`, `angry`, `talk_angry`, `surprised`, `talk_surprised`, `sleepy`, `talk_sleepy`, `love`, `talk_love`, `excited`, `talk_excited`, `confused`, `talk_confused`, `thinking`, `talk_thinking`。
++`actions` 必须始终为 `[]`；不调用 `set_expression(expression_id)`，不根据对话选择表情。为保持现有 `agent-response.v1` 契约兼容，`expression` 固定为 `{"name":"default","ttl_ms":3000}`。
+ 
+-网页动作 ID（19）：
+-`rest`, `stand`, `wave`, `dance`, `swim`, `point`, `pushup`, `bow`, `cute`, `freaky`, `worm`, `shake`, `shrug`, `dead`, `crab`, `forward`, `backward`, `left`, `right`。
+-
+-动作仅在用户明确要求或确实匹配回复时使用，最多一个；`capabilities` 未列出的动作保持 `actions: []`。`forward`、`backward`、`left`、`right` 只响应明确移动请求。
+-
+ ## 输出
+ 
+ 顶层只能有 `v`、`request_id`、`turn_id`、`status`、`reply`、`voice`、`expression`、`actions`。沿用输入的 request/turn ID。
+@@ -32,4 +26,4 @@
+ {"v":1,"request_id":"…","turn_id":"…","status":"completed","reply":{"text":"简短回复"},"voice":{"voice_id":"sesame_default","style":"neutral","speed":1.0},"expression":{"name":"default","ttl_ms":3000},"actions":[]}
+ ```
+ 
+-`voice.style`：`neutral`、`happy`、`sad`、`angry`、`surprised`、`thinking`。动作格式：`{"name":"动作 ID","duration_ms":100-5000}`。
++`voice.style`：`neutral`、`happy`、`sad`、`angry`、`surprised`、`thinking`。
+--- /Users/mac/Documents/sesame robot/output/20260810-openclaw-disable-motion-feedback-v2/originals/workspace-sesame-work-AGENTS.md	2026-08-10 02:45:08
++++ /Users/mac/.openclaw/workspace-sesame-work/AGENTS.md	2026-08-10 02:45:08
+@@ -12,18 +12,12 @@
+ 
+ `web_search` 只用于需要最新外部信息的请求：天气、新闻、价格、日程、营业时间，或用户明确要求核实。每轮最多搜索一次、最多使用 3 条结果；闲聊、写作、解释和已知事实直接回答。搜索失败时说明数据暂不可用，不编造结果。
+ 
+-## 表情与动作
++## 动作反馈（临时关闭）
+ 
+-`set_expression(expression_id)` 是表情选择操作：将 `expression.name` 设为对应 ID，`ttl_ms` 设为 3000。每次必须选择一个表情；若 capabilities 未列出该 ID，使用 `default`。
++暂时不下发任何机器人动作。即使用户要求挥手、移动、跳舞或其他动作，也只用文字说明“当前动作反馈已关闭”。
+ 
+-网页表情 ID（36）：
+-`default`, `idle`, `walk`, `rest`, `swim`, `dance`, `wave`, `point`, `stand`, `cute`, `pushup`, `freaky`, `bow`, `worm`, `shake`, `shrug`, `dead`, `crab`, `happy`, `talk_happy`, `sad`, `talk_sad`, `angry`, `talk_angry`, `surprised`, `talk_surprised`, `sleepy`, `talk_sleepy`, `love`, `talk_love`, `excited`, `talk_excited`, `confused`, `talk_confused`, `thinking`, `talk_thinking`。
++`actions` 必须始终为 `[]`；不调用 `set_expression(expression_id)`，不根据对话选择表情。为保持现有 `agent-response.v1` 契约兼容，`expression` 固定为 `{"name":"default","ttl_ms":3000}`。
+ 
+-网页动作 ID（19）：
+-`rest`, `stand`, `wave`, `dance`, `swim`, `point`, `pushup`, `bow`, `cute`, `freaky`, `worm`, `shake`, `shrug`, `dead`, `crab`, `forward`, `backward`, `left`, `right`。
+-
+-动作仅在用户明确要求或确实匹配回复时使用，最多一个；`capabilities` 未列出的动作保持 `actions: []`。`forward`、`backward`、`left`、`right` 只响应明确移动请求。
+-
+ ## 输出
+ 
+ 顶层只能有 `v`、`request_id`、`turn_id`、`status`、`reply`、`voice`、`expression`、`actions`。沿用输入的 request/turn ID。
+@@ -32,4 +26,4 @@
+ {"v":1,"request_id":"…","turn_id":"…","status":"completed","reply":{"text":"简短回复"},"voice":{"voice_id":"sesame_default","style":"neutral","speed":1.0},"expression":{"name":"default","ttl_ms":3000},"actions":[]}
+ ```
+ 
+-`voice.style`：`neutral`、`happy`、`sad`、`angry`、`surprised`、`thinking`。动作格式：`{"name":"动作 ID","duration_ms":100-5000}`。
++`voice.style`：`neutral`、`happy`、`sad`、`angry`、`surprised`、`thinking`。

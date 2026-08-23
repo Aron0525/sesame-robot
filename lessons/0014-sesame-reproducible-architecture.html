@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="以一次人工录音回合为线索，理解如何工程化重建 Sesame V3。">
+  <title>专题课｜重建 Sesame 的一轮语音</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="14">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+      <div class="lesson-tabs">
+        <a href="0011-openclaw-agent-sandbox-privacy.html" title="安全边界">11</a>
+        <a href="0012-esp32-wifi-disconnect-basics.html" title="Wi-Fi 排障">12</a>
+        <a href="0013-sesame-v15-project-compass.html" title="项目罗盘">13</a>
+        <a href="0014-sesame-reproducible-architecture.html" aria-current="page" title="可复现架构">14</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="14">
+      <div>
+        <p class="kicker">Sesame Robot V3 · 工程应用课</p>
+        <h1>从一次按键录音，<br>重建整套系统</h1>
+        <p class="lead">本课不用先看所有代码。只追踪一次“按 BOOT，说一句话，机器人回复”的回合，架构为什么要分成 ESP32、Gateway、OpenClaw 和语音服务会自然清楚。</p>
+        <div class="lesson-meta"><span>约 18 分钟</span><span>工程复现</span><span>代码级链路</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="precondition">
+      <div class="chapter-head"><span class="chapter-no">14—A</span><div><h2>先把四个前提配对</h2><p>一项不一致，系统会在正确的位置拒绝你。</p></div></div>
+      <div class="diagram">Gateway .env                     ESP32 NVS
+────────────────────             ────────────────────
+gateway_id     ─────────────────→ gateway_id
+device token   ←───────────────── device_token
+TLS cert/key   ───────────────┐
+mDNS hostname  ───────────────┼→ root CA + hostname verification
+DashScope key  ── Gateway only │
+OpenClaw token ── Gateway only │</div>
+      <p>设备不需要 DashScope key 或 OpenClaw token。OpenClaw 也不应拿到设备 token 或 TLS 私钥。这样即使一段 Agent 配置有问题，它也不能升级成操控机器人或泄露整台电脑的权限。</p>
+    </section>
+
+    <section class="chapter" id="turn">
+      <div class="chapter-head"><span class="chapter-no">14—B</span><div><h2>从按钮到声音的实际调用链</h2><p>文件路径比术语更重要，因为它让你能回到代码验证。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>时刻</th><th>发生什么</th><th>核心文件</th><th>如果失败</th></tr></thead>
+        <tbody>
+          <tr><td>开机</td><td><code>app_main()</code> 启动网络、OLED、舵机、网页控制、AudioHal 和 VoiceController。</td><td><code>firmware/.../main/app_main.cpp</code></td><td>先看哪个初始化返回 ESP_ERR。</td></tr>
+          <tr><td>连接</td><td>VoiceController 读取 NVS，通过 mDNS 找 Gateway，建立 WSS，发送 <code>session.hello</code>。</td><td><code>sesame_voice/voice_controller.cpp</code>、<code>sesame_transport/gateway_client.cpp</code></td><td>查 Wi-Fi、mDNS、证书、gateway_id、token。</td></tr>
+          <tr><td>录音</td><td>按 BOOT 后，I2S 每 20 ms 读 PCM；Opus 编码，装进 SSM1 二进制帧，放入上行队列。</td><td><code>sesame_audio/</code>、<code>sesame_voice/</code></td><td>查 I2S、队列、帧序号和最大录音时长。</td></tr>
+          <tr><td>接收</td><td>Gateway 验证每个 binary frame，把整轮 Opus 解码成 PCM。</td><td><code>gateway/.../app.py</code>、<code>protocol/audio.py</code></td><td>查 direction、stream_id、generation_id、sequence、字节上限。</td></tr>
+          <tr><td>理解</td><td>Pipeline 调 ASR，再把最终文本交给 OpenClaw，解析严格 JSON。</td><td><code>pipeline.py</code>、<code>openclaw/client.py</code></td><td>查 Provider 超时、Schema、request_id、turn_id。</td></tr>
+          <tr><td>回复</td><td>TTS 返回 PCM，Gateway 编为 Opus，先下发 response.plan，再发送 tts.start、音频包、tts.stop。</td><td><code>pipeline.py</code>、<code>app.py</code></td><td>查 TTS、下行 packet、generation 和 I2S 功放。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="why-gateway">
+      <div class="chapter-head"><span class="chapter-no">14—C</span><div><h2>为什么不能让 ESP32 直连 OpenClaw</h2><p>直连会把四个本该独立的问题绑死。</p></div></div>
+      <div class="concept-grid">
+        <article class="concept"><span class="term">Audio</span><h3>格式转换不该交给 Agent</h3><p>ESP32 的 Opus 包必须被解码、限长和关联到一轮会话，ASR 才能消费；这属于 Gateway 的确定性工作。</p></article>
+        <article class="concept"><span class="term">Secrets</span><h3>最小权限</h3><p>设备只有自己的 token 和根证书。DashScope Key 与 OpenClaw token 留在 Mac，不会出现在固件或局域网广播中。</p></article>
+        <article class="concept"><span class="term">Control</span><h3>模型输出必须二次验证</h3><p>AI 回复不是硬件命令。Gateway 检查 Schema、关联 ID、声音和表情白名单；ESP32 仍检查自己的安全状态。</p></article>
+        <article class="concept"><span class="term">Recovery</span><h3>断线不应等于重启</h3><p>设备可以重新发现 mDNS、重建 WSS；Gateway 可以取消过期回合，避免旧 TTS 在新一轮继续播放。</p></article>
+      </div>
+    </section>
+
+    <section class="chapter" id="exercise">
+      <div class="chapter-head"><span class="chapter-no">14—D</span><div><h2>复现时的工作顺序</h2><p>按层做一次小验证，比一次性启动全部服务更快定位问题。</p></div></div>
+      <ol class="checklist">
+        <li>只做 build：确认 Python/uv/libopus 与 ESP-IDF 工具链，不碰密钥和硬件。</li>
+        <li>只做服务：确认 OpenClaw 是 loopback daemon，Gateway 配置完整且 healthz 可达。</li>
+        <li>只做设备连接：用安全生成的 NVS 验证 TLS/WSS 握手，不开始录音。</li>
+        <li>只做上行：按键录音后确认 Gateway 收到受限 Opus 包。</li>
+        <li>再启用 ASR、OpenClaw、TTS；每一层单独看阶段日志和错误码。</li>
+        <li>最后接功放和舵机，优先验证 stop，再做实际姿态和声音。</li>
+      </ol>
+      <div class="danger"><strong>常见错误</strong>把 Gateway 的 <code>.env</code>、设备 NVS、根证书和 OpenClaw home 当作“缺失代码”从旧电脑复制。这不仅不可靠，也会把 token、Wi-Fi 密码和会话状态带入不该出现的地方。</div>
+    </section>
+
+    <section class="chapter" id="check">
+      <div class="chapter-head"><span class="chapter-no">14—E</span><div><h2>自测：能否自己画出链路</h2><p>不用背全部字段，只要能说明责任为什么放在这一层。</p></div></div>
+      <div class="quiz">
+        <details><summary>Gateway 为什么同时是 ESP32 的服务端、OpenClaw 的客户端？</summary><p>ESP32 主动通过 WSS 连接 Gateway，所以 Gateway 监听设备路径；Gateway 又主动连接本机 OpenClaw 发起 chat.send。两条连接方向不同，Gateway 因而处在编排位置。</p></details>
+        <details><summary>如果 mDNS 找到了错误 IP，应该先改模型、语音或硬件吗？</summary><p>都不该。mDNS 只负责发现 LAN 地址；先检查 Gateway 广播的地址、VPN/客户端隔离和 TLS hostname。它尚未进入 ASR 或 OpenClaw。</p></details>
+        <details><summary>为什么 AI 返回的字符串还不够，必须有 JSON Schema？</summary><p>因为 Gateway 需要无歧义地检查它属于哪一轮、表情是否允许、速度是否在范围内，以及是否错误地请求了工具或动作。</p></details>
+      </div>
+    </section>
+
+    <section class="sources">
+      <h2>继续阅读</h2>
+      <p>工程速查请看 <a href="../reference/sesame-v3-rebuild-blueprint.html">可复现架构蓝图</a>。下一节可直接进入 <code>app_main.cpp</code> 与 VoiceController，逐段解释 ESP32 是怎样把这张架构图跑起来的。</p>
+    </section>
+  </main>
+</body>
+</html>

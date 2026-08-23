@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "capability": "web.search",
+  "transport": "local",
+  "provider": "parallel-free",
+  "attempts": [],
+  "outputs": [
+    {
+      "result": {
+        "searchQueries": [
+          "OpenClaw web search official documentation"
+        ],
+        "provider": "parallel-free",
+        "count": 1,
+        "tookMs": 2445,
+        "externalContent": {
+          "untrusted": true,
+          "source": "web_search",
+          "provider": "parallel-free",
+          "wrapped": true
+        },
+        "results": [
+          {
+            "title": "\n<<<EXTERNAL_UNTRUSTED_CONTENT id=\"9cb47219d3ecae62\">>>\nSource: Web Search\n---\nOpenClaw API — The Developer's Guide\n<<<END_EXTERNAL_UNTRUSTED_CONTENT id=\"9cb47219d3ecae62\">>>",
+            "url": "https://instaclaw.io/blog/openclaw-api-guide",
+            "description": "\n<<<EXTERNAL_UNTRUSTED_CONTENT id=\"5e94ae410143ccb8\">>>\nSource: Web Search\n---\nFor frequently accessed data such as skill lists or agent configurations, a 5-minute cache TTL is usually reasonable.\n\nFinally, keep your integration libraries up to date. Official OpenClaw client libraries are maintained for Node.js, Python, Ruby, and Go, with community libraries available for other languages. These libraries handle authentication, retries, and pagination automatically, reducing the amount of boilerplate code you need to maintain.\n\n## Getting Started with the API\n\nThe fastest way to get started is through InstaClaw, which provides hosted API access without any infrastructure setup. After creating an account, navigate to API Settings in your dashboard to generate your first key. The documentation includes interactive examples and a Postman collection you can import to test endpoints.\n\nStart with read-only operations such as listing agents and querying task history.\nOnce you're comfortable with authentication and response formats, move on to creating tasks and managing skills. The sandbox environment lets you experiment without affecting production data.\n\nThe OpenClaw community maintains [example repositories](https://github.com/openclaw) for common integration patterns including Slack bots, GitHub Actions workflows, and data pipeline integrations. These provide tested starting points for your own projects. You can find links to these resources in the developer documentation along with tutorials covering specific use cases.\n\nUnderstanding how OpenClaw works at a fundamental level will help you design better integrations. The architecture combines modular skills, persistent memory, and intelligent task routing — all accessible through the API.\n\n## Related Pages\n\n* Full API Documentation\n* What Is OpenClaw?\n* OpenClaw Skills Guide\n* How OpenClaw Works\n\n## Ready to get started?\n\nGet your personal AI agent live in minutes.\n<<<END_EXTERNAL_UNTRUSTED_CONTENT id=\"5e94ae410143ccb8\">>>",
+            "siteName": "instaclaw.io",
+            "excerpts": [
+              "\n<<<EXTERNAL_UNTRUSTED_CONTENT id=\"5e94ae410143ccb8\">>>\nSource: Web Search\n---\nFor frequently accessed data such as skill lists or agent configurations, a 5-minute cache TTL is usually reasonable.\n\nFinally, keep your integration libraries up to date. Official OpenClaw client libraries are maintained for Node.js, Python, Ruby, and Go, with community libraries available for other languages. These libraries handle authentication, retries, and pagination automatically, reducing the amount of boilerplate code you need to maintain.\n\n## Getting Started with the API\n\nThe fastest way to get started is through InstaClaw, which provides hosted API access without any infrastructure setup. After creating an account, navigate to API Settings in your dashboard to generate your first key. The documentation includes interactive examples and a Postman collection you can import to test endpoints.\n\nStart with read-only operations such as listing agents and querying task history.\nOnce you're comfortable with authentication and response formats, move on to creating tasks and managing skills. The sandbox environment lets you experiment without affecting production data.\n\nThe OpenClaw community maintains [example repositories](https://github.com/openclaw) for common integration patterns including Slack bots, GitHub Actions workflows, and data pipeline integrations. These provide tested starting points for your own projects. You can find links to these resources in the developer documentation along with tutorials covering specific use cases.\n\nUnderstanding how OpenClaw works at a fundamental level will help you design better integrations. The architecture combines modular skills, persistent memory, and intelligent task routing — all accessible through the API.\n\n## Related Pages\n\n* Full API Documentation\n* What Is OpenClaw?\n* OpenClaw Skills Guide\n* How OpenClaw Works\n\n## Ready to get started?\n\nGet your personal AI agent live in minutes.\n<<<END_EXTERNAL_UNTRUSTED_CONTENT id=\"5e94ae410143ccb8\">>>"
+            ]
+          }
+        ],
+        "searchId": "search_43ea9bcef226c2a05ba2058b448532f5",
+        "sessionId": "43a02d84-3734-4ec3-bc11-35ae47132125",
+        "usage": [
+          {
+            "name": "sku_search",
+            "count": 1
+          }
+        ]
+      }
+    }
+  ]
+}

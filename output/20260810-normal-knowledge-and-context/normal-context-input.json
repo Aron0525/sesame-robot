@@ -1,0 +1,1 @@
+{"v":1,"request_id":"normal-context-verify","conversation_id":"context-verify","turn_id":"context-1","input":{"text":"根据已确认的当前上下文，我现在在哪个城市？"},"capabilities":{"expressions":["default","thinking","happy"],"actions":[]}}

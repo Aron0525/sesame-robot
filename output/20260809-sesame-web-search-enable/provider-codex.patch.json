@@ -1,0 +1,14 @@
+{
+  "tools": {
+    "web": {
+      "search": {
+        "enabled": true,
+        "provider": "codex",
+        "maxResults": 3,
+        "timeoutSeconds": 8,
+        "cacheTtlMinutes": 5,
+        "openaiCodex": {"enabled": true, "mode": "cached", "contextSize": "low"}
+      }
+    }
+  }
+}

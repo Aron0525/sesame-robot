@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="以 Desktop/2 当前 Sesame V3 v1.5 代码为准，建立从运行链路到文件入口的项目心智模型。">
+  <title>专题课｜Sesame V3 v1.5 项目罗盘</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="13">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+      <div class="lesson-tabs">
+        <a href="0007-sesame-runtime-connections.html" title="运行链路">07</a>
+        <a href="0008-sesame-software-bundle-map.html" title="旧软件包地图">08</a>
+        <a href="0010-sesame-openclaw-config.html" title="OpenClaw 配置">10</a>
+        <a href="0011-openclaw-agent-sandbox-privacy.html" title="安全边界">11</a>
+        <a href="0012-esp32-wifi-disconnect-basics.html" title="Wi-Fi 排障">12</a>
+        <a href="0013-sesame-v15-project-compass.html" aria-current="page" title="当前项目罗盘">13</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="13">
+      <div>
+        <p class="kicker">Sesame Robot V3 · 当前代码基线</p>
+        <h1>先认清项目，<br>再读代码</h1>
+        <p class="lead">你不需要先懂完 C++、Python、FreeRTOS 或 OpenClaw。第一步是能回答：一句话从哪里进来，经过谁，最后由谁播放；一个文件属于哪一层。</p>
+        <div class="lesson-meta"><span>约 15 分钟</span><span>项目全景</span><span>基于 v1.5 代码</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="truth">
+      <div class="chapter-head"><span class="chapter-no">13—A</span><div><h2>先纠正两套旧认知</h2><p>先后有过不同架构，必须以当前正式代码为准。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>容易混淆的说法</th><th>当前项目的事实</th></tr></thead>
+        <tbody>
+          <tr><td>“这是 Arduino 主工程。”</td><td>不是。当前唯一正式固件是 <code>firmware/esp32_voice_idf/</code>，使用 ESP-IDF；<code>firmware/arduino/</code> 是旧基线和动作来源。</td></tr>
+          <tr><td>“ASR/TTS 还是 Demo 或静音。”</td><td>不是当前目标实现。Gateway 代码已包含 DashScope ASR/TTS Provider；是否真能调用取决于本机 <code>.env</code> 的凭据与授权。</td></tr>
+          <tr><td>“OpenClaw 说挥手，机器人就挥手。”</td><td>当前 v1.5 网关会把 AI 输出的动作清掉；AI 只影响回复、声音风格和表情。本机控制台与 ESP32 才负责受保护的物理动作。</td></tr>
+        </tbody>
+      </table>
+      <div class="danger"><strong>学习规则</strong>阅读旧课程或旧文档时，凡是与根目录 <code>README.md</code>、<code>contracts/</code> 和当前源代码冲突的地方，都把当前代码当成事实，不把旧说明当成命令。</div>
+    </section>
+
+    <section class="chapter" id="whole-turn">
+      <div class="chapter-head"><span class="chapter-no">13—B</span><div><h2>一次对话，实际上经过七步</h2><p>这七步是之后读所有文件的坐标轴。</p></div></div>
+      <div class="diagram">① 用户按 BOOT / 说唤醒词
+② ESP32：I2S 读麦克风 PCM
+③ ESP32：PCM → Opus，经 WSS 发给电脑
+④ Gateway：Opus → PCM，DashScope ASR → 最终文字
+⑤ Gateway：文字 → 本机 OpenClaw → 受限 JSON 回复
+⑥ Gateway：回复文字 → DashScope TTS PCM → Opus
+⑦ ESP32：播放 Opus、显示表情；必要时执行已校验的本地动作</div>
+      <div class="concept-grid">
+        <article class="concept"><span class="term">Device</span><h3>ESP32 处理实时世界</h3><p>它离硬件最近，所以负责采音、播音、按键、Wi-Fi、OLED、舵机；它不需要理解“用户问了什么”。</p></article>
+        <article class="concept"><span class="term">Gateway</span><h3>电脑负责编排</h3><p>它是唯一同时认识设备、语音服务和 OpenClaw 的组件，因此负责验证、转换格式、调用顺序与失败处理。</p></article>
+        <article class="concept wide"><span class="term">OpenClaw</span><h3>AI 是链路的一段，不是整个系统</h3><p>它只看到 Gateway 给它的文字和允许的能力清单。它不能读取机器人录音、不能登录设备，也不能越过 Gateway 去操作硬件。</p></article>
+      </div>
+    </section>
+
+    <section class="chapter" id="programs">
+      <div class="chapter-head"><span class="chapter-no">13—C</span><div><h2>程序、框架、协议、服务要分开</h2><p>这一步能消除“目录里为什么有这么多东西”的困惑。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>名称</th><th>类别</th><th>在这个项目中的作用</th><th>位置</th></tr></thead>
+        <tbody>
+          <tr><td>C++ / Python</td><td>编程语言</td><td>分别写 ESP32 固件与电脑网关</td><td><code>firmware/</code>、<code>gateway/</code></td></tr>
+          <tr><td>ESP-IDF</td><td>嵌入式框架</td><td>提供 ESP32 的 Wi-Fi、GPIO、I2S、Flash、构建和 FreeRTOS</td><td>固件的 <code>CMakeLists.txt</code> 与 SDK 环境</td></tr>
+          <tr><td>FreeRTOS</td><td>实时操作系统</td><td>让语音、网络、OLED、舵机等多项工作并发，不互相卡死</td><td><code>sesame_voice</code>、<code>sesame_robot</code> 等组件</td></tr>
+          <tr><td>FastAPI / Uvicorn</td><td>Python Web 框架 / 服务器</td><td>让 Mac 对 ESP32 提供 HTTP、WebSocket、控制台和健康检查</td><td><code>gateway/.../app.py</code></td></tr>
+          <tr><td>Opus / WSS / JSON Schema</td><td>编码或协议</td><td>分别约定语音如何压缩、如何加密传输、消息长什么样</td><td><code>contracts/</code> 与两端协议代码</td></tr>
+          <tr><td>DashScope</td><td>外部云服务</td><td>ASR：语音转文字；TTS：文字转语音</td><td>Gateway Provider</td></tr>
+          <tr><td>OpenClaw</td><td>本机 AI 运行时</td><td>根据文字产生严格 JSON 的回复计划</td><td><code>ops/openclaw/</code> 与 Gateway Adapter</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="entries">
+      <div class="chapter-head"><span class="chapter-no">13—D</span><div><h2>只记住六个入口文件</h2><p>其他文件都是围绕这些入口服务的。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>文件</th><th>读它要回答的问题</th></tr></thead>
+        <tbody>
+          <tr><td><code>firmware/esp32_voice_idf/main/app_main.cpp</code></td><td>机器人开机后初始化了哪些硬件和服务？</td></tr>
+          <tr><td><code>.../sesame_voice/voice_controller.h/.cpp</code></td><td>一轮录音、唤醒、播放和重连如何运转？</td></tr>
+          <tr><td><code>.../sesame_transport/gateway_client.cpp</code></td><td>ESP32 如何找到并安全连接电脑？</td></tr>
+          <tr><td><code>gateway/.../sesame_voice_gateway/app.py</code></td><td>电脑如何接收设备、鉴权和处理一轮会话？</td></tr>
+          <tr><td><code>gateway/.../pipeline.py</code></td><td>ASR → OpenClaw → TTS 是怎样按顺序编排的？</td></tr>
+          <tr><td><code>gateway/.../openclaw/client.py</code></td><td>网关怎样限制并验证 AI 输出？</td></tr>
+        </tbody>
+      </table>
+      <div class="boundary"><strong>读法</strong>先读“谁创建谁、谁调用谁”，再读函数内部细节。第一次遇到 500 行文件，不要从第 1 行硬读到最后一行。</div>
+    </section>
+
+    <section class="chapter" id="files">
+      <div class="chapter-head"><span class="chapter-no">13—E</span><div><h2>看到文件后，怎样判断它该不该改</h2><p>先划清源代码、合同、配置和生成物。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>类型</th><th>例子</th><th>通常如何对待</th></tr></thead>
+        <tbody>
+          <tr><td>源代码</td><td><code>.cpp</code>、<code>.h</code>、<code>.py</code></td><td>实现功能；修改后需要对应测试。</td></tr>
+          <tr><td>构建描述</td><td><code>CMakeLists.txt</code>、<code>pyproject.toml</code>、<code>uv.lock</code></td><td>决定如何编译、安装和启动；不要为绕过报错随意改锁文件。</td></tr>
+          <tr><td>跨层合同</td><td><code>contracts/schemas/*.json</code></td><td>改变字段前必须同时检查 ESP32、Gateway、测试和文档。</td></tr>
+          <tr><td>本机秘密</td><td><code>.env</code>、证书、<code>device-nvs.bin</code></td><td>可配置但不进 Git、不贴到聊天；它们不是学习代码的起点。</td></tr>
+          <tr><td>生成物/本机状态</td><td><code>.venv</code>、<code>build/</code>、<code>managed_components/</code></td><td>通常不手改，可从配置和工具链重新生成。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="route">
+      <div class="chapter-head"><span class="chapter-no">13—F</span><div><h2>接下来的学习路线</h2><p>目标不是背术语，而是每次都能沿调用链定位问题。</p></div></div>
+      <ol class="checklist">
+        <li>设备启动：从 <code>app_main.cpp</code> 认识对象如何被创建。</li>
+        <li>FreeRTOS：任务、队列、互斥锁怎样保证实时语音不卡住。</li>
+        <li>音频：PCM、I2S、Opus、20 ms 帧为什么这样设计。</li>
+        <li>网络：Wi-Fi、mDNS、TLS、WSS、会话和重连分别解决什么问题。</li>
+        <li>Gateway：FastAPI WebSocket、认证、状态与异步回合。</li>
+        <li>Pipeline：ASR、OpenClaw、TTS、打断与错误如何流动。</li>
+        <li>协议与安全：JSON Schema、序号、能力白名单和三层拒绝。</li>
+        <li>动作与硬件：网页控制、舵机电源、姿态、急停与验证。</li>
+        <li>构建与部署：从新电脑到实机联调，每层如何独立验收。</li>
+        <li>测试与改动：怎样为一次小修改找到正确测试，而不被 AI 生成代码带着跑。</li>
+      </ol>
+      <div class="memory"><h3>本课唯一要记住的话</h3><p>这个项目的中心不是 OpenClaw，也不是 ESP32；中心是“受验证的语音回合”。ESP32 负责现实世界，Gateway 负责跨边界编排，OpenClaw 负责受限制的语言理解。</p></div>
+    </section>
+
+    <section class="chapter" id="check">
+      <div class="chapter-head"><span class="chapter-no">13—G</span><div><h2>两分钟自测</h2><p>先自己回答，再展开答案；答不上来是下一节的起点。</p></div></div>
+      <div class="quiz">
+        <details><summary>1. ESP32 想把录音交给 OpenClaw，能直接连接它吗？</summary><p>不能。ESP32 只连接 Voice Gateway；Gateway 先完成设备鉴权、音频解码和 ASR，才把最终文本交给本机 OpenClaw。</p></details>
+        <details><summary>2. <code>contracts/</code> 是可启动程序吗？</summary><p>不是。它是两端共同遵守的消息合同。ESP32 或 Gateway 改字段时，合同和另一端都可能需要同步。</p></details>
+        <details><summary>3. 为什么 <code>.env</code> 不能提交到 Git？</summary><p>它包含设备 token、云端 API Key、会话密钥和 TLS 路径等部署秘密。代码可以复制，秘密必须通过受控渠道为每台设备重新配置。</p></details>
+      </div>
+    </section>
+
+    <section class="sources">
+      <h2>本课依据与继续阅读</h2>
+      <p>主资料是当前仓库的 <code>README.md</code>、<code>docs/project-overview.md</code>、<code>docs/security.md</code>、<code>contracts/</code> 与六个入口源文件。它们比早期 Arduino/Demo 架构材料更接近当前 v1.5 实现。</p>
+      <p>打开 <a href="../reference/sesame-v15-project-map.html">v1.5 项目地图速查表</a>，阅读时始终保持在旁边。看不懂任何术语或文件时，直接把路径和片段发给我；我会先解释它处于哪一层，再解释代码细节。</p>
+    </section>
+  </main>
+</body>
+</html>

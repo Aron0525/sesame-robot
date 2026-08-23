@@ -1,0 +1,131 @@
+{
+  "target_time": "2026-08-09 20:44:00 PDT",
+  "root": "/Users/mac/Desktop/2",
+  "archive": "/Users/mac/Documents/sesame robot/restore-archives/desktop2-pre-2044-restore-20260810-000349",
+  "restored": [
+    {
+      "path": "contracts/schemas/control-event.v1.schema.json",
+      "before_sha256": "6591bd170cb58523828eafb629190b1ca8ecedca2c0381452b44486dd5e49976",
+      "baseline_sha256": "2237f44b36583c0a972fd476af3a64401f636702c3b35e46d2a7d3847da5e423",
+      "after_sha256": "2237f44b36583c0a972fd476af3a64401f636702c3b35e46d2a7d3847da5e423"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/CMakeLists.txt",
+      "before_sha256": "cd76013f496c2a1ca1250f35656882f80de44d1ce0b890a0f4ed9f2f1f96ac7b",
+      "baseline_sha256": "cd76013f496c2a1ca1250f35656882f80de44d1ce0b890a0f4ed9f2f1f96ac7b",
+      "after_sha256": "cd76013f496c2a1ca1250f35656882f80de44d1ce0b890a0f4ed9f2f1f96ac7b"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/include/sesame_voice/voice_controller.h",
+      "before_sha256": "98b530df1eeb3fddca888f874bb46e0164ec1cf824a1ff444c8365b6186a8d20",
+      "baseline_sha256": "e74031bd07980e7c21f16e280de3462bcd0fea61ccd67cbd5746b16c9c3177b1",
+      "after_sha256": "e74031bd07980e7c21f16e280de3462bcd0fea61ccd67cbd5746b16c9c3177b1"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/voice_controller.cpp",
+      "before_sha256": "6d8e5946d48fb0d953e52b82773af46d71620e79a56389cef4613aed77f944dc",
+      "baseline_sha256": "01b5de2a51aa9ca15c4af05fbb7d4d757063710fe4123f8b875454267ad81beb",
+      "after_sha256": "01b5de2a51aa9ca15c4af05fbb7d4d757063710fe4123f8b875454267ad81beb"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/wake_vad_engine.cpp",
+      "before_sha256": "13b3d5d20017df6026d9974c3c1f0aa2ac38aa6f4731afd7211e9674c83e3a06",
+      "baseline_sha256": "13b3d5d20017df6026d9974c3c1f0aa2ac38aa6f4731afd7211e9674c83e3a06",
+      "after_sha256": "13b3d5d20017df6026d9974c3c1f0aa2ac38aa6f4731afd7211e9674c83e3a06"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/tests/run_host_tests.sh",
+      "before_sha256": "360557a19fe2756f667083bda4eb0ae5f7b62c91754809c74c033d8c814ff048",
+      "baseline_sha256": "25b17ba02d1c7048e5b3450e38693ebe6618c4df55b56e416ee7176a56cbc3a6",
+      "after_sha256": "25b17ba02d1c7048e5b3450e38693ebe6618c4df55b56e416ee7176a56cbc3a6"
+    },
+    {
+      "path": "gateway/apps/voice_gateway/src/sesame_voice_gateway/app.py",
+      "before_sha256": "5fb02b311760b27a90c4bfaf723749f79f4f30075430e0b0ea6dd5b8c42bb993",
+      "baseline_sha256": "307b4d7e4ccdd2f73c83c7db150063af77c941af8f2bc92ca108a93ace365d3b",
+      "after_sha256": "307b4d7e4ccdd2f73c83c7db150063af77c941af8f2bc92ca108a93ace365d3b"
+    },
+    {
+      "path": "gateway/apps/voice_gateway/src/sesame_voice_gateway/pipeline.py",
+      "before_sha256": "d27489aa263da377d784f8546d6b21c5cfbf91c4fdd44785358bae640f356510",
+      "baseline_sha256": "f410c3b1d047fd076022be1dd15e67c972af1184c43faadba6fd9ff61e87d8df",
+      "after_sha256": "f410c3b1d047fd076022be1dd15e67c972af1184c43faadba6fd9ff61e87d8df"
+    },
+    {
+      "path": "gateway/tests/test_gateway_protocol_hardening.py",
+      "before_sha256": "bbee949fb0a2266f56330933cb34aa6601bf690d4159ece9291af862f6409405",
+      "baseline_sha256": "20683d09f1414be2824d53a3c2e0a276719c042d5fb35d9057ef6d5b34a1d6b5",
+      "after_sha256": "20683d09f1414be2824d53a3c2e0a276719c042d5fb35d9057ef6d5b34a1d6b5"
+    },
+    {
+      "path": "gateway/tests/test_privacy_pipeline.py",
+      "before_sha256": "156dd0d9dcc6384448477d4d7bc50404df9fa281c02f12e6b0f3c1c1e0f3aac6",
+      "baseline_sha256": "156dd0d9dcc6384448477d4d7bc50404df9fa281c02f12e6b0f3c1c1e0f3aac6",
+      "after_sha256": "156dd0d9dcc6384448477d4d7bc50404df9fa281c02f12e6b0f3c1c1e0f3aac6"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/include/sesame_voice/voice_turn_detector.h",
+      "before_sha256": "74063ac96bc61ed7146cfc5e7f3876d08244319f7bb95d3f6e94cb57343e8cf1",
+      "baseline_sha256": "b9841442845fb47c2cb7b4c0064268effd9dd9354442a2f90ed5e0a6213ef823",
+      "after_sha256": "b9841442845fb47c2cb7b4c0064268effd9dd9354442a2f90ed5e0a6213ef823"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/voice_turn_detector.cpp",
+      "before_sha256": "fe7ab7b89e55c4e283cf9525be22802e0795f52658d7ad0b7f19e583b81a4a6b",
+      "baseline_sha256": "49d2ab7c95765184efde900da1124783ca5855add2a1e4cac5f8de56c254bd58",
+      "after_sha256": "49d2ab7c95765184efde900da1124783ca5855add2a1e4cac5f8de56c254bd58"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/models/zhima_wakeword_tts_v2_int8.tflite",
+      "before_sha256": "2247f91d43b4d70fe17c90b1e999130c2b51476e044a86156b4ea250ba6ae305",
+      "baseline_sha256": "79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065",
+      "after_sha256": "79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/include/sesame_voice/zhima_wakeword_config.h",
+      "before_sha256": "bfa63f39cc82ba69df52107830dbbe808859474b7d13596bf9b78b436ad67b0d",
+      "baseline_sha256": "55fb909f7c3c79fd2b7d3e57ccb38053006f871e1695ed0d0358c12b0b97ca17",
+      "after_sha256": "55fb909f7c3c79fd2b7d3e57ccb38053006f871e1695ed0d0358c12b0b97ca17"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/include/sesame_voice/zhima_wakeword_model_data.h",
+      "before_sha256": "f0f3fefd0cf5ccac4d93f4ce0d7f63181ae19420b4aa2740ee96173281fcfe09",
+      "baseline_sha256": "fc61c979c367952bb2c51ec60648ea1f4aee17e7afc618c137135be2d06a7d3e",
+      "after_sha256": "fc61c979c367952bb2c51ec60648ea1f4aee17e7afc618c137135be2d06a7d3e"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/components/sesame_voice/zhima_wakeword_model_data.cpp",
+      "before_sha256": "f66587388049cb020b679113a3acd61b29827e27c78c3edab906384db801c452",
+      "baseline_sha256": "4edc76160f0be31b91248abaaf357b0b64c7b57a7b159edbb91a1dab83cb931f",
+      "after_sha256": "4edc76160f0be31b91248abaaf357b0b64c7b57a7b159edbb91a1dab83cb931f"
+    },
+    {
+      "path": "firmware/esp32_voice_idf/tests/verify_nihao_zhima_wakeword.py",
+      "before_sha256": "fbc29efaf078bd2368b4fa0e6386d864c9d142d8386b27496810fee372858a3f",
+      "baseline_sha256": "a78b4a94942749dd99aa459f1303ad7c58bedb5a6f0c76d63434e5ebcaf8085d",
+      "after_sha256": "a78b4a94942749dd99aa459f1303ad7c58bedb5a6f0c76d63434e5ebcaf8085d"
+    }
+  ],
+  "removed_new_source": [
+    "firmware/esp32_voice_idf/components/sesame_voice/include/sesame_voice/voice_turn_policy.h",
+    "firmware/esp32_voice_idf/tests/test_voice_turn_policy.cpp"
+  ],
+  "moved_generated": [
+    "output/20260809-wake-vad-uplink-reliability",
+    "output/20260809-dashscope-tts10-wakenet",
+    "firmware/esp32_voice_idf/build-wake-vad-reliability",
+    "firmware/esp32_voice_idf/build-dashscope-tts10"
+  ],
+  "moved_recordings": [
+    "gateway/test-recordings/138_turn_71e150dd_132.wav",
+    "gateway/test-recordings/139_turn_68a4af04_133.wav",
+    "gateway/test-recordings/140_turn_dd85c7b9_134.wav",
+    "gateway/test-recordings/141_turn_1ff94856_135.wav",
+    "gateway/test-recordings/142_turn_218fed44_136.wav",
+    "gateway/test-recordings/143_turn_a39a9d1b_137.wav",
+    "gateway/test-recordings/144_turn_f023f676_138.wav",
+    "gateway/test-recordings/145_turn_8fa8d31e_139.wav",
+    "gateway/test-recordings/146_turn_ccb8c617_140.wav",
+    "gateway/test-recordings/147_turn_347255ec_141.wav"
+  ]
+}

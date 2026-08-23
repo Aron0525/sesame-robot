@@ -1,0 +1,18 @@
+{
+  "normal": {
+    "agentId": "sesame",
+    "knowledgeBase": null
+  },
+  "learning": {
+    "agentId": "sesame-learning",
+    "knowledgeBase": "kb-learning"
+  },
+  "children": {
+    "agentId": "sesame-children",
+    "knowledgeBase": "kb-children"
+  },
+  "work": {
+    "agentId": "sesame-work",
+    "knowledgeBase": "kb-work"
+  }
+}

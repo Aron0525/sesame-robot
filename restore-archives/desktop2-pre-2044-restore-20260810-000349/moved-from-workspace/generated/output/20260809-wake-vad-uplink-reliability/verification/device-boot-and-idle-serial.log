@@ -1,0 +1,107 @@
+I (750) esp_psram: SPI SRAM memory test OK
+I (759) cpu_start: Pro cpu start user code
+I (759) cpu_start: cpu freq: 160000000 Hz
+I (759) app_init: Application information:
+I (759) app_init: Project name:     sesame_robot_v3
+I (759) app_init: App version:      v1.3.1-dirty
+I (759) app_init: Compile time:     Aug  9 2026 20:55:34
+I (760) app_init: ELF file SHA256:  a66b68bca...
+I (760) app_init: ESP-IDF:          v5.5.4
+I (760) efuse_init: Min chip rev:     v0.0
+I (760) efuse_init: Max chip rev:     v0.99 
+I (760) efuse_init: Chip rev:         v0.2
+I (760) heap_init: Initializing. RAM available for dynamic allocation:
+I (761) heap_init: At 3FCACFD8 len 0003C738 (241 KiB): RAM
+I (761) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+I (761) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
+I (761) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+I (762) esp_psram: Adding pool of 8192K of PSRAM memory to heap allocator
+I (763) spi_flash: detected chip: generic
+I (763) spi_flash: flash io: dio
+I (764) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (765) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (765) main_task: Started on CPU0
+I (766) esp_psram: Reserving pool of 32K of internal memory for DMA/internal allocations
+I (767) main_task: Calling app_main()
+I (787) uart: queue free spaces: 20
+I (789) sesame_main: Sesame Robot V3 production firmware starting
+I (789) sesame_main: Initial turn state: idle
+I (828) sesame_servo: S0-S7 PWM ready; outputs remain released until an allowed action
+I (832) sesame_web: HTTP control page ready on port 80
+I (834) sesame_audio: I2S ready: 16 kHz, 32-bit stereo bus, mic left slot, 20 ms frame
+I (835) sesame_main: Audio HAL ready
+I (844) wake_vad: custom model ready: zhima_wakeword_tts_v2_int8, 22456 bytes, threshold=0.85, arena=98304 bytes
+I (845) wake_vad: custom TFLite wake word + ESP-SR VAD mode 3 ready (start=60 ms, continuation=40 ms)
+I (852) sesame_main: Opus/WSS voice runtime ready; HTTP page is available on the same Wi-Fi
+I (852) sesame_voice: discovering Voice Gateway over mDNS
+I (853) main_task: Returned from app_main()
+I (854) mdns_mem: mDNS task will be created from internal RAM
+I (855) sesame_transport: local web control published: http://dev-001.local/
+I (856) pp: pp rom version: e7ae62f
+I (856) net80211: net80211 rom version: e7ae62f
+I (858) wifi:wifi driver task: 3fce4bf4, prio:23, stack:6656, core=0
+I (869) wifi:wifi firmware version: 0947e8b
+I (870) wifi:wifi certification version: v7.0
+I (870) wifi:config NVS flash: enabled
+I (870) wifi:config nano formatting: disabled
+I (871) wifi:Init data frame dynamic rx buffer num: 32
+I (871) wifi:Init static rx mgmt buffer num: 5
+I (871) wifi:Init management short buffer num: 32
+I (871) wifi:Init dynamic tx buffer num: 32
+I (872) wifi:Init static tx FG buffer num: 2
+I (872) wifi:Init static rx buffer size: 1600
+I (872) wifi:Init static rx buffer num: 10
+I (872) wifi:Init dynamic rx buffer num: 32
+I (873) wifi_init: rx ba win: 6
+I (874) wifi_init: accept mbox: 6
+I (874) wifi_init: tcpip mbox: 32
+I (874) wifi_init: udp mbox: 6
+I (874) wifi_init: tcp mbox: 6
+I (874) wifi_init: tcp tx win: 5760
+I (874) wifi_init: tcp rx win: 5760
+I (875) wifi_init: tcp mss: 1440
+I (875) wifi_init: WiFi IRAM OP enabled
+I (875) wifi_init: WiFi RX IRAM OP enabled
+I (876) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10
+I (914) wifi:mode : sta (28:84:85:a4:ef:1c)
+I (914) wifi:enable tsf
+I (3328) wifi:new:<6,0>, old:<1,0>, ap:<255,255>, sta:<6,0>, prof:1, snd_ch_cfg:0x0
+I (3330) wifi:state: init -> auth (0xb0)
+I (3366) wifi:state: auth -> assoc (0x0)
+I (3417) wifi:state: assoc -> run (0x10)
+I (3443) wifi:connected with YuanGuang, aid = 1, channel 6, BW20, bssid = c0:e0:18:ce:70:10
+I (3444) wifi:security: WPA2-PSK, phy: bgn, rssi: -53, cipher(pairwise:0x3, group:0x3), pmf:0
+I (3447) wifi:pm start, type: 1
+
+I (3447) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+I (3448) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+I (3464) wifi:<ba-add>idx:0 (ifx:0, c0:e0:18:ce:70:10), tid:6, ssn:2, winSize:64
+I (3491) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+I (3973) wifi:<ba-add>idx:1 (ifx:0, c0:e0:18:ce:70:10), tid:0, ssn:0, winSize:64
+I (5005) esp_netif_handlers: sta ip: 192.168.88.183, mask: 255.255.255.0, gw: 192.168.88.1
+I (10055) sesame_transport: P1 mDNS selected: host=sesame-gateway port=8765 gateway_id=gw_local_dev
+I (10057) websocket_client: Started
+I (10057) sesame_transport: P1 WSS starting; VoiceController owns rediscovery
+I (10577) sesame_transport: P1 WSS transport connected
+I (10591) sesame_voice: P1 session.hello sent: protocol=1 codec=opus rate=16000 frame_ms=20
+I (10591) sesame_voice: P1 WSS connected; session.hello queued
+W (10611) transport_ws: esp_transport_ws_poll_connection_closed: unexpected data readable on socket=57
+W (10611) websocket_client: Connection terminated while waiting for clean TCP close
+W (10612) sesame_transport: P1 WSS transport disconnected; rediscovery requested
+I (10615) sesame_voice: next Gateway discovery in 500 ms
+W (10616) sesame_voice: P1 WSS disconnected; audio and motion stopped
+I (11125) sesame_voice: discovering Voice Gateway over mDNS
+W (11125) websocket_client: Client was not started
+I (16155) sesame_transport: P1 mDNS selected: host=sesame-gateway port=8765 gateway_id=gw_local_dev
+I (16157) websocket_client: Started
+I (16157) sesame_transport: P1 WSS starting; VoiceController owns rediscovery
+I (16750) sesame_transport: P1 WSS transport connected
+I (16943) sesame_voice: P1 session.hello sent: protocol=1 codec=opus rate=16000 frame_ms=20
+I (16944) sesame_voice: P1 WSS connected; session.hello queued
+W (16966) transport_ws: esp_transport_ws_poll_connection_closed: unexpected data readable on socket=57
+W (16966) websocket_client: Connection terminated while waiting for clean TCP close
+W (16967) sesame_transport: P1 WSS transport disconnected; rediscovery requested
+I (16975) sesame_voice: next Gateway discovery in 500 ms
+W (16976) sesame_voice: P1 WSS disconnected; audio and motion stopped
+I (17591) sesame_voice: discovering Voice Gateway over mDNS
+W (17591) websocket_client: Client was not started

@@ -1,0 +1,13 @@
+--- /Users/mac/Documents/sesame robot/output/20260809-sesame-web-search-enable/AGENTS.md.before	2026-08-09 20:38:32
++++ /Users/mac/Documents/sesame robot/output/20260809-sesame-web-search-enable/AGENTS.md.final	2026-08-09 20:44:31
+@@ -4,6 +4,10 @@
+ 
+ 只使用 `trusted_context` 中确认的事实。回复未知或参数缺失时，简短追问；不假装已执行、联网或看见未确认内容。
+ 
++## Web Search
++
++`web_search` 只用于需要最新外部信息的请求：天气、新闻、价格、日程、营业时间，或用户明确要求核实。每轮最多搜索一次、最多使用 3 条结果；闲聊、写作、解释和已知事实直接回答。搜索失败时说明数据暂不可用，不编造结果。
++
+ ## 表情与动作
+ 
+ `set_expression(expression_id)` 是表情选择操作：将 `expression.name` 设为对应 ID，`ttl_ms` 设为 3000。每次必须选择一个表情；若 capabilities 未列出该 ID，使用 `default`。

@@ -1,0 +1,23 @@
+$ python3 verify modified/manifest-sha256.txt
+modified_manifest_hashes=OK
+$ bash -n rollback.sh && ./rollback.sh --dry-run
+Would restore five baseline model asset/source files from: /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/source
+Would write and verify the four original ESP32 partitions on /dev/cu.usbmodem101 at 115200 baud.
+$ grep changed model fields patch/dashscope-tts10-wakenet-deployment.patch
++inline constexpr char kModelName[] = "zhima_wakeword_dashscope10_int8";
++inline constexpr char kModelSha256[] = "2247f91d43b4d70fe17c90b1e999130c2b51476e044a86156b4ea250ba6ae305";
+-inline constexpr float kFeatureMean = -17.3653469f;
+-inline constexpr float kFeatureStd = 2.71605949f;
+-inline constexpr float kInputScale = 0.0244557578f;
++inline constexpr float kFeatureMean = -17.3126373f;
++inline constexpr float kFeatureStd = 2.72947984f;
++inline constexpr float kInputScale = 0.0243355129f;
++EXPECTED_SHA256 = "2247f91d43b4d70fe17c90b1e999130c2b51476e044a86156b4ea250ba6ae305"
++EXPECTED_MODEL_NAME = "zhima_wakeword_dashscope10_int8"
+-    "kFeatureMean = -17.3653469f",
+-    "kFeatureStd = 2.71605949f",
+-    "kInputScale = 0.0244557578f",
++    "kFeatureMean = -17.3126373f",
++    "kFeatureStd = 2.72947984f",
++    "kInputScale = 0.0243355129f",
+exit_status=0

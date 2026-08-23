@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sesame Robot 的 OpenClaw 配置边界：专用 Agent、会话、沙盒、工具策略、结构化输出与运行维护。">
+  <title>专题课｜OpenClaw 除了 API 还要配置什么</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="10">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+      <div class="lesson-tabs">
+        <a href="0008-sesame-software-bundle-map.html" title="Sesame 软件包地图">08</a>
+        <a href="0009-sesame-next-build-order.html" title="Sesame 开发路线">09</a>
+        <a href="0010-sesame-openclaw-config.html" aria-current="page" title="OpenClaw 配置">10</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="10">
+      <div>
+        <p class="kicker">Sesame Robot · OpenClaw 配置</p>
+        <h1>API 只解决“模型能调用”</h1>
+        <p class="lead">要让 OpenClaw 进入机器人产品，还要配置身份边界、会话、结构化输出、沙盒、工具权限、记忆和运行维护。对 Sesame 来说，安全边界比增加工具更优先。</p>
+        <div class="lesson-meta"><span>约 10 分钟</span><span>基于本机实测</span><span>先隔离再接入</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="status">
+      <div class="chapter-head">
+        <span class="chapter-no">10—A</span>
+        <div><h2>你电脑上的实际状态</h2><p>这些不是设想，而是对当前 OpenClaw 2026.7.1-1 的检查结果。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>配置项</th><th>当前状态</th><th>判断</th></tr></thead>
+        <tbody>
+          <tr><td>Gateway</td><td>只监听 <code>127.0.0.1:18789</code>，token 鉴权已开启</td><td>本机接入方式正确，暂时不要公开到局域网或公网</td></tr>
+          <tr><td>Agent</td><td>只有 <code>main</code>，微信与 Sesame 会话都进入它</td><td>缺少 Sesame 专用身份和权限边界</td></tr>
+          <tr><td>Sandbox</td><td>Sesame 会话为 <code>mode: off</code></td><td>未隔离，工具直接在宿主机运行</td></tr>
+          <tr><td>工具权限</td><td>当前允许 <code>exec/read/write/edit/apply_patch/process</code></td><td>对用户语音入口权限过大</td></tr>
+          <tr><td>结构化输出</td><td>模型曾输出 <code>actions:["wave"]</code></td><td>与项目要求的动作对象 Schema 不一致</td></tr>
+          <tr><td>服务运行时</td><td>LaunchAgent 使用 nvm 中的 Node</td><td>Node 升级后可能失效，需要修复为稳定系统运行时</td></tr>
+          <tr><td>插件完整性</td><td>安全审计提示一个插件缺少 integrity 元数据</td><td>需要更新或重装该插件以补齐校验信息</td></tr>
+        </tbody>
+      </table>
+      <div class="danger"><strong>当前最重要的问题</strong>Sesame 会话并没有运行在沙盒中，却能调用文件写入和 shell 命令。即使安全审计显示“0 critical”，也不能把它理解成适合面向用户开放；该审计默认的是单个可信操作者模型。</div>
+    </section>
+
+    <section class="chapter" id="layers">
+      <div class="chapter-head">
+        <span class="chapter-no">10—B</span>
+        <div><h2>除了 API，还要配置七层</h2><p>每一层解决的是不同问题，不能互相替代。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept"><span class="term">01 · Gateway</span><h3>连接与鉴权</h3><p>固定本机端口、loopback 绑定和 gateway token。Voice Gateway 通过本机连接 OpenClaw；Wi-Fi、mDNS 和 ESP32 配对不属于 OpenClaw。</p></article>
+        <article class="concept"><span class="term">02 · Agent</span><h3>专用角色</h3><p>建立 <code>sesame</code> Agent，使用独立 workspace、系统提示词和模型参数，不复用拥有个人工具的 <code>main</code>。</p></article>
+        <article class="concept"><span class="term">03 · Session</span><h3>会话隔离</h3><p>由 <code>user_id + device_id</code> 生成稳定 session key，并明确超时、清理和并发规则，防止不同设备串上下文。</p></article>
+        <article class="concept"><span class="term">04 · Contract</span><h3>固定 JSON 契约</h3><p>回答、动作和表情必须符合版本化 Schema；OpenClaw 只返回意图，Voice Gateway 再验证和下发。</p></article>
+        <article class="concept"><span class="term">05 · Sandbox</span><h3>运行位置隔离</h3><p>决定工具是在宿主机还是隔离容器中运行。Sesame 应使用 <code>all</code> 模式，scope 至少为 <code>agent</code>，更严格时用 <code>session</code>。</p></article>
+        <article class="concept"><span class="term">06 · Tool policy</span><h3>能力最小化</h3><p>决定 Agent 能调用哪些工具。首版语音问答不需要 shell、文件系统、浏览器、定时任务、节点控制或 Gateway 管理工具。</p></article>
+        <article class="concept wide"><span class="term">07 · Operations</span><h3>记忆、日志和运行维护</h3><p>首版关闭长期记忆或只保存脱敏的最少文本；设置模型超时、错误事件、健康检查、自动重启和延迟指标。原始 Opus、PCM、Wi-Fi 密码与 token 不进入模型上下文。</p></article>
+      </div>
+    </section>
+
+    <section class="chapter" id="sandbox">
+      <div class="chapter-head">
+        <span class="chapter-no">10—C</span>
+        <div><h2>沙盒和工具权限要同时配置</h2><p>这是 OpenClaw 最容易混淆、也最关键的部分。</p></div>
+      </div>
+      <div class="diagram">Sandbox（沙盒）
+决定：工具代码在哪里执行
+目标：即使工具出错，也尽量不影响宿主机
+
+Tool policy（工具策略）
+决定：模型能不能调用某个工具
+目标：模型根本看不到不需要的能力
+
+Elevated（提权执行）
+决定：exec 是否可以绕出沙盒到宿主机
+Sesame：关闭</div>
+      <div class="danger"><strong>不能只禁用 write/edit</strong>如果仍允许 <code>exec</code>，shell 命令照样可以修改或删除文件。官方策略中 deny 优先；使用 allowlist 时，未列出的工具都应视为不可用。</div>
+      <table class="comparison">
+        <thead><tr><th>Sesame 第一版</th><th>建议值</th><th>原因</th></tr></thead>
+        <tbody>
+          <tr><td>Sandbox mode</td><td><code>all</code></td><td>包括主会话在内的工具执行全部隔离</td></tr>
+          <tr><td>Sandbox scope</td><td><code>agent</code>；多用户时优先 <code>session</code></td><td>避免不同角色或用户共享容器边界</td></tr>
+          <tr><td>Workspace access</td><td><code>none</code></td><td>纯语音问答不需要读取电脑文件</td></tr>
+          <tr><td>Tool allowlist</td><td>首版为空或只保留纯文本所需能力</td><td>OpenClaw 只负责推理和结构化回答</td></tr>
+          <tr><td>Elevated</td><td><code>false</code></td><td>不允许机器人语音入口执行宿主机命令</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="contract">
+      <div class="chapter-head">
+        <span class="chapter-no">10—D</span>
+        <div><h2>OpenClaw 只输出“意图”，不直接控制硬件</h2><p>动作安全由确定性程序负责，不能交给模型自由发挥。</p></div>
+      </div>
+      <div class="diagram">ASR 文本 + user_id + device_id
+             ↓
+Voice Gateway：构造受控请求
+             ↓
+OpenClaw sesame Agent：只做理解与决策
+             ↓
+固定 JSON：reply_text / actions / expressions
+             ↓
+Voice Gateway：Schema、枚举、范围、deadline 再验证
+             ↓
+TTS 文本 + ESP32 白名单动作</div>
+      <pre><code>{
+  "version": "1.0",
+  "reply_text": "你好，我在这里。",
+  "actions": [
+    {"name": "wave", "duration_ms": 1200}
+  ],
+  "expressions": [
+    {"name": "happy", "duration_ms": 1800}
+  ]
+}</code></pre>
+      <p>如果输出不合规，Voice Gateway 最多发起一次受限修复；仍失败就返回 <code>agent.error</code>。ESP32 只执行固件白名单内、参数合法且未过期的动作。</p>
+    </section>
+
+    <section class="chapter" id="order">
+      <div class="chapter-head">
+        <span class="chapter-no">10—E</span>
+        <div><h2>你的配置顺序</h2><p>顺序本身也是风险控制：先建立边界，再开放能力。</p></div>
+      </div>
+      <ol class="checklist">
+        <li>保留当前 <code>127.0.0.1:18789 + token</code>，不把 OpenClaw Gateway 暴露给 ESP32；ESP32 只连接 Voice Gateway。</li>
+        <li>创建独立 <code>sesame</code> Agent 和 workspace，把 Sesame session key 从 <code>agent:main:sesame:...</code> 改到专用 Agent。</li>
+        <li>对该 Agent 开启 Sandbox，关闭 elevated，并设置最小工具 allowlist。</li>
+        <li>写入专用系统提示词：固定语言、回答长度、动作/表情枚举和严格 JSON Schema。</li>
+        <li>配置模型超时、最大输出、并发数、会话清理；首版关闭长期记忆。</li>
+        <li>让 Voice Gateway 完成 Schema 校验、一次修复、错误映射、日志脱敏和延迟统计。</li>
+        <li>最后再逐个增加窄工具，例如只接受枚举参数的 <code>robot_action</code>；不要开放 shell 或直接 GPIO 控制。</li>
+      </ol>
+      <div class="boundary"><strong>多用户边界</strong>Session key 只负责上下文路由，不是权限边界。一个家庭内的多台设备可以在同一租户 Gateway 中使用不同 session；互不信任的不同客户不能共用一个 OpenClaw Gateway。产品化部署应按用户或家庭建立独立 Gateway cell、凭据和状态目录，最好再使用独立容器、OS 用户或主机。</div>
+    </section>
+
+    <section class="chapter" id="checks">
+      <div class="chapter-head">
+        <span class="chapter-no">10—F</span>
+        <div><h2>配置完成后的验收命令</h2><p>不要只看配置文件，要看最终生效策略。</p></div>
+      </div>
+      <pre><code>openclaw doctor
+openclaw security audit --deep
+openclaw sandbox explain --agent sesame --json
+openclaw gateway probe</code></pre>
+      <ul class="checklist">
+        <li><code>sandbox explain</code> 必须显示 Sesame 会话已 sandboxed。</li>
+        <li>有效工具中不得出现 <code>exec/process/read/write/edit/apply_patch</code> 等宿主机能力。</li>
+        <li>用恶意 ASR 文本测试“读取文件、执行命令、修改配置”，应全部被拒绝。</li>
+        <li>用错误动作名、超长时长和错误 JSON 测试，Voice Gateway 应拒绝并产生明确错误。</li>
+        <li>修复当前 nvm Node 的 LaunchAgent 警告，重启电脑后 Gateway 仍应自动可用。</li>
+      </ul>
+    </section>
+
+    <section class="chapter" id="sources">
+      <div class="chapter-head">
+        <span class="chapter-no">10—G</span>
+        <div><h2>官方依据与前置课程</h2><p>具体字段随版本变化，实际配置前以本机版本的官方文档和 explain 输出为准。</p></div>
+      </div>
+      <ul class="checklist">
+        <li><a href="0009-sesame-next-build-order.html">第 9 课：Sesame 接下来做什么</a></li>
+        <li><a href="https://docs.openclaw.ai/gateway/sandbox-vs-tool-policy-vs-elevated">OpenClaw：Sandbox、tool policy 与 elevated</a></li>
+        <li><a href="https://docs.openclaw.ai/tools/multi-agent-sandbox-tools">OpenClaw：多 Agent 的 Sandbox 和工具配置</a></li>
+        <li><a href="https://docs.openclaw.ai/sandboxing">OpenClaw：Sandbox 运行机制</a></li>
+        <li><a href="https://docs.openclaw.ai/gateway/security">OpenClaw：Gateway 安全说明</a></li>
+      </ul>
+    </section>
+
+    <section class="chapter" id="recall">
+      <div class="chapter-head">
+        <span class="chapter-no">10—H</span>
+        <div><h2>一分钟自测</h2><p>能回答这三个问题，说明边界已经清楚。</p></div>
+      </div>
+      <details><summary>配置了 API，为什么还不能直接给用户使用？</summary><p>API 只让模型可调用，并没有限制会话身份、工具权限、文件访问、命令执行和硬件动作。当前 Sesame 会话甚至还是未沙盒化状态。</p></details>
+      <details><summary>有 Sandbox 后，是否可以允许所有工具？</summary><p>不可以。Sandbox 只缩小事故影响范围，tool policy 才决定模型能否调用工具。两层必须同时使用。</p></details>
+      <details><summary>OpenClaw 是否应该直接操作舵机？</summary><p>首版不应该。它只输出经过 Schema 约束的动作意图，Voice Gateway 与 ESP32 再通过白名单、范围和 deadline 做确定性验证。</p></details>
+    </section>
+  </main>
+</body>
+</html>

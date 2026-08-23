@@ -1,0 +1,80 @@
+[
+  {
+    "target": "/Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/app.py",
+    "storage": "endpoint-gateway/src/sesame_endpoint_gateway/app.py",
+    "original_sha256": "139058c46fd28b56e2b1437719898cdbe4832ec83ec9537603e8d239b0498cb1",
+    "final_sha256": "f95b510eef2eae6e5f9463ab02e00d05b13fa3d1283de80f932cdc4c97a631eb"
+  },
+  {
+    "target": "/Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_device_stream.py",
+    "storage": "endpoint-gateway/tests/test_device_stream.py",
+    "original_sha256": "bc215630aafaf993e198edba7a592e9a0f8663ab32d3664fb10b3fab71576ec4",
+    "final_sha256": "a85d17d9d1a5ffa2d82eb1059598d7533a69a6c7529cd53f239a08226ff25291"
+  },
+  {
+    "target": "/Users/mac/Documents/sesame robot/endpoint-gateway/README.md",
+    "storage": "endpoint-gateway/README.md",
+    "original_sha256": "08a4a4d805dd605cc7310c37c7385cad39427e988ab596a2e1c5972f8e187afa",
+    "final_sha256": "0c911187cecd465222bd89eaf790fdf712ac9374d9906dee3dfb6e88de99bda2"
+  },
+  {
+    "target": "/Users/mac/.openclaw/workspace-sesame/AGENTS.md",
+    "storage": "openclaw/workspace-sesame/AGENTS.md",
+    "original_sha256": "a01577e1bdb5898bb98fcaddcde547eae021d5604f7bb886fb87b74f2347e422",
+    "final_sha256": "e838bf39894ddc1ab739fa34bef46dad5a664a93b7f5e9e689ea044d4daca842"
+  },
+  {
+    "target": "/Users/mac/.openclaw/workspace-sesame-learning/AGENTS.md",
+    "storage": "openclaw/workspace-sesame-learning/AGENTS.md",
+    "original_sha256": "ebfc78d8ba2512c8376505ef600c6e9ba6df4bab9ebbf5d3d742ff8420299620",
+    "final_sha256": "8e6c25916d44b6a925d01bd0a60ddf40f54a19dea836e83dcda00fc8ede99689"
+  },
+  {
+    "target": "/Users/mac/.openclaw/workspace-sesame-children/AGENTS.md",
+    "storage": "openclaw/workspace-sesame-children/AGENTS.md",
+    "original_sha256": "080006b7724ffcac64efeae1ad8677ed920b6ed0edeb0b361bae2c0a16c28c61",
+    "final_sha256": "13be6b1fff0b76358f933eb65a1e83b6e1f1f309a881ed09bc3b31730389b537"
+  },
+  {
+    "target": "/Users/mac/.openclaw/workspace-sesame-work/AGENTS.md",
+    "storage": "openclaw/workspace-sesame-work/AGENTS.md",
+    "original_sha256": "258d0d66f77560a43fca8fd4e8c209ad2a9f75ed3ab3851b06b558e2ac1aa56d",
+    "final_sha256": "beaf88498f47a27b271bde99553fe405faf9c9a318796d224174016ef48cf720"
+  },
+  {
+    "target": "/Users/mac/Desktop/2/gateway/apps/voice_gateway/src/sesame_voice_gateway/openclaw/client.py",
+    "storage": "desktop2-gateway/apps/voice_gateway/src/sesame_voice_gateway/openclaw/client.py",
+    "original_sha256": "3f075bf27865c61b1b09f36d1cc50c66da1f5aed8616be1fea11dcd6b15c6a94",
+    "final_sha256": "41ab21214f776f07961a2e22d52a9947e61f30842d208f60802f63760135036d"
+  },
+  {
+    "target": "/Users/mac/Desktop/2/gateway/apps/voice_gateway/src/sesame_voice_gateway/app.py",
+    "storage": "desktop2-gateway/apps/voice_gateway/src/sesame_voice_gateway/app.py",
+    "original_sha256": "3d2ffa8d64c53b2d6bbff84fcfb0ee028607046382de14ebbdc0ae6e81833f9c",
+    "final_sha256": "a74456395d49b2caf0a24cfaa6956217e40281ca6db8f17a49f0051e89ec0e27"
+  },
+  {
+    "target": "/Users/mac/Desktop/2/gateway/tests/test_response_plan.py",
+    "storage": "desktop2-gateway/tests/test_response_plan.py",
+    "original_sha256": "3d697ee336917fc6e420bd0addfe769d237ed7aeb35d4e9915e5b9d91e3f3369",
+    "final_sha256": "e028bbb46ec4cbb6fe5ed95c831ac6fd5dd7fd67d436e454ce97124741c15cd9"
+  },
+  {
+    "target": "/Users/mac/Desktop/2/gateway/tests/test_device_capabilities.py",
+    "storage": "desktop2-gateway/tests/test_device_capabilities.py",
+    "original_sha256": "67a444a35c0ca59a977e3044967b998d0caa64af143d652ba0908a6f73849b42",
+    "final_sha256": "ad61898dfe74c7ca3d584762198fe3b6c813a19aa1de4ee9628a6949f880db36"
+  },
+  {
+    "target": "/Users/mac/Desktop/2/gateway/tests/test_gateway_protocol_hardening.py",
+    "storage": "desktop2-gateway/tests/test_gateway_protocol_hardening.py",
+    "original_sha256": "7ab1c29862c7f6a833a01844866faa31a20add7a3d66c3186ec22679e0ed5b3c",
+    "final_sha256": "b5c093fdfa509a1ab9db46b0123ce4c2a1edf4fc8f3c0dbe89e3b1e5cdd33d07"
+  },
+  {
+    "target": "/Users/mac/Desktop/2/contracts/schemas/agent-request.v1.schema.json",
+    "storage": "desktop2-contracts/schemas/agent-request.v1.schema.json",
+    "original_sha256": "aeb7e57c38a9bb14c938f547c8594ba42317186c74c5969d891607846c5aad05",
+    "final_sha256": "52a0c9729b878fc7235d539fbb9ab9aa3589d3d4e489d487dbfb6a6a44749fbd"
+  }
+]

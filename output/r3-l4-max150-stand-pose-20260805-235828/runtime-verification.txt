@@ -1,0 +1,3 @@
+expected PWM
+angle=30 pulse_us=1098 duty=899/16383
+angle=150 pulse_us=2562 duty=2098/16383

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sesame.local/schemas/agent-response.v2.schema.json",
+  "title": "Sesame Agent Tool Request v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["v", "request_id", "turn_id", "status", "tool_call"],
+  "properties": {
+    "v": {"const": 2},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 100},
+    "turn_id": {"type": "string", "minLength": 1, "maxLength": 100},
+    "status": {"const": "requires_tool"},
+    "tool_call": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "arguments"],
+      "properties": {
+        "name": {"const": "web_search"},
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["query"],
+          "properties": {
+            "query": {"type": "string", "minLength": 1, "maxLength": 256},
+            "freshness_days": {"enum": [7, 30, 180, 365]}
+          }
+        }
+      }
+    }
+  }
+}

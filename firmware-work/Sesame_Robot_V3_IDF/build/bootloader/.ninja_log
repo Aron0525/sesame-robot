@@ -1,0 +1,197 @@
+# ninja log v7
+9	83	1786253041252380170	esp-idf/log/CMakeFiles/__idf_log.dir/src/noos/util.c.obj	8bcf6f2c19c0f7b3
+8	86	1786253041251451581	esp-idf/log/CMakeFiles/__idf_log.dir/src/noos/log_lock.c.obj	781024ae17e392c
+19	92	1786253041262393226	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_crc.c.obj	cc5b0b8938f37baf
+10	99	1786253041253797970	esp-idf/log/CMakeFiles/__idf_log.dir/src/util.c.obj	10fac4d38f22dbb4
+7	126	1786253041249882739	esp-idf/log/CMakeFiles/__idf_log.dir/src/noos/log_timestamp.c.obj	706b5f47dffbbb73
+7	140	1786253041250258366	esp-idf/log/CMakeFiles/__idf_log.dir/src/log_timestamp_common.c.obj	9f2b7d36078e10d7
+11	141	1786253041254216430	esp-idf/log/CMakeFiles/__idf_log.dir/src/log_print.c.obj	5b8c5becc3d84890
+11	150	1786253041254033721	esp-idf/log/CMakeFiles/__idf_log.dir/src/log_format_text.c.obj	e3a937c6d045f7d5
+15	151	1786253041258276745	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_sys.c.obj	bcac85c28ddaa6c5
+99	166	1786253041342515302	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_gpio.c.obj	b5c3facab2411a6c
+11	176	1786253041254726100	esp-idf/log/CMakeFiles/__idf_log.dir/src/log.c.obj	b02d5c8c5eaae048
+92	182	1786253041335277220	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_efuse.c.obj	a7e4018d90e121cf
+87	186	1786253041329843855	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_spiflash.c.obj	d74c3d48fb4f3434
+126	189	1786253041369685621	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_longjmp.S.obj	17584501d5364260
+84	194	1786253041327419092	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_uart.c.obj	42b5e6dd9b5b70a0
+9	222	1786253041251923792	esp-idf/log/CMakeFiles/__idf_log.dir/src/buffer/log_buffers.c.obj	816dc1338753adb0
+151	227	1786253041394452760	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_cache_writeback_esp32s3.S.obj	b0d62d42a8309807
+140	233	1786253041383169697	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_systimer.c.obj	4b380da4fb91b30c
+142	255	1786253041384874623	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_wdt.c.obj	55cec5cf0c34dc16
+182	289	1786253041424987057	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32s3/esp_cpu_intr.c.obj	80e5271ed140eaf6
+186	291	1786253041429469832	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/esp_memory_utils.c.obj	c9ba00bf0407fa63
+189	294	1786253041432566225	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32s3/cpu_region_protect.c.obj	971e0a9c9c171da9
+150	315	1786253041393239295	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_cache_esp32s2_esp32s3.c.obj	3ae8c25c9f795107
+222	326	1786253041465114658	esp-idf/log/liblog.a	21b18d98c71ffd6f
+166	328	1786253041409103384	esp-idf/esp_common/CMakeFiles/__idf_esp_common.dir/src/esp_err_to_name.c.obj	6766865d5bf95577
+176	355	1786253041419011232	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/cpu.c.obj	90d71b7e3f333aa
+227	364	1786253041470247978	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32s3/rtc_clk_init.c.obj	83f007095a3aaaba
+294	382	1786253041536986479	esp-idf/esp_system/CMakeFiles/__idf_esp_system.dir/esp_err.c.obj	8236727a09f45c3a
+291	396	1786253041534547006	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32s3/chip_info.c.obj	b784a6ff73a26aae
+17	407	1786253041260335548	esp-idf/esp_rom/CMakeFiles/__idf_esp_rom.dir/patches/esp_rom_print.c.obj	ab9bb4e8626b8804
+255	416	1786253041497948134	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32s3/rtc_sleep.c.obj	d991f2dd41c19a17
+315	433	1786253041558454724	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/esp32s3/esp_efuse_table.c.obj	4d3ef8f018f7ecc7
+328	457	1786253041571668465	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/esp32s3/esp_efuse_rtc_calib.c.obj	6f98901a7f0cfdfc
+326	461	1786253041569274660	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/esp32s3/esp_efuse_fields.c.obj	2c6277b00cff152a
+233	484	1786253041476846057	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32s3/rtc_init.c.obj	df10fd5944e57f0c
+289	507	1786253041532449995	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32s3/rtc_time.c.obj	2a968c7df5e53f8f
+382	518	1786253041625790436	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/src/esp_efuse_fields.c.obj	a1589ebe234531f3
+407	524	1786253041650569367	esp-idf/esp_rom/libesp_rom.a	75543e1b766cf8a7
+461	560	1786253041704370711	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_clock_init.c.obj	1036b21a01ba4d22
+355	571	1786253041598613575	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/esp32s3/esp_efuse_utility.c.obj	4d8000ec53dac809
+484	575	1786253041726999505	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_mem.c.obj	eec47c911c06614
+525	597	1786253041767821443	esp-idf/esp_common/libesp_common.a	5fb11773860b4fdd
+507	606	1786253041750130219	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_random.c.obj	f3b0b82928b6188c
+364	609	1786253041607465125	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/src/esp_efuse_api.c.obj	bb4f7f8524ff9cfe
+518	611	1786253041761264906	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_efuse.c.obj	11397b034ce278e9
+433	631	1786253041676570722	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_common.c.obj	7ba40a47f9d2cc0a
+457	632	1786253041700014770	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_common_loader.c.obj	61788f5e27d612ce
+571	672	1786253041814140537	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/secure_boot.c.obj	33e6e7751bc39770
+194	685	1786253041437561836	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32s3/rtc_clk.c.obj	49ef0dbd962a57c5
+396	694	1786253041639787640	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/src/esp_efuse_utility.c.obj	66f0b9b9a42bbc41
+575	705	1786253041818709729	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_random_esp32s3.c.obj	df7b0529d3a7f714
+417	717	1786253041660203838	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/src/efuse_controller/keys/with_key_purposes/esp_efuse_api_key.c.obj	74b43c444ecd1b08
+560	733	1786253041803027266	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/flash_encrypt.c.obj	fcad695270167c5c
+631	750	1786253041874538501	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/flash_partitions.c.obj	c288235972a0584a
+607	766	1786253041849838154	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/bootloader_flash/src/flash_qio_mode.c.obj	8286ded17029329d
+672	775	1786253041915589816	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_sha.c.obj	db9a57dbff6fe987
+609	798	1786253041852396419	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/bootloader_flash/src/bootloader_flash_config_esp32s3.c.obj	d3b7f8f9f140e89
+705	803	1786253041948784127	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_clock_loader.c.obj	a12928ebdfe34171
+686	806	1786253041928899974	esp-idf/esp_hw_support/libesp_hw_support.a	badcda0b96b9a4ad
+733	823	1786253041976554367	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_console_loader.c.obj	9aca2787c916de1d
+750	838	1786253041993603588	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/esp32s3/bootloader_soc.c.obj	cda4871835f2736d
+717	847	1786253041960108399	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_console.c.obj	a6db48e428c4e469
+775	876	1786253042018707395	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_panic.c.obj	7118fc9d5711c2c7
+694	882	1786253041937015561	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_init.c.obj	5288e726914fb0c9
+798	893	1786253042041799067	esp-idf/esp_bootloader_format/CMakeFiles/__idf_esp_bootloader_format.dir/esp_bootloader_desc.c.obj	770861403a40e80a
+806	910	1786253042049278192	esp-idf/esp_system/libesp_system.a	eeaf239964478137
+803	917	1786253042045926715	esp-idf/spi_flash/CMakeFiles/__idf_spi_flash.dir/spi_flash_wrap.c.obj	1472a18566318713
+766	931	1786253042009264134	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/esp32s3/bootloader_esp32s3.c.obj	5d2195c566e2d033
+838	934	1786253042081524165	esp-idf/hal/CMakeFiles/__idf_hal.dir/mpu_hal.c.obj	a9acdcaf5f90ef7d
+823	943	1786253042066155662	esp-idf/hal/CMakeFiles/__idf_hal.dir/hal_utils.c.obj	8583f371d6c483c2
+847	950	1786253042090312590	esp-idf/hal/CMakeFiles/__idf_hal.dir/efuse_hal.c.obj	b5fc844951a89c63
+943	1002	1786253042185963752	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/interrupts.c.obj	c70d36a3424ac3bc
+934	1004	1786253042177005910	esp-idf/soc/CMakeFiles/__idf_soc.dir/dport_access_common.c.obj	6e606246707002d0
+910	1006	1786253042153346444	esp-idf/efuse/libefuse.a	e7c9466d07f7707f
+931	1007	1786253042174103769	esp-idf/soc/CMakeFiles/__idf_soc.dir/lldesc.c.obj	9e213a89d62651d3
+950	1009	1786253042193463711	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/gpio_periph.c.obj	f7b500e4c9ad4be1
+877	1014	1786253042119891214	esp-idf/hal/CMakeFiles/__idf_hal.dir/esp32s3/efuse_hal.c.obj	c41f1970024da245
+882	1039	1786253042125662163	esp-idf/hal/CMakeFiles/__idf_hal.dir/mmu_hal.c.obj	dcf1a835bc288ab1
+597	1042	1786253041840433018	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/bootloader_flash/src/bootloader_flash.c.obj	7b8bdfbdcbef497e
+1008	1062	1786253042250843158	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/gdma_periph.c.obj	f7ba9f574692031e
+893	1066	1786253042136480724	esp-idf/hal/CMakeFiles/__idf_hal.dir/cache_hal.c.obj	49ede7d620e9b427
+1004	1070	1786253042247535139	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/adc_periph.c.obj	9856d9531d515dd4
+1006	1072	1786253042249004856	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/dedic_gpio_periph.c.obj	eea9adeaf9c77cb6
+1002	1073	1786253042245229251	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/uart_periph.c.obj	dff9c4a28975e048
+1009	1082	1786253042252460292	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/spi_periph.c.obj	f5c5caef98f0a70f
+1014	1083	1786253042257285111	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/ledc_periph.c.obj	d46c5d0c3d6ef64c
+1042	1124	1786253042285609895	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/rmt_periph.c.obj	5e335dc3b57d0a28
+1039	1127	1786253042282186584	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/pcnt_periph.c.obj	b9aebdfc809f26b4
+1062	1132	1786253042305241297	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/sdm_periph.c.obj	293350ccedbcb043
+1066	1136	1786253042309734197	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/i2s_periph.c.obj	c15723eddb579917
+611	1143	1786253041854621681	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_utility.c.obj	4bb996917762f37c
+1072	1149	1786253042315502021	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/temperature_sensor_periph.c.obj	a3884c67a040d3bb
+1073	1151	1786253042315998358	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/timer_periph.c.obj	a293394b2b5b9f2b
+632	1151	1786253041875155213	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/esp_image_format.c.obj	20ddb33451bf7de5
+1071	1152	1786253042313860471	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/i2c_periph.c.obj	7491a49ba7ad201d
+1082	1152	1786253042325772663	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/lcd_periph.c.obj	4250e0f164a3568a
+1083	1158	1786253042326801335	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/mcpwm_periph.c.obj	3cb71eb11f0baac6
+1133	1183	1786253042376874033	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/touch_sensor_periph.c.obj	7406608cb2f29130
+1136	1191	1786253042379227588	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/twai_periph.c.obj	a6a7ad0144aa9a2
+1127	1198	1786253042370373538	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/sdmmc_periph.c.obj	30ce70b4a159532
+1125	1200	1786253042368785238	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/mpi_periph.c.obj	583848082d68c29a
+1152	1208	1786253042395207720	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/cam_periph.c.obj	c4bcdc529962f61f
+1191	1213	1786253042453932800	project_elf_src_esp32s3.c	2ddc72060aa8bde3
+1191	1213	1786253042453932800	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/project_elf_src_esp32s3.c	2ddc72060aa8bde3
+1152	1217	1786253042395497138	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/power_supply_periph.c.obj	32b2d713b5ba788b
+1143	1218	1786253042386854131	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/wdt_periph.c.obj	5433c98a9c0571af
+1149	1219	1786253042392353995	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/usb_dwc_periph.c.obj	cf1358d4ddc7452
+1158	1225	1786253042401570547	esp-idf/xtensa/CMakeFiles/__idf_xtensa.dir/eri.c.obj	651c4cede7a4db6b
+1151	1229	1786253042394268631	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32s3/rtc_io_periph.c.obj	5f92e36e073f5e4e
+1183	1253	1786253042426454395	esp-idf/xtensa/CMakeFiles/__idf_xtensa.dir/xt_trax.c.obj	7ec111631b0fced2
+1215	1256	1786253042458460700	CMakeFiles/bootloader.elf.dir/project_elf_src_esp32s3.c.obj	f33bb9e8359e0d60
+1199	1266	1786253042441905190	esp-idf/main/CMakeFiles/__idf_main.dir/bootloader_start.c.obj	b6eab4ca0a1d88d4
+1152	1271	1786253042394821259	esp-idf/bootloader_support/libbootloader_support.a	ebfa7bfe5565e1b0
+1272	1323	1786253042515027602	esp-idf/esp_bootloader_format/libesp_bootloader_format.a	c3235f3b8adaa1ff
+1323	1370	1786253042566634475	esp-idf/spi_flash/libspi_flash.a	95fa4ce1080ef1ee
+1370	1423	1786253042613362030	esp-idf/hal/libhal.a	ad1915ae75d7ad1c
+917	1462	1786253042160698735	esp-idf/micro-ecc/CMakeFiles/__idf_micro-ecc.dir/uECC_verify_antifault.c.obj	ec82539bcc4a0ecd
+1463	1505	1786253042705817883	esp-idf/micro-ecc/libmicro-ecc.a	bdac02310d159b9f
+1505	1590	1786253042748005953	esp-idf/soc/libsoc.a	51282a73a52bf52b
+1590	1630	1786253042833289183	esp-idf/xtensa/libxtensa.a	5d11e464229ec6
+1630	1669	1786253042873031156	esp-idf/main/libmain.a	cc95cd838ce1391
+1669	1750	1786253042912660921	bootloader.elf	6f0c29178b30ed8e
+1750	1933	1786253043175869526	.bin_timestamp	de93d8403dbdd57b
+1750	1933	1786253043175869526	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/.bin_timestamp	de93d8403dbdd57b
+1934	1977	1786253043176983823	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+1934	1977	1786253043176983823	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	49	1786253492815291355	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	49	1786253492815291355	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	48	1786254123590111049	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	48	1786254123590111049	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+4	47	1786254172663900634	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+4	47	1786254172663900634	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	55	1786254804428883073	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	55	1786254804428883073	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+6	52	1786350481100095404	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+6	52	1786350481100095404	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	46	1786350508577905236	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	46	1786350508577905236	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	44	1786350508768647452	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	44	1786350508768647452	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+4	46	1786350547693493667	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+4	46	1786350547693493667	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	47	1787292760504453736	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	47	1787292760504453736	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	45	1787292760696249843	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	45	1787292760696249843	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+11	61	1787299849385726539	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+11	61	1787299849385726539	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+7	56	1787299870564071181	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+7	56	1787299870564071181	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+6	47	1787300092686480736	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+6	47	1787300092686480736	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	49	1787303260184169463	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	49	1787303260184169463	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	66	1787303675586748945	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	66	1787303675586748945	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+9	56	1787303933765697588	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+9	56	1787303933765697588	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+7	50	1787306906353449701	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+7	50	1787306906353449701	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	55	1787307444482681925	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	55	1787307444482681925	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+23	96	1787308376504855026	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+23	96	1787308376504855026	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	49	1787308403677909197	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	49	1787308403677909197	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+11	55	1787389827072898784	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+11	55	1787389827072898784	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	55	1787392791459555415	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	55	1787392791459555415	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+9	60	1787392834849711079	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+9	60	1787392834849711079	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+7	47	1787392924103044923	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+7	47	1787392924103044923	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+7	52	1787393397159984048	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+7	52	1787393397159984048	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+6	45	1787401452275833912	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+6	45	1787401452275833912	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	49	1787401690352552155	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+8	49	1787401690352552155	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	45	1787401753706307760	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	45	1787401753706307760	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+15	56	1787403843213793327	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+15	56	1787403843213793327	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	48	1787404135546037597	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	48	1787404135546037597	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+13	57	1787404547639235051	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+13	57	1787404547639235051	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	49	1787404814914617957	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	49	1787404814914617957	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	50	1787405201915654477	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	50	1787405201915654477	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	47	1787405481509500086	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+5	47	1787405481509500086	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+4	46	1787405829054205590	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8
+4	46	1787405829054205590	/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	522c602d9cb42a8

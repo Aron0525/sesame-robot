@@ -1,0 +1,137 @@
+{
+  "agents": {
+    "defaults": {
+      "skipBootstrap": true
+    },
+    "list": [
+      {
+        "id": "sesame",
+        "name": "Sesame Robot",
+        "workspace": "~/.openclaw/workspace-sesame",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "ro"
+        },
+        "tools": {
+          "allow": ["read"],
+          "deny": [
+            "write",
+            "edit",
+            "apply_patch",
+            "exec",
+            "process",
+            "web_search",
+            "browser",
+            "computer",
+            "message",
+            "sessions_list",
+            "sessions_history",
+            "sessions_send",
+            "sessions_spawn",
+            "session_status"
+          ],
+          "elevated": {
+            "enabled": false
+          }
+        }
+      },
+      {
+        "id": "sesame-learning",
+        "name": "Sesame Learning",
+        "workspace": "~/.openclaw/workspace-sesame-learning",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "ro"
+        },
+        "tools": {
+          "allow": ["read"],
+          "deny": [
+            "write",
+            "edit",
+            "apply_patch",
+            "exec",
+            "process",
+            "web_search",
+            "browser",
+            "computer",
+            "message",
+            "sessions_list",
+            "sessions_history",
+            "sessions_send",
+            "sessions_spawn",
+            "session_status"
+          ],
+          "elevated": {
+            "enabled": false
+          }
+        }
+      },
+      {
+        "id": "sesame-children",
+        "name": "Sesame Children",
+        "workspace": "~/.openclaw/workspace-sesame-children",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "ro"
+        },
+        "tools": {
+          "allow": ["read"],
+          "deny": [
+            "write",
+            "edit",
+            "apply_patch",
+            "exec",
+            "process",
+            "web_search",
+            "browser",
+            "computer",
+            "message",
+            "sessions_list",
+            "sessions_history",
+            "sessions_send",
+            "sessions_spawn",
+            "session_status"
+          ],
+          "elevated": {
+            "enabled": false
+          }
+        }
+      },
+      {
+        "id": "sesame-work",
+        "name": "Sesame Work",
+        "workspace": "~/.openclaw/workspace-sesame-work",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "ro"
+        },
+        "tools": {
+          "allow": ["read"],
+          "deny": [
+            "write",
+            "edit",
+            "apply_patch",
+            "exec",
+            "process",
+            "web_search",
+            "browser",
+            "computer",
+            "message",
+            "sessions_list",
+            "sessions_history",
+            "sessions_send",
+            "sessions_spawn",
+            "session_status"
+          ],
+          "elevated": {
+            "enabled": false
+          }
+        }
+      }
+    ]
+  }
+}

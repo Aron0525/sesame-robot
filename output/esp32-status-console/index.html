@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101914" />
+    <title>Sesame · ESP32 状态台</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DM+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap');
+
+      :root {
+        --ink: #e9eee5;
+        --muted: #93a49a;
+        --ground: #101914;
+        --panel: #16231c;
+        --panel-deep: #0c140f;
+        --line: rgba(196, 216, 190, 0.17);
+        --lime: #d7f56b;
+        --lime-dark: #a6c13e;
+        --amber: #ffbf5a;
+        --red: #ff7164;
+        --blue: #71c8ef;
+        --font-display: 'Barlow Condensed', sans-serif;
+        --font-mono: 'DM Mono', monospace;
+        --font-serif: 'Newsreader', serif;
+      }
+
+      * { box-sizing: border-box; }
+      html { min-width: 320px; background: var(--ground); }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: var(--font-mono);
+        background:
+          radial-gradient(circle at 84% -5%, rgba(97, 130, 70, 0.25), transparent 29rem),
+          radial-gradient(circle at 0% 60%, rgba(28, 73, 59, 0.25), transparent 28rem),
+          var(--ground);
+      }
+      body::before {
+        content: '';
+        position: fixed; inset: 0; pointer-events: none; opacity: .24;
+        background-image: linear-gradient(rgba(213, 242, 202, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(213, 242, 202, .045) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(to bottom, #000, transparent 90%);
+      }
+      button, input { font: inherit; }
+      button { cursor: pointer; }
+
+      .shell { width: min(1520px, calc(100% - 36px)); margin: 0 auto; padding: 23px 0 38px; position: relative; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 0 20px; border-bottom: 1px solid var(--line); }
+      .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+      .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--lime); color: var(--lime); transform: rotate(45deg); }
+      .brand-mark span { transform: rotate(-45deg); font-size: 17px; font-weight: 700; }
+      .eyebrow, .kicker { color: var(--muted); letter-spacing: .13em; text-transform: uppercase; font-size: 10px; }
+      .brand h1 { font: 600 25px/0.85 var(--font-display); letter-spacing: .045em; margin: 4px 0 0; text-transform: uppercase; }
+      .top-meta { display: flex; align-items: center; gap: 20px; text-align: right; }
+      .live-cluster { display: flex; align-items: center; gap: 9px; color: var(--lime); font-size: 11px; }
+      .pulse { width: 8px; height: 8px; border-radius: 999px; background: var(--lime); box-shadow: 0 0 0 0 rgba(215,245,107,.6); animation: pulse 1.8s infinite; }
+      .clock { color: var(--ink); font-size: 12px; }
+      @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(215,245,107,0); } 100% { box-shadow: 0 0 0 0 rgba(215,245,107,0); } }
+
+      .hero { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr); gap: 18px; padding: 22px 0 18px; }
+      .hero-copy { padding: 13px 0 0; }
+      .hero h2 { margin: 9px 0 10px; max-width: 760px; font: 500 clamp(35px, 4.8vw, 65px)/.91 var(--font-serif); letter-spacing: -.045em; }
+      .hero h2 em { color: var(--lime); font-style: normal; }
+      .hero p { max-width: 620px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.75; }
+      .connection { border: 1px solid var(--line); background: rgba(22, 35, 28, .8); padding: 16px; align-self: end; }
+      .connection-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+      .connection h3 { margin: 0; font: 600 17px var(--font-display); letter-spacing: .08em; text-transform: uppercase; }
+      .status-chip { padding: 4px 7px; color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber), transparent 60%); font-size: 9px; letter-spacing: .08em; }
+      .status-chip.online { color: var(--lime); border-color: color-mix(in srgb, var(--lime), transparent 55%); }
+      .connect-row { display: flex; gap: 8px; }
+      .connect-row input { min-width: 0; flex: 1; border: 1px solid var(--line); background: var(--panel-deep); color: var(--ink); padding: 10px; outline: none; font-size: 11px; }
+      .connect-row input:focus { border-color: var(--lime-dark); }
+      .button { border: 1px solid var(--lime); background: var(--lime); color: #16200f; padding: 0 13px; font-weight: 500; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+      .button.ghost { border-color: var(--line); background: transparent; color: var(--muted); }
+      .connection-hint { min-height: 15px; color: var(--muted); margin: 11px 0 0; font-size: 10px; line-height: 1.5; }
+
+      .primary-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .8fr); gap: 18px; }
+      .panel { border: 1px solid var(--line); background: linear-gradient(135deg, rgba(28, 42, 33, .91), rgba(13, 22, 16, .86)); }
+      .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 15px 16px; border-bottom: 1px solid var(--line); }
+      .panel-title { margin: 3px 0 0; font: 600 20px/.9 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+      .tag { color: var(--muted); font-size: 9px; border: 1px solid var(--line); padding: 4px 6px; }
+      .main-state { padding: 15px 16px 13px; }
+      .state-row { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 16px; }
+      .state-label { color: var(--lime); font: 600 clamp(39px, 5vw, 67px)/.8 var(--font-display); letter-spacing: .035em; text-transform: uppercase; }
+      .state-detail { color: var(--muted); font-size: 10px; margin-top: 10px; }
+      .gen { color: var(--amber); text-align: right; font-size: 10px; line-height: 1.6; white-space: pre-line; }
+      .state-rail { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 24px; }
+      .state-step { min-width: 0; color: #697b70; font-size: 9px; }
+      .state-step::before { content: ''; display: block; width: 100%; height: 4px; margin-bottom: 7px; background: #2b3a30; }
+      .state-step.done, .state-step.active { color: var(--ink); }
+      .state-step.done::before { background: var(--lime-dark); }
+      .state-step.active::before { background: var(--lime); box-shadow: 0 0 11px rgba(215,245,107,.45); }
+      .metrics { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
+      .metric { padding: 13px 16px; border-right: 1px solid var(--line); min-width: 0; }
+      .metric:last-child { border-right: 0; }
+      .metric-label { color: var(--muted); font-size: 9px; letter-spacing: .07em; text-transform: uppercase; }
+      .metric-value { display: block; margin-top: 6px; color: var(--ink); font: 600 24px/1 var(--font-display); letter-spacing: .04em; white-space: nowrap; }
+      .metric-value small { color: var(--muted); font: 10px var(--font-mono); }
+
+      .signal-body { padding: 15px 16px 14px; }
+      .wave-area { position: relative; height: 122px; overflow: hidden; border: 1px solid var(--line); background: #0b130e; }
+      .wave-area::after { content: 'INMP441 · I2S RX / 16 kHz'; position: absolute; top: 8px; left: 9px; color: #68806f; font-size: 9px; }
+      #wave { width: 100%; height: 100%; display: block; }
+      .audio-level { display: flex; align-items: baseline; justify-content: space-between; margin-top: 13px; }
+      .dbfs { color: var(--lime); font: 600 31px/1 var(--font-display); }
+      .dbfs span { color: var(--muted); font: 10px var(--font-mono); }
+      .audio-note { color: var(--muted); font-size: 9px; text-align: right; line-height: 1.6; white-space: pre-line; }
+
+      .section-heading { display: flex; justify-content: space-between; align-items: end; margin: 25px 0 11px; }
+      .section-heading h2 { margin: 0; font: 600 24px/.9 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+      .section-heading span { color: var(--muted); font-size: 9px; }
+      .module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .module { position: relative; overflow: hidden; min-height: 176px; padding: 15px; border: 1px solid var(--line); background: rgba(19, 31, 24, .78); transition: border-color .2s, transform .2s; }
+      .module:hover { border-color: rgba(215,245,107,.62); transform: translateY(-2px); }
+      .module::after { content: ''; position: absolute; width: 72px; height: 72px; right: -27px; bottom: -29px; border: 1px solid rgba(215,245,107,.13); transform: rotate(45deg); }
+      .module-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+      .module-id { color: var(--muted); font-size: 9px; letter-spacing: .09em; }
+      .module-state { display: flex; gap: 5px; align-items: center; color: var(--lime); font-size: 9px; }
+      .module-state i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+      .module-state.warn { color: var(--amber); }
+      .module-state.offline { color: var(--red); }
+      .module h3 { margin: 22px 0 7px; font: 600 25px/.88 var(--font-display); letter-spacing: .045em; text-transform: uppercase; }
+      .module p { margin: 0; max-width: 94%; color: var(--muted); font-size: 10px; line-height: 1.6; }
+      .module-data { position: absolute; left: 15px; bottom: 14px; color: var(--ink); font-size: 10px; }
+      .module-data strong { color: var(--lime); font-size: 14px; font-weight: 500; }
+      .module.warning .module-data strong { color: var(--amber); }
+
+      .bottom-grid { display: grid; grid-template-columns: .98fr 1.02fr; gap: 18px; margin-top: 18px; }
+      .servo-list { padding: 5px 16px 10px; }
+      .servo { display: grid; grid-template-columns: 64px 1fr 36px; gap: 9px; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(196,216,190,.1); font-size: 10px; }
+      .servo:last-child { border-bottom: 0; }
+      .servo-name { color: var(--muted); }
+      .servo-rail { height: 3px; background: #2a3b31; position: relative; }
+      .servo-rail b { position: absolute; left: 0; height: 100%; background: var(--lime-dark); }
+      .servo-value { color: var(--ink); text-align: right; }
+      .event-list { padding: 3px 16px 9px; max-height: 223px; overflow: auto; }
+      .event { display: grid; grid-template-columns: 56px 11px 1fr; gap: 7px; padding: 8px 0; font-size: 10px; border-bottom: 1px solid rgba(196,216,190,.1); }
+      .event:last-child { border-bottom: 0; }
+      .event-time { color: var(--muted); }
+      .event-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); margin-top: 3px; }
+      .event-dot.warn { background: var(--amber); }
+      .event-dot.error { background: var(--red); }
+      .event-text { color: #c4d0c4; line-height: 1.45; }
+      .footer { display: flex; justify-content: space-between; gap: 20px; padding-top: 18px; color: #64746a; font-size: 9px; line-height: 1.6; }
+      .footer strong { color: var(--muted); font-weight: 400; }
+
+      @media (max-width: 900px) { .hero, .primary-grid, .bottom-grid { grid-template-columns: 1fr; } .module-grid { grid-template-columns: repeat(2, 1fr); } .hero-copy { padding-top: 0; } }
+      @media (max-width: 590px) { .shell { width: min(100% - 24px, 1520px); padding-top: 15px; } .top-meta { gap: 10px; } .clock { display: none; } .hero { padding-top: 16px; } .connection { padding: 13px; } .connect-row { flex-wrap: wrap; } .connect-row input { min-height: 39px; flex-basis: 100%; } .connect-row .button { height: 36px; } .metrics { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(2) { border-right: 0; } .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); } .module-grid { grid-template-columns: 1fr; } .state-row { grid-template-columns: 1fr; } .gen { text-align: left; } .footer { display: block; } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand"><div class="brand-mark"><span>S</span></div><div><div class="eyebrow">Sesame Robot / V3</div><h1>系统状态台</h1></div></div>
+        <div class="top-meta"><div id="liveLabel" class="live-cluster"><span class="pulse"></span>NO LIVE FEED</div><div id="clock" class="clock">--:--:--</div></div>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy"><div class="kicker">设备遥测 · 实时视图</div><h2>一眼看清 <em>ESP32</em> 每个动作与模块。</h2><p>只显示设备当前回传的遥测帧。没有真实状态帧时，所有指标均标为未接入；状态帧超过 3 秒未刷新会明确标为过期，不会循环或伪造数据。</p></div>
+        <aside class="connection" aria-label="设备连接"><div class="connection-top"><h3>数据接入</h3><span id="connectionState" class="status-chip">未连接</span></div><div class="connect-row"><input id="socketUrl" aria-label="WebSocket 地址" value="ws://127.0.0.1:8765/status" placeholder="wss://sesame-gateway.local/status" /><button id="connectButton" class="button">连接设备</button></div><p id="connectionHint" class="connection-hint">默认连接电脑本地串口桥；仅本机开发允许 ws://localhost。</p></aside>
+      </section>
+
+      <section class="primary-grid">
+        <article class="panel"><div class="panel-head"><div><div class="kicker">机器人会话</div><h2 class="panel-title">运行状态</h2></div><span id="uptimeTag" class="tag">UP --:--:--</span></div><div class="main-state"><div class="state-row"><div><div id="sessionState" class="state-label">未接入</div><div id="stateDetail" class="state-detail">尚未接收到 ESP32 当前状态帧</div></div><div id="generation" class="gen">SESSION · --<br />GENERATION · --</div></div><div class="state-rail" aria-label="会话状态流"><span class="state-step" data-state="IDLE">01 IDLE</span><span class="state-step" data-state="WAKE">02 WAKE</span><span class="state-step" data-state="LISTEN">03 LISTEN</span><span class="state-step" data-state="THINK">04 THINK</span><span class="state-step" data-state="SPEAK">05 SPEAK</span></div></div><div class="metrics"><div class="metric"><span class="metric-label">Wi-Fi RSSI</span><b id="rssi" class="metric-value">-- <small>dBm</small></b></div><div class="metric"><span class="metric-label">WSS 延迟</span><b id="latency" class="metric-value">-- <small>ms</small></b></div><div class="metric"><span class="metric-label">可用堆内存</span><b id="heap" class="metric-value">-- <small>KB</small></b></div><div class="metric"><span class="metric-label">CPU 温度</span><b id="temperature" class="metric-value">-- <small>°C</small></b></div></div></article>
+        <article class="panel"><div class="panel-head"><div><div class="kicker">环境采音</div><h2 class="panel-title">输入信号</h2></div><span id="soundFlag" class="tag">NO DATA</span></div><div class="signal-body"><div class="wave-area"><canvas id="wave" width="640" height="180" aria-label="麦克风声波图"></canvas></div><div class="audio-level"><div><div id="dbfs" class="dbfs">-- <span>dBFS</span></div><div class="kicker" style="margin-top:6px">RMS / 实时音量</div></div><div id="audioNote" class="audio-note">等待 I2S 当前采样<br />PEAK --</div></div></div></article>
+      </section>
+
+      <div class="section-heading"><h2>硬件模块</h2><span>最后状态帧：<b id="lastSeen">尚未接收</b></span></div>
+      <section id="moduleGrid" class="module-grid"></section>
+
+      <section class="bottom-grid">
+        <article class="panel"><div class="panel-head"><div><div class="kicker">8 路 MG90S</div><h2 class="panel-title">舵机姿态</h2></div><span id="motionName" class="tag">REST</span></div><div id="servoList" class="servo-list"></div></article>
+        <article class="panel"><div class="panel-head"><div><div class="kicker">事件追踪</div><h2 class="panel-title">最近日志</h2></div><span id="eventCount" class="tag">00 EVENTS</span></div><div id="eventList" class="event-list" aria-live="polite"></div></article>
+      </section>
+
+      <footer class="footer"><span><strong>实时状态协议：</strong>接收 JSON 后按 <code>status</code> / <code>modules</code> / <code>servos</code> 合并。</span><span>安全优先级：<strong>stop / flush → control → audio</strong></span></footer>
+    </main>
+
+    <script>
+      const MODULES = [
+        ['wifi', 'WSS 连接', 'Wi-Fi / 加密 WebSocket'],
+        ['microphone', 'INMP441', 'I2S RX · 声音采集'],
+        ['speaker', 'MAX98357', 'I2S TX · 功放与扬声器'],
+        ['oled', 'OLED 表情', '128 × 64 · 表情显示'],
+        ['servos', '8 路舵机', '动作播放器 · 白名单资产'],
+        ['safety', '安全控制', '看门狗 / stop / 断线保护'],
+      ];
+      const SERVO_NAMES = ['R1 前右', 'R2 中右', 'L1 前左', 'L2 中左', 'R4 后右', 'R3 后右', 'L3 后左', 'L4 后左'];
+      const STATE_DETAILS = { IDLE: '等待唤醒词 · 本地采音未上传', WAKE: '唤醒词命中 · 准备开启聆听窗口', LISTEN: '上行 Opus 流已发送 · 正在聆听', THINK: '等待 ASR / Agent / TTS 首段结果', SPEAK: '下行 Opus 播放中 · 半双工模式' };
+      const VALID_STATES = new Set(Object.keys(STATE_DETAILS));
+      const VALID_HEALTH = new Set(['ok', 'warn', 'error']);
+      const MODULE_IDS = new Set(MODULES.map(([id]) => id));
+      const MAX_STATUS_FRAME_BYTES = 64 * 1024;
+      const MAX_TEXT_LENGTH = 512;
+      const MAX_SESSION_ID_LENGTH = 128;
+      const state = {
+        status: null, sessionId: null, generation: null, uptime: null,
+        rssi: null, latency: null, heap: null, temperature: null, dbfs: null, peak: null,
+        waveform: [], modules: Object.fromEntries(MODULES.map(([id, title, description]) => [id, { title, description, state: '未接入', value: '--', health: 'unknown' }])),
+        servos: Array(8).fill(null), events: [], connected: false, connecting: false, dataAvailable: false,
+        stale: false, lastFrameAt: null, staleAfterMs: 3000,
+      };
+      let ws = null;
+      let connectionId = 0;
+      let connectionTimeout = null;
+      const $ = (id) => document.getElementById(id);
+      const formatTime = () => new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+      const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+      const isBoundedText = (value, limit = MAX_TEXT_LENGTH) => typeof value === 'string' && value.length <= limit;
+      const isFiniteNumber = (value, min, max) => typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
+      const isLocalDevelopmentSocket = (url) => url.protocol === 'ws:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+
+      const isCurrent = () => state.dataAvailable && !state.stale;
+      const value = (number, unit, precision = 0) => number === null || number === undefined ? `-- <small>${unit}</small>` : `${Number(number).toFixed(precision)} <small>${unit}</small>`;
+      const uptime = (seconds) => seconds === null || seconds === undefined ? '--:--:--' : new Date(Number(seconds) * 1000).toISOString().slice(11, 19);
+      const age = () => state.lastFrameAt ? `${Math.max(0, Math.floor((Date.now() - state.lastFrameAt) / 1000))} 秒前` : '尚未接收';
+
+      function renderModules() {
+        const cards = document.createDocumentFragment();
+        MODULES.forEach(([id]) => {
+          const m = state.modules[id] || {};
+          const health = !isCurrent() ? 'offline' : m.health === 'error' ? 'offline' : m.health === 'warn' ? 'warn' : '';
+          const label = !state.dataAvailable ? '未接入' : state.stale ? '数据过期' : m.state || '未知';
+          const card = document.createElement('article');
+          card.className = `module ${health === 'warn' ? 'warning' : ''}`;
+          const top = document.createElement('div');
+          top.className = 'module-top';
+          const moduleId = document.createElement('span');
+          moduleId.className = 'module-id';
+          moduleId.textContent = id.toUpperCase();
+          const moduleState = document.createElement('span');
+          moduleState.className = `module-state ${health}`;
+          const dot = document.createElement('i');
+          moduleState.append(dot, document.createTextNode(label));
+          top.append(moduleId, moduleState);
+          const title = document.createElement('h3');
+          title.textContent = m.title || id;
+          const description = document.createElement('p');
+          description.textContent = m.description || '等待设备状态';
+          const data = document.createElement('div');
+          data.className = 'module-data';
+          const dataValue = document.createElement('strong');
+          dataValue.textContent = m.value || '--';
+          data.append(dataValue, document.createTextNode(` · ${isCurrent() ? '当前遥测' : '不可视为当前值'}`));
+          card.append(top, title, description, data);
+          cards.append(card);
+        });
+        $('moduleGrid').replaceChildren(cards);
+      }
+      function renderServos() { $('servoList').innerHTML = state.servos.map((angle, i) => { const liveAngle = isCurrent() && angle !== null; return `<div class="servo"><span class="servo-name">${String(i + 1).padStart(2, '0')} · ${SERVO_NAMES[i]}</span><span class="servo-rail"><b style="width:${liveAngle ? clamp(angle / 180 * 100, 1, 100) : 0}%"></b></span><span class="servo-value">${liveAngle ? `${Math.round(angle)}°` : '--'}</span></div>`; }).join(''); }
+      function renderEvents() {
+        $('eventCount').textContent = `${String(state.events.length).padStart(2, '0')} EVENTS`;
+        const events = document.createDocumentFragment();
+        const items = state.events.length ? state.events.slice(0, 8) : [{ time: '--:--:--', text: '尚未收到设备事件。', level: '' }];
+        items.forEach((event) => {
+          const row = document.createElement('div');
+          row.className = 'event';
+          const time = document.createElement('span');
+          time.className = 'event-time';
+          time.textContent = event.time;
+          const dot = document.createElement('i');
+          dot.className = `event-dot ${event.level === 'warn' || event.level === 'error' ? event.level : ''}`;
+          const text = document.createElement('span');
+          text.className = 'event-text';
+          text.textContent = event.text;
+          row.append(time, dot, text);
+          events.append(row);
+        });
+        $('eventList').replaceChildren(events);
+      }
+      function render() {
+        $('sessionState').textContent = !state.dataAvailable ? '未接入' : state.stale ? '数据过期' : state.status || '未知';
+        $('stateDetail').textContent = !state.dataAvailable ? '尚未接收到 ESP32 当前状态帧' : state.stale ? `最后一帧为 ${age()}；显示已冻结，不能代表当前状态` : STATE_DETAILS[state.status] || '设备未提供会话状态说明';
+        $('generation').textContent = `SESSION · ${state.sessionId || '--'}\nGENERATION · ${state.generation ?? '--'}`;
+        $('uptimeTag').textContent = `UP ${uptime(state.uptime)}`;
+        $('rssi').innerHTML = value(isCurrent() ? state.rssi : null, 'dBm'); $('latency').innerHTML = value(isCurrent() ? state.latency : null, 'ms'); $('heap').innerHTML = value(isCurrent() ? state.heap : null, 'KB'); $('temperature').innerHTML = value(isCurrent() ? state.temperature : null, '°C', 1);
+        $('dbfs').innerHTML = state.dbfs === null || !isCurrent() ? '-- <span>dBFS</span>' : `${Number(state.dbfs).toFixed(1).replace('-', '−')} <span>dBFS</span>`; $('audioNote').textContent = isCurrent() ? `I2S 当前采样\nPEAK ${state.peak ?? '--'}` : '等待 I2S 当前采样\nPEAK --';
+        $('soundFlag').textContent = !isCurrent() ? 'NO DATA' : state.dbfs > -31 ? 'SOUND' : 'QUIET';
+        document.querySelectorAll('.state-step').forEach((step) => { const index = ['IDLE','WAKE','LISTEN','THINK','SPEAK'].indexOf(step.dataset.state); const current = isCurrent() ? ['IDLE','WAKE','LISTEN','THINK','SPEAK'].indexOf(state.status) : -1; step.className = `state-step ${index < current ? 'done' : index === current ? 'active' : ''}`; });
+        $('lastSeen').textContent = age(); $('motionName').textContent = isCurrent() ? (state.modules.servos?.value || '--').toUpperCase() : '--';
+        renderModules(); renderServos(); renderEvents(); drawWave(); renderConnection();
+      }
+      function pushEvent(text, level = '') { state.events.unshift({ time: formatTime(), text, level }); state.events = state.events.slice(0, 20); renderEvents(); }
+      function renderConnection() {
+        const text = state.connecting ? '正在连接' : state.stale ? '数据过期' : state.connected ? '已连接' : '未连接';
+        $('connectionState').textContent = text; $('connectionState').classList.toggle('online', state.connected && !state.stale);
+        const pulse = document.createElement('span');
+        pulse.className = 'pulse';
+        $('liveLabel').replaceChildren(pulse, document.createTextNode(state.connecting ? 'CONNECTING' : state.stale ? 'STALE DATA' : state.connected ? 'LIVE DEVICE FEED' : 'NO LIVE FEED'));
+        $('connectButton').textContent = state.connected ? '断开设备' : state.connecting ? '取消连接' : '连接设备';
+      }
+      function rejectFrame(reason) { pushEvent(`状态帧已拒绝：${reason}`, 'warn'); return false; }
+      function validateStatus(payload) {
+        const data = isPlainObject(payload) && isPlainObject(payload.status) ? payload.status : payload;
+        if (!isPlainObject(data)) return { reason: '根对象必须是 JSON object' };
+        const normalized = {};
+        if (data.schemaVersion !== undefined) {
+          if (data.schemaVersion !== 1) return { reason: '不支持的 schemaVersion' };
+          normalized.schemaVersion = 1;
+        }
+        if (data.status !== undefined) {
+          if (!VALID_STATES.has(data.status)) return { reason: 'status 不在允许集合中' };
+          normalized.status = data.status;
+        }
+        if (data.sessionId !== undefined) {
+          if (!isBoundedText(data.sessionId, MAX_SESSION_ID_LENGTH)) return { reason: 'sessionId 无效' };
+          normalized.sessionId = data.sessionId;
+        }
+        const numericRules = {
+          generation: (value) => Number.isSafeInteger(value) && value >= 0,
+          uptime: (value) => isFiniteNumber(value, 0, 315576000),
+          rssi: (value) => isFiniteNumber(value, -150, 0),
+          latency: (value) => isFiniteNumber(value, 0, 60000),
+          heap: (value) => isFiniteNumber(value, 0, 1048576),
+          temperature: (value) => isFiniteNumber(value, -40, 125),
+          dbfs: (value) => isFiniteNumber(value, -160, 0),
+          peak: (value) => isFiniteNumber(value, 0, 32767),
+        };
+        for (const [key, isValid] of Object.entries(numericRules)) {
+          if (data[key] !== undefined) {
+            if (!isValid(data[key])) return { reason: `${key} 超出允许范围` };
+            normalized[key] = data[key];
+          }
+        }
+        if (data.heartbeat_ms !== undefined) {
+          if (!isFiniteNumber(data.heartbeat_ms, 250, 10000)) return { reason: 'heartbeat_ms 超出允许范围' };
+          normalized.heartbeat_ms = data.heartbeat_ms;
+        }
+        if (data.modules !== undefined) {
+          if (!isPlainObject(data.modules)) return { reason: 'modules 必须是 object' };
+          normalized.modules = {};
+          for (const [key, module] of Object.entries(data.modules)) {
+            if (!MODULE_IDS.has(key) || !isPlainObject(module)) return { reason: `modules.${key} 无效` };
+            const cleanModule = {};
+            for (const field of ['title', 'description', 'state', 'value']) {
+              if (module[field] !== undefined) {
+                if (!isBoundedText(module[field])) return { reason: `modules.${key}.${field} 无效` };
+                cleanModule[field] = module[field];
+              }
+            }
+            if (module.health !== undefined) {
+              if (!VALID_HEALTH.has(module.health)) return { reason: `modules.${key}.health 无效` };
+              cleanModule.health = module.health;
+            }
+            normalized.modules[key] = cleanModule;
+          }
+        }
+        if (data.servos !== undefined) {
+          if (!Array.isArray(data.servos) || data.servos.length > 8 || !data.servos.every((angle) => isFiniteNumber(angle, 0, 180))) return { reason: 'servos 无效' };
+          normalized.servos = data.servos;
+        }
+        if (data.waveform !== undefined) {
+          if (!Array.isArray(data.waveform) || data.waveform.length > 256 || !data.waveform.every((sample) => isFiniteNumber(sample, -1, 1))) return { reason: 'waveform 无效' };
+          normalized.waveform = data.waveform;
+        }
+        if (data.event !== undefined) {
+          if (!isPlainObject(data.event) || !isBoundedText(data.event.text) || !['', 'warn', 'error'].includes(data.event.level ?? '')) return { reason: 'event 无效' };
+          normalized.event = { text: data.event.text, level: data.event.level ?? '' };
+        }
+        return Object.keys(normalized).length ? { data: normalized } : { reason: '没有可识别字段' };
+      }
+      function mergeStatus(payload) {
+        const result = validateStatus(payload);
+        if (!result.data) return rejectFrame(result.reason);
+        const data = result.data;
+        ['status','sessionId','generation','uptime','rssi','latency','heap','temperature','dbfs','peak'].forEach(k => { if (data[k] !== undefined) state[k] = data[k]; });
+        if (data.modules) Object.entries(data.modules).forEach(([key, value]) => state.modules[key] = { ...(state.modules[key] || { title: key }), ...value });
+        if (data.servos) state.servos = data.servos.slice();
+        if (data.waveform) state.waveform = data.waveform.slice();
+        if (data.heartbeat_ms) state.staleAfterMs = Math.max(1000, data.heartbeat_ms * 3);
+        if (data.event) pushEvent(data.event.text, data.event.level);
+        state.dataAvailable = true; state.stale = false; state.lastFrameAt = Date.now();
+        render();
+        return true;
+      }
+      function clearConnectionTimeout() { if (connectionTimeout !== null) { clearTimeout(connectionTimeout); connectionTimeout = null; } }
+      function isCurrentConnection(socket, id) { return ws === socket && connectionId === id; }
+      function disconnect() {
+        const socket = ws;
+        connectionId += 1;
+        ws = null;
+        clearConnectionTimeout();
+        state.connected = false;
+        state.connecting = false;
+        if (state.dataAvailable) state.stale = true;
+        if (socket && (socket.readyState === WebSocket.CONNECTING || socket.readyState === WebSocket.OPEN)) socket.close(1000, '用户断开');
+        $('connectionHint').textContent = '已断开设备；最后一帧已冻结并标记为过期。';
+        pushEvent('WSS 连接已由用户断开。', 'warn');
+        render();
+      }
+      function connect() {
+        if (ws) { disconnect(); return; }
+        const rawUrl = $('socketUrl').value.trim();
+        let endpoint;
+        try { endpoint = new URL(rawUrl); } catch { $('connectionHint').textContent = '地址无效，未生成任何替代数据。'; return; }
+        if (endpoint.protocol !== 'wss:' && !isLocalDevelopmentSocket(endpoint)) { $('connectionHint').textContent = '生产状态台只允许 wss://；仅本机开发允许 ws://localhost。'; return; }
+        const url = endpoint.toString();
+        const id = ++connectionId;
+        state.connecting = true;
+        state.connected = false;
+        if (state.dataAvailable) state.stale = true;
+        $('connectionHint').textContent = `正在连接 ${url}…`;
+        let socket;
+        try { socket = new WebSocket(url); } catch { state.connecting = false; $('connectionHint').textContent = '地址无效，未生成任何替代数据。'; render(); return; }
+        ws = socket;
+        connectionTimeout = setTimeout(() => { if (isCurrentConnection(socket, id) && socket.readyState === WebSocket.CONNECTING) { $('connectionHint').textContent = '连接超时；请检查 Gateway 地址、证书和网络。'; socket.close(1000, '连接超时'); } }, 10000);
+        socket.onopen = () => {
+          if (!isCurrentConnection(socket, id)) { socket.close(1000, '过期连接'); return; }
+          clearConnectionTimeout();
+          state.connecting = false;
+          state.connected = true;
+          $('connectionHint').textContent = `已连接 ${url}，等待设备首个有效状态帧。`;
+          pushEvent('WSS 连接已建立，等待首帧。');
+          render();
+          try { socket.send(JSON.stringify({ type: 'status.subscribe', payload: { interval_ms: 1000 } })); } catch { $('connectionHint').textContent = '订阅发送失败；连接将关闭。'; socket.close(1011, '订阅发送失败'); }
+        };
+        socket.onmessage = (event) => {
+          if (!isCurrentConnection(socket, id)) return;
+          if (typeof event.data !== 'string' || event.data.length > MAX_STATUS_FRAME_BYTES) { pushEvent('状态帧类型或大小无效。', 'warn'); return; }
+          try { mergeStatus(JSON.parse(event.data)); } catch { pushEvent('收到无法解析的状态帧。', 'warn'); }
+        };
+        socket.onerror = () => { if (isCurrentConnection(socket, id)) $('connectionHint').textContent = '连接失败：检查 Gateway 地址、端口、证书和 WSS 服务；页面不会伪造数据。'; };
+        socket.onclose = () => {
+          if (!isCurrentConnection(socket, id)) return;
+          clearConnectionTimeout();
+          ws = null;
+          state.connected = false;
+          state.connecting = false;
+          if (state.dataAvailable) state.stale = true;
+          $('connectionHint').textContent = '设备已断开；最后一帧已冻结并标记为过期。';
+          pushEvent('WSS 连接已关闭。', 'warn');
+          render();
+        };
+        render();
+      }
+      function drawWave() { const canvas = $('wave'), ctx = canvas.getContext('2d'), ratio = devicePixelRatio || 1, width = canvas.clientWidth, height = canvas.clientHeight; if (canvas.width !== width * ratio || canvas.height !== height * ratio) { canvas.width = width * ratio; canvas.height = height * ratio; } ctx.setTransform(ratio, 0, 0, ratio, 0, 0); ctx.clearRect(0, 0, width, height); ctx.strokeStyle = 'rgba(191,229,150,.1)'; ctx.lineWidth = 1; for (let x = 0; x < width; x += 34) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); } for (let y = 20; y < height; y += 28) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); } if (!isCurrent() || state.waveform.length < 2) { ctx.fillStyle = '#68806f'; ctx.font = '10px DM Mono'; ctx.fillText(!state.dataAvailable ? 'NO DEVICE SAMPLE' : 'STALE SAMPLE — NOT CURRENT', 10, height / 2); return; } ctx.beginPath(); state.waveform.forEach((sample, index) => { const x = index / (state.waveform.length - 1) * width; const y = height / 2 - clamp(sample, -1, 1) * height * .39; index ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.strokeStyle = '#d7f56b'; ctx.lineWidth = 1.5; ctx.shadowColor = '#d7f56b'; ctx.shadowBlur = 8; ctx.stroke(); ctx.shadowBlur = 0; }
+      function checkFreshness() { if (state.lastFrameAt && Date.now() - state.lastFrameAt > state.staleAfterMs && !state.stale) { state.stale = true; $('connectionHint').textContent = `超过 ${Math.round(state.staleAfterMs / 1000)} 秒未收到状态帧；所有值已标为过期。`; render(); } else if (state.lastFrameAt) { $('lastSeen').textContent = age(); } }
+      $('connectButton').addEventListener('click', connect); setInterval(() => { $('clock').textContent = formatTime(); checkFreshness(); }, 1000); $('clock').textContent = formatTime(); render();
+    </script>
+  </body>
+</html>

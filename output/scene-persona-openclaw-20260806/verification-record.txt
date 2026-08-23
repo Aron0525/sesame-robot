@@ -1,0 +1,49 @@
+# 场景化人设 + OpenClaw 切换：验证记录
+
+## 改动摘要
+
+- 新增场景字段 `scene_id`：`office`、`parenting`、`companion`；默认 `companion`。
+- 选中场景的角色、身份、表达方式和优先事项由 Gateway 保存并向控制台广播。
+- OpenClaw 获得仅三个 MCP 工具：`list_scenes`、`get_scene`、`select_scene`。MCP bridge 只调用本机 Gateway 的受控场景端点；无动作、音频、文件或系统控制能力。
+- Sesame Agent 提示词要求每轮读取场景；只在用户明确要求时切换。
+
+## 基线
+
+命令：
+
+```sh
+endpoint-gateway/.venv/bin/python -m unittest discover -s endpoint-gateway/tests -v
+```
+
+退出：`0`。字面结果：`Ran 5 tests ... OK`。
+
+## 修改后验证
+
+| 命令 | 退出 | 字面输出 / 证据 |
+| --- | ---: | --- |
+| `./.venv/bin/python -m unittest discover -s tests -v` | 0 | `Ran 7 tests ... OK`；完整输出：`gateway-tests-release.log` |
+| `NODE_PATH=/Users/mac/.nvm/versions/node/v26.4.0/lib/node_modules/openclaw/node_modules node tests/test_console_ui.cjs` | 0 | `PASS: console auto-connects, exposes only approved controls, and is responsive`；完整输出：`console-ui-tests-final.log` |
+| `openclaw config validate` | 0 | `Config valid: ~/.openclaw/openclaw.json`；完整输出：`openclaw-config-validate-final.log` |
+| `openclaw mcp probe sesame-scene` | 0 | `- sesame-scene: 3 tools`；完整输出：`openclaw-mcp-probe-release.log` |
+| `sh -n rollback.sh` | 0 | 语法检查通过；退出码：`rollback_syntax=0` |
+
+## 真实 MCP 切换记录
+
+测试运行中的次序与字面结果保存在 `mcp-live-switch.jsonl`：
+
+1. `get_scene` 返回 `companion` 和角色 `可靠的陪伴型桌面机器人`。
+2. `select_scene({"scene_id":"office"})` 返回 `office` 和角色 `办公协作桌面机器人`。
+3. 再次 `get_scene` 返回仍为 `office`。
+
+测试结束前已使用相同 MCP bridge 恢复默认：`mcp-live-rollback.jsonl` 的 `select_scene({"scene_id":"companion"})` 与后续 `get_scene` 均返回 `companion`。
+
+`http-scene-final.json` 记录了切换到 `office` 时 Gateway 返回的完整场景契约。测试 Gateway 已停止，确认记录：`verification-exit-status.txt` 中 `test_gateway_stopped=true`。
+
+## 工件角色
+
+- 修改后工件：`modified/`
+- 补丁：`scene-persona-openclaw.patch`
+- 基线 / 修改后哈希：`baseline-sha256.txt`、`modified-sha256.txt`
+- 可运行回滚：`rollback.sh`
+
+工件不包含 Gateway 控制 token；token 扫描已通过。`rollback.sh` 会移除 `sesame-scene` MCP 配置、还原 Sesame Agent 工具白名单与工作区文档，并恢复 Gateway 源码。

@@ -1,0 +1,2 @@
+"""OpenClaw Gateway protocol adapter."""
+

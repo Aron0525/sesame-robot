@@ -1,0 +1,42 @@
+test_authorized_mode_text_endpoint_prompts_then_selects (tests.test_mode_selection.ModeSelectionEndpointTests) ... FAIL
+test_choice_after_generic_prompt_switches_to_selected_scene (tests.test_mode_selection.ModeSelectionRouterTests) ... ERROR
+test_generic_switch_request_announces_hard_coded_options (tests.test_mode_selection.ModeSelectionRouterTests) ... ERROR
+test_unrecognized_choice_keeps_selection_pending (tests.test_mode_selection.ModeSelectionRouterTests) ... ERROR
+
+======================================================================
+ERROR: test_choice_after_generic_prompt_switches_to_selected_scene (tests.test_mode_selection.ModeSelectionRouterTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_mode_selection.py", line 23, in test_choice_after_generic_prompt_switches_to_selected_scene
+    self._run(hub.handle_mode_text("sesame-v3-001", "我要切换模式", source="asr"))
+AttributeError: 'GatewayHub' object has no attribute 'handle_mode_text'
+
+======================================================================
+ERROR: test_generic_switch_request_announces_hard_coded_options (tests.test_mode_selection.ModeSelectionRouterTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_mode_selection.py", line 11, in test_generic_switch_request_announces_hard_coded_options
+    result = self._run(hub.handle_mode_text("sesame-v3-001", "切换模式", source="asr"))
+AttributeError: 'GatewayHub' object has no attribute 'handle_mode_text'
+
+======================================================================
+ERROR: test_unrecognized_choice_keeps_selection_pending (tests.test_mode_selection.ModeSelectionRouterTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_mode_selection.py", line 34, in test_unrecognized_choice_keeps_selection_pending
+    self._run(hub.handle_mode_text("sesame-v3-001", "切换模式", source="asr"))
+AttributeError: 'GatewayHub' object has no attribute 'handle_mode_text'
+
+======================================================================
+FAIL: test_authorized_mode_text_endpoint_prompts_then_selects (tests.test_mode_selection.ModeSelectionEndpointTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_mode_selection.py", line 70, in test_authorized_mode_text_endpoint_prompts_then_selects
+    self.assertEqual(prompt.status_code, 200)
+AssertionError: 404 != 200
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.116s
+
+FAILED (failures=1, errors=3)
+exit_status=1

@@ -1,0 +1,16 @@
+{
+  "model": "sesame-v3-provisional",
+  "servo_order": ["R1", "R2", "L1", "L2", "R4", "R3", "L3", "L4"],
+  "stand_angles": [135, 45, 45, 135, 0, 180, 0, 180],
+  "servos": {
+    "R1": {"channel": 0, "joint": "right_front_hip", "pair": "R3", "direction": 1, "min_deg": 0, "max_deg": 180},
+    "R2": {"channel": 1, "joint": "right_rear_hip", "pair": "R4", "direction": -1, "min_deg": 0, "max_deg": 180},
+    "L1": {"channel": 2, "joint": "left_front_hip", "pair": "L3", "direction": -1, "min_deg": 0, "max_deg": 180},
+    "L2": {"channel": 3, "joint": "left_rear_hip", "pair": "L4", "direction": 1, "min_deg": 0, "max_deg": 180},
+    "R4": {"channel": 4, "joint": "right_rear_knee", "pair": "R2", "direction": -1, "min_deg": 0, "max_deg": 180},
+    "R3": {"channel": 5, "joint": "right_front_knee", "pair": "R1", "direction": 1, "min_deg": 0, "max_deg": 180},
+    "L3": {"channel": 6, "joint": "left_front_knee", "pair": "L1", "direction": -1, "min_deg": 0, "max_deg": 180},
+    "L4": {"channel": 7, "joint": "left_rear_knee", "pair": "L2", "direction": 1, "min_deg": 0, "max_deg": 180}
+  },
+  "calibration_status": "provisional: replace 0/180 limits and direction after per-joint hardware calibration"
+}

@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="网关五课教材第二课：代理、DNS、CDN、WAF、TLS、路由、负载均衡和健康检查。">
+  <title>第二课｜代理、TLS 与负载均衡</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="2">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>×5</span></a>
+      <div class="lesson-tabs">
+        <a href="0001-gateway-foundations.html" title="第一课">01</a>
+        <a href="0002-proxies-routing-and-load-balancing.html" aria-current="page" title="第二课">02</a>
+        <a href="0003-api-gateway-policies-and-resilience.html" title="第三课">03</a>
+        <a href="0004-cloud-kubernetes-and-service-mesh.html" title="第四课">04</a>
+        <a href="0005-ai-gateway-design-and-troubleshooting.html" title="第五课">05</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="2">
+      <div>
+        <p class="kicker">第二课 · 流量工程</p>
+        <h1>代理、TLS 与负载均衡</h1>
+        <p class="lead">网关怎样接住请求、识别目标、选择实例并安全转发？这一课拆开真正的数据面零件。</p>
+        <div class="lesson-meta"><span>约 35 分钟</span><span>24 个概念</span><span>5 个练习</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="proxy-family">
+      <div class="chapter-head">
+        <span class="chapter-no">02—A</span>
+        <div><h2>代理家族：它到底代表谁</h2><p>正向和反向的关键不是箭头方向，而是代理站在哪一方。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 01</span>
+          <h3>正向代理（Forward Proxy）</h3>
+          <p>代表客户端访问外部服务。外部服务看见的是代理，而不一定看见真实客户端。</p>
+          <div class="case"><strong>案例</strong>公司电脑先访问企业代理，代理再访问互联网，用于出口审计与访问控制。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 02</span>
+          <h3>反向代理（Reverse Proxy）</h3>
+          <p>代表后端服务接收客户端请求。客户端只知道代理地址，不知道真实服务实例。</p>
+          <div class="case"><strong>案例</strong>用户访问 <code>api.example.com</code>，Nginx 再把请求转给内网 FastAPI。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 03</span>
+          <h3>透明代理（Transparent Proxy）</h3>
+          <p>流量被网络规则自动截获，调用方不必显式配置代理地址。</p>
+          <div class="plain"><strong>通俗解释</strong>普通代理像主动去服务窗口；透明代理像道路上的自动检查站，车辆自然会经过。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 04</span>
+          <h3>边缘代理（Edge Proxy）</h3>
+          <p>部署在最接近外部用户的系统边缘，通常负责 TLS、WAF、缓存和公网入口。</p>
+          <div class="case"><strong>案例</strong>全球用户先到最近的 CDN 边缘节点，再进入区域 API 网关。</div>
+        </article>
+      </div>
+      <div class="diagram">正向代理：客户端 ──▶ 代理 ──▶ 互联网
+                    代理代表客户端
+
+反向代理：客户端 ──▶ 代理 ──▶ 后端服务
+                    代理代表服务端</div>
+    </section>
+
+    <section class="chapter" id="proxy-anatomy">
+      <div class="chapter-head">
+        <span class="chapter-no">02—B</span>
+        <div><h2>反向代理内部的五个零件</h2><p>理解这些词，就能读懂 Nginx、Envoy、Kong 等大量配置。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 05</span>
+          <h3>Listener（监听器）</h3>
+          <p>代理接收连接的网络位置，通常包含 IP、端口和协议。</p>
+          <div class="case"><strong>案例</strong>网关在 <code>0.0.0.0:443</code> 监听 HTTPS，在 <code>:80</code> 把 HTTP 重定向到 HTTPS。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 06</span>
+          <h3>Virtual Host（虚拟主机）</h3>
+          <p>同一个 IP 和端口根据域名承载多个站点或 API。</p>
+          <div class="case"><strong>案例</strong><code>api.example.com</code> 和 <code>admin.example.com</code> 都到同一网关，但匹配不同规则。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 07</span>
+          <h3>Route（路由）</h3>
+          <p>把匹配条件映射到处理动作或上游目标。条件可以包含 Host、路径、方法、Header、查询参数。</p>
+          <div class="case"><strong>案例</strong><code>POST /v1/chat</code> 路由到 Agent 集群，<code>GET /assets/*</code> 路由到对象存储。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 08</span>
+          <h3>Upstream / Cluster（上游集群）</h3>
+          <p>提供相同逻辑能力的一组后端端点。代理会在组内选择一个实例。</p>
+          <div class="case"><strong>案例</strong><code>order-cluster</code> 包含三个订单服务 Pod，任何一个都能处理订单查询。</div>
+        </article>
+        <article class="concept wide">
+          <span class="term">Concept 09</span>
+          <h3>Filter / Middleware（过滤器或中间件）</h3>
+          <p>请求经过路由前后执行的一段公共处理逻辑，例如认证、压缩、改写 Header、记录日志。</p>
+          <div class="plain"><strong>通俗解释</strong>Listener 是大楼入口，Route 是楼层指示牌，Cluster 是目标部门，Filter 是沿途经过的安检、登记和消毒步骤。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="dns-edge-security">
+      <div class="chapter-head">
+        <span class="chapter-no">02—C</span>
+        <div><h2>请求到网关之前：DNS、CDN 与 WAF</h2><p>它们经常排成一条链，但解决的问题不同。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 10</span>
+          <h3>DNS（域名系统）</h3>
+          <p>把域名解析成 IP 或另一个域名。DNS 通常负责“找到入口”，而不是处理进入后的请求。</p>
+          <div class="case"><strong>案例</strong><code>api.example.com</code> 解析到云负载均衡器；后续 HTTP 请求才进入网关。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 11</span>
+          <h3>CDN（内容分发网络）</h3>
+          <p>把可缓存内容放到离用户更近的边缘节点，减少延迟和源站压力。</p>
+          <div class="case"><strong>案例</strong>机器人表情图片直接由附近 CDN 返回，不必每次回到主服务器。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 12</span>
+          <h3>WAF（Web 应用防火墙）</h3>
+          <p>根据 Web 攻击特征或安全规则阻断恶意 HTTP 请求。</p>
+          <div class="case"><strong>案例</strong>请求参数含明显 SQL 注入片段时，WAF 在到达 API 网关前直接拒绝。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 13</span>
+          <h3>DDoS 防护</h3>
+          <p>吸收或清洗大规模恶意流量，重点是网络容量与攻击流量识别，不等同于普通 API 限流。</p>
+          <div class="case"><strong>案例</strong>百万级伪造请求先被云边缘清洗，避免网关带宽耗尽。</div>
+        </article>
+      </div>
+      <div class="diagram">用户
+  │
+DNS：找到入口
+  ▼
+CDN / DDoS：边缘缓存与大流量防护
+  ▼
+WAF：识别 Web 攻击
+  ▼
+API Gateway：身份、路由、配额
+  ▼
+业务服务</div>
+    </section>
+
+    <section class="chapter" id="tls">
+      <div class="chapter-head">
+        <span class="chapter-no">02—D</span>
+        <div><h2>TLS：加密连接在哪里结束</h2><p>HTTPS 不只是“有个证书”，还涉及信任边界如何划分。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 14</span>
+          <h3>TLS Termination（TLS 终止）</h3>
+          <p>网关完成证书握手和解密，再把明文或重新加密后的请求发给上游。</p>
+          <div class="case"><strong>案例</strong>用户与网关使用 HTTPS；网关和同一私有网络的 FastAPI 使用 HTTP。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 15</span>
+          <h3>TLS Passthrough（TLS 透传）</h3>
+          <p>网关只转发加密连接，不解密内容，因此看不到 HTTP 路径。</p>
+          <div class="case"><strong>案例</strong>银行要求证书和解密必须发生在核心服务，前置四层网关只按端口转发。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 16</span>
+          <h3>Re-encryption（重新加密）</h3>
+          <p>客户端到网关是一段 TLS，网关到上游又建立另一段 TLS。</p>
+          <div class="case"><strong>案例</strong>网关需要读取路径做路由，但公司政策要求内部网络也不能传明文。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 17</span>
+          <h3>mTLS（双向 TLS）</h3>
+          <p>双方都出示并验证证书，不只是客户端验证服务端。常用于服务身份认证。</p>
+          <div class="plain"><strong>通俗解释</strong>普通 HTTPS 像顾客检查银行执照；mTLS 像银行也检查顾客的工作证。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="load-balancing">
+      <div class="chapter-head">
+        <span class="chapter-no">02—E</span>
+        <div><h2>负载均衡：选哪一个实例</h2><p>路由先选“哪个服务”，负载均衡再选“该服务的哪个实例”。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 18</span>
+          <h3>Round Robin（轮询）</h3>
+          <p>按顺序把请求分给各实例，简单且适合处理能力接近的无状态服务。</p>
+          <div class="case"><strong>案例</strong>请求依次去 A、B、C、A、B、C。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 19</span>
+          <h3>Weighted Routing（加权分配）</h3>
+          <p>不同实例或版本得到不同比例的流量。</p>
+          <div class="case"><strong>案例</strong>新版本先接 10% 流量，旧版本继续接 90%，观察错误率后再扩大。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 20</span>
+          <h3>Least Connections（最少连接）</h3>
+          <p>优先选择当前活跃连接较少的实例，适合请求时长差异较大的场景。</p>
+          <div class="case"><strong>案例</strong>文件上传可能持续几十秒，不能只按请求数量平均分配。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 21</span>
+          <h3>Consistent Hash（一致性哈希）</h3>
+          <p>根据用户、会话或某个键稳定选择实例，节点变化时尽量少改变映射。</p>
+          <div class="case"><strong>案例</strong>相同会话 ID 尽量路由到同一个实时对话实例，减少本地缓存失效。</div>
+        </article>
+        <article class="concept wide">
+          <span class="term">Related Concept</span>
+          <h3>Sticky Session（会话黏性）</h3>
+          <p>同一用户持续访问同一实例。它能兼容本地会话状态，但会导致负载不均和扩容困难；更稳妥的方式通常是把状态放到 Redis、数据库或专门状态服务。</p>
+          <div class="case"><strong>案例</strong>实例 A 重启后，保存在其内存中的购物车消失。问题根源不是负载均衡，而是状态只存在单机。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="health-discovery">
+      <div class="chapter-head">
+        <span class="chapter-no">02—F</span>
+        <div><h2>服务发现、健康检查与故障转移</h2><p>知道实例地址还不够，还要知道它现在是否能接请求。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 22</span>
+          <h3>Service Discovery（服务发现）</h3>
+          <p>动态获得服务实例列表。来源可以是静态配置、DNS、Kubernetes、Consul 或控制面。</p>
+          <div class="case"><strong>案例</strong>Kubernetes 中订单 Pod 扩容后，网关自动发现新端点，不需要人工改 IP。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 23</span>
+          <h3>主动健康检查</h3>
+          <p>网关定期请求专用健康端点，根据结果决定实例是否可接流量。</p>
+          <div class="case"><strong>案例</strong>每 5 秒访问一次 <code>/health/ready</code>，连续失败三次便暂时摘除实例。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 24</span>
+          <h3>被动健康检查 / 异常实例剔除</h3>
+          <p>根据真实业务请求的连接失败、超时和 5xx 比率判断实例异常。</p>
+          <div class="case"><strong>案例</strong>实例 B 的真实请求连续超时，即使健康端点还能返回 200，也应临时降低其流量。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 25</span>
+          <h3>Failover（故障转移）</h3>
+          <p>主实例、主区域或主服务不可用时，把流量切到备用目标。</p>
+          <div class="case"><strong>案例</strong>美国西部区域故障后，DNS 或全局负载均衡把用户切到东部区域。</div>
+        </article>
+      </div>
+      <div class="boundary"><strong>边界提醒</strong>“进程活着”不等于“服务可用”。Liveness 检查是否需要重启，Readiness 检查是否应该接收流量；两者不应混为一谈。</div>
+    </section>
+
+    <section class="chapter" id="optimization">
+      <div class="chapter-head">
+        <span class="chapter-no">02—G</span>
+        <div><h2>缓存、压缩与协议转换</h2><p>网关还能减少重复工作，但优化必须服从正确性。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Knowledge Point</span>
+          <h3>Response Cache（响应缓存）</h3>
+          <p>对相同请求复用已有响应，降低上游负载。必须正确处理缓存键、过期时间和用户隔离。</p>
+          <div class="danger"><strong>反例</strong>只按 URL 缓存 <code>/me</code>，可能把张三的个人信息返回给李四。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Knowledge Point</span>
+          <h3>Compression（压缩）</h3>
+          <p>使用 gzip 或 Brotli 减少响应体积，以 CPU 换带宽。</p>
+          <div class="case"><strong>案例</strong>大型 JSON 从 500 KB 压到 70 KB，移动端下载更快。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Knowledge Point</span>
+          <h3>Protocol Translation（协议转换）</h3>
+          <p>在边界两侧使用不同协议时进行翻译。</p>
+          <div class="case"><strong>案例</strong>外部客户端使用 REST/JSON，网关把请求转换为内部 gRPC 调用。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Knowledge Point</span>
+          <h3>Request / Response Transformation（报文转换）</h3>
+          <p>改写路径、Header 或轻量字段格式，以适配不同接口。</p>
+          <div class="boundary"><strong>边界</strong>把 <code>/old/users</code> 改成 <code>/v2/users</code>可以；在网关里计算复杂订单价格不合适。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="quiz">
+      <div class="chapter-head">
+        <span class="chapter-no">02—H</span>
+        <div><h2>检索练习</h2><p>用真实流量问题检验理解。</p></div>
+      </div>
+      <div class="quiz">
+        <details><summary>1. 路由与负载均衡有什么区别？</summary><p>路由通常先确定逻辑服务或处理规则；负载均衡再从该服务的一组实例中选择具体目标。</p></details>
+        <details><summary>2. 为什么 TLS 透传后通常不能按 HTTP 路径路由？</summary><p>路径仍在加密内容里，四层代理看不到；除非它终止 TLS 或使用协议暴露的有限元数据。</p></details>
+        <details><summary>3. 健康端点返回 200，真实请求却持续超时，应该补什么能力？</summary><p>被动健康检查或异常实例剔除，用真实流量结果补充主动探测。</p></details>
+        <details><summary>4. CDN、WAF、API Gateway 各解决什么问题？</summary><p>CDN 侧重边缘缓存，WAF 侧重 Web 攻击防护，API Gateway 侧重 API 入口、身份、路由与治理。</p></details>
+        <details><summary>5. 为什么 Sticky Session 不是保存业务状态的理想方案？</summary><p>它让状态依赖单个实例，导致故障恢复、扩容和负载均衡变难；共享状态存储通常更稳。</p></details>
+      </div>
+    </section>
+
+    <aside class="sources">
+      <h2>本课主参考</h2>
+      <p><a href="https://nginx.org/en/">NGINX 官方能力说明</a>与 <a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/service_discovery">Envoy Service Discovery</a>。前者展示代理的能力集合，后者解释动态端点与健康检查如何共同决定路由。</p>
+    </aside>
+
+    <nav class="pager" aria-label="前后课程">
+      <a href="0001-gateway-foundations.html"><small>上一课 01</small><strong>← 网关的本质与网络基础</strong></a>
+      <a href="0003-api-gateway-policies-and-resilience.html"><small>下一课 03</small><strong>API 治理、安全与韧性 →</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

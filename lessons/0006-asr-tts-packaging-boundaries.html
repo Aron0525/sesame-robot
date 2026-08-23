@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="专题课：理解软件封装，并比较端侧电脑上 ASR/TTS 的代码、进程、服务与容器封装方法。">
+  <title>专题课｜ASR/TTS 的封装边界</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="6">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+      <div class="lesson-tabs">
+        <a href="0001-gateway-foundations.html" title="第一课">01</a>
+        <a href="0002-proxies-routing-and-load-balancing.html" title="第二课">02</a>
+        <a href="0003-api-gateway-policies-and-resilience.html" title="第三课">03</a>
+        <a href="0004-cloud-kubernetes-and-service-mesh.html" title="第四课">04</a>
+        <a href="0005-ai-gateway-design-and-troubleshooting.html" title="第五课">05</a>
+        <a href="0006-asr-tts-packaging-boundaries.html" aria-current="page" title="ASR/TTS 专题">专题</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="＋">
+      <div>
+        <p class="kicker">专题课 · 模型工程边界</p>
+        <h1>ASR/TTS 的封装是什么意思</h1>
+        <p class="lead">先把 ASR/TTS 定义成独立能力，再分别适配本地模型和远程 API。调用方不需要知道能力究竟运行在哪里。</p>
+        <div class="lesson-meta"><span>约 15 分钟</span><span>本地与远程</span><span>统一 Provider</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="meaning">
+      <div class="chapter-head">
+        <span class="chapter-no">S—A</span>
+        <div><h2>先建立“封装”的心智模型</h2><p>调用方只需要知道怎样使用能力，不需要知道模型内部怎样加载、推理和后处理。</p></div>
+      </div>
+      <div class="diagram">VoiceSession
+  ├─ AsrProvider
+  │    ├─ LocalAsrProvider  → 本机 sherpa/FunASR 模型
+  │    └─ RemoteAsrProvider → 云厂商 ASR API
+  └─ TtsProvider
+       ├─ LocalTtsProvider  → 本机 Kokoro/CosyVoice 模型
+       └─ RemoteTtsProvider → 云厂商 TTS API</div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Core idea</span>
+          <h3>封装隐藏“怎么做”</h3>
+          <p>本地模型的文件路径、推理框架和 CPU/GPU，以及远程 API 的鉴权、URL 和厂商格式，都留在各自适配器内部。</p>
+          <div class="case"><strong>案例</strong>上层只调用 <code>synthesize(text)</code>，不用知道底层是本机 Kokoro 还是云端 TTS API。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Contract</span>
+          <h3>封装公开“怎样用”</h3>
+          <p>输入、输出、错误、超时、取消、并发和健康状态必须形成明确契约。</p>
+          <div class="danger"><strong>反例</strong>只写一个 <code>run_model()</code>，却不定义音频格式、取消方式和错误类型，这只是藏代码，不是可靠封装。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="levels">
+      <div class="chapter-head">
+        <span class="chapter-no">S—B</span>
+        <div><h2>封装有四层，不要混为一谈</h2><p>一套系统可以同时使用四层；它们回答的是不同问题。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>层次</th><th>回答的问题</th><th>ASR/TTS 例子</th></tr></thead>
+        <tbody>
+          <tr><td>代码封装</td><td>上层调用什么接口？</td><td><code>AsrProvider</code>、<code>TtsProvider</code></td></tr>
+          <tr><td>进程封装</td><td>模型和网关是否共享进程？</td><td>ASR worker、TTS worker</td></tr>
+          <tr><td>服务封装</td><td>进程之间用什么协议？</td><td>HTTP、WebSocket、gRPC</td></tr>
+          <tr><td>部署封装</td><td>怎样安装、启动和隔离？</td><td>venv、systemd、Docker、Compose</td></tr>
+        </tbody>
+      </table>
+      <div class="boundary"><strong>关键判断</strong>“封装成 API”属于服务封装；“封装成 Docker”属于部署封装。Docker 不会自动替你设计一个正确的 API。</div>
+    </section>
+
+    <section class="chapter" id="local-remote">
+      <div class="chapter-head">
+        <span class="chapter-no">S—C</span>
+        <div><h2>两种来源，都必须封装</h2><p>差别在于封装内部负责的事情不同，对 Voice Gateway 暴露的能力契约应尽量相同。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>维度</th><th>本地模型封装</th><th>远程 API 封装</th></tr></thead>
+        <tbody>
+          <tr><td>推理位置</td><td>端侧电脑 CPU/GPU</td><td>厂商服务器</td></tr>
+          <tr><td>封装重点</td><td>加载模型、硬件、线程、内存、音频前后处理</td><td>鉴权、请求转换、响应转换、限流、重试、网络错误</td></tr>
+          <tr><td>网络</td><td>可完全离线；进程内或本机通信</td><td>依赖互联网和厂商可用性</td></tr>
+          <tr><td>隐私</td><td>音频不必离开本机</td><td>音频或文本会发送给厂商</td></tr>
+          <tr><td>成本</td><td>购买硬件和承担本地运维</td><td>通常按时长、字符或请求计费</td></tr>
+          <tr><td>扩容</td><td>自己管理并发和硬件容量</td><td>厂商负责模型容量，但受配额限制</td></tr>
+          <tr><td>典型故障</td><td>内存不足、模型加载失败、推理过慢</td><td>超时、断网、429、鉴权失败、厂商故障</td></tr>
+        </tbody>
+      </table>
+      <div class="boundary"><strong>统一边界</strong>两种实现最终都应转换成项目自己的 <code>AsrEvent</code> 和 PCM chunk，而不是让厂商 JSON 或本地模型 tensor 泄漏到 VoiceSession。</div>
+    </section>
+
+    <section class="chapter" id="methods">
+      <div class="chapter-head">
+        <span class="chapter-no">S—D</span>
+        <div><h2>本地模型内部还能怎样封装</h2><p>本地与远程是能力来源；同进程、worker、服务和容器是本地实现的部署形式。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Method 01</span>
+          <h3>同进程 Python 类</h3>
+          <p>FastAPI 直接创建模型对象，通过 Provider 类调用。</p>
+          <div class="plain"><strong>适用</strong>单模型原型、短期验证。</div>
+          <div class="danger"><strong>代价</strong>推理阻塞、依赖冲突或模型崩溃会拖垮 Voice Gateway。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Method 02</span>
+          <h3>独立 worker 进程</h3>
+          <p>ASR/TTS 分别常驻在本机进程，通过 Queue、Pipe 或 Unix domain socket 通信。</p>
+          <div class="plain"><strong>适用</strong>单机 MVP，既要隔离又不想先维护网络服务。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Method 03</span>
+          <h3>本地模型服务</h3>
+          <p>ASR/TTS 各自提供 HTTP、WebSocket 或 gRPC API，Gateway 作为客户端。</p>
+          <div class="plain"><strong>适用</strong>正式项目、模型可替换、以后可能迁移 GPU 主机。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Method 04</span>
+          <h3>Docker 容器</h3>
+          <p>把依赖、模型服务和启动方式打入镜像，再用 Compose 编排。</p>
+          <div class="plain"><strong>适用</strong>Linux/NVIDIA 生产部署和多服务交付。</div>
+          <div class="danger"><strong>反例</strong>在 Apple Silicon 上为了“看起来正式”先套不兼容的 x86/CUDA 镜像，反而失去本机加速并增加排错成本。</div>
+        </article>
+        <article class="concept wide">
+          <span class="term">Method 05</span>
+          <h3>本地守护进程或原生库</h3>
+          <p>用 systemd/launchd 管理常驻服务，或者把 ONNX/C++ runtime 通过 FFI（外部函数接口）暴露给 Python。</p>
+          <div class="plain"><strong>适用</strong>追求最低 IPC 开销、桌面产品化或需要开机自启。实现和维护成本最高，不应作为第一版起点。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="why-package">
+      <div class="chapter-head">
+        <span class="chapter-no">S—E</span>
+        <div><h2>为什么需要封装</h2><p>目的不是隐藏几行代码，而是把变化和故障限制在 ASR/TTS 边界内。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>不封装的风险</th><th>在语音系统里的具体后果</th><th>封装怎样控制</th></tr></thead>
+        <tbody>
+          <tr><td>模型耦合</td><td>从云 ASR 换到本地 ASR，需要修改 WebSocket、会话和 Agent 链路</td><td>只替换 Provider Adapter</td></tr>
+          <tr><td>格式泄漏</td><td>24 kHz WAV、16 kHz PCM、Opus 和厂商 JSON 在业务层混用</td><td>Provider 统一输出项目 PCM/Event</td></tr>
+          <tr><td>资源失控</td><td>每个连接重复加载本地模型，导致内存耗尽或阻塞事件循环</td><td>统一管理模型生命周期和并发</td></tr>
+          <tr><td>打断失效</td><td>用户已经说话，旧 TTS 仍继续生成和播放</td><td>统一 cancel 与 generation_id</td></tr>
+          <tr><td>故障扩散</td><td>超时、429、断网或模型崩溃直接破坏整条会话</td><td>适配器转换错误并执行明确策略</td></tr>
+          <tr><td>安全泄漏</td><td>API Key 散落在业务代码，或本地失败后擅自把音频传到云端</td><td>密钥与隐私策略集中在 Provider</td></tr>
+          <tr><td>无法测试</td><td>每次测试都必须启动真实模型或付费云 API</td><td>Fake Provider 可稳定模拟事件与故障</td></tr>
+        </tbody>
+      </table>
+      <div class="diagram">封装顺序：
+1. 定义项目自己的 AsrProvider / TtsProvider 契约
+2. 定义统一 AsrEvent、PCM 格式、错误和取消语义
+3. 实现 Local Adapter 与 Cloud Adapter
+4. 用 Factory/Dependency Injection 按配置选择实现
+5. 为 Provider 写独立 contract tests
+6. 最后决定本地实现是同进程、worker、服务还是 Docker</div>
+      <div class="boundary"><strong>最低必要封装</strong>正式项目至少完成“统一接口 + Local/Cloud Adapter + 统一格式/错误/取消 + 可替换配置”。独立进程、API 服务和 Docker 不必第一天全部完成。</div>
+    </section>
+
+    <section class="chapter" id="cloud-compute">
+      <div class="chapter-head">
+        <span class="chapter-no">S—F</span>
+        <div><h2>云端 API 还需要本地算力吗</h2><p>模型推理算力由厂商承担，但本地仍要处理音频、网络和设备协议。</p></div>
+      </div>
+      <div class="diagram">云端 ASR：
+ESP32 Opus → 本地解码/重采样/发送 → 云端模型推理 → 本地接收文本
+
+云端 TTS：
+本地发送文本 → 云端模型推理 → 本地接收音频/解码/重采样/Opus 编码 → ESP32</div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Cloud compute</span>
+          <h3>云端负责的重计算</h3>
+          <p>神经网络前向推理、模型权重、显存和模型并发容量都在厂商服务器。本地不需要为了该云模型准备 GPU 或下载权重。</p>
+        </article>
+        <article class="concept">
+          <span class="term">Local compute</span>
+          <h3>本地仍然负责什么</h3>
+          <p>麦克风采集、Opus/PCM 编解码、VAD、AEC、降噪、重采样、加密传输、JSON 解析、队列、打断和扬声器播放仍会使用本地 CPU、内存与网络。</p>
+        </article>
+      </div>
+      <div class="boundary"><strong>结论</strong>云端 API 不需要本地“模型算力”，但需要本地“系统处理算力”。后者通常远小于运行 ASR/TTS 神经网络所需的算力。</div>
+    </section>
+
+    <section class="chapter" id="security-boundary">
+      <div class="chapter-head">
+        <span class="chapter-no">S—G</span>
+        <div><h2>封装能保护 API 和隐私吗</h2><p>能帮助集中控制，但只有和安全机制组合后才真正有效。</p></div>
+      </div>
+      <div class="diagram">错误：
+ESP32 / 前端 App ── 内置永久 API Key ──→ 云厂商
+
+正确：
+ESP32 ── 设备短期凭证/WSS ──→ Voice Gateway
+                              ├─ Secret Manager 中的厂商密钥
+                              ├─ Cloud Provider Adapter
+                              ├─ 音频外发策略
+                              └─ 日志脱敏与审计
+                                      ↓
+                                  云 ASR/TTS</div>
+      <table class="comparison">
+        <thead><tr><th>目标</th><th>封装提供什么</th><th>还必须增加什么</th></tr></thead>
+        <tbody>
+          <tr><td>保护 API Key</td><td>所有厂商调用集中在 Cloud Adapter</td><td>后端代理、Secret Manager、轮换、最小权限</td></tr>
+          <tr><td>保护用户音频</td><td>统一控制哪些数据可以外发</td><td>TLS、用户同意、数据最小化、保留/删除政策</td></tr>
+          <tr><td>防止日志泄漏</td><td>统一事件和错误出口</td><td>日志脱敏、禁止记录原始音频/完整对话/密钥</td></tr>
+          <tr><td>本地失败回退</td><td>所有切换经过 Provider Factory/Policy</td><td>禁止未经授权自动回退到云端</td></tr>
+        </tbody>
+      </table>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">API security</span>
+          <h3>先保护入口</h3>
+          <p>认证确认“你是谁”，授权决定“你能访问谁的数据”，TLS 防止传输窃听，签名/防重放保证请求未被伪造，限流降低批量盗取和资源耗尽风险。</p>
+        </article>
+        <article class="concept">
+          <span class="term">Data protection</span>
+          <h3>再保护数据生命周期</h3>
+          <p>即使请求合法，也要限制收集内容、租户隔离、静态加密、日志脱敏、云端外发、保留期限、备份和删除。合法用户不等于可以读取所有用户数据。</p>
+        </article>
+      </div>
+      <div class="danger"><strong>重要限制</strong>把 API Key 写进桌面程序、手机 App 或 ESP32 固件，即使代码经过混淆或“封装”，最终仍可能被设备拥有者提取。产品级密钥应保存在受控后端，设备只拿短期、受限凭证。</div>
+      <div class="boundary"><strong>隐私边界</strong>本地模型可以让原始音频不离开设备；云端模型无论怎样封装，都必须把必要音频发给厂商。封装只能控制、审计和最小化外发，不能把云调用变成本地处理。</div>
+    </section>
+
+    <section class="chapter" id="protocols">
+      <div class="chapter-head">
+        <span class="chapter-no">S—H</span>
+        <div><h2>服务协议怎样选</h2><p>ASR 与 TTS 的数据方向不同，通常不应机械地使用同一个接口形式。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>协议</th><th>优点</th><th>适合</th></tr></thead>
+        <tbody>
+          <tr><td>普通 HTTP</td><td>简单、易调试</td><td>整段音频识别、整段 TTS</td></tr>
+          <tr><td>HTTP chunked</td><td>客户端简单，可逐块收音频</td><td>流式 TTS 输出</td></tr>
+          <tr><td>WebSocket</td><td>双向持续通信</td><td>PCM 连续上传、partial/final 连续返回的 ASR</td></tr>
+          <tr><td>gRPC streaming</td><td>强类型、双向流和取消语义清晰</td><td>正式内部 ASR/TTS 服务</td></tr>
+          <tr><td>Queue/Pipe/UDS</td><td>仅本机、开销低</td><td>单机 worker MVP</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="decision">
+      <div class="chapter-head">
+        <span class="chapter-no">S—I</span>
+        <div><h2>Sesame Robot 的正确封装结构</h2><p>业务层只依赖统一 Provider；配置决定本轮使用本地实现还是远程 API 实现。</p></div>
+      </div>
+      <div class="diagram">Voice Gateway / VoiceSession
+  ├─ AsrProvider
+  │    ├─ LocalAsrAdapter  → 本机 ASR worker/service
+  │    └─ CloudAsrAdapter  → 云 ASR WebSocket API
+  └─ TtsProvider
+       ├─ LocalTtsAdapter  → 本机 TTS worker/service
+       └─ CloudTtsAdapter  → 云 TTS streaming API
+
+配置：
+ASR_PROVIDER=local | cloud
+TTS_PROVIDER=local | cloud</div>
+      <div class="boundary"><strong>推荐</strong>先定义统一 Provider 契约，再实现四个适配器。M1 本地实现可原生运行；远程实现只负责调用厂商 API。两种实现可以独立切换，也允许 ASR 本地、TTS 云端的混合组合。</div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Retrieval</span>
+          <h3>30 秒自测</h3>
+          <p>如果本地模型和云 API 都能用，但 VoiceSession 里到处都是 <code>if provider == ...</code>，这算完成封装吗？为什么？</p>
+          <div class="plain"><strong>参考判断</strong>不算。分支和厂商差异仍泄漏到业务层，应由 Local/Cloud Adapter 各自吸收。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Primary sources</span>
+          <h3>继续阅读</h3>
+          <p><a href="https://k2-fsa.github.io/sherpa/onnx/index.html">sherpa-onnx 官方文档</a>用于查看端侧 ASR/TTS runtime；<a href="https://github.com/FunAudioLLM/CosyVoice">CosyVoice 官方仓库</a>用于理解模型级双向流式 TTS。</p>
+          <div class="case"><strong>提醒</strong>有任何术语或边界不清楚，继续向 Codex 提问，并用你自己的话复述一次“封装”的定义。</div>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

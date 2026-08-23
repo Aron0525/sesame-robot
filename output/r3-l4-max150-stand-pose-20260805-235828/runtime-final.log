@@ -1,0 +1,5 @@
+r3_180 HTTP 202 {"status":"accepted","device_id":"dev_001","kind":"servo"}
+l4_151 HTTP 202 {"status":"accepted","device_id":"dev_001","kind":"servo"}
+stand HTTP 202 {"status":"accepted","device_id":"dev_001","kind":"action"}
+stop HTTP 202 {"status":"accepted","device_id":"dev_001","kind":"stop"}
+{'online': True, 'current_turn_id': None}

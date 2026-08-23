@@ -1,0 +1,17 @@
+{
+  "target_time": "2026-08-09 20:44:00 PDT",
+  "all_baselines_match": true,
+  "new_files_absent": [
+    "firmware/esp32_voice_idf/components/sesame_voice/include/sesame_voice/voice_turn_policy.h",
+    "firmware/esp32_voice_idf/tests/test_voice_turn_policy.cpp"
+  ],
+  "old_model_sha256": "79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065",
+  "archive": "/Users/mac/Documents/sesame robot/restore-archives/desktop2-pre-2044-restore-20260810-000349",
+  "gateway_healthz": "ok",
+  "console_lan_http_status": 200,
+  "console_lan_tls_verify_result": 0,
+  "wakeword_verifier": "ok",
+  "rollback_syntax": "ok",
+  "mdns_note": "sesame-gateway.local resolver timed out during final probe; direct LAN endpoint is healthy",
+  "post_restore_checks": "passed"
+}

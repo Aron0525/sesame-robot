@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sesame V3 v1.5 项目地图</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+  <main>
+    <header class="hero" data-lesson="REF">
+      <div>
+        <p class="kicker">Sesame Robot V3 · Reference</p>
+        <h1>v1.5 项目地图</h1>
+        <p class="lead">读代码前先分清：哪些是正式程序，哪些是合同、工具、配置或本机运行状态。</p>
+      </div>
+    </header>
+
+    <section class="chapter">
+      <div class="chapter-head"><span class="chapter-no">REF—A</span><div><h2>唯一正式运行链路</h2><p>这是一条链路，不是三套彼此独立的软件。</p></div></div>
+      <div class="diagram">用户语音
+  ↓
+ESP32-S3 固件 ── WSS + Opus ──→ 电脑 Voice Gateway
+  ↑                                      │
+  └──────── WSS + Opus + 表情 ────────────┤
+                                         ├─ PCM → DashScope ASR
+                                         ├─ 最终文本 → 本机 OpenClaw
+                                         └─ 回复文字 → DashScope TTS</div>
+    </section>
+
+    <section class="chapter">
+      <div class="chapter-head"><span class="chapter-no">REF—B</span><div><h2>正式目录与入口</h2><p>先从入口读，不从文件数量最多的目录读。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>位置</th><th>它是什么</th><th>优先入口</th></tr></thead>
+        <tbody>
+          <tr><td><code>firmware/esp32_voice_idf/</code></td><td>唯一正式 ESP32-S3 固件；C++/ESP-IDF</td><td><code>main/app_main.cpp</code></td></tr>
+          <tr><td><code>gateway/</code></td><td>电脑端 Voice Gateway；Python/FastAPI</td><td><code>apps/voice_gateway/src/.../app.py</code></td></tr>
+          <tr><td><code>contracts/</code></td><td>两端交换消息的合同；不是可单独启动的程序</td><td><code>protocols/esp32-voice-gateway.md</code></td></tr>
+          <tr><td><code>ops/openclaw/</code></td><td>固定 OpenClaw 版本的安装入口；不是 Agent 业务代码</td><td><code>README.md</code></td></tr>
+          <tr><td><code>docs/</code></td><td>架构、部署、硬件和安全说明；用于理解与操作</td><td><code>project-overview.md</code></td></tr>
+        </tbody>
+      </table>
+      <div class="danger"><strong>不作为正式运行基线</strong><code>endpoint-gateway/</code>、<code>output/</code>、<code>training/</code>、<code>.venv/</code>、<code>build/</code> 和 <code>managed_components/</code> 是遗留、本机输出、训练材料或可重建产物。不要把它们当成主程序入口。</div>
+    </section>
+
+    <section class="chapter">
+      <div class="chapter-head"><span class="chapter-no">REF—C</span><div><h2>三个层的最小职责</h2><p>每一层都只做自己该做的事。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>层</th><th>接收</th><th>产出</th><th>绝不应负责</th></tr></thead>
+        <tbody>
+          <tr><td>ESP32 固件</td><td>麦克风、按键、网关命令</td><td>Opus 音频、播放、OLED、经校验的动作</td><td>调用 LLM、保存云端密钥</td></tr>
+          <tr><td>Voice Gateway</td><td>设备 WSS、DashScope、OpenClaw 结果</td><td>一轮受验证的语音回复</td><td>让模型直接碰 GPIO 或任意舵机角度</td></tr>
+          <tr><td>OpenClaw</td><td>Gateway 已确认的文本和能力清单</td><td>受限 JSON：回复、音色、表情</td><td>接收原始音频、设备 token、TLS 私钥</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter">
+      <div class="chapter-head"><span class="chapter-no">REF—D</span><div><h2>判断一个文件是否重要</h2><p>用四个问题，不需要猜作者意图。</p></div></div>
+      <ol class="checklist">
+        <li>它会被构建、启动或导入吗？若会，查入口和 <code>CMakeLists.txt</code>/<code>pyproject.toml</code>。</li>
+        <li>它在运行链路哪一段读数据、写数据或做验证？</li>
+        <li>失败时它会拒绝、重试、停止还是悄悄跳过？</li>
+        <li>它是否存放秘密或生成物？若是，通常不应进入 Git。</li>
+      </ol>
+      <p><a href="../lessons/0013-sesame-v15-project-compass.html">打开第 13 节：如何读这张地图</a></p>
+    </section>
+  </main>
+</body>
+</html>

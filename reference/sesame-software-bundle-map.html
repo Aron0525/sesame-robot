@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sesame V3 软件包速查表</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+  <main>
+    <header class="hero" data-lesson="REF">
+      <div>
+        <p class="kicker">Sesame Robot V3 · Reference</p>
+        <h1>软件包速查表</h1>
+        <p class="lead">看到一个目录时，快速判断它负责什么、从哪里启动。</p>
+      </div>
+    </header>
+    <section class="chapter">
+      <table class="comparison">
+        <thead><tr><th>目录</th><th>作用</th><th>入口</th><th>当前状态</th></tr></thead>
+        <tbody>
+          <tr><td>01 Arduino</td><td>机器人端固件</td><td><code>Sesame_Robot_V3.ino</code></td><td>可编译</td></tr>
+          <tr><td>02 Voice Gateway</td><td>电脑端语音编排</td><td><code>app.py</code></td><td>Demo 可运行</td></tr>
+          <tr><td>03 ASR/TTS</td><td>声音↔文字接口</td><td><code>base.py</code></td><td>真实模型未接入</td></tr>
+          <tr><td>04 OpenClaw</td><td>Agent 与工具调用</td><td><code>README.md</code></td><td>Adapter/实验已实现</td></tr>
+          <tr><td>05 配置协议</td><td>环境变量与消息合同</td><td><code>.env.example</code></td><td>已定义</td></tr>
+          <tr><td>06 Studio</td><td>生成舵机动作代码</td><td><code>sesame_studio.py</code></td><td>可运行</td></tr>
+        </tbody>
+      </table>
+      <div class="diagram">先跑：Arduino 编译 → Voice Gateway Demo
+再接：OpenClaw → 真实 ASR → 真实 TTS
+最后：真实音频硬件 → 动作整机验收</div>
+      <p><a href="../lessons/0008-sesame-software-bundle-map.html">返回完整课程</a></p>
+    </section>
+  </main>
+</body>
+</html>

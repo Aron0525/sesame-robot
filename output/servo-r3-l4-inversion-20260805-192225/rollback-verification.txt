@@ -1,0 +1,26 @@
+$ patch --dry-run -d rollback-fixture -p1 < servo-r3-l4-inversion.patch
+patching file 'firmware/esp32_voice_idf/components/sesame_robot/include/sesame_robot/servo_calibration.h'
+patching file 'firmware/esp32_voice_idf/tests/test_servo_calibration.cpp'
+patching file 'firmware/arduino/Sesame_Robot_WiFi_Controller/Sesame_Robot_WiFi_Controller.ino'
+EXIT_STATUS=0
+
+$ patch -d rollback-fixture -p1 < servo-r3-l4-inversion.patch
+patching file 'firmware/esp32_voice_idf/components/sesame_robot/include/sesame_robot/servo_calibration.h'
+patching file 'firmware/esp32_voice_idf/tests/test_servo_calibration.cpp'
+patching file 'firmware/arduino/Sesame_Robot_WiFi_Controller/Sesame_Robot_WiFi_Controller.ino'
+EXIT_STATUS=0
+
+$ git -C PROJECT apply --check --reverse servo-r3-l4-inversion.patch
+EXIT_STATUS=0
+
+$ rollback.sh rollback-fixture
+patching file 'firmware/esp32_voice_idf/components/sesame_robot/include/sesame_robot/servo_calibration.h'
+patching file 'firmware/esp32_voice_idf/tests/test_servo_calibration.cpp'
+patching file 'firmware/arduino/Sesame_Robot_WiFi_Controller/Sesame_Robot_WiFi_Controller.ino'
+EXIT_STATUS=0
+
+$ cmp rollback-fixture originals (three files)
+MATCH firmware/esp32_voice_idf/components/sesame_robot/include/sesame_robot/servo_calibration.h
+MATCH firmware/esp32_voice_idf/tests/test_servo_calibration.cpp
+MATCH firmware/arduino/Sesame_Robot_WiFi_Controller/Sesame_Robot_WiFi_Controller.ino
+EXIT_STATUS=0

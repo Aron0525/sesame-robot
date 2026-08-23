@@ -1,0 +1,239 @@
+{
+  "model_name": "zhima_wakeword_five_tts_int8",
+  "target_wake_word": "你好，芝麻",
+  "source": {
+    "selected_tts_voices": [
+      "Xiaoxiao",
+      "Xiaoyi",
+      "Yunyang",
+      "Yunjian",
+      "Xiaoxiao"
+    ],
+    "train_records": 25,
+    "holdout_records": 25
+  },
+  "feature_contract": {
+    "sample_rate_hz": 16000,
+    "clip_samples": 16000,
+    "frame_size": 480,
+    "frame_count": 33,
+    "frequency_dft_bins": [
+      6,
+      10,
+      13,
+      17,
+      21,
+      24,
+      28,
+      32,
+      35,
+      39,
+      43,
+      46,
+      50,
+      54,
+      57,
+      61,
+      65,
+      69,
+      72,
+      76,
+      80,
+      83,
+      87,
+      91,
+      94,
+      98,
+      102,
+      105,
+      109,
+      113,
+      116,
+      120
+    ],
+    "normalization_mean": -17.619386672973633,
+    "normalization_std": 2.627662228179932,
+    "clip_range": [
+      -6.0,
+      6.0
+    ]
+  },
+  "training": {
+    "seed": 20260810,
+    "epochs_run": 40,
+    "train_examples": 1200,
+    "holdout_augmented_examples": 600
+  },
+  "tflite": {
+    "path": "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/artifacts/wakeword_edge_five_tts_20260810/model/zhima_wakeword_five_tts_int8.tflite",
+    "bytes": 22528,
+    "sha256": "9c20563309845fa620296a278e94877d15de0e0c23fee9bcd156388b764f1949",
+    "input": {
+      "shape": [
+        1,
+        33,
+        32,
+        1
+      ],
+      "dtype": "<class 'numpy.int8'>",
+      "scale": 0.024462483823299408,
+      "zero_point": -80
+    },
+    "output": {
+      "shape": [
+        1,
+        2
+      ],
+      "dtype": "<class 'numpy.int8'>",
+      "operators": [
+        "CONV_2D",
+        "MAX_POOL_2D",
+        "CONV_2D",
+        "MAX_POOL_2D",
+        "RESHAPE",
+        "FULLY_CONNECTED",
+        "FULLY_CONNECTED",
+        "SOFTMAX",
+        "DELEGATE"
+      ]
+    }
+  },
+  "threshold": 0.8600000000000005,
+  "holdout": {
+    "threshold": 0.86,
+    "tp": 5,
+    "fn": 0,
+    "fp": 0,
+    "tn": 20,
+    "recall": 1.0,
+    "accepted": true,
+    "rows": [
+      {
+        "id": "xiaoxiao_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.99609375
+      },
+      {
+        "id": "xiaoxiao_holdout_你好_小智",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "xiaoxiao_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "xiaoxiao_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "xiaoxiao_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "xiaoyi_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.99609375
+      },
+      {
+        "id": "xiaoyi_holdout_你好_小智",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "xiaoyi_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "xiaoyi_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "xiaoyi_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunxi_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.99609375
+      },
+      {
+        "id": "yunxi_holdout_你好_小智",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunxi_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunxi_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunxi_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunyang_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.99609375
+      },
+      {
+        "id": "yunyang_holdout_你好_小智",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunyang_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.00390625
+      },
+      {
+        "id": "yunyang_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunyang_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunjian_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.8671875
+      },
+      {
+        "id": "yunjian_holdout_你好_小智",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunjian_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunjian_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "yunjian_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      }
+    ]
+  },
+  "deployment_gate": true
+}

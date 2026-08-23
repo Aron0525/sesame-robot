@@ -1,0 +1,66 @@
+--- /Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/originals/app.py	2026-08-09 22:27:19
++++ /Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/final/repo/app.py	2026-08-09 22:35:05
+@@ -19,7 +19,7 @@
+ from pydantic import BaseModel, ConfigDict, Field, ValidationError
+ 
+ from sesame_endpoint_gateway.protocol import AudioFrameError, UPLINK, unpack_audio_frame
+-from sesame_endpoint_gateway.scenes import DEFAULT_SCENE_ID, SCENES, scene_catalog, scene_profile
++from sesame_endpoint_gateway.scenes import DEFAULT_SCENE_ID, SCENES, active_profile, is_mode_id, scene_catalog, scene_profile
+ 
+ 
+ STATIC_DIR = Path(__file__).with_name("static")
+@@ -134,14 +134,21 @@
+         return next(iter(self.devices.values()), None) if len(self.devices) == 1 else None
+ 
+     def scene_for(self, device_id: str) -> dict:
+-        return scene_profile(self.scene_by_device.get(device_id, DEFAULT_SCENE_ID))
++        return active_profile(self.scene_by_device.get(device_id, DEFAULT_SCENE_ID))
+ 
+     async def select_scene(self, device_id: str, scene_id: str, *, source: str) -> dict:
+-        scene = scene_profile(scene_id)
+-        self.scene_by_device[device_id] = scene_id
++        if scene_id not in SCENES:
++            raise ValueError(f"unknown_scene:{scene_id}")
++        return await self.select_mode(device_id, scene_id, source=source)
++
++    async def select_mode(self, device_id: str, mode_id: str, *, source: str) -> dict:
++        if not is_mode_id(mode_id):
++            raise ValueError(f"unknown_mode:{mode_id}")
++        scene = active_profile(mode_id)
++        self.scene_by_device[device_id] = mode_id
+         session = self.devices.get(device_id)
+         if session is not None:
+-            session.scene_id = scene_id
++            session.scene_id = mode_id
+         payload = {"device_id": device_id, "scene": scene, "source": source}
+         await self.broadcast({"type": "scene.changed", "payload": payload})
+         return payload
+@@ -211,6 +218,11 @@
+         if scene_id not in SCENES:
+             return None, None, console_error("unknown_scene", request_id)
+         return "scene.select", {"scene_id": scene_id}, None
++    if command_type == "mode.select":
++        mode_id = payload.get("mode_id")
++        if not is_mode_id(mode_id):
++            return None, None, console_error("unknown_mode", request_id)
++        return "mode.select", {"mode_id": mode_id}, None
+     if command_type == "robot.stop":
+         return "action.execute", {"action": "stop", "duration_ms": DEFAULT_ACTION_DURATION_MS["stop"]}, None
+     if command_type == "action.execute":
+@@ -299,11 +311,14 @@
+                     continue
+                 device = hub.active_device
+                 request_id = raw["request_id"]
+-                if event_type == "scene.select":
++                if event_type in {"scene.select", "mode.select"}:
+                     if device is None:
+                         await websocket.send_json(console_error("device_unavailable", request_id))
+                         continue
+-                    changed = await hub.select_scene(device.device_id, payload["scene_id"], source="console")
++                    if event_type == "scene.select":
++                        changed = await hub.select_scene(device.device_id, payload["scene_id"], source="console")
++                    else:
++                        changed = await hub.select_mode(device.device_id, payload["mode_id"], source="console")
+                     await websocket.send_json(
+                         {"type": "command.accepted", "request_id": request_id, "payload": {"command": event_type, **changed}}
+                     )

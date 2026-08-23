@@ -1,0 +1,1 @@
+tts_drained -> follow_up listen.start -> VAD speech or 3s no-speech timeout -> listen.stop wiring=passed

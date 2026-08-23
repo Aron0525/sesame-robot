@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}

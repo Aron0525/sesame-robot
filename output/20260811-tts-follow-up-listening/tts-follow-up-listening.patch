@@ -1,0 +1,154 @@
+--- /Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/originals/components/sesame_voice/include/sesame_voice/voice_turn_detector.h	2026-08-11 19:17:55
++++ /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/include/sesame_voice/voice_turn_detector.h	2026-08-11 19:18:19
+@@ -10,6 +10,7 @@
+   kListenStarted,
+   kListenStopped,
+   kWakeTimedOut,
++  kFollowUpTimedOut,
+   kListenTimedOut,
+ };
+ 
+@@ -24,6 +25,7 @@
+   explicit VoiceTurnDetector(VoiceTurnDetectorConfig config) : config_(config) {}
+ 
+   VoiceTurnEvent start_from_button(uint64_t now_ms);
++  VoiceTurnEvent start_follow_up(uint64_t now_ms);
+   VoiceTurnEvent update(uint64_t now_ms, bool wake_detected, bool vad_speech);
+   void reset();
+   bool listening() const;
+@@ -36,6 +38,7 @@
+   uint64_t listen_started_ms_{0};
+   uint64_t last_speech_ms_{0};
+   bool waiting_for_first_speech_{false};
++  bool follow_up_window_{false};
+ };
+ 
+ }  // namespace sesame::voice
+--- /Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/originals/components/sesame_voice/voice_turn_detector.cpp	2026-08-11 19:17:55
++++ /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/voice_turn_detector.cpp	2026-08-11 19:18:19
+@@ -7,9 +7,19 @@
+   listen_started_ms_ = now_ms;
+   last_speech_ms_ = now_ms;
+   waiting_for_first_speech_ = false;
++  follow_up_window_ = false;
+   return VoiceTurnEvent::kListenStarted;
+ }
+ 
++VoiceTurnEvent VoiceTurnDetector::start_follow_up(uint64_t now_ms) {
++  state_ = State::kListening;
++  listen_started_ms_ = now_ms;
++  last_speech_ms_ = now_ms;
++  waiting_for_first_speech_ = true;
++  follow_up_window_ = true;
++  return VoiceTurnEvent::kListenStarted;
++}
++
+ VoiceTurnEvent VoiceTurnDetector::update(uint64_t now_ms, bool wake_detected,
+                                           bool vad_speech) {
+   switch (state_) {
+@@ -21,6 +31,7 @@
+       listen_started_ms_ = now_ms;
+       last_speech_ms_ = now_ms;
+       waiting_for_first_speech_ = !vad_speech;
++      follow_up_window_ = false;
+       return VoiceTurnEvent::kWakeDetected;
+ 
+     case State::kListening:
+@@ -37,8 +48,10 @@
+       }
+       if (waiting_for_first_speech_) {
+         if (now_ms - listen_started_ms_ >= config_.wake_to_speech_timeout_ms) {
++          const bool follow_up_timed_out = follow_up_window_;
+           reset();
+-          return VoiceTurnEvent::kWakeTimedOut;
++          return follow_up_timed_out ? VoiceTurnEvent::kFollowUpTimedOut
++                                     : VoiceTurnEvent::kWakeTimedOut;
+         }
+         return VoiceTurnEvent::kNone;
+       }
+@@ -56,6 +69,7 @@
+   listen_started_ms_ = 0;
+   last_speech_ms_ = 0;
+   waiting_for_first_speech_ = false;
++  follow_up_window_ = false;
+ }
+ 
+ bool VoiceTurnDetector::listening() const { return state_ == State::kListening; }
+--- /Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/originals/components/sesame_voice/test/test_voice_turn_detector.cpp	2026-08-11 19:17:55
++++ /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/test/test_voice_turn_detector.cpp	2026-08-11 19:18:00
+@@ -34,4 +34,18 @@
+   detector.reset();
+   assert(detector.start_from_button(16000) == VoiceTurnEvent::kListenStarted);
+   assert(detector.listening());
++
++  detector.reset();
++  assert(detector.start_follow_up(20000) == VoiceTurnEvent::kListenStarted);
++  assert(detector.listening());
++  assert(detector.update(22999, false, false) == VoiceTurnEvent::kNone);
++  assert(detector.update(23000, false, false) ==
++         VoiceTurnEvent::kFollowUpTimedOut);
++  assert(!detector.listening());
++
++  assert(detector.start_follow_up(24000) == VoiceTurnEvent::kListenStarted);
++  assert(detector.update(24500, false, true) == VoiceTurnEvent::kNone);
++  assert(detector.update(25299, false, false) == VoiceTurnEvent::kNone);
++  assert(detector.update(25300, false, false) ==
++         VoiceTurnEvent::kListenStopped);
+ }
+--- /Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/originals/components/sesame_voice/include/sesame_voice/voice_controller.h	2026-08-11 19:17:55
++++ /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/include/sesame_voice/voice_controller.h	2026-08-11 19:18:19
+@@ -56,6 +56,7 @@
+   void handle_turn_event(VoiceTurnEvent event, uint64_t now_ms);
+   void begin_listening(uint64_t now_ms);
+   void finish_listening();
++  void cancel_listening(const char* reason);
+   void play_pending_audio();
+   esp_err_t send_control(sesame::protocol::ControlEventType type,
+                          const char* payload_json,
+--- /Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/originals/components/sesame_voice/voice_controller.cpp	2026-08-11 19:17:55
++++ /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/voice_controller.cpp	2026-08-11 19:18:19
+@@ -248,7 +248,12 @@
+       return;
+     case VoiceTurnEvent::kWakeTimedOut:
+       ESP_LOGI(kTag, "wake timed out without speech");
++      cancel_listening("wake_timeout");
+       return;
++    case VoiceTurnEvent::kFollowUpTimedOut:
++      ESP_LOGI(kTag, "follow-up window timed out without speech");
++      cancel_listening("follow_up_timeout");
++      return;
+     case VoiceTurnEvent::kListenTimedOut:
+       ESP_LOGI(kTag, "listen turn reached the 10-second safety limit");
+       finish_listening();
+@@ -286,6 +291,22 @@
+   voice_capture_enabled_ = false;
+ }
+ 
++void VoiceController::cancel_listening(const char* reason) {
++  if (turn_state_.state() != sesame::protocol::TurnState::kListening ||
++      reason == nullptr) {
++    return;
++  }
++  std::array<char, 96> payload{};
++  const int length = std::snprintf(payload.data(), payload.size(),
++                                   "{\"reason\":\"%s\"}", reason);
++  if (length > 0 && static_cast<size_t>(length) < payload.size()) {
++    send_control(sesame::protocol::ControlEventType::kListenStop,
++                 payload.data());
++  }
++  turn_state_.apply(sesame::protocol::TurnEvent::kInterrupted);
++  voice_capture_enabled_ = true;
++}
++
+ void VoiceController::play_pending_audio() {
+   if (!tts_active_ || downlink_queue_ == nullptr) return;
+   DownlinkPacket packet{};
+@@ -538,6 +559,8 @@
+   turn_state_.stop_generation(generation_id);
+   turn_detector_.reset();
+   voice_capture_enabled_ = true;
++  const uint64_t timestamp = now_ms();
++  handle_turn_event(turn_detector_.start_follow_up(timestamp), timestamp);
+ }
+ 
+ void VoiceController::flush_tts() {

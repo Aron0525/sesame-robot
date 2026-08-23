@@ -1,0 +1,4 @@
+{"status":"accepted","device_id":"dev_001","kind":"servo"}
+{"status":"accepted","device_id":"dev_001","kind":"stop"}
+{"status":"accepted","device_id":"dev_001","kind":"servo"}
+{"status":"accepted","device_id":"dev_001","kind":"stop"}

@@ -1,0 +1,38 @@
+Command: ninja app-flash
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/__main__.py", line 9, in <module>
+    esptool._main()
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/__init__.py", line 1382, in _main
+    main()
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/__init__.py", line 989, in main
+    flash_id = esp.flash_id()
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/loader.py", line 1065, in flash_id
+    self.cache["flash_id"] = self.run_spiflash_command(SPIFLASH_RDID, b"", 24)
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/loader.py", line 1587, in run_spiflash_command
+    set_data_lengths(data_bits, read_bits)
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/loader.py", line 1531, in set_data_lengths
+    self.write_reg(SPI_MISO_DLEN_REG, miso_bits - 1)
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/loader.py", line 912, in write_reg
+    return self.check_command("write target memory", self.ESP_WRITE_REG, command)
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/loader.py", line 558, in check_command
+    val, data = self.command(op, data, chk, timeout=timeout)
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/esptool/loader.py", line 464, in command
+    self._port.timeout = new_timeout
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/serial/serialutil.py", line 372, in timeout
+    self._reconfigure_port()
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/serial/serialposix.py", line 524, in _reconfigure_port
+    self._set_special_baudrate(custom_baud)
+  File "/Users/mac/.espressif/python_env/idf5.5_py3.9_env/lib/python3.9/site-packages/serial/serialposix.py", line 225, in _set_special_baudrate
+    fcntl.ioctl(self.fd, IOSSIOSPEED, buf, 1)
+OSError: [Errno 6] Device not configured
+CMake Error at run_serial_tool.cmake:67 (message):
+  
+  /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python;;/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esptool_py/esptool/esptool.py;--chip;esp32s3
+  failed.
+
+
+

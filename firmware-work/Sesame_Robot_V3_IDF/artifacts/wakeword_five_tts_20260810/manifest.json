@@ -1,0 +1,1527 @@
+{
+  "schema_version": 1,
+  "purpose": "five-voice local-TTS 你好芝麻 wake-word corpus",
+  "target_wake_word": "你好，芝麻",
+  "records": [
+    {
+      "id": "eddy_train_你好_芝麻",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/train/eddy_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_train_你好_小智",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/train/eddy_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_train_你好_机器人",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/eddy_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_train_芝麻开门",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/eddy_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_train_今天天气很好",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/eddy_train_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_train_请播放音乐",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/eddy_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_train_小智你好",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/eddy_train_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_train_你好_小明",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/eddy_train_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_holdout_你好_芝麻",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/holdout/eddy_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_holdout_你好_小智",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/holdout/eddy_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_holdout_你好_机器人",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/eddy_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_holdout_芝麻开门",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/eddy_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_holdout_今天天气很好",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/eddy_holdout_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_holdout_请播放音乐",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/eddy_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_holdout_小智你好",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/eddy_holdout_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "eddy_holdout_你好_小明",
+      "voice": "Eddy",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/eddy_holdout_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_train_你好_芝麻",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/train/flo_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_train_你好_小智",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/train/flo_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_train_你好_机器人",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/flo_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_train_芝麻开门",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/flo_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_train_今天天气很好",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/flo_train_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_train_请播放音乐",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/flo_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_train_小智你好",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/flo_train_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_train_你好_小明",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/flo_train_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_holdout_你好_芝麻",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/holdout/flo_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_holdout_你好_小智",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/holdout/flo_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_holdout_你好_机器人",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/flo_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_holdout_芝麻开门",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/flo_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_holdout_今天天气很好",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/flo_holdout_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_holdout_请播放音乐",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/flo_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_holdout_小智你好",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/flo_holdout_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "flo_holdout_你好_小明",
+      "voice": "Flo",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/flo_holdout_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 256
+      },
+      "sha256": "bbc3f5a6a1add36a5a76615a43cc6deef494ca636fb7a5ae790789dff359cefa"
+    },
+    {
+      "id": "tingting_train_你好_芝麻",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/train/tingting_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 20350
+      },
+      "sha256": "13ae96f77865501f676f418fa9c5b2be20a32fd6f64314c3dfc5b7296bbbd4af"
+    },
+    {
+      "id": "tingting_train_你好_小智",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/train/tingting_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 22207
+      },
+      "sha256": "ee860a1d46b887d40a25d9ac804834760a3044932ae21c45c7dd345b76083696"
+    },
+    {
+      "id": "tingting_train_你好_机器人",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/tingting_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25180
+      },
+      "sha256": "6b4f0a7354201e5ec6bc37273a30654fe174ee9d6112bc60c5c23bec4eaf0d2c"
+    },
+    {
+      "id": "tingting_train_芝麻开门",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/tingting_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 14276
+      },
+      "sha256": "44708c370d02b51e2970c67ad63c2252686dbb7cade39264fe72b829b06134c7"
+    },
+    {
+      "id": "tingting_train_今天天气很好",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/tingting_train_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 26275
+      },
+      "sha256": "266b7eba8a5e899f4a14ff28f3ccc03141cc623dfd728244d47f0cc8cc387844"
+    },
+    {
+      "id": "tingting_train_请播放音乐",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/tingting_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 18845
+      },
+      "sha256": "21ca4099f2e9f6b7b4b8e933e16174e4e3470f78da8bc5aa0aeb109ea89fb322"
+    },
+    {
+      "id": "tingting_train_小智你好",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/tingting_train_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 17505
+      },
+      "sha256": "176552293a6b19060f75306e010f80ce0178f12425e4cd2f13b6be23f534b4d2"
+    },
+    {
+      "id": "tingting_train_你好_小明",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/tingting_train_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 23322
+      },
+      "sha256": "5812c830cfb95470b10e7d710b43a595f942b2556c3344eb76922b5da8741a06"
+    },
+    {
+      "id": "tingting_holdout_你好_芝麻",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/holdout/tingting_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 16505
+      },
+      "sha256": "bd4065752d69ab796572822fffa14755dc712ab3047030a6069020710f269c6c"
+    },
+    {
+      "id": "tingting_holdout_你好_小智",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/holdout/tingting_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 17991
+      },
+      "sha256": "827c999fc729233c18b90859b3d4d7c89845014db03346a2ff4a4a379d4c6ee2"
+    },
+    {
+      "id": "tingting_holdout_你好_机器人",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/tingting_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 20406
+      },
+      "sha256": "d862c9f1ae7beb20ea63c425b25c348cef29d71b0b44dadeab965fab92cc8f1a"
+    },
+    {
+      "id": "tingting_holdout_芝麻开门",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/tingting_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 11563
+      },
+      "sha256": "85db6581b56d28ad7e05f5986fc34acf000ae089f67130feb13f7302f92aa5c3"
+    },
+    {
+      "id": "tingting_holdout_今天天气很好",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/tingting_holdout_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 21135
+      },
+      "sha256": "b9ab87e394b48bc853bccf6f44f2521cad3d498d62c8cb0a6a6da4a35f6c89bb"
+    },
+    {
+      "id": "tingting_holdout_请播放音乐",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/tingting_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 15191
+      },
+      "sha256": "2f1aab4b22a0fe8a42351647ff36715fe4dab36a1d266dbbf12fb03866b47745"
+    },
+    {
+      "id": "tingting_holdout_小智你好",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/tingting_holdout_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 14239
+      },
+      "sha256": "4fe1c636b1b07da6763cf20bd9fb407ae065cead522115eff9b091159f75da23"
+    },
+    {
+      "id": "tingting_holdout_你好_小明",
+      "voice": "Tingting",
+      "locale": "zh_CN",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/tingting_holdout_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 18920
+      },
+      "sha256": "c6fe6ee4535b48ece31cfad5507e867160d765d71197fec3c6dc87c3e764abd2"
+    },
+    {
+      "id": "meijia_train_你好_芝麻",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/train/meijia_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 18702
+      },
+      "sha256": "07643b5a5a3faa1d3e8c6eceb58989083db17986e31f2d2961d8f4684268be67"
+    },
+    {
+      "id": "meijia_train_你好_小智",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/train/meijia_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 21860
+      },
+      "sha256": "e725ea33053b4e22325269fff22d6d6e665586b365a6f1311890ee9e40b3e6a8"
+    },
+    {
+      "id": "meijia_train_你好_机器人",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/meijia_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25389
+      },
+      "sha256": "48563c29b492e168c48fd0271b0f96d7bfd61547fa9191192cd345d9ef97e7a9"
+    },
+    {
+      "id": "meijia_train_芝麻开门",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/meijia_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 14842
+      },
+      "sha256": "0cab3c15df042b1af42896fba47cdf6facd1805d64935b7888fdca14e3327025"
+    },
+    {
+      "id": "meijia_train_今天天气很好",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/meijia_train_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 24473
+      },
+      "sha256": "b10e48a904aeadf5244ec8c6a89d8874fadfad327c6eb989b3da33eece22727f"
+    },
+    {
+      "id": "meijia_train_请播放音乐",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/meijia_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 18901
+      },
+      "sha256": "d37cbc439d7a5f652eb3e2740eafe82bf38eecfd27432a2952919aa417456dbd"
+    },
+    {
+      "id": "meijia_train_小智你好",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/meijia_train_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 14988
+      },
+      "sha256": "2a8dc4274de11a559b34fc035bb5dbe6f166807cf84302685d43bc3cea10c876"
+    },
+    {
+      "id": "meijia_train_你好_小明",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/meijia_train_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 22789
+      },
+      "sha256": "0953d75f041b61735f6e15a50f8eb506eae900bd6f4e0945cae3e28b80465020"
+    },
+    {
+      "id": "meijia_holdout_你好_芝麻",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/holdout/meijia_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 15225
+      },
+      "sha256": "e64b464539b6d688149249adb9d204c3b8366a4cd46e13d6b83583eb2c746ed9"
+    },
+    {
+      "id": "meijia_holdout_你好_小智",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/holdout/meijia_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 17825
+      },
+      "sha256": "74a1ace77d6590da0b9f21a80b1f7a3bb24053dc1cde56b4bcfacbf1cd264659"
+    },
+    {
+      "id": "meijia_holdout_你好_机器人",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/meijia_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 20612
+      },
+      "sha256": "65b62d10b618c64d96841c511859e0fc9ed067b88ef84ca98cf5e7234b733a04"
+    },
+    {
+      "id": "meijia_holdout_芝麻开门",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/meijia_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 11949
+      },
+      "sha256": "9f3fec49369f4adc514a72c251c907d92676ecb3ca0b7d2f1acd99210c24249b"
+    },
+    {
+      "id": "meijia_holdout_今天天气很好",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/meijia_holdout_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 19878
+      },
+      "sha256": "5bef60670a8dd6473f4541d3beec32d746f4bcad4b478f115e57598580fb3dda"
+    },
+    {
+      "id": "meijia_holdout_请播放音乐",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/meijia_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 15420
+      },
+      "sha256": "2b89c9ebb24654e15826dd57bda0951df31535d3c3f0ca0abc2ad24b1f407238"
+    },
+    {
+      "id": "meijia_holdout_小智你好",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/meijia_holdout_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 12250
+      },
+      "sha256": "eff8ce6319bf1d0ac5c175c8a3421aa68279be1a5cde12ababf702e275141e50"
+    },
+    {
+      "id": "meijia_holdout_你好_小明",
+      "voice": "Meijia",
+      "locale": "zh_TW",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/meijia_holdout_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 18383
+      },
+      "sha256": "0523b65fbf47df761a1c3df05a4f8538035e573644ed4c5fad20b7a82892d344"
+    },
+    {
+      "id": "sinji_train_你好_芝麻",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/train/sinji_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 23943
+      },
+      "sha256": "65b0be3a93d49c30edce71d84e306558abaf882d1fcd8660c9ee5f35a92add33"
+    },
+    {
+      "id": "sinji_train_你好_小智",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/train/sinji_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25615
+      },
+      "sha256": "b02208c3c1456e0221d1674ceb2255ba18a4b53c89d26c61aa327c60aa3cd448"
+    },
+    {
+      "id": "sinji_train_你好_机器人",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/sinji_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 27287
+      },
+      "sha256": "3c0d8882e4cfc1c0b623767b3c06b38032447ba38dc6082e971146a9e843cd1b"
+    },
+    {
+      "id": "sinji_train_芝麻开门",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/sinji_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 17306
+      },
+      "sha256": "7264e67af3ccd0691f136ec80b9ac6a053cb1bd1cee50c2d0eae4970ac78785a"
+    },
+    {
+      "id": "sinji_train_今天天气很好",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/sinji_train_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 24659
+      },
+      "sha256": "3ff83633d7f96a898aedfd0a61a2e46c382f55b063bf52cf4faa08f315cfc45b"
+    },
+    {
+      "id": "sinji_train_请播放音乐",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/sinji_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 19542
+      },
+      "sha256": "5408bb22c740d0cb4e5b62962cb3c5c0f4d323dbd7146a82f531fa67112edf03"
+    },
+    {
+      "id": "sinji_train_小智你好",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/sinji_train_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 18538
+      },
+      "sha256": "5fcd968e912c885489842f937cf1bdbd7b326f78f7ff2bcff92704ef1ff01608"
+    },
+    {
+      "id": "sinji_train_你好_小明",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "train",
+      "speech_rate": 170,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/train/sinji_train_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25058
+      },
+      "sha256": "83f7bd767710468ef00a4b56aa7251fbb1d6986f9b0c53f128b832419bc064f6"
+    },
+    {
+      "id": "sinji_holdout_你好_芝麻",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "engine": "macOS say",
+      "path": "wav/holdout/sinji_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 19383
+      },
+      "sha256": "e56a1d3056350a3fceed014be5df8ad91a882f5066a4ba8211953b24576b3f9d"
+    },
+    {
+      "id": "sinji_holdout_你好_小智",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "engine": "macOS say",
+      "path": "wav/holdout/sinji_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 20683
+      },
+      "sha256": "b823885b25963c2b821824db60fb04ddc39d2cb083110fd7ec67c6df43073037"
+    },
+    {
+      "id": "sinji_holdout_你好_机器人",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/sinji_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 22169
+      },
+      "sha256": "d0a75729936c0ab032326c672d35f4e9e8a27c64e0a0056e0989c9e885567ec1"
+    },
+    {
+      "id": "sinji_holdout_芝麻开门",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/sinji_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 14020
+      },
+      "sha256": "ddac5a027eefaf9237a850226e99a3dec4acc2ea54e528cfdc96ac37e56f0d0d"
+    },
+    {
+      "id": "sinji_holdout_今天天气很好",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "今天天气很好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/sinji_holdout_今天天气很好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 19991
+      },
+      "sha256": "fb4f7581d21ba4601773fcb70b6c7d46a611f51d2b4211282a4ee5154c84e606"
+    },
+    {
+      "id": "sinji_holdout_请播放音乐",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/sinji_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 15896
+      },
+      "sha256": "0cb9c3ae91f8d7cfd699620fd0f895137744da7e7e581a3742ea6b9dd2d8bcd9"
+    },
+    {
+      "id": "sinji_holdout_小智你好",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "小智你好",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/sinji_holdout_小智你好.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 15093
+      },
+      "sha256": "f7417145e4409f7ebfb20ca8a92bfefdbf3ec23d9d089931567228af112e274b"
+    },
+    {
+      "id": "sinji_holdout_你好_小明",
+      "voice": "Sinji",
+      "locale": "zh_HK",
+      "split": "holdout",
+      "speech_rate": 220,
+      "phrase": "你好，小明",
+      "label": 0,
+      "category": "general_negative",
+      "engine": "macOS say",
+      "path": "wav/holdout/sinji_holdout_你好_小明.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 20311
+      },
+      "sha256": "d7c6d514e91c128a8042efc841a573b23c40d87aab54dedcb6ecc91d73e87dee"
+    }
+  ]
+}

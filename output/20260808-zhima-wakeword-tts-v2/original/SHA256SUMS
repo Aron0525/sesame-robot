@@ -1,0 +1,12 @@
+baseline_files:
+e48b0f8c1f114e33783830046119dc9f4dab8f4001f38ad9972708c3440a0245  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/README.md
+c0660eeccf24d59ac12007183a13514b816b7a82dc50576296fb6b4947c9dc0c  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/components/sesame_audio/audio_hal.cpp
+ddc7ce809b55c0d69b65038bbbf626a717654e6c3657beef057ed3f1d4f08859  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/components/sesame_voice/CMakeLists.txt
+67474a177b50d391e2d6201e7b6b8e1dfca53398398fb4d50a1566912acd955a  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/components/sesame_voice/include/sesame_voice/wake_vad_engine.h
+058d1f394e97ca2eda6a385fc39acf4b09870800d26006e516069aac26428c53  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/components/sesame_voice/wake_vad_engine.cpp
+048306cc52e739176dda71fbe1ef94a57756053ccd48f8a5ccaf74ceb119b84e  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/main/idf_component.yml
+7e734061bea12d96c519d0e546cb0fa043b2ccabd2dcb93b311863b50f47de24  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/partitions.csv
+79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/source-model.tflite
+
+source_model_expected_sha256 79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065
+97c7869a6652372ce928e3d6ec0aab05b8e4d1d0311f3d21fb4d355d178bd40a  /Users/mac/Documents/sesame robot/output/20260808-zhima-wakeword-tts-v2/original/components/sesame_voice/voice_controller.cpp

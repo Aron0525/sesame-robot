@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sesame Robot OpenClaw Agent、Session、Sandbox、Tool Policy 与 JSON 契约速查表。">
+  <title>速查｜Sesame OpenClaw 安全配置</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+  <main>
+    <header class="hero" data-lesson="REF">
+      <div>
+        <p class="kicker">Sesame Robot · Reference</p>
+        <h1>OpenClaw 安全配置速查</h1>
+        <p class="lead">固定边界：ESP32 → Voice Gateway → OpenClaw sesame Agent。Session 是路由，Gateway cell 才是客户信任边界。</p>
+      </div>
+    </header>
+
+    <section class="chapter">
+      <div class="chapter-head"><span class="chapter-no">REF—A</span><div><h2>目标 Agent 配置骨架</h2><p>写入前保留现有 Agent；<code>agents.list</code> 是数组，覆盖会替换整个数组。</p></div></div>
+      <pre><code>{
+  agents: {
+    list: [
+      {
+        id: "main",
+        default: true,
+        workspace: "~/.openclaw/workspace"
+      },
+      {
+        id: "sesame",
+        workspace: "~/.openclaw/workspace-sesame",
+        skills: [],
+        memorySearch: {enabled: false},
+        sandbox: {
+          mode: "all",
+          backend: "docker",
+          scope: "session",
+          workspaceAccess: "none",
+          docker: {
+            network: "none",
+            readOnlyRoot: true,
+            capDrop: ["ALL"],
+            pidsLimit: 64,
+            memory: "512m",
+            cpus: 0.5
+          }
+        },
+        tools: {
+          profile: "minimal",
+          deny: [
+            "group:runtime", "group:fs", "group:sessions",
+            "group:memory", "group:web", "group:ui",
+            "group:automation", "group:messaging", "group:nodes",
+            "group:agents", "group:media", "group:plugins",
+            "group:openclaw"
+          ],
+          elevated: {enabled: false},
+          exec: {host: "sandbox", security: "deny"}
+        }
+      }
+    ]
+  }
+}</code></pre>
+      <div class="danger"><strong>注意</strong>这是基于当前本机配置的目标骨架；<code>agents.list</code> 是替换型数组，所以示例保留了现有 <code>main</code>。正式修改时仍应先用 <code>openclaw agents add</code> 创建 Agent，再合并配置，并执行 <code>openclaw config validate</code>。</div>
+    </section>
+
+    <section class="chapter">
+      <div class="chapter-head"><span class="chapter-no">REF—B</span><div><h2>固定输出</h2><p>OpenClaw 只输出 JSON，Voice Gateway 和 ESP32 再校验。</p></div></div>
+      <pre><code>{
+  "v": 1,
+  "request_id": "req_001",
+  "turn_id": "turn_001",
+  "status": "completed",
+  "reply": {"text": "你好，很高兴见到你。"},
+  "voice": {
+    "voice_id": "sesame_default",
+    "style": "happy",
+    "speed": 1.0
+  },
+  "expression": {"name": "happy", "ttl_ms": 2500},
+  "actions": [
+    {"name": "wave", "duration_ms": 1200}
+  ]
+}</code></pre>
+    </section>
+
+    <section class="chapter">
+      <div class="chapter-head"><span class="chapter-no">REF—C</span><div><h2>验证命令</h2><p>配置文件存在不等于运行时已经生效。</p></div></div>
+      <pre><code>openclaw config validate
+openclaw sandbox recreate --agent sesame
+openclaw sandbox list --json
+openclaw sandbox explain --agent sesame --json
+openclaw security audit --deep
+openclaw gateway probe</code></pre>
+      <ul class="checklist">
+        <li>必须显示 session 已 sandboxed。</li>
+        <li>不得出现 host shell、文件写入、浏览器、消息、node 工具。</li>
+        <li>不得挂载 Docker socket、用户主目录或凭据目录。</li>
+        <li>不同客户使用独立 Gateway cell 和凭据。</li>
+      </ul>
+      <p><a href="../lessons/0011-openclaw-agent-sandbox-privacy.html">返回完整课程</a></p>
+    </section>
+  </main>
+</body>
+</html>

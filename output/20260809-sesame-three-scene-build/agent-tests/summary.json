@@ -1,0 +1,23 @@
+{
+  "learning": {
+    "durationMs": 7243,
+    "workspace": "/Users/mac/.openclaw/sandboxes/agent-sesame-learning-scene-veri-b3aaa198",
+    "reply": "分数表示把一个整体平均分成若干份，取其中一份或几份的数，比如把蛋糕平均分成4份，取1份就是四分之一。最简单的小题：把一个月饼平均分成2份，每份是几分之几？",
+    "expression": "happy",
+    "toolCalls": 0
+  },
+  "children": {
+    "durationMs": 4251,
+    "workspace": "/Users/mac/.openclaw/sandboxes/agent-sesame-children-scene-veri-7465ccbb",
+    "reply": "小树和小鸟是好朋友，每天小鸟都在小树上唱歌。下雨了，小树就用叶子给小鸟撑伞。你想不想也和小鸟做朋友呀？",
+    "expression": "happy",
+    "toolCalls": 0
+  },
+  "work": {
+    "durationMs": 7048,
+    "workspace": "/Users/mac/.openclaw/sandboxes/agent-sesame-work-scene-verifica-d7e2835c",
+    "reply": "建议顺序：1）回复客户（时效性高、涉及外部等待）；2）完成报告（核心交付物）；3）整理会议记录（可最后收尾）。告诉我各任务的截止时间，我可以帮你细化每个任务的步骤。",
+    "expression": "thinking",
+    "toolCalls": 1
+  }
+}

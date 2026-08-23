@@ -1,0 +1,6 @@
+$ REPO=rollback-fixture ./rollback.sh
+rollback_complete=/Users/mac/Documents/sesame robot/output/servo-angle-pass-through-20260805/rollback-fixture
+exit=0
+$ git status --porcelain
+exit=0
+rollback_clean=true

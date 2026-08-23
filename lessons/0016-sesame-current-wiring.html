@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="理解 Sesame V3 接线的信号、供电和实机验证边界。">
+  <title>第 16 节｜Sesame 接线怎么读</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="16">
+  <nav class="course-nav" aria-label="课程导航"><div class="course-nav__inner"><a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a><div class="lesson-tabs"><a href="0014-sesame-reproducible-architecture.html" title="可复现架构">14</a><a href="0015-sesame-code-reading-first-tour.html" title="源码第一游">15</a><a href="0016-sesame-current-wiring.html" aria-current="page" title="接线核对">16</a></div><div class="reading-progress" aria-hidden="true"></div></div></nav>
+  <main>
+    <header class="hero" data-lesson="16"><div><p class="kicker">Sesame Robot V3 · 硬件入门课</p><h1>接线不是一张表。<br>它有三种不同的线。</h1><p class="lead">这节课的目标是让你看懂自己的机器人：哪根线传数据，哪根线供电，哪根线必须共地；也知道项目记录尚未证明什么。</p><div class="lesson-meta"><span>约 12 分钟</span><span>GPIO</span><span>安全核对</span></div></div></header>
+    <section class="chapter"><div class="chapter-head"><span class="chapter-no">16—A</span><div><h2>三种线，不能互相替代</h2><p>先把这三种概念分开，才不会把“接了 GPIO”误以为“模块已经有电”。</p></div></div>
+      <div class="concept-grid"><article class="concept"><span class="term">Signal</span><h3>信号线</h3><p>例如 GPIO48→/←INMP441 SD，GPIO4→S0。它传递的是数据或控制，不负责给电机供电。</p></article><article class="concept"><span class="term">Power</span><h3>供电线</h3><p>例如 3V3→麦克风/OLED，5V_SERVO→舵机 V+。它决定模块能不能工作和可承受的电流。</p></article><article class="concept"><span class="term">Ground</span><h3>共同参考地</h3><p>所有低压模块与 ESP32 的 GND 要有共同参考。舵机电源可以独立，但地不能漂浮。</p></article><article class="concept"><span class="term">Bus</span><h3>共享总线</h3><p>I2S 的 BCLK、WS 可共享给麦克风和功放；I²C 的 SDA、SCL 是 OLED 总线。数据方向仍各不相同。</p></article></div>
+    </section>
+    <section class="chapter"><div class="chapter-head"><span class="chapter-no">16—B</span><div><h2>只记住音频这一张小图</h2><p>它足够解释“为什么当前能录音不代表能播放”。</p></div></div>
+      <div class="diagram">INMP441：GPIO14→SCK，GPIO47→WS，GPIO48←SD，L/R→GND
+MAX98357A：GPIO14→BCLK，GPIO47→LRC，GPIO2→DIN，GPIO1→EN
+
+两者共享时钟；各自不共享数据线。
+INMP441 未实机录音验收；MAX98357A 与扬声器记录为未安装。</div>
+      <div class="case"><strong>先记方向</strong>麦克风的声音数据进入 ESP32，所以箭头是 INMP441 → GPIO48；功放接收 ESP32 要播放的数据，所以箭头是 GPIO2 → MAX98357A DIN。</div>
+    </section>
+    <section class="chapter"><div class="chapter-head"><span class="chapter-no">16—C</span><div><h2>舵机不是接到 GPIO 就完成</h2><p>每个 SG90S 都有 signal、V+、GND 三条线。</p></div></div>
+      <table class="comparison"><thead><tr><th>组</th><th>GPIO</th><th>同组必须检查的供电</th></tr></thead><tbody><tr><td>S0–S3</td><td>4、5、6、7</td><td>红线去 5V_SERVO；棕/黑线去共地。</td></tr><tr><td>S4–S7</td><td>10、11、12、13</td><td>同上；不能从 ESP32 3V3 或 USB 数据口取电。</td></tr></tbody></table>
+      <p>项目记录的 Distro V3 电源树是：电池/USB-C PD → VSYS → 板载 TPS54531 → 5V_SERVO。正式 README 同时要求不要用 USB 给八路舵机供电。理解为：USB Serial/JTAG 仅是主控/数据线；高电流舵机轨必须由合格的 VSYS 来源提供。</p>
+    </section>
+    <section class="chapter"><div class="chapter-head"><span class="chapter-no">16—D</span><div><h2>你现在能做的第一个安全核对</h2><p>无需上电，也无需运行代码。</p></div></div>
+      <ol class="checklist"><li>断开舵机高电流电源，拍清楚正面/背面照片。</li><li>按照 GPIO 表找 INMP441 的 SCK、WS、SD、L/R；确认 L/R 是 GND。</li><li>找 OLED 的 SDA/SCL，不把模块的上拉接到高于 ESP32 可承受的逻辑电平。</li><li>逐个确认舵机的信号、V+、GND；特别确认所有舵机地与 ESP32 地相连。</li><li>功放和扬声器先不假设已接：当前项目记录没有实机验收。</li></ol>
+      <div class="quiz"><details><summary>GPIO14 与 GPIO47 为什么可以分别接两块音频模块？</summary><p>它们是主控输出的时钟。多个 I2S 从设备监听同一时钟没有问题；但两个设备不能同时驱动同一数据线。</p></details><details><summary>为什么要先断舵机电源？</summary><p>这样可以在不让机械臂突然动作的情况下确认信号线和地线，避免短路或机械碰撞。</p></details></div>
+    </section>
+    <section class="sources"><h2>工程图</h2><p>完整 GPIO、供电树、已确认/未确认状态都在 <a href="../reference/sesame-v3-wiring-map.html">Sesame V3 接线核对图</a>。对着实物无法确认的地方，不要猜；拍图后可以逐个标号继续核对。</p></section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,957 @@
+{
+  "schema_version": 2,
+  "purpose": "five Azure Edge Neural TTS voice corpus for 你好芝麻",
+  "target_wake_word": "你好，芝麻",
+  "records": [
+    {
+      "id": "xiaoxiao_train_你好_芝麻",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/train/xiaoxiao_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 29184
+      },
+      "sha256": "6dcb610d76fd087a498735930bbd541e3610246118dc89e881af7e8cd26634a6"
+    },
+    {
+      "id": "xiaoxiao_train_你好_小智",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/train/xiaoxiao_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 30720
+      },
+      "sha256": "4374b4659689fc2428138c0d8326eddc0648b0afb80191e32f127d2d593f21a6"
+    },
+    {
+      "id": "xiaoxiao_train_你好_机器人",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/xiaoxiao_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 32640
+      },
+      "sha256": "2107c9e01bf1ec354537155fd788a5e03cf54bab53890e1675efbea07be992a6"
+    },
+    {
+      "id": "xiaoxiao_train_芝麻开门",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/xiaoxiao_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25728
+      },
+      "sha256": "0fd05ce076132da631c2e963994c53b80ceaaed0b04078da67a59383ee663ebd"
+    },
+    {
+      "id": "xiaoxiao_train_请播放音乐",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/xiaoxiao_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 28416
+      },
+      "sha256": "197b78c450cb8e8642b5c5a708a326249c29d200424a12fe6cd0da4bfcd92d65"
+    },
+    {
+      "id": "xiaoxiao_holdout_你好_芝麻",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/holdout/xiaoxiao_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 26496
+      },
+      "sha256": "8c2ef4cd6129d5314e43695998574edd21c3b0bbc50250fe0aa440db1b17d21a"
+    },
+    {
+      "id": "xiaoxiao_holdout_你好_小智",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/holdout/xiaoxiao_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 27648
+      },
+      "sha256": "d38faf9a5fe33b5db5217e2b44c6a7b8d2c00293d8b7be551718f2184e4ad703"
+    },
+    {
+      "id": "xiaoxiao_holdout_你好_机器人",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/xiaoxiao_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 29568
+      },
+      "sha256": "4969662affef7185f3f8eb4653ce08a88f07bc6231c9572587517615b26c8549"
+    },
+    {
+      "id": "xiaoxiao_holdout_芝麻开门",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/xiaoxiao_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 23040
+      },
+      "sha256": "3c089b171575f259ba2c85f71d713bba1734ddf0c2cacb86ecdf504ee7bcdf1c"
+    },
+    {
+      "id": "xiaoxiao_holdout_请播放音乐",
+      "voice": "Xiaoxiao",
+      "voice_id": "zh-CN-XiaoxiaoNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/xiaoxiao_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25728
+      },
+      "sha256": "eb4e43a519aa9b437fa00a7627caeeb12b4bc342c6e0081c3c7972ca7ab80f21"
+    },
+    {
+      "id": "xiaoyi_train_你好_芝麻",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/train/xiaoyi_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 31104
+      },
+      "sha256": "1d981d1a3666446e1f3fda7c45f6817c516f8ccfc61281fde100c2f2d51f1cb4"
+    },
+    {
+      "id": "xiaoyi_train_你好_小智",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/train/xiaoyi_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 32640
+      },
+      "sha256": "1f19f63cefe108d91a7c04c6b7ce4fd461bb8630875044f7d2c0bcedfa15eb6a"
+    },
+    {
+      "id": "xiaoyi_train_你好_机器人",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/xiaoyi_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 35328
+      },
+      "sha256": "4f4054633890078c37657c6bd63b91841ffc39c12eeec18b028c6481bb332707"
+    },
+    {
+      "id": "xiaoyi_train_芝麻开门",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/xiaoyi_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 28800
+      },
+      "sha256": "9d717bc07976481a0a0fd92f84146f5f57be36a63296944a89167ac860120748"
+    },
+    {
+      "id": "xiaoyi_train_请播放音乐",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/xiaoyi_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 31104
+      },
+      "sha256": "ee03c3ce39edcb0931c6c6350373f213eb136d3c6ac17f216e08d7ec4ec15cdf"
+    },
+    {
+      "id": "xiaoyi_holdout_你好_芝麻",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/holdout/xiaoyi_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 28032
+      },
+      "sha256": "9121c46ef636c94abf42e021dce955c992a600aba9c1a6cbd3a72b3743034a2d"
+    },
+    {
+      "id": "xiaoyi_holdout_你好_小智",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/holdout/xiaoyi_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 29568
+      },
+      "sha256": "28ad928a600626dde225fb81f93cfc4a91b7b832ae4da7f2fb6876b3eac4b274"
+    },
+    {
+      "id": "xiaoyi_holdout_你好_机器人",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/xiaoyi_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 31872
+      },
+      "sha256": "54391c454421ab659fa0d01e7c9746b41dbe25a911bb9969d7aaf7947b0fb534"
+    },
+    {
+      "id": "xiaoyi_holdout_芝麻开门",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/xiaoyi_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 26112
+      },
+      "sha256": "34c7db758bd4ad3ddb9e4e77ee0edd2a0498e4d3913c00698485cd277f2c8082"
+    },
+    {
+      "id": "xiaoyi_holdout_请播放音乐",
+      "voice": "Xiaoyi",
+      "voice_id": "zh-CN-XiaoyiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/xiaoyi_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 28416
+      },
+      "sha256": "8b3909ac711a2a69d7d252305a0c372d11dc2f44a2ffaf2fb7eba97597400549"
+    },
+    {
+      "id": "yunxi_train_你好_芝麻",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/train/yunxi_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 35328
+      },
+      "sha256": "f3df5f9869cb51880f2aeac3582c624f974eafdd88b8ce7ce102a4cffcfe6b3f"
+    },
+    {
+      "id": "yunxi_train_你好_小智",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/train/yunxi_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 37248
+      },
+      "sha256": "880152f157e218179dbdaaa2d1d63e552d159b6281eaf2c5e9357deba42cff70"
+    },
+    {
+      "id": "yunxi_train_你好_机器人",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunxi_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 38400
+      },
+      "sha256": "e99992bc58fccf23365b4123b94e6072cdcd5a380fcbfb297e4ccb2a0d136dc8"
+    },
+    {
+      "id": "yunxi_train_芝麻开门",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunxi_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 29952
+      },
+      "sha256": "9d2ce813afac68455f35e4593c164b7f5d2760c2134a0c5d8d08abe4926d295b"
+    },
+    {
+      "id": "yunxi_train_请播放音乐",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunxi_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 32640
+      },
+      "sha256": "284018892795d5ca0d23d673b7b8b75ae0660b7b0dfbbe03319dd48e80fc63be"
+    },
+    {
+      "id": "yunxi_holdout_你好_芝麻",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/holdout/yunxi_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 31872
+      },
+      "sha256": "43deea78224df5719cd8a671daeb066c4433c77cfa77414b91722ad6cf0b8842"
+    },
+    {
+      "id": "yunxi_holdout_你好_小智",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/holdout/yunxi_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 33408
+      },
+      "sha256": "259790d9bde07844a279b9a4e6cc52771467f2239dbcd57a4583b3d2c521442c"
+    },
+    {
+      "id": "yunxi_holdout_你好_机器人",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunxi_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 34944
+      },
+      "sha256": "b3513c7112fb3e6475bb00ef116ad09e231ebe3e0cae80748e6ce77749c2a0e7"
+    },
+    {
+      "id": "yunxi_holdout_芝麻开门",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunxi_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 28416
+      },
+      "sha256": "79afbe8587de040bc91f643f56b4b6b23df530bbfa6f71f67b3a90e8caf90fe0"
+    },
+    {
+      "id": "yunxi_holdout_请播放音乐",
+      "voice": "Yunxi",
+      "voice_id": "zh-CN-YunxiNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunxi_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 29568
+      },
+      "sha256": "a69f87d0eb9510877649ddd66a2618e005cfc27113be033031600ea7d68deabd"
+    },
+    {
+      "id": "yunyang_train_你好_芝麻",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/train/yunyang_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 28032
+      },
+      "sha256": "b9bfaa3a6128cfa56e42956e0275cef082c4f510026cda0042fbdbc90784956a"
+    },
+    {
+      "id": "yunyang_train_你好_小智",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/train/yunyang_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 28800
+      },
+      "sha256": "7638d6e449e962ee8eb8da31758cbf77110a2d6f9f1139f6163ac5cd534fea41"
+    },
+    {
+      "id": "yunyang_train_你好_机器人",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunyang_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 29568
+      },
+      "sha256": "4be82ce32a0b124788fd029833579224fb3b25cab62ab1189702d383c1332ee2"
+    },
+    {
+      "id": "yunyang_train_芝麻开门",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunyang_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25728
+      },
+      "sha256": "9ab6b813ef72d6210b1c6ee02c8d258baf6916eeeed6490a618daeb12c2b2cd5"
+    },
+    {
+      "id": "yunyang_train_请播放音乐",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunyang_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25728
+      },
+      "sha256": "eed204c5b25f77f6ee9b671aca3365c3bcd7945326b7971290fb37d44210923d"
+    },
+    {
+      "id": "yunyang_holdout_你好_芝麻",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/holdout/yunyang_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 25344
+      },
+      "sha256": "c23fda6f247a0fb806a046d1506a75988e04f6ad23842b4ab15ea1639a26e840"
+    },
+    {
+      "id": "yunyang_holdout_你好_小智",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/holdout/yunyang_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 28416
+      },
+      "sha256": "e501dde5752ed5a52140ba4fc00db909346ea1d848ef1f26a478fdbf1deb52a0"
+    },
+    {
+      "id": "yunyang_holdout_你好_机器人",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunyang_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 26880
+      },
+      "sha256": "d383dbf309e33695ed24ba5bcfaa8b6097d0c23d53f58df70f98b28cf538d1d3"
+    },
+    {
+      "id": "yunyang_holdout_芝麻开门",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunyang_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 23424
+      },
+      "sha256": "38a1a1107b51d67bb539ccf191f69c2899de5fbcfcfdc06ca3214d9469cb1acc"
+    },
+    {
+      "id": "yunyang_holdout_请播放音乐",
+      "voice": "Yunyang",
+      "voice_id": "zh-CN-YunyangNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunyang_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 23424
+      },
+      "sha256": "d9151f05a26dad871e0958ad08188fea362f3556f833f8818500d7551b99edf2"
+    },
+    {
+      "id": "yunjian_train_你好_芝麻",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/train/yunjian_train_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 34176
+      },
+      "sha256": "c99de4068f117f934b06c9e9b7069df2baa77ba41f510def18ace7a47a5184d3"
+    },
+    {
+      "id": "yunjian_train_你好_小智",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/train/yunjian_train_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 34944
+      },
+      "sha256": "69b3a2be9f1ae8c0b55cb67355161ea5bc19c3962b394e1a87373f1d69cd5db9"
+    },
+    {
+      "id": "yunjian_train_你好_机器人",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunjian_train_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 34944
+      },
+      "sha256": "d94539db05644b2d9844ad6a79aa45334f7586f881d83279afc6a97395448f3e"
+    },
+    {
+      "id": "yunjian_train_芝麻开门",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunjian_train_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 29184
+      },
+      "sha256": "9a34fe0b1deeab73ca6003ce8429aadf65d20b68c573dd72ae31875f77465c8e"
+    },
+    {
+      "id": "yunjian_train_请播放音乐",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "train",
+      "speech_rate": 180,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/train/yunjian_train_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 32256
+      },
+      "sha256": "3c6b249a97819b604db7b3cb00667c06992aade097f3fd5d4adbc788627f288b"
+    },
+    {
+      "id": "yunjian_holdout_你好_芝麻",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "category": "target",
+      "path": "wav/holdout/yunjian_holdout_你好_芝麻.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 30720
+      },
+      "sha256": "99a1a8c2bd6bd68742cc319bd5eb91529459775db20baa74f26d95d3ac6d8e25"
+    },
+    {
+      "id": "yunjian_holdout_你好_小智",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，小智",
+      "label": 0,
+      "category": "hard_negative_nihaoxiaozhi",
+      "path": "wav/holdout/yunjian_holdout_你好_小智.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 31488
+      },
+      "sha256": "da968888d35ff7f6c951708108d270f8ce4e265e21c2a63a724c8b3301600fba"
+    },
+    {
+      "id": "yunjian_holdout_你好_机器人",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "你好，机器人",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunjian_holdout_你好_机器人.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 31488
+      },
+      "sha256": "32acab9e6f5b429ffc13093f07d24ff8e152902abef22a3e6ac36bd20f988e12"
+    },
+    {
+      "id": "yunjian_holdout_芝麻开门",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "芝麻开门",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunjian_holdout_芝麻开门.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 26496
+      },
+      "sha256": "7f746e231902d381c8f952bf0b3397602f9029be92dea94dbdd55bf2144c62e5"
+    },
+    {
+      "id": "yunjian_holdout_请播放音乐",
+      "voice": "Yunjian",
+      "voice_id": "zh-CN-YunjianNeural",
+      "engine": "Azure Edge Neural TTS",
+      "split": "holdout",
+      "speech_rate": 200,
+      "phrase": "请播放音乐",
+      "label": 0,
+      "category": "general_negative",
+      "path": "wav/holdout/yunjian_holdout_请播放音乐.wav",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 29184
+      },
+      "sha256": "548d537642e2964bb5ecd1e7468ba0d909257bdf5434dd9236d9a1cc084e9ae9"
+    }
+  ]
+}

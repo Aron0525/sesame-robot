@@ -1,0 +1,9 @@
+{
+  "openclaw_capability_actions": [],
+  "legacy_agent_action_count_after_parse": 0,
+  "response_plan_action_id": null,
+  "response_plan_action_request_id": null,
+  "response_plan_action_duration_ms": null,
+  "response_plan_action_deadline_ms": null,
+  "response_plan_expression_id": "happy"
+}

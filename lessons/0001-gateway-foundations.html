@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="网关五课教材第一课：建立网关、通信边界和网络分层的统一心智模型。">
+  <title>第一课｜网关的本质与网络基础</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="1">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>×5</span></a>
+      <div class="lesson-tabs">
+        <a href="0001-gateway-foundations.html" aria-current="page" title="第一课">01</a>
+        <a href="0002-proxies-routing-and-load-balancing.html" title="第二课">02</a>
+        <a href="0003-api-gateway-policies-and-resilience.html" title="第三课">03</a>
+        <a href="0004-cloud-kubernetes-and-service-mesh.html" title="第四课">04</a>
+        <a href="0005-ai-gateway-design-and-troubleshooting.html" title="第五课">05</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="1">
+      <div>
+        <p class="kicker">第一课 · 心智模型</p>
+        <h1>网关的本质与网络基础</h1>
+        <p class="lead">先不背产品名。我们从“边界、代理、策略”三个词出发，把家庭路由器、Nginx、API Gateway 和 AI Gateway 放进同一个模型。</p>
+        <div class="lesson-meta"><span>约 25 分钟</span><span>15 个概念</span><span>4 个练习</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="definition">
+      <div class="chapter-head">
+        <span class="chapter-no">01—A</span>
+        <div><h2>一个能覆盖所有网关的定义</h2><p>先抓住不随产品变化的本质，再理解不同形态。</p></div>
+      </div>
+      <div class="memory">
+        <h3>本课总纲</h3>
+        <p>网关是位于两个通信域边界上的中介节点。它代表一侧接收通信，按照统一策略决定拒绝、转换、路由或转发，再把通信交给另一侧。</p>
+      </div>
+      <div class="concept-grid">
+        <article class="concept reveal">
+          <span class="term">Concept 01</span>
+          <h3>通信域（Communication Domain）</h3>
+          <p>一组遵守相近规则、能直接通信的参与者。公网与公司内网是两个通信域；用户应用与模型供应商也可以看成两个通信域。</p>
+          <div class="plain"><strong>通俗解释</strong>像两栋门禁规则不同的办公楼。楼内可以自由走动，跨楼则必须经过门口。</div>
+        </article>
+        <article class="concept reveal">
+          <span class="term">Concept 02</span>
+          <h3>边界（Boundary）</h3>
+          <p>两个通信域相接的位置。边界意味着信任、协议、地址或管理责任发生变化。</p>
+          <div class="case"><strong>案例</strong>浏览器属于不可信公网，订单服务属于私有网络；公网入口就是安全边界。</div>
+        </article>
+        <article class="concept reveal">
+          <span class="term">Concept 03</span>
+          <h3>代理（Proxy）</h3>
+          <p>调用者不直接接触真实处理者，而由中间节点代表一方完成通信。网关通常具有代理性质。</p>
+          <div class="plain"><strong>通俗解释</strong>你不直接进入仓库取货，而是把取货单交给窗口，窗口人员替你到仓库办理。</div>
+        </article>
+        <article class="concept reveal">
+          <span class="term">Concept 04</span>
+          <h3>策略（Policy）</h3>
+          <p>网关处理通信时执行的规则，例如谁能进、每分钟能进几次、请求应送到哪里。</p>
+          <div class="case"><strong>案例</strong>“普通用户每分钟最多调用聊天接口 20 次”就是一条网关策略。</div>
+        </article>
+        <article class="concept wide reveal">
+          <span class="term">Concept 05</span>
+          <h3>网关是一种角色，不是一种固定产品</h3>
+          <p>路由器、Nginx、Envoy、Kong、AWS API Gateway 都可能扮演网关。判断依据不是软件名，而是它在当前架构中是否位于边界、代理通信并执行统一策略。</p>
+          <div class="case"><strong>案例</strong>同一台 Nginx 在博客系统里可能只是静态 Web Server；在微服务前面接收全部 API 请求时，它就在扮演网关。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="traffic-language">
+      <div class="chapter-head">
+        <span class="chapter-no">01—B</span>
+        <div><h2>描述流量时必须掌握的语言</h2><p>这些词会贯穿后面四课。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 06</span>
+          <h3>下游（Downstream）与上游（Upstream）</h3>
+          <p>连接到网关、发起请求的一侧叫下游；接收网关转发请求的一侧叫上游。它们是相对于当前代理而言的。</p>
+          <div class="case"><strong>案例</strong>浏览器 → Nginx → FastAPI。对 Nginx 而言，浏览器是下游，FastAPI 是上游。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 07</span>
+          <h3>入口（Ingress）与出口（Egress）</h3>
+          <p>Ingress 表示流量进入一个受管理区域；Egress 表示流量离开该区域。它们描述方向，不必然指某个产品。</p>
+          <div class="case"><strong>案例</strong>用户访问集群是 Ingress；Agent 从集群调用外部搜索 API 是 Egress。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 08</span>
+          <h3>数据包、连接与请求</h3>
+          <p>数据包是网络层传输单元；TCP 连接是一段可靠通信通道；HTTP 请求是在连接上承载的应用消息。不同网关处理的对象不同。</p>
+          <div class="plain"><strong>通俗解释</strong>数据包像一辆辆货车，连接像固定运输线路，请求像一张完整订单。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 09</span>
+          <h3>端点（Endpoint）</h3>
+          <p>可以被访问的具体网络位置，通常由 IP、端口或 URL 表示。一个服务可能有多个实例，也就有多个端点。</p>
+          <div class="case"><strong>案例</strong>订单服务有三个实例：<code>10.0.1.8:8000</code>、<code>10.0.1.9:8000</code>、<code>10.0.1.10:8000</code>。</div>
+        </article>
+      </div>
+      <div class="diagram">下游客户端                    网关                    上游服务
+Browser ── HTTP Request ──▶ Listener ── Route ──▶ Endpoint
+          进入（Ingress）                         真实处理者</div>
+    </section>
+
+    <section class="chapter" id="layers">
+      <div class="chapter-head">
+        <span class="chapter-no">01—C</span>
+        <div><h2>L3、L4、L7：网关到底看得多深</h2><p>层次决定网关可以根据什么信息做决策。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>层次</th><th>网关能看见</th><th>典型决策</th><th>案例</th></tr></thead>
+        <tbody>
+          <tr><td>L3 网络层</td><td>源/目标 IP、数据包</td><td>下一跳路由</td><td>把去公网的数据包交给家庭路由器</td></tr>
+          <tr><td>L4 传输层</td><td>TCP/UDP、IP、端口、连接</td><td>连接分发</td><td>把 443 端口的新连接分给一台服务器</td></tr>
+          <tr><td>L7 应用层</td><td>HTTP 路径、方法、Header、身份</td><td>API 路由与治理</td><td><code>/orders</code> 去订单服务，<code>/chat</code> 去 Agent 服务</td></tr>
+        </tbody>
+      </table>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 10</span>
+          <h3>网络层网关（L3 Gateway）</h3>
+          <p>根据 IP 路由表决定数据包的下一跳，不理解订单、用户或 HTTP 路径。</p>
+          <div class="case"><strong>案例</strong>电脑发现目标 IP 不在本地网段，于是把数据包发给默认网关 <code>192.168.1.1</code>。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 11</span>
+          <h3>传输层网关或四层代理</h3>
+          <p>根据 IP、端口和连接状态转发 TCP/UDP 流量，性能高，但通常不知道 HTTP 路径。</p>
+          <div class="case"><strong>案例</strong>云负载均衡器把所有到 443 端口的 TCP 连接分给四台 Nginx。</div>
+        </article>
+        <article class="concept wide">
+          <span class="term">Concept 12</span>
+          <h3>应用层网关（L7 Gateway）</h3>
+          <p>理解 HTTP、gRPC、WebSocket 等应用协议，因此能依据路径、方法、Header、Cookie、用户身份和消息内容做决策。</p>
+          <div class="case"><strong>案例</strong><code>GET /products</code> 可公开访问；<code>POST /admin/products</code> 必须是管理员，并且每分钟最多 30 次。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="default-gateway">
+      <div class="chapter-head">
+        <span class="chapter-no">01—D</span>
+        <div><h2>默认网关、路由器、NAT 与防火墙</h2><p>这些词经常与“网关”一起出现，但并不等同。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 13</span>
+          <h3>默认网关（Default Gateway）</h3>
+          <p>主机找不到更具体路由时，把数据包交给的默认下一跳。</p>
+          <div class="plain"><strong>通俗解释</strong>你不知道某个快递的专用通道时，就统一先交给小区大门的快递站。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 14</span>
+          <h3>路由与下一跳（Route / Next Hop）</h3>
+          <p>路由表把目标网段映射到下一跳或网络接口。网关通常根据路由表转发，但“路由器”强调转发网络包，“网关”强调跨边界角色。</p>
+          <div class="case"><strong>案例</strong><code>10.0.0.0/8</code> 走公司 VPN；其他目标走家庭默认网关。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 15</span>
+          <h3>NAT（网络地址转换）</h3>
+          <p>把内部私有地址转换成公网地址。家庭路由器常同时提供默认网关、NAT、防火墙和 Wi-Fi，所以这些概念容易被混为一谈。</p>
+          <div class="case"><strong>案例</strong>家中三台设备使用不同私有 IP，却通过路由器的同一个公网 IP 访问互联网。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Adjacent Concept</span>
+          <h3>防火墙与 DNS 不是网关的同义词</h3>
+          <p>防火墙的核心是允许或阻止流量；DNS 的核心是名称解析。它们可以与网关集成，但职责不同。</p>
+          <div class="case"><strong>案例</strong>DNS 把 <code>api.example.com</code> 解析到网关 IP；防火墙只允许 443；网关再把请求路由到订单服务。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="method">
+      <div class="chapter-head">
+        <span class="chapter-no">01—E</span>
+        <div><h2>识别任何网关的四步法</h2><p>以后看到陌生产品，不要先看功能表，先问下面四个问题。</p></div>
+      </div>
+      <ol class="checklist">
+        <li>它位于哪两个通信域之间？</li>
+        <li>它代表哪一侧接收或发起通信？</li>
+        <li>它处理的是数据包、连接，还是应用请求？</li>
+        <li>它执行哪些公共策略，又有哪些业务规则不应放进去？</li>
+      </ol>
+      <div class="case"><strong>综合案例</strong>“Agent 应用通过一个组件调用 OpenAI 和本地模型。”边界是应用与模型供应商；组件代表应用发起请求；处理对象是 L7 模型 API；公共策略包括密钥隔离、模型路由和成本统计——因此它是 AI Gateway。</div>
+    </section>
+
+    <section class="chapter" id="quiz">
+      <div class="chapter-head">
+        <span class="chapter-no">01—F</span>
+        <div><h2>检索练习</h2><p>先自己回答，再展开答案。主动回忆比重复阅读更容易形成长期记忆。</p></div>
+      </div>
+      <div class="quiz">
+        <details><summary>1. DNS 把域名解析成 IP，所以 DNS 就是网关吗？</summary><p>不是。DNS 的核心职责是名称解析；它可以把域名指向网关，但通常不代理后续请求。</p></details>
+        <details><summary>2. 为什么说“网关是一种角色”比“网关是一种软件”更准确？</summary><p>同一软件在不同部署中可能承担不同职责；是否是网关取决于它是否位于边界、代理通信并执行策略。</p></details>
+        <details><summary>3. L4 网关为什么不能按 <code>/orders</code> 和 <code>/chat</code> 分流？</summary><p>因为它通常只理解连接、IP 和端口，不解析 HTTP 路径等 L7 信息。</p></details>
+        <details><summary>4. 浏览器 → Nginx → FastAPI 中，谁是上游？</summary><p>相对于 Nginx，FastAPI 是上游，浏览器是下游。</p></details>
+      </div>
+    </section>
+
+    <aside class="sources">
+      <h2>本课主参考</h2>
+      <p><a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/intro/terminology">Envoy Terminology</a>：下游、上游、Listener、Cluster 等代理术语。建议先记住概念关系，不必现在学习 Envoy 配置。</p>
+    </aside>
+
+    <nav class="pager" aria-label="前后课程">
+      <span class="empty"></span>
+      <a href="0002-proxies-routing-and-load-balancing.html"><small>下一课 02</small><strong>代理、TLS 与负载均衡 →</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

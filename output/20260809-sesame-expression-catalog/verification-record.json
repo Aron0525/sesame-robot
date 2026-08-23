@@ -1,0 +1,63 @@
+{
+  "baseline": {
+    "path": "/Users/mac/.openclaw/workspace-sesame/AGENTS.md",
+    "command": "shasum -a 256 /Users/mac/.openclaw/workspace-sesame/AGENTS.md",
+    "literal_output": "7f4406540765af3b574d4800b9f7ed679519740cd36abda250f3d041d8332019  /Users/mac/.openclaw/workspace-sesame/AGENTS.md",
+    "exit_status": 0
+  },
+  "modified": {
+    "path": "/Users/mac/.openclaw/workspace-sesame/AGENTS.md",
+    "command": "openclaw agent --agent sesame --session-key agent:sesame:expression-contract-20260809 --message-file /Users/mac/Documents/sesame robot/output/20260809-sesame-expression-catalog/agent-contract-input.json --thinking low --json --timeout 60",
+    "input": {
+      "v": 1,
+      "request_id": "expr-contract-20260809",
+      "conversation_id": "verify",
+      "turn_id": "turn-expression-1",
+      "input": {
+        "text": "你好呀，今天心情很好"
+      },
+      "capabilities": {
+        "expressions": [
+          "default",
+          "happy"
+        ],
+        "actions": [
+          "wave"
+        ]
+      }
+    },
+    "literal_output": {
+      "v": 1,
+      "request_id": "expr-contract-20260809",
+      "turn_id": "turn-expression-1",
+      "status": "completed",
+      "reply": {
+        "text": "你好呀，看到你这么开心，我也跟着高兴起来啦！"
+      },
+      "voice": {
+        "voice_id": "sesame_default",
+        "style": "happy",
+        "speed": 1.0
+      },
+      "expression": {
+        "name": "happy",
+        "ttl_ms": 3000
+      },
+      "actions": [
+        {
+          "name": "wave",
+          "duration_ms": 2000
+        }
+      ]
+    },
+    "exit_status": 0
+  },
+  "rollback": {
+    "path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-expression-catalog/rollback.sh",
+    "command": "/Users/mac/Documents/sesame robot/output/20260809-sesame-expression-catalog/rollback.sh",
+    "literal_output": "7f4406540765af3b574d4800b9f7ed679519740cd36abda250f3d041d8332019  /Users/mac/.openclaw/workspace-sesame/AGENTS.md",
+    "exit_status": 0,
+    "baseline_hash_verified": "7f4406540765af3b574d4800b9f7ed679519740cd36abda250f3d041d8332019",
+    "modified_hash_restored": "84c9fb381744a3d55d05827726bae6e569ea33e4ca548407b2c7cbf33a213a37"
+  }
+}

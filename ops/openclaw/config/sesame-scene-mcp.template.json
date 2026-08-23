@@ -1,0 +1,22 @@
+{
+  "mcp": {
+    "servers": {
+      "sesame-scene": {
+        "command": "<V3_PROJECT_ROOT>/endpoint-gateway/.venv/bin/python",
+        "args": [
+          "<V3_PROJECT_ROOT>/endpoint-gateway/src/sesame_endpoint_gateway/openclaw_scene_mcp.py"
+        ],
+        "cwd": "<V3_PROJECT_ROOT>/endpoint-gateway",
+        "env": {
+          "SESAME_SCENE_GATEWAY_URL": "http://127.0.0.1:8788",
+          "SESAME_SCENE_CONTROL_TOKEN": "<CONFIGURE_AS_LOCAL_SECRET_REF>",
+          "SESAME_DEFAULT_DEVICE_ID": "sesame-v3-001"
+        },
+        "timeout": 5,
+        "toolFilter": {
+          "include": ["list_scenes", "get_scene", "select_scene"]
+        }
+      }
+    }
+  }
+}

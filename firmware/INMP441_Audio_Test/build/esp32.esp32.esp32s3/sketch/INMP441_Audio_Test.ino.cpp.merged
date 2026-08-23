@@ -1,0 +1,411 @@
+#line 1 "/Users/mac/Documents/sesame robot/firmware/INMP441_Audio_Test/INMP441_Audio_Test.ino"
+/*
+  Sesame Robot V3 - INMP441 microphone test
+
+  Board: ESP32-S3-WROOM-1-N16R8 (ESP32S3 Dev Module)
+  Wiring used by this sketch:
+    INMP441 VDD -> V3 3V3
+    INMP441 GND -> V3 GND
+    INMP441 L/R -> V3 GND  (left I2S channel)
+    INMP441 SCK -> V3 IO14 (I2S BCLK)
+    INMP441 WS  -> V3 IO47 (I2S WS/LRCLK)
+    INMP441 SD  -> V3 IO48 (I2S DIN)
+
+  Serial monitor: 115200 baud
+    h: print help
+    r: record RECORD_SECONDS seconds to /inmp441_test.wav in SPIFFS
+    d: send that WAV as a framed binary stream for capture_inmp441_wav.py
+
+  The I2S bus intentionally uses two 32-bit slots (64 BCLKs per frame).
+  INMP441 requires 64 clock cycles per stereo frame even when only its
+  left channel is used.
+*/
+
+#include <Arduino.h>
+#include <FS.h>
+#include <SPIFFS.h>
+#include <math.h>
+
+#include "driver/i2s_std.h"
+#include "esp_err.h"
+
+namespace {
+
+constexpr gpio_num_t I2S_BCLK_PIN = GPIO_NUM_14;
+constexpr gpio_num_t I2S_WS_PIN = GPIO_NUM_47;
+constexpr gpio_num_t I2S_DIN_PIN = GPIO_NUM_48;
+// V3's physical BOT/BOOT button connects GPIO0 to GND. It is a boot strap
+// during reset, so it is only read after the application has started.
+constexpr gpio_num_t BOT_BUTTON_PIN = GPIO_NUM_0;
+
+constexpr uint32_t SAMPLE_RATE_HZ = 16000;
+constexpr uint32_t RECORD_SECONDS = 5;
+constexpr uint32_t BOT_PCM_RECORD_SECONDS = 10;
+constexpr size_t FRAMES_PER_READ = 256;
+constexpr size_t WORDS_PER_FRAME = 2;  // Left + right, 32-bit each.
+constexpr char WAV_PATH[] = "/inmp441_test.wav";
+constexpr char BOT_PCM_PATH[] = "/inmp441_bot_10s.pcm";
+
+i2s_chan_handle_t rxChannel = nullptr;
+int32_t i2sWords[FRAMES_PER_READ * WORDS_PER_FRAME];
+
+struct AudioStats {
+  uint64_t sumSquares = 0;
+  uint32_t sampleCount = 0;
+  uint32_t peak = 0;
+
+  void add(const int16_t sample) {
+    const int32_t value = sample;
+    const uint32_t magnitude = value < 0 ? static_cast<uint32_t>(-value)
+                                         : static_cast<uint32_t>(value);
+    sumSquares += static_cast<int64_t>(value) * value;
+    sampleCount++;
+    if (magnitude > peak) {
+      peak = magnitude;
+    }
+  }
+
+  float rms() const {
+    return sampleCount == 0
+               ? 0.0f
+               : sqrtf(static_cast<float>(sumSquares) / sampleCount);
+  }
+};
+
+float decibelsFullScale(const float rms) {
+  if (rms < 1.0f) {
+    return -90.0f;
+  }
+  return 20.0f * log10f(rms / 32768.0f);
+}
+
+void writeLe16(File &file, const uint16_t value) {
+  const uint8_t bytes[2] = {
+      static_cast<uint8_t>(value & 0xFF),
+      static_cast<uint8_t>((value >> 8) & 0xFF),
+  };
+  file.write(bytes, sizeof(bytes));
+}
+
+void writeLe32(File &file, const uint32_t value) {
+  const uint8_t bytes[4] = {
+      static_cast<uint8_t>(value & 0xFF),
+      static_cast<uint8_t>((value >> 8) & 0xFF),
+      static_cast<uint8_t>((value >> 16) & 0xFF),
+      static_cast<uint8_t>((value >> 24) & 0xFF),
+  };
+  file.write(bytes, sizeof(bytes));
+}
+
+void writeWavHeader(File &file, const uint32_t pcmBytes) {
+  constexpr uint16_t channels = 1;
+  constexpr uint16_t bitsPerSample = 16;
+  constexpr uint32_t byteRate = SAMPLE_RATE_HZ * channels * bitsPerSample / 8;
+  constexpr uint16_t blockAlign = channels * bitsPerSample / 8;
+
+  file.write(reinterpret_cast<const uint8_t *>("RIFF"), 4);
+  writeLe32(file, 36 + pcmBytes);
+  file.write(reinterpret_cast<const uint8_t *>("WAVE"), 4);
+  file.write(reinterpret_cast<const uint8_t *>("fmt "), 4);
+  writeLe32(file, 16);
+  writeLe16(file, 1);  // PCM
+  writeLe16(file, channels);
+  writeLe32(file, SAMPLE_RATE_HZ);
+  writeLe32(file, byteRate);
+  writeLe16(file, blockAlign);
+  writeLe16(file, bitsPerSample);
+  file.write(reinterpret_cast<const uint8_t *>("data"), 4);
+  writeLe32(file, pcmBytes);
+}
+
+bool readAudioChunk(AudioStats &stats, File *wavFile = nullptr,
+                    size_t maxSamples = FRAMES_PER_READ) {
+  size_t bytesRead = 0;
+  const esp_err_t result = i2s_channel_read(
+      rxChannel, i2sWords, sizeof(i2sWords), &bytesRead, pdMS_TO_TICKS(1000));
+
+  if (result != ESP_OK) {
+    Serial.printf("ERR|i2s_read|%s\n", esp_err_to_name(result));
+    return false;
+  }
+
+  const size_t wordCount = bytesRead / sizeof(i2sWords[0]);
+  if (wordCount < WORDS_PER_FRAME) {
+    Serial.printf("ERR|short_i2s_read|bytes=%u\n", static_cast<unsigned>(bytesRead));
+    return false;
+  }
+
+  // INMP441's 24 meaningful bits are left-aligned in the 32-bit I2S slot.
+  // Keeping the top 16 bits produces ordinary signed 16-bit PCM for the WAV.
+  const size_t availableSamples = wordCount / WORDS_PER_FRAME;
+  const size_t samplesToUse = min(availableSamples, maxSamples);
+  for (size_t sampleIndex = 0; sampleIndex < samplesToUse; sampleIndex++) {
+    const size_t word = sampleIndex * WORDS_PER_FRAME;
+    const int16_t sample = static_cast<int16_t>(i2sWords[word] >> 16);
+    stats.add(sample);
+    if (wavFile != nullptr) {
+      wavFile->write(reinterpret_cast<const uint8_t *>(&sample), sizeof(sample));
+    }
+  }
+  return true;
+}
+
+bool setupI2s() {
+  i2s_chan_config_t channelConfig = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
+  esp_err_t result = i2s_new_channel(&channelConfig, nullptr, &rxChannel);
+  if (result != ESP_OK) {
+    Serial.printf("ERR|i2s_new_channel|%s\n", esp_err_to_name(result));
+    return false;
+  }
+
+  i2s_std_clk_config_t clockConfig = I2S_STD_CLK_DEFAULT_CONFIG(SAMPLE_RATE_HZ);
+  i2s_std_slot_config_t slotConfig = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(
+      I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_STEREO);
+
+  i2s_std_gpio_config_t gpioConfig = {};
+  gpioConfig.mclk = I2S_GPIO_UNUSED;
+  gpioConfig.bclk = I2S_BCLK_PIN;
+  gpioConfig.ws = I2S_WS_PIN;
+  gpioConfig.dout = I2S_GPIO_UNUSED;
+  gpioConfig.din = I2S_DIN_PIN;
+  gpioConfig.invert_flags.mclk_inv = false;
+  gpioConfig.invert_flags.bclk_inv = false;
+  gpioConfig.invert_flags.ws_inv = false;
+
+  i2s_std_config_t stdConfig = {};
+  stdConfig.clk_cfg = clockConfig;
+  stdConfig.slot_cfg = slotConfig;
+  stdConfig.gpio_cfg = gpioConfig;
+
+  result = i2s_channel_init_std_mode(rxChannel, &stdConfig);
+  if (result != ESP_OK) {
+    Serial.printf("ERR|i2s_init|%s\n", esp_err_to_name(result));
+    return false;
+  }
+
+  result = i2s_channel_enable(rxChannel);
+  if (result != ESP_OK) {
+    Serial.printf("ERR|i2s_enable|%s\n", esp_err_to_name(result));
+    return false;
+  }
+  return true;
+}
+
+void printHelp() {
+  Serial.println();
+  Serial.println("INMP441 test commands:");
+  Serial.println("  h  show this help");
+  Serial.println("  r  record 5 seconds to SPIFFS as /inmp441_test.wav");
+  Serial.println("  b  record 10 seconds PCM16 after a BOT button press");
+  Serial.println("  p  show BOT PCM file size");
+  Serial.println("  d  stream that WAV to capture_inmp441_wav.py");
+  Serial.println("Speak or clap near the microphone. RMS and PEAK must rise.");
+}
+
+void recordBotPcm() {
+  SPIFFS.remove(BOT_PCM_PATH);
+  File pcmFile = SPIFFS.open(BOT_PCM_PATH, FILE_WRITE);
+  if (!pcmFile) {
+    Serial.println("ERR|pcm_open_for_write");
+    return;
+  }
+
+  const uint32_t targetSamples = SAMPLE_RATE_HZ * BOT_PCM_RECORD_SECONDS;
+  Serial.printf("PCM_REC_START|source=BOT|seconds=%u|rate=%u|format=s16le_mono\n",
+                BOT_PCM_RECORD_SECONDS, SAMPLE_RATE_HZ);
+
+  AudioStats stats;
+  while (stats.sampleCount < targetSamples) {
+    const size_t remainingSamples = targetSamples - stats.sampleCount;
+    if (!readAudioChunk(stats, &pcmFile, remainingSamples)) {
+      pcmFile.close();
+      return;
+    }
+  }
+  pcmFile.close();
+
+  const uint32_t pcmBytes = stats.sampleCount * sizeof(int16_t);
+  Serial.printf(
+      "PCM_REC_DONE|samples=%u|bytes=%u|rms=%.1f|peak=%u|dbfs=%.1f|file=%s\n",
+      stats.sampleCount, pcmBytes, stats.rms(), stats.peak,
+      decibelsFullScale(stats.rms()), BOT_PCM_PATH);
+}
+
+void printBotPcmStatus() {
+  File pcmFile = SPIFFS.open(BOT_PCM_PATH, FILE_READ);
+  if (!pcmFile) {
+    Serial.printf("PCM_FILE|missing|file=%s\n", BOT_PCM_PATH);
+    return;
+  }
+  const size_t actualBytes = pcmFile.size();
+  const size_t expectedBytes = SAMPLE_RATE_HZ * BOT_PCM_RECORD_SECONDS * sizeof(int16_t);
+  pcmFile.close();
+  Serial.printf("PCM_FILE|bytes=%u|expected=%u|format=s16le_mono|rate=%u|file=%s\n",
+                static_cast<unsigned>(actualBytes), static_cast<unsigned>(expectedBytes),
+                SAMPLE_RATE_HZ, BOT_PCM_PATH);
+}
+
+void handleBotButton() {
+  static bool buttonLatched = false;
+  const bool pressed = digitalRead(BOT_BUTTON_PIN) == LOW;
+
+  if (!pressed) {
+    buttonLatched = false;
+    return;
+  }
+  if (buttonLatched) {
+    return;
+  }
+
+  delay(25);  // Debounce the physical switch before starting a long recording.
+  if (digitalRead(BOT_BUTTON_PIN) == LOW) {
+    buttonLatched = true;
+    recordBotPcm();
+  }
+}
+
+void recordWav() {
+  Serial.printf("REC_START|seconds=%u|rate=%u\n", RECORD_SECONDS, SAMPLE_RATE_HZ);
+  SPIFFS.remove(WAV_PATH);
+  File wavFile = SPIFFS.open(WAV_PATH, FILE_WRITE);
+  if (!wavFile) {
+    Serial.println("ERR|spiffs_open_for_write");
+    return;
+  }
+
+  writeWavHeader(wavFile, 0);  // Replaced with the final size when recording ends.
+  AudioStats stats;
+  const uint32_t targetSamples = SAMPLE_RATE_HZ * RECORD_SECONDS;
+  while (stats.sampleCount < targetSamples) {
+    const size_t remainingSamples = targetSamples - stats.sampleCount;
+    if (!readAudioChunk(stats, &wavFile, remainingSamples)) {
+      wavFile.close();
+      return;
+    }
+  }
+
+  const uint32_t pcmBytes = stats.sampleCount * sizeof(int16_t);
+  wavFile.seek(0);
+  writeWavHeader(wavFile, pcmBytes);
+  wavFile.close();
+
+  Serial.printf(
+      "REC_DONE|samples=%u|bytes=%u|rms=%.1f|peak=%u|dbfs=%.1f|file=%s\n",
+      stats.sampleCount, pcmBytes, stats.rms(), stats.peak,
+      decibelsFullScale(stats.rms()), WAV_PATH);
+}
+
+void downloadWav() {
+  File wavFile = SPIFFS.open(WAV_PATH, FILE_READ);
+  if (!wavFile) {
+    Serial.println("ERR|no_wav_file|press_r_first");
+    return;
+  }
+
+  const size_t totalBytes = wavFile.size();
+  Serial.printf("WAV_BEGIN %u\n", static_cast<unsigned>(totalBytes));
+  Serial.flush();
+
+  uint8_t buffer[512];
+  while (wavFile.available()) {
+    const size_t count = wavFile.read(buffer, sizeof(buffer));
+    Serial.write(buffer, count);
+  }
+  Serial.flush();
+  wavFile.close();
+  Serial.print("\nWAV_END\n");
+}
+
+void handleSerialCommands() {
+  while (Serial.available() > 0) {
+    const char command = static_cast<char>(Serial.read());
+    switch (command) {
+      case 'h':
+      case 'H':
+      case '?':
+        printHelp();
+        break;
+      case 'r':
+      case 'R':
+        recordWav();
+        break;
+      case 'b':
+      case 'B':
+        recordBotPcm();
+        break;
+      case 'p':
+      case 'P':
+        printBotPcmStatus();
+        break;
+      case 'd':
+      case 'D':
+        downloadWav();
+        break;
+      case '\r':
+      case '\n':
+      case ' ':
+        break;
+      default:
+        Serial.printf("ERR|unknown_command|%c\n", command);
+        printHelp();
+        break;
+    }
+  }
+}
+
+}  // namespace
+
+void setup() {
+  Serial.begin(115200);
+  delay(1200);
+  Serial.println();
+  Serial.println("INMP441_TEST|boot");
+  Serial.printf("I2S|BCLK=%d|WS=%d|DIN=%d|rate=%u|slot=32bit_stereo\n",
+                I2S_BCLK_PIN, I2S_WS_PIN, I2S_DIN_PIN, SAMPLE_RATE_HZ);
+  pinMode(BOT_BUTTON_PIN, INPUT_PULLUP);
+
+  // The first test run sees an empty SPIFFS volume. Permit its one-time format
+  // so recording works immediately after this sketch and partition table are flashed.
+  if (!SPIFFS.begin(true)) {
+    Serial.println("ERR|spiffs_mount|Choose a partition scheme with SPIFFS.");
+  } else {
+    Serial.printf("SPIFFS|total=%u|used=%u\n",
+                  static_cast<unsigned>(SPIFFS.totalBytes()),
+                  static_cast<unsigned>(SPIFFS.usedBytes()));
+  }
+
+  if (!setupI2s()) {
+    Serial.println("FATAL|i2s_setup_failed");
+    return;
+  }
+
+  printHelp();
+  Serial.println("LEVEL|rms|peak|dbfs|state");
+}
+
+void loop() {
+  static AudioStats accumulated;
+  static uint32_t lastReportAt = millis();
+
+  handleSerialCommands();
+  handleBotButton();
+  if (rxChannel == nullptr) {
+    delay(1000);
+    return;
+  }
+
+  if (!readAudioChunk(accumulated)) {
+    delay(100);
+    return;
+  }
+
+  if (millis() - lastReportAt >= 250) {
+    const float rms = accumulated.rms();
+    const char *state = accumulated.peak >= 1200 ? "SOUND" : "QUIET";
+    Serial.printf("LEVEL|%.1f|%u|%.1f|%s\n", rms, accumulated.peak,
+                  decibelsFullScale(rms), state);
+    accumulated = {};
+    lastReportAt = millis();
+  }
+}
+

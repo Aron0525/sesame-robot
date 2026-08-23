@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="用 SesameRobot 当前实现理解本地 ASR/TTS 封装、WebSocket 建连和监听端口。">
+  <title>专题课｜SesameRobot 的本地封装与连接通路</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="7">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+      <div class="lesson-tabs">
+        <a href="0001-gateway-foundations.html" title="第一课">01</a>
+        <a href="0002-proxies-routing-and-load-balancing.html" title="第二课">02</a>
+        <a href="0003-api-gateway-policies-and-resilience.html" title="第三课">03</a>
+        <a href="0004-cloud-kubernetes-and-service-mesh.html" title="第四课">04</a>
+        <a href="0005-ai-gateway-design-and-troubleshooting.html" title="第五课">05</a>
+        <a href="0006-asr-tts-packaging-boundaries.html" title="ASR/TTS 封装专题">06</a>
+        <a href="0007-sesame-runtime-connections.html" aria-current="page" title="Sesame 运行链路">07</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="07">
+      <div>
+        <p class="kicker">SesameRobot · 当前软件实现</p>
+        <h1>本地封装与两条连接</h1>
+        <p class="lead">当前只有电脑 Voice Gateway 和 OpenClaw Gateway 监听固定端口；ESP32 是客户端，ASR/TTS 是电脑进程内部的 Provider 对象。</p>
+        <div class="lesson-meta"><span>约 12 分钟</span><span>代码级封装</span><span>WebSocket 全双工</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="truth">
+      <div class="chapter-head">
+        <span class="chapter-no">07—A</span>
+        <div><h2>先说当前项目的真实边界</h2><p>“能力组件”“网关进程”和“监听端口”不是一回事。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>组件</th><th>当前形态</th><th>是否监听端口</th></tr></thead>
+        <tbody>
+          <tr><td>ESP32-S3</td><td>WebSocket 客户端与音频设备</td><td>否，由它主动连接电脑</td></tr>
+          <tr><td>Voice Gateway</td><td>电脑上的 FastAPI 进程</td><td>是，默认 <code>0.0.0.0:8765</code></td></tr>
+          <tr><td>ASR</td><td>Voice Gateway 进程内的 <code>AsrProvider</code> 对象</td><td>否</td></tr>
+          <tr><td>TTS</td><td>Voice Gateway 进程内的 <code>TtsProvider</code> 对象</td><td>否</td></tr>
+          <tr><td>OpenClaw Gateway</td><td>本机独立服务</td><td>是，默认 <code>127.0.0.1:18789</code></td></tr>
+        </tbody>
+      </table>
+      <div class="boundary"><strong>关键判断</strong>当前 ASR/TTS 只完成了“代码封装”，没有完成独立进程或独立服务封装，所以它们没有自己的 IP、端口或网关名称。</div>
+    </section>
+
+    <section class="chapter" id="providers">
+      <div class="chapter-head">
+        <span class="chapter-no">07—B</span>
+        <div><h2>ASR/TTS 怎样封装</h2><p>Pipeline 依赖稳定接口；底层模型以后可以替换，上层语音会话不用跟着改。</p></div>
+      </div>
+      <div class="diagram">固定接口：
+AsrProvider.transcribe(PCM, AudioFormat) → AsrResult(text, confidence)
+TtsProvider.synthesize(text, VoiceSpec)  → PCM bytes
+
+当前实现：
+DemoAsrProvider → 校验 PCM，返回固定测试文字
+DemoTtsProvider → 校验文本，返回静音 PCM
+
+目标实现：
+LocalAsrProvider → 调用本地 ASR 模型
+LocalTtsProvider → 调用本地 TTS 模型</div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Decode + ASR</span>
+          <h3>Opus 不会直接送进 ASR</h3>
+          <p>Voice Gateway 用 <code>libopus</code> 把每个 Opus 包解码成内存里的 16 kHz、mono、S16LE PCM，再把一段 PCM 交给 ASR Provider。</p>
+        </article>
+        <article class="concept">
+          <span class="term">TTS + Encode</span>
+          <h3>TTS 先生成 PCM</h3>
+          <p>TTS Provider 返回 PCM。Gateway 每 640 bytes 切成一帧，再用 <code>libopus</code> 编成 Opus 包，通过原来的设备 WebSocket 返回。</p>
+        </article>
+      </div>
+      <div class="danger"><strong>当前限制</strong>libopus 编解码是真实实现；ASR 仍返回固定文字，TTS 仍生成静音，尚未接入真正的本地模型。</div>
+    </section>
+
+    <section class="chapter" id="connections">
+      <div class="chapter-head">
+        <span class="chapter-no">07—C</span>
+        <div><h2>两条 WebSocket 连接</h2><p>电脑 Voice Gateway 位于中间：对 ESP32 是服务端，对 OpenClaw 是客户端。</p></div>
+      </div>
+      <div class="diagram">连接一：设备链路
+ESP32 192.168.1.50:49722
+      ── TCP / WebSocket ──→
+电脑  192.168.1.20:8765/v1/device-stream
+
+连接二：Agent 链路
+Voice Gateway 127.0.0.1:53142
+      ── TCP / WebSocket ──→
+OpenClaw     127.0.0.1:18789
+
+其中 49722、53142 是操作系统临时分配的源端口；
+8765、18789 是服务端稳定监听的目标端口。</div>
+      <table class="comparison">
+        <thead><tr><th>阶段</th><th>设备链路</th><th>OpenClaw 链路</th></tr></thead>
+        <tbody>
+          <tr><td>发现</td><td>mDNS 查询 <code>_sesame-gw._tcp.local</code></td><td>当前直接配置 <code>127.0.0.1:18789</code></td></tr>
+          <tr><td>连接者</td><td>ESP32 主动连接</td><td>Voice Gateway 主动连接</td></tr>
+          <tr><td>鉴权</td><td>Bearer 设备 token + <code>session.hello</code></td><td>OpenClaw challenge/connect + token/scopes</td></tr>
+          <tr><td>数据</td><td>JSON 控制帧 + Opus 二进制帧</td><td><code>chat.send</code> + OpenClaw 事件/结构化 JSON</td></tr>
+          <tr><td>寿命</td><td>设备在线期间保持长连接</td><td>当前每次请求新建，收到结果后关闭</td></tr>
+        </tbody>
+      </table>
+      <div class="boundary"><strong>mDNS 的职责</strong>mDNS 只负责告诉 ESP32 “电脑当前在哪个 IP 和端口”，实际音频不经过 mDNS；找到地址后仍要建立普通 TCP/WebSocket。</div>
+    </section>
+
+    <section class="chapter" id="listen">
+      <div class="chapter-head">
+        <span class="chapter-no">07—D</span>
+        <div><h2>监听端口与通信不是一回事</h2><p>监听是等待新连接；通信发生在连接建立后产生的已连接 socket 上。</p></div>
+      </div>
+      <div class="diagram">1. Voice Gateway 对 8765 执行 listen：等待设备
+2. ESP32 从临时源端口 connect 到电脑 8765
+3. 服务端 accept，得到一个只属于该设备的已连接 socket
+4. WebSocket Upgrade 完成
+5. 双方在同一个 socket 上全双工收发
+6. 更多 ESP32 连接时，8765 仍继续监听，并为每台设备创建独立 socket</div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Listener</span>
+          <h3>监听 socket</h3>
+          <p>只用来接收新连接。它像前台号码，不直接代表某一次具体对话。</p>
+        </article>
+        <article class="concept">
+          <span class="term">Connected socket</span>
+          <h3>已连接 socket</h3>
+          <p>由“源 IP:源端口 + 目标 IP:目标端口 + 协议”唯一标识。返回数据沿同一条连接反向发送，不需要客户端再开监听端口。</p>
+        </article>
+      </div>
+      <div class="danger"><strong>反例</strong>“两个网关都必须监听，然后相互连接”不成立。一次连接只需要一侧监听、另一侧主动连接；连接建立后天然可以双向发送。</div>
+    </section>
+
+    <section class="chapter" id="sequence">
+      <div class="chapter-head">
+        <span class="chapter-no">07—E</span>
+        <div><h2>一次完整语音回合</h2><p>以下顺序对应当前软件端的执行方式。</p></div>
+      </div>
+      <div class="diagram">ESP32                         Voice Gateway                    OpenClaw
+  │ session.hello ───────────────→│                                  │
+  │ listen.start ────────────────→│                                  │
+  │ binary(Opus × N) ────────────→│                                  │
+  │ listen.stop ─────────────────→│                                  │
+  │                               │ Opus → PCM → ASR                  │
+  │                               │ chat.send(text) ─────────────────→│
+  │                               │←──────── structured answer JSON  │
+  │                               │ TTS(text) → PCM → Opus            │
+  │←──────── asr.final / action / expression / tts.start             │
+  │←──────── binary(Opus × N)                                          │
+  │←──────── tts.stop                                                   │</div>
+      <div class="boundary"><strong>协议分工</strong>WebSocket 是运输通道；JSON Schema 规定事件含义；32-byte 二进制头规定 Opus 包的方向、序号、会话和时间；Provider 接口规定本地能力怎样被调用。</div>
+    </section>
+
+    <section class="chapter" id="next">
+      <div class="chapter-head">
+        <span class="chapter-no">07—F</span>
+        <div><h2>从当前版走向可用版</h2><p>下一步不是再增加“网关名字”，而是把真实模型、生命周期和故障隔离补齐。</p></div>
+      </div>
+      <div class="diagram">建议顺序：
+1. 接入真实本地 ASR/TTS Provider，先保持同进程验证纵向链路
+2. 将重模型迁移为常驻 worker 进程，避免反复加载权重
+3. 用 Unix domain socket 或 gRPC 定义本机 IPC 契约
+4. OpenClaw 改为持久连接/连接池，并补超时、重连、取消
+5. 设备链路启用 WSS、配对凭证、token 轮换和日志脱敏
+6. 远程部署时再决定 VPN/Tailnet 或受控公网入口</div>
+      <div class="boundary"><strong>架构立场</strong>单机阶段不需要把 ASR/TTS 都做成“网关”。它们应先是受 Voice Gateway 管理的本地能力；只有需要独立扩缩容、GPU 隔离或跨主机部署时，再升级为独立服务。</div>
+    </section>
+  </main>
+</body>
+</html>

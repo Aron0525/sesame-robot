@@ -1,0 +1,2 @@
+ALLOWED_ACTIONS=[]
+schema_actions={'const': []}

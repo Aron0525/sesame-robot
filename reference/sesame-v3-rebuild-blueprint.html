@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sesame V3 可复现架构蓝图</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+  <main>
+    <header class="hero" data-lesson="REF">
+      <div>
+        <p class="kicker">Sesame Robot V3 · Engineering Reference</p>
+        <h1>可复现架构蓝图</h1>
+        <p class="lead">目标不是复制一台旧电脑，而是在新电脑和新 ESP32 上重新建立同样的边界、合同和验证链路。</p>
+      </div>
+    </header>
+
+    <section class="chapter" id="definition">
+      <div class="chapter-head"><span class="chapter-no">REF—A</span><div><h2>复现的定义</h2><p>“能 build”不等于“机器人能对话”。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>层次</th><th>成功标准</th><th>还不能证明什么</th></tr></thead>
+        <tbody>
+          <tr><td>代码复现</td><td>Gateway 依赖可安装，ESP-IDF 主机测试和固件 build 可运行。</td><td>密钥有效、硬件已连接、语音能播放。</td></tr>
+          <tr><td>服务复现</td><td>OpenClaw daemon 在回环地址运行，Gateway 读到完整非敏感配置并可通过 healthz。</td><td>ESP32 已完成 TLS/WSS 握手。</td></tr>
+          <tr><td>设备复现</td><td>ESP32 从 NVS 取得 Wi-Fi、设备 token 和根证书，能发现并认证 Gateway。</td><td>云端 ASR、LLM、TTS 和扬声器都已验收。</td></tr>
+          <tr><td>端到端复现</td><td>一次人工录音经过 ASR、OpenClaw、TTS 后由同一设备播放，并有中断和急停证据。</td><td>长期稳定性、成本、家庭多设备或量产安全已解决。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="units">
+      <div class="chapter-head"><span class="chapter-no">REF—B</span><div><h2>四个部署单元</h2><p>每一个单元有自己的运行位置、输入和秘密。它们不应合并。</p></div></div>
+      <div class="diagram">[ESP32-S3]
+I2S / PWM / OLED / Wi-Fi / WSS client
+     │  WSS: Opus + JSON
+     ▼
+[Mac: Voice Gateway]
+FastAPI / session / Opus / ASR / TTS / policy
+     │  loopback WebSocket: text + strict JSON
+     ▼
+[Mac: OpenClaw daemon]
+LLM session runtime
+     │  approved HTTPS/WSS cloud requests
+     ▼
+[DashScope]
+ASR / TTS / optional web search</div>
+      <table class="comparison">
+        <thead><tr><th>单元</th><th>正式位置</th><th>启动入口</th><th>不应拥有</th></tr></thead>
+        <tbody>
+          <tr><td>设备固件</td><td><code>firmware/esp32_voice_idf/</code></td><td><code>main/app_main.cpp</code></td><td>LLM、DashScope Key、Gateway 私钥</td></tr>
+          <tr><td>Voice Gateway</td><td><code>gateway/</code></td><td><code>sesame-voice-gateway</code> → <code>server_cli.py</code></td><td>任意模型硬件权限</td></tr>
+          <tr><td>OpenClaw</td><td><code>ops/openclaw/</code> 只固定安装版本</td><td><code>openclaw daemon start</code></td><td>ESP32 连接、原始音频、设备 token、DashScope Key</td></tr>
+          <tr><td>DashScope</td><td>仓库外的受控云端服务</td><td>由 Gateway Provider 调用</td><td>设备控制协议或本机文件访问</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="device-gateway">
+      <div class="chapter-head"><span class="chapter-no">REF—C</span><div><h2>接口一：ESP32 和 Gateway</h2><p>这是项目最重要的边界。复现时先固定合同，再写实现。</p></div></div>
+      <ol class="checklist">
+        <li>Gateway 以 mDNS 服务 <code>_sesame-gw._tcp.local.</code> 广播 LAN 地址、端口、<code>gateway_id</code>、协议版本、TLS 标记和 <code>/v1/device-stream</code> 路径。</li>
+        <li>ESP32 发现服务后，检查 advertised <code>gateway_id</code>、协议和 <code>tls=1</code>，用根证书校验 <code>&lt;mdns-hostname&gt;.local</code>。</li>
+        <li>WebSocket Upgrade 携带每台设备独立的 Bearer token；连接后的第一帧必须是 sequence 为 0 的 <code>session.hello</code>。</li>
+        <li>Gateway 把 <code>device_id</code> 映射到 token 和 user ID，拒绝 token 错误、Gateway ID 错误、重复活跃连接或不连续的控制序号。</li>
+        <li>双方随后交换 JSON 控制帧与带 32 字节 SSM1 头的 Opus 二进制帧。音频固定为 16 kHz、mono、20 ms、PCM S16LE 边界。</li>
+      </ol>
+      <div class="boundary"><strong>为什么要有 generation_id</strong>它把一轮录音和一轮 TTS 分开。用户中断后，旧 generation 的包不能继续被当作最新声音播放。</div>
+      <div class="case"><strong>最小验收</strong>不接云端也可以验证：ESP32 完成 <code>session.hello → session.ready</code>，发送 <code>listen.start</code>、若干上行 Opus 包和 <code>listen.stop</code>。这证明网络、TLS、鉴权和二进制协议；不证明语义正确。</div>
+    </section>
+
+    <section class="chapter" id="gateway-ai">
+      <div class="chapter-head"><span class="chapter-no">REF—D</span><div><h2>接口二：Gateway、OpenClaw 和语音服务</h2><p>Gateway 是唯一编排者，Provider 只是它调用的能力。</p></div></div>
+      <div class="diagram">Opus packets
+  ↓ decode
+PCM (16 kHz / mono / S16LE)
+  ↓ DashScope ASR
+AsrResult(text, confidence)
+  ↓ OpenClaw Adapter
+AgentResult(reply, voice, expression, actions)
+  ↓ validate + action strip
+reply text + allowed voice
+  ↓ DashScope TTS
+PCM
+  ↓ encode
+Opus packets + response.plan</div>
+      <p>Gateway 在 <code>app.py</code> 的 <code>_build_pipeline</code> 创建 DashScope ASR、OpenClaw Agent 和 DashScope TTS，再把三者传给 <code>ConversationPipeline</code>。Pipeline 不该知道 token、WebSocket HTTP 细节或 GPIO；它只处理一轮输入如何变成一轮输出。</p>
+      <p>OpenClaw Adapter 使用回环地址，先做 challenge/connect，再发 <code>chat.send</code>。它为每段对话从 <code>conversation_id</code> 和本机 secret 派生 HMAC session key，避免把原始 DeviceID/UserID 发给 Agent。模型输出必须是项目 JSON Schema，而不是自由文本。</p>
+      <div class="danger"><strong>当前代码与部分文档存在的差异</strong>协议文档仍保留动作示例，但当前 <code>openclaw/client.py</code> 解析结果时设定 <code>actions=()</code>，<code>app.py</code> 发送 response.plan 前也把 action 固定为 <code>None</code>。复现当前代码时，模型不应触发物理动作；网页本地操作员控制是另一条通道。若要恢复 AI 动作，必须同时重做 Schema、Gateway、固件、测试和安全评审，不能改一行配置。</div>
+    </section>
+
+    <section class="chapter" id="device-runtime">
+      <div class="chapter-head"><span class="chapter-no">REF—E</span><div><h2>设备端的运行分工</h2><p>ESP-IDF 是框架，FreeRTOS 是并发运行时；它们不是另一套业务服务。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>组件</th><th>文件范围</th><th>工程职责</th></tr></thead>
+        <tbody>
+          <tr><td>启动组合</td><td><code>main/app_main.cpp</code></td><td>初始化网络、OLED、舵机、网页控制、音频和 VoiceController。</td></tr>
+          <tr><td>语音控制器</td><td><code>components/sesame_voice/voice_controller.*</code></td><td>录音、唤醒、预录音、TTS 播放、重连和会话状态。</td></tr>
+          <tr><td>音频</td><td><code>sesame_audio/</code></td><td>I2S 与 Opus；输入输出只保留内存帧。</td></tr>
+          <tr><td>网络</td><td><code>sesame_transport/</code></td><td>NVS 配置、Wi-Fi、mDNS、WSS 和 TLS。</td></tr>
+          <tr><td>协议</td><td><code>sesame_protocol/</code></td><td>SSM1 帧、控制事件、序号和回合状态机。</td></tr>
+          <tr><td>身体与 UI</td><td><code>sesame_robot/</code>、<code>sesame_ui/</code>、<code>sesame_web/</code></td><td>舵机白名单、动作执行、OLED 和独立的本地网页控制。</td></tr>
+        </tbody>
+      </table>
+      <p><code>VoiceController</code> 不是阻塞式录音函数。它创建语音任务和上行发送任务，并用有界队列隔离网络回调、上行帧和下行 TTS。这样 TLS 写入缓慢时，不会直接饿死 I2S 采样或 BOOT 按键处理。</p>
+    </section>
+
+    <section class="chapter" id="configuration">
+      <div class="chapter-head"><span class="chapter-no">REF—F</span><div><h2>四份必须重新准备的配置</h2><p>它们不可从 Git 可靠恢复，也不应被复制到源码。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>配置</th><th>保存位置</th><th>最少包含</th><th>与谁保持一致</th></tr></thead>
+        <tbody>
+          <tr><td>Gateway 环境</td><td><code>gateway/.env</code>，权限 0600</td><td>device token/user map、DashScope、OpenClaw、TLS、mDNS</td><td>设备 NVS、证书、OpenClaw daemon</td></tr>
+          <tr><td>设备 NVS</td><td>仓库外 JSON 生成 <code>device-nvs.bin</code></td><td>Wi-Fi、device_id、gateway_id、device token、根证书</td><td>Gateway 的 ID/token 与 TLS CA</td></tr>
+          <tr><td>TLS 材料</td><td>仓库外私密目录</td><td>私有 CA、服务器证书、私钥</td><td>mDNS hostname、Gateway TLS 设置、设备 root CA</td></tr>
+          <tr><td>OpenClaw 本机状态</td><td>OpenClaw 自己的本机目录</td><td>运行时 token、daemon、Agent/sandbox 设定</td><td>Gateway 的 loopback URL、token 和 session-key secret</td></tr>
+        </tbody>
+      </table>
+      <p>Gateway 的 Settings 会拒绝不完整的组合：启用 TLS 必须同时有证书和私钥；使用 DashScope 必须显式允许远程语音并提供 API key；OpenClaw 模式必须有 token 与 session-key secret；OpenClaw URL 必须保持在 loopback。</p>
+    </section>
+
+    <section class="chapter" id="rebuild">
+      <div class="chapter-head"><span class="chapter-no">REF—G</span><div><h2>从零重建的正确顺序</h2><p>每一步只证明一层，避免把硬件、凭据和云端问题混成一个故障。</p></div></div>
+      <ol class="checklist">
+        <li>克隆正式仓库，保留 <code>firmware/esp32_voice_idf</code>、<code>gateway</code>、<code>contracts</code>、<code>docs</code>、<code>ops</code>；不要复制旧 <code>.venv</code>、build 或整个 OpenClaw home。</li>
+        <li>新电脑安装 Python 3.12、uv、系统 libopus、Node.js 22/24、ESP-IDF v5.5.4、ESP32-S3 工具链和 Node 主机测试环境。</li>
+        <li>在 Gateway 执行依赖同步，构建或运行测试；在固件目录运行主机测试，再运行 ESP-IDF build。此时仍不需要硬件秘密。</li>
+        <li>安装固定版本的 OpenClaw，确认 daemon 只监听 <code>127.0.0.1:18789</code>。不要向 LAN 公开它。</li>
+        <li>由安全渠道创建 <code>gateway/.env</code>，再让 Gateway 校验配置并通过 healthz；准备 TLS 后才可启用实际设备连接。</li>
+        <li>生成私有 CA、网关证书和私钥。证书 DNS SAN 必须包含 mDNS hostname；启用 Gateway TLS 和 mDNS。</li>
+        <li>为每台 ESP32 生成独立 NVS，烧录固件与 NVS。固件本体与 NVS 分离，后者含秘密。</li>
+        <li>按“握手、上行音频、ASR、OpenClaw、TTS、播放、中断、本机急停”的顺序做联调，每一次失败只回到对应层排查。</li>
+      </ol>
+    </section>
+
+    <section class="chapter" id="verification">
+      <div class="chapter-head"><span class="chapter-no">REF—H</span><div><h2>验证矩阵与故障定位</h2><p>不要用“没回应”这种总症状排查。</p></div></div>
+      <table class="comparison">
+        <thead><tr><th>现象</th><th>先查哪一层</th><th>可观察证据</th></tr></thead>
+        <tbody>
+          <tr><td>固件不能 build</td><td>ESP-IDF/组件/CMake</td><td><code>idf.py build</code> 的第一个真实编译错误</td></tr>
+          <tr><td>设备找不到电脑</td><td>Wi-Fi/mDNS/LAN</td><td>mDNS 服务记录、LAN IP、客户端隔离、固件发现日志</td></tr>
+          <tr><td>WSS 建立后马上断开</td><td>TLS/鉴权/握手</td><td>证书 SAN、根 CA、gateway_id、Bearer token、session.hello</td></tr>
+          <tr><td>录音后没有回答</td><td>Pipeline</td><td>Gateway 的阶段事件：decode、ASR、OpenClaw、TTS 哪一步失败</td></tr>
+          <tr><td>有文字但没声音</td><td>TTS/下行 Opus/I2S/功放</td><td>tts.start/stop、下行包数、MAX98357A 与扬声器供电</td></tr>
+          <tr><td>动作异常</td><td>本地控制路径/机械安全</td><td>operator.control、ESP32 action.result、PWM、舵机电源与急停</td></tr>
+        </tbody>
+      </table>
+      <div class="danger"><strong>物理边界</strong>八路 SG90S 舵机不得由 USB 供电；使用独立 5–6 V 供电并与 ESP32 共地。供电掉压会把重启伪装成 Wi-Fi 或语音故障。</div>
+    </section>
+
+    <section class="sources">
+      <h2>依据</h2>
+      <p>当前项目源码与文档：根目录 README、<code>docs/project-overview.md</code>、<code>docs/security.md</code>、<code>docs/gateway-tls.md</code>、<code>docs/setup/new-machine-setup-guide.md</code>、<code>contracts/</code>、设备 <code>app_main.cpp</code>、Gateway <code>app.py</code>/<code>pipeline.py</code>/<code>config.py</code>。</p>
+      <p>从本蓝图进入课程：<a href="../lessons/0014-sesame-reproducible-architecture.html">第 14 节：手工追踪一次可复现语音回合</a>。</p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{
+  "model": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/model/zhima_wakeword_dashscope10_int8.tflite",
+  "model_sha256": "2247f91d43b4d70fe17c90b1e999130c2b51476e044a86156b4ea250ba6ae305",
+  "threshold": 0.85,
+  "samples": [
+    {
+      "id": "dashscope_01_nihao_zhima",
+      "split": "train",
+      "rate": 0.82,
+      "duration_ms": 1242.75,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_02_nihao_zhima",
+      "split": "train",
+      "rate": 0.86,
+      "duration_ms": 1089.88,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_03_nihao_zhima",
+      "split": "train",
+      "rate": 0.9,
+      "duration_ms": 1128.12,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_04_nihao_zhima",
+      "split": "train",
+      "rate": 0.94,
+      "duration_ms": 1005.0,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_05_nihao_zhima",
+      "split": "train",
+      "rate": 0.98,
+      "duration_ms": 1059.25,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_06_nihao_zhima",
+      "split": "train",
+      "rate": 1.02,
+      "duration_ms": 998.12,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_07_nihao_zhima",
+      "split": "train",
+      "rate": 1.06,
+      "duration_ms": 967.5,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_08_nihao_zhima",
+      "split": "train",
+      "rate": 1.1,
+      "duration_ms": 936.94,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_09_nihao_zhima",
+      "split": "holdout",
+      "rate": 1.14,
+      "duration_ms": 832.56,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_10_nihao_zhima",
+      "split": "holdout",
+      "rate": 1.18,
+      "duration_ms": 814.62,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    }
+  ],
+  "holdout": {
+    "count": 2,
+    "triggers": 2,
+    "recall": 1.0,
+    "passed": true
+  }
+}

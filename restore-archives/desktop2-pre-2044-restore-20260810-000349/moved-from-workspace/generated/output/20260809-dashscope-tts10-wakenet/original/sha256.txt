@@ -1,0 +1,1 @@
+79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/original/current-deployed-wakenet.tflite

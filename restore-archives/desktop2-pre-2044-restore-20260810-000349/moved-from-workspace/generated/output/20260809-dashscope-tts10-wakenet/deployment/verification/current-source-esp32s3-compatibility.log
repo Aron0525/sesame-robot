@@ -1,0 +1,89 @@
+$ python3 ./tests/verify_nihao_zhima_wakeword.py
+nihao-zhima WakeNet verified: bytes=22456 sha256=2247f91d43b4d70fe17c90b1e999130c2b51476e044a86156b4ea250ba6ae305
+asset_verifier_exit_status=0
+$ TensorFlow Lite contract check against current project model
+/Users/mac/Desktop/test/zhima-wakeword/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+{"bytes": 22456, "input_shape": [1, 33, 32, 1], "input_dtype": "<class 'numpy.int8'>", "output_shape": [1, 2], "output_dtype": "<class 'numpy.int8'>", "operators": ["CONV_2D", "MAX_POOL_2D", "CONV_2D", "MAX_POOL_2D", "RESHAPE", "FULLY_CONNECTED", "FULLY_CONNECTED", "SOFTMAX", "DELEGATE"], "operator_contract": true, "passed": true}
+$ idf.py -B build-dashscope-tts10 build
+Activating ESP-IDF 5.5
+Setting IDF_PATH to '/Users/mac/.espressif/frameworks/esp-idf-v5.5.4'.
+* Checking python version ... 3.9.6
+* Checking python dependencies ... OK
+* Deactivating the current ESP-IDF environment (if any) ... OK
+* Establishing a new ESP-IDF environment ... OK
+* Identifying shell ... zsh
+* Detecting outdated tools in system ... OK - no outdated tools found
+* Shell completion ... Autocompletion code generated
+Executing action: all (aliases: build)
+Running ninja in directory /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10
+Executing "ninja all"...
+[1/9] Performing build step for 'bootloader'
+[1/1] cd /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/bootloader/esp-idf/esptool_py && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/bootloader/bootloader.bin
+Bootloader binary size 0x5160 bytes. 0x2ea0 bytes (36%) free.
+[2/9] No install step for 'bootloader'
+[3/9] Completed 'bootloader'
+[4/9] Building CXX object esp-idf/sesame_voice/CMakeFiles/__idf_sesame_voice.dir/zhima_wakeword_model_data.cpp.obj
+[5/9] Linking C static library esp-idf/sesame_voice/libsesame_voice.a
+[6/9] Generating esp-idf/esp_system/ld/sections.ld
+[7/9] Linking CXX executable sesame_robot_v3.elf
+[8/9] Generating binary image from built executable
+esptool.py v4.12.0
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Generated /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/sesame_robot_v3.bin
+[9/9] cd /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/esp-idf/esptool_py && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/partition_table/partition-table.bin /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/sesame_robot_v3.bin
+sesame_robot_v3.bin binary size 0x175480 bytes. Smallest app partition is 0x400000 bytes. 0x28ab80 bytes (64%) free.
+
+Project build complete. To flash, run:
+ idf.py flash
+or
+ idf.py -p PORT flash
+or
+ python -m esptool --chip esp32s3 -b 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_size 16MB --flash_freq 80m 0x0 build-dashscope-tts10/bootloader/bootloader.bin 0x8000 build-dashscope-tts10/partition_table/partition-table.bin 0x10000 build-dashscope-tts10/sesame_robot_v3.bin 0x410000 build-dashscope-tts10/srmodels/srmodels.bin
+or from the "/Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10" directory
+ python -m esptool --chip esp32s3 -b 460800 --before default_reset --after hard_reset write_flash "@flash_args"
+idf_build_exit_status=0
+Executing action: size
+Running ninja in directory /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10
+Executing "ninja all"...
+[1/4] cd /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/esp-idf/esptool_py && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/partition_table/partition-table.bin /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/sesame_robot_v3.bin
+sesame_robot_v3.bin binary size 0x175480 bytes. Smallest app partition is 0x400000 bytes. 0x28ab80 bytes (64%) free.
+[2/4] Performing build step for 'bootloader'
+[1/1] cd /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/bootloader/esp-idf/esptool_py && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/bootloader/bootloader.bin
+Bootloader binary size 0x5160 bytes. 0x2ea0 bytes (36%) free.
+[3/4] No install step for 'bootloader'
+[4/4] Completed 'bootloader'
+Running ninja in directory /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10
+Executing "ninja size"...
+[0/1] cd /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10 && /opt/homebrew/bin/cmake -D "IDF_SIZE_TOOL=/Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python;-m;esp_idf_size" -D MAP_FILE=/Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/sesame_robot_v3.map -D OUTPUT_JSON= -P /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/tools/cmake/run_size_tool.cmake
+                           Memory Type Usage Summary                            
+┏━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Memory            ┃              ┃          ┃                ┃               ┃
+┃ Type/Section      ┃ Used [bytes] ┃ Used [%] ┃ Remain [bytes] ┃ Total [bytes] ┃
+┡━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ Flash Code        │      1069594 │          │                │               │
+│    .text          │      1069594 │          │                │               │
+│ Flash Data        │       332844 │          │                │               │
+│    .rodata        │       332588 │          │                │               │
+│    .appdesc       │          256 │          │                │               │
+│ DIRAM             │       151339 │    44.28 │         190421 │        341760 │
+│    .text          │        87895 │    25.72 │                │               │
+│    .bss           │        41344 │     12.1 │                │               │
+│    .data          │        22100 │     6.47 │                │               │
+│ IRAM              │        16384 │    100.0 │              0 │         16384 │
+│    .text          │        15356 │    93.73 │                │               │
+│    .vectors       │         1028 │     6.27 │                │               │
+│ RTC SLOW          │           32 │     0.39 │           8160 │          8192 │
+│    .force_slow    │           32 │     0.39 │                │               │
+│ RTC FAST          │           24 │     0.29 │           8168 │          8192 │
+│    .rtc_reserved  │           24 │     0.29 │                │               │
+└───────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+Total image size: 1528849 bytes (.bin may be padded larger)
+Note: The reported total sizes may be smaller than those in the technical 
+reference manual due to reserved memory and application configuration. The total
+flash size available for the application is not included by default, as it 
+cannot be reliably determined due to the presence of other data like the 
+bootloader, partition table, and application partition size.

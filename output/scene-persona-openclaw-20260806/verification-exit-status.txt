@@ -1,0 +1,2 @@
+unit=0 config=0 probe=0 rollback_syntax=0
+test_gateway_stopped=true

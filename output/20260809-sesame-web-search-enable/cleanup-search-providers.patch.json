@@ -1,0 +1,15 @@
+{
+  "tools": {
+    "web": {
+      "search": {
+        "openaiCodex": null
+      }
+    }
+  },
+  "plugins": {
+    "allow": ["wecom-openclaw-plugin", "memory-core", "codex", "deepseek", "parallel"],
+    "entries": {
+      "duckduckgo": null
+    }
+  }
+}

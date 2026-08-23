@@ -1,0 +1,4 @@
+$ arduino-cli compile --fqbn esp32:esp32:esp32s3 firmware/arduino/Sesame_Robot_WiFi_Controller
+Sketch uses 1133888 bytes (86%) of program storage space. Maximum is 1310720 bytes.
+Global variables use 50988 bytes (15%) of dynamic memory, leaving 276692 bytes for local variables. Maximum is 327680 bytes.
+EXIT_STATUS=0

@@ -1,0 +1,154 @@
+{
+  "model_name": "zhima_wakeword_five_tts_int8",
+  "target_wake_word": "你好，芝麻",
+  "source": {
+    "selected_tts_voices": [
+      "Eddy",
+      "Flo",
+      "Tingting",
+      "Meijia",
+      "Sinji"
+    ],
+    "train_records": 32,
+    "holdout_records": 8
+  },
+  "feature_contract": {
+    "sample_rate_hz": 16000,
+    "clip_samples": 16000,
+    "frame_size": 480,
+    "frame_count": 33,
+    "frequency_dft_bins": [
+      6,
+      10,
+      13,
+      17,
+      21,
+      24,
+      28,
+      32,
+      35,
+      39,
+      43,
+      46,
+      50,
+      54,
+      57,
+      61,
+      65,
+      69,
+      72,
+      76,
+      80,
+      83,
+      87,
+      91,
+      94,
+      98,
+      102,
+      105,
+      109,
+      113,
+      116,
+      120
+    ],
+    "normalization_mean": -18.482254028320312,
+    "normalization_std": 2.7455187307128908,
+    "clip_range": [
+      -6.0,
+      6.0
+    ]
+  },
+  "training": {
+    "seed": 20260810,
+    "epochs_run": 36,
+    "train_examples": 1536,
+    "holdout_augmented_examples": 192
+  },
+  "tflite": {
+    "path": "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/artifacts/wakeword_five_tts_20260810/model/zhima_wakeword_five_tts_int8.tflite",
+    "bytes": 22528,
+    "sha256": "e4ac725d01a3b6c25242e0a633558fb3d329c66d6e1227bac68fdf10b143e753",
+    "input": {
+      "shape": [
+        1,
+        33,
+        32,
+        1
+      ],
+      "dtype": "<class 'numpy.int8'>",
+      "scale": 0.02422488108277321,
+      "zero_point": -94
+    },
+    "output": {
+      "shape": [
+        1,
+        2
+      ],
+      "dtype": "<class 'numpy.int8'>",
+      "operators": [
+        "CONV_2D",
+        "MAX_POOL_2D",
+        "CONV_2D",
+        "MAX_POOL_2D",
+        "RESHAPE",
+        "FULLY_CONNECTED",
+        "FULLY_CONNECTED",
+        "SOFTMAX",
+        "DELEGATE"
+      ]
+    }
+  },
+  "threshold": 0.3,
+  "holdout": {
+    "threshold": 0.3,
+    "tp": 0,
+    "fn": 1,
+    "fp": 0,
+    "tn": 7,
+    "recall": 0.0,
+    "accepted": false,
+    "rows": [
+      {
+        "id": "sinji_你好_芝麻",
+        "label": 1,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_你好_小智",
+        "label": 0,
+        "score": 0.00390625
+      },
+      {
+        "id": "sinji_你好_机器人",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_今天天气很好",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_小智你好",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_你好_小明",
+        "label": 0,
+        "score": 0.0
+      }
+    ]
+  },
+  "deployment_gate": false
+}

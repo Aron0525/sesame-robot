@@ -1,0 +1,28 @@
+[Sesame Voice Gateway-3]
+Lookup Sesame Voice Gateway-3._sesame-gw._tcp.local.
+DATE: ---Sat 08 Aug 2026---
+21:14:55.905  ...STARTING...
+21:14:55.907  Sesame\032Voice\032Gateway-3._sesame-gw._tcp.local. can be reached at sesame-gateway.local.:8765 (interface 1) Flags: 1
+ gateway_id=gw_local_dev protocol=1 tls=1 path=/v1/device-stream
+21:14:55.907  Sesame\032Voice\032Gateway-3._sesame-gw._tcp.local. can be reached at sesame-gateway.local.:8765 (interface 1)
+ gateway_id=gw_local_dev protocol=1 tls=1 path=/v1/device-stream
+
+
+[Sesame Voice Gateway-2]
+Lookup Sesame Voice Gateway-2._sesame-gw._tcp.local.
+DATE: ---Sat 08 Aug 2026---
+21:14:58.907  ...STARTING...
+21:14:58.908  Sesame\032Voice\032Gateway-2._sesame-gw._tcp.local. can be reached at sesame-gateway.local.:8765 (interface 14) Flags: 1
+ gateway_id=gw_local_dev protocol=1 tls=1 path=/v1/device-stream
+21:14:58.908  Sesame\032Voice\032Gateway-2._sesame-gw._tcp.local. can be reached at sesame-gateway.local.:8765 (interface 14)
+ gateway_id=gw_local_dev protocol=1 tls=1 path=/v1/device-stream
+
+
+[Sesame Voice Gateway-6]
+Lookup Sesame Voice Gateway-6._sesame-gw._tcp.local.
+DATE: ---Sat 08 Aug 2026---
+21:15:01.915  ...STARTING...
+21:15:01.915  Sesame\032Voice\032Gateway-6._sesame-gw._tcp.local. can be reached at sesame-gateway.local.:8765 (interface 14) Flags: 1
+ gateway_id=gw_local_dev protocol=1 tls=1 path=/v1/device-stream
+21:15:01.915  Sesame\032Voice\032Gateway-6._sesame-gw._tcp.local. can be reached at sesame-gateway.local.:8765 (interface 14)
+ gateway_id=gw_local_dev protocol=1 tls=1 path=/v1/device-stream

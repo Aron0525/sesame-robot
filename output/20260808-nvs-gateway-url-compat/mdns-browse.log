@@ -1,0 +1,10 @@
+Browsing for _sesame-gw._tcp.local.
+DATE: ---Sat 08 Aug 2026---
+21:14:19.912  ...STARTING...
+Timestamp     A/R    Flags  if Domain               Service Type         Instance Name
+21:14:19.913  Add        3  14 local.               _sesame-gw._tcp.     Sesame Voice Gateway-3
+21:14:19.913  Add        3   1 local.               _sesame-gw._tcp.     Sesame Voice Gateway-3
+21:14:19.913  Add        3   1 local.               _sesame-gw._tcp.     Sesame Voice Gateway-2
+21:14:19.913  Add        3  14 local.               _sesame-gw._tcp.     Sesame Voice Gateway-2
+21:14:19.913  Add        3   1 local.               _sesame-gw._tcp.     Sesame Voice Gateway-6
+21:14:19.913  Add        2  14 local.               _sesame-gw._tcp.     Sesame Voice Gateway-6

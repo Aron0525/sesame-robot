@@ -1,0 +1,23 @@
+Change:
+1. Removed the R3/L4 electrical angle inversion in ESP-IDF and Arduino controller paths.
+2. Reduced the console motion task stack from 6144 to 4096 bytes after board logs proved task creation failure; retained reason-specific failure logs.
+
+Baseline: R3/L4 logical 180 was transformed to PWM 0; console stand was rejected because the 6144-byte motion task could not be created.
+Modified: all servo outputs directly match authored angles. Console stand motion task is created and accepted.
+
+Baseline source hashes: original-sha256.txt
+Modified source hashes: modified-sha256.txt
+Patch: cancel-angle-inversion.patch
+Modified artifact: build-p1/sesame_robot_v3.bin
+Modified binary SHA256: 59775d305813d0496c3143d3f0bd66725c09e9fdf57f2a2cddeb9d4a02af6424  /Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/build-p1/sesame_robot_v3.bin
+
+Verification:
+Host: cd /Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf && bash tests/run_host_tests.sh
+Host output: host_tests=PASS; R3 index 5 and L4 index 7 map 0->0, 90->90, 180->180.
+Flash: SESAME_ESP32_PORT=/dev/cu.usbmodem101 zsh /Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/tools/flash_sesame_robot.command
+Flash output: four regions reported Hash of data verified; device dev_001 reconnected online.
+Runtime: action stand returned accepted (request ctl_c772d01df41c4f19906ac2c186546c9e), then stop accepted.
+Runtime: manual R3 servo 6 angle 180 and L4 servo 8 angle 180 both returned accepted.
+PWM: R3/L4 logical 180 -> physical 180 -> 2929us high pulse, LEDC duty 2399/16383 at 50Hz.
+
+Rollback: ./rollback.sh restores all four exact source backups, reruns host tests, then rerun the flash command.

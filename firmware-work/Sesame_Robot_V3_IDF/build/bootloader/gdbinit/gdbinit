@@ -1,0 +1,2 @@
+source /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/gdbinit/symbols
+source /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/gdbinit/connect

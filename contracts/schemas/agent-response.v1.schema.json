@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sesame.local/schemas/agent-response.v1.schema.json",
+  "title": "Sesame Agent Response v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "request_id",
+    "turn_id",
+    "status",
+    "reply",
+    "voice",
+    "expression",
+    "actions"
+  ],
+  "properties": {
+    "v": {
+      "const": 1
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "turn_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "cancelled",
+        "failed"
+      ]
+    },
+    "reply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16000
+        }
+      }
+    },
+    "voice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "voice_id",
+        "style",
+        "speed"
+      ],
+      "properties": {
+        "voice_id": {
+          "type": "string",
+          "enum": ["sesame_default"]
+        },
+        "style": {
+          "type": "string",
+          "enum": ["neutral", "happy", "sad", "angry", "surprised", "thinking"]
+        },
+        "speed": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2.0
+        }
+      }
+    },
+    "expression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "ttl_ms"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "default",
+            "walk",
+            "rest",
+            "swim",
+            "dance",
+            "wave",
+            "point",
+            "cute",
+            "pushup",
+            "freaky",
+            "bow",
+            "worm",
+            "shake",
+            "shrug",
+            "dead",
+            "crab",
+            "idle",
+            "idle_blink",
+            "happy",
+            "talk_happy",
+            "sad",
+            "talk_sad",
+            "angry",
+            "talk_angry",
+            "surprised",
+            "talk_surprised",
+            "sleepy",
+            "talk_sleepy",
+            "love",
+            "talk_love",
+            "excited",
+            "talk_excited",
+            "confused",
+            "talk_confused",
+            "thinking",
+            "talk_thinking"
+          ]
+        },
+        "ttl_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 10000
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "duration_ms"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "stop",
+              "rest",
+              "stand",
+              "wave",
+              "dance",
+              "swim",
+              "pushup",
+              "cute",
+              "freaky",
+              "worm",
+              "shake",
+              "shrug",
+              "dead",
+              "crab",
+              "forward",
+              "backward",
+              "left",
+              "right"
+            ]
+          },
+          "duration_ms": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 5000
+          }
+        }
+      }
+    }
+  }
+}

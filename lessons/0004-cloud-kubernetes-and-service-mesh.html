@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="网关五课教材第四课：微服务网关、BFF、服务发现、Kubernetes Ingress、Gateway API、Service Mesh 与多协议流量。">
+  <title>第四课｜微服务、Kubernetes 与 Service Mesh</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="4">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>×5</span></a>
+      <div class="lesson-tabs">
+        <a href="0001-gateway-foundations.html" title="第一课">01</a>
+        <a href="0002-proxies-routing-and-load-balancing.html" title="第二课">02</a>
+        <a href="0003-api-gateway-policies-and-resilience.html" title="第三课">03</a>
+        <a href="0004-cloud-kubernetes-and-service-mesh.html" aria-current="page" title="第四课">04</a>
+        <a href="0005-ai-gateway-design-and-troubleshooting.html" title="第五课">05</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="4">
+      <div>
+        <p class="kicker">第四课 · 云原生拓扑</p>
+        <h1>微服务、Kubernetes 与 Mesh</h1>
+        <p class="lead">服务数量变多后，“一个入口”会分裂成外部入口、内部调用、客户端适配和集群路由。名字相似，职责却不同。</p>
+        <div class="lesson-meta"><span>约 45 分钟</span><span>31 个概念</span><span>5 个练习</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="monolith-microservices">
+      <div class="chapter-head">
+        <span class="chapter-no">04—A</span>
+        <div><h2>单体与微服务为什么需要不同网关策略</h2><p>服务数量不是目的；边界、团队和发布方式才决定网关复杂度。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 01</span>
+          <h3>单体应用入口</h3>
+          <p>一个应用进程承载大部分业务时，反向代理加应用中间件通常足够。</p>
+          <div class="case"><strong>案例</strong>一个 FastAPI 服务同时处理用户、订单和聊天；Caddy 负责 HTTPS，FastAPI 负责登录与业务权限。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 02</span>
+          <h3>微服务 API Gateway</h3>
+          <p>服务独立部署后，网关隐藏内部拓扑，并统一认证、配额、路由与版本。</p>
+          <div class="case"><strong>案例</strong>客户端只调用 <code>api.example.com</code>，不直接知道 user-service、order-service 的内部地址。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 03</span>
+          <h3>External Gateway（外部网关）</h3>
+          <p>面向公网用户或合作伙伴，重点是安全、API 契约、配额和外部身份。</p>
+          <div class="case"><strong>案例</strong>合作伙伴通过 API Key 调用外部订单 API，但不能访问内部运维接口。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 04</span>
+          <h3>Internal Gateway（内部网关）</h3>
+          <p>面向公司内部系统或服务，重点是服务身份、内部路由、审计和网络隔离。</p>
+          <div class="case"><strong>案例</strong>财务系统通过内部网关调用订单结算接口，公网无法解析该域名。</div>
+        </article>
+      </div>
+      <div class="boundary"><strong>判断</strong>“用了微服务”不代表必须上重量级 API 管理平台。如果调用方少、政策简单，Ingress Controller 或轻量代理仍可能足够。</div>
+    </section>
+
+    <section class="chapter" id="bff-aggregation">
+      <div class="chapter-head">
+        <span class="chapter-no">04—B</span>
+        <div><h2>BFF 与 API 聚合：别把通用网关变成超级后端</h2><p>网关负责公共边界政策，BFF 负责某类前端的体验适配。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 05</span>
+          <h3>BFF（Backend for Frontend）</h3>
+          <p>为某一种客户端提供专属后端接口，组合数据并适配交互需求。</p>
+          <div class="case"><strong>案例</strong>小程序 BFF 一次返回订单、司机位置和联系电话；管理后台 BFF 返回统计和审计字段。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 06</span>
+          <h3>API Aggregation（API 聚合）</h3>
+          <p>一次外部请求并行或串行调用多个内部服务，再组合响应。</p>
+          <div class="case"><strong>案例</strong>“订单详情页”同时读取订单、用户、支付和司机服务。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 07</span>
+          <h3>Fan-out（扇出）</h3>
+          <p>一个请求扩展为多个下游调用。扇出越大，任一依赖失败的概率和尾延迟通常越高。</p>
+          <div class="case"><strong>案例</strong>一个页面并行调用 20 个服务，每个服务成功率 99.9%，整体全成功概率已经低于单个服务。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 08</span>
+          <h3>Backend Contract（后端契约）</h3>
+          <p>BFF 可以稳定前端契约，但不能靠任意转换掩盖所有后端不兼容变化。</p>
+          <div class="case"><strong>案例</strong>BFF 把内部多个状态映射成小程序需要的五种展示态，并对映射写契约测试。</div>
+        </article>
+      </div>
+      <div class="danger"><strong>反模式</strong>把支付计算、库存事务、Agent 工作流全部写进通用 API Gateway。结果是所有团队共用一个发布瓶颈，业务错误也会影响整个入口。</div>
+    </section>
+
+    <section class="chapter" id="directions">
+      <div class="chapter-head">
+        <span class="chapter-no">04—C</span>
+        <div><h2>南北向与东西向流量</h2><p>方向不是地理，而是系统边界的抽象。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 09</span>
+          <h3>North-South Traffic（南北向流量）</h3>
+          <p>外部调用者与内部系统之间的流量，包括进入和出去。</p>
+          <div class="case"><strong>案例</strong>手机调用订单 API 是进入；订单服务调用外部短信平台是出去。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 10</span>
+          <h3>East-West Traffic（东西向流量）</h3>
+          <p>系统内部服务之间的通信。</p>
+          <div class="case"><strong>案例</strong>订单服务调用支付服务和司机服务，属于东西向流量。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 11</span>
+          <h3>Ingress Gateway</h3>
+          <p>控制流量进入集群或服务网格的入口。</p>
+          <div class="case"><strong>案例</strong>公网 HTTPS 请求进入 Kubernetes 前先通过 Envoy Ingress Gateway。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 12</span>
+          <h3>Egress Gateway</h3>
+          <p>控制内部服务访问外部系统的出口，便于固定出口 IP、审计、策略和密钥隔离。</p>
+          <div class="case"><strong>案例</strong>所有模型调用统一从 Egress Gateway 出口，供应商只需放行一个固定 IP。</div>
+        </article>
+      </div>
+      <div class="diagram">                 北：外部世界
+                      │
+                Ingress Gateway
+                      │
+     用户服务 ◀──── 东西向 ────▶ 订单服务
+                      │
+                Egress Gateway
+                      │
+                 南：外部依赖</div>
+    </section>
+
+    <section class="chapter" id="kubernetes-basics">
+      <div class="chapter-head">
+        <span class="chapter-no">04—D</span>
+        <div><h2>Kubernetes 中的入口对象</h2><p>先分清 Kubernetes Service、Ingress 与 Gateway API。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 13</span>
+          <h3>Pod</h3>
+          <p>Kubernetes 中承载一个或多个容器的基本运行单元，地址和生命周期可能变化。</p>
+          <div class="case"><strong>案例</strong>订单服务部署三个 Pod；滚动更新时旧 Pod 消失、新 Pod 获得新 IP。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 14</span>
+          <h3>Service</h3>
+          <p>为一组动态 Pod 提供稳定的访问身份和负载分发。</p>
+          <div class="case"><strong>案例</strong>其他服务访问 <code>order-service:8000</code>，不必跟踪三个 Pod 的具体 IP。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 15</span>
+          <h3>Ingress</h3>
+          <p>较早的 Kubernetes HTTP/HTTPS 入口 API，通过规则把外部流量路由到 Service。高级能力常依赖实现专属 Annotation。</p>
+          <div class="case"><strong>案例</strong><code>/orders</code> 指向 order-service，<code>/users</code> 指向 user-service。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 16</span>
+          <h3>Ingress Controller</h3>
+          <p>监听 Ingress 等资源并实际配置代理或云负载均衡器的控制器。只有 Ingress YAML，没有 Controller，并不会自动产生流量入口。</p>
+          <div class="plain"><strong>通俗解释</strong>Ingress 是申请单，Controller 是读申请单并安排门卫和指示牌的人。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="gateway-api">
+      <div class="chapter-head">
+        <span class="chapter-no">04—E</span>
+        <div><h2>Kubernetes Gateway API 的完整资源模型</h2><p>Gateway API 是一套标准化配置接口，不是某个具体网关产品。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 17</span>
+          <h3>GatewayClass</h3>
+          <p>声明哪一种控制器和基础设施来实现一类 Gateway，通常由基础设施团队管理。</p>
+          <div class="case"><strong>案例</strong><code>envoy-public</code> 表示由某 Envoy Gateway 控制器实现公网入口。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 18</span>
+          <h3>Gateway</h3>
+          <p>请求一个实际流量入口，声明地址、Listener 和使用的 GatewayClass。</p>
+          <div class="case"><strong>案例</strong>平台团队创建 <code>public-gateway</code>，监听 80 和 443。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 19</span>
+          <h3>Listener</h3>
+          <p>Gateway 接收流量的端口、协议、域名和 TLS 配置，也规定哪些 Route 可以附着。</p>
+          <div class="case"><strong>案例</strong>443 Listener 只接受 <code>*.example.com</code>，并引用对应 TLS 证书。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 20</span>
+          <h3>HTTPRoute / GRPCRoute / TCPRoute</h3>
+          <p>按协议描述匹配和转发规则。应用团队可独立管理自己的 Route。</p>
+          <div class="case"><strong>案例</strong>订单团队的 HTTPRoute 把 <code>/orders</code> 附着到共享 Gateway。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 21</span>
+          <h3>BackendRef</h3>
+          <p>Route 指向的后端对象，通常是 Kubernetes Service，也可由扩展支持其他目标。</p>
+          <div class="case"><strong>案例</strong>HTTPRoute 的 BackendRef 指向 <code>order-service:8000</code>。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 22</span>
+          <h3>Role-oriented API（面向角色）</h3>
+          <p>Gateway API 把基础设施提供者、集群运维者和应用开发者的职责分开。</p>
+          <div class="case"><strong>案例</strong>平台团队管证书和公网地址；订单团队只管自己路径如何进入订单 Service。</div>
+        </article>
+      </div>
+      <div class="diagram">基础设施团队
+  └─ GatewayClass：由谁实现
+        │
+平台团队
+  └─ Gateway + Listener：在哪里、用什么协议监听
+        │
+应用团队
+  └─ HTTPRoute：什么请求去哪里
+        │
+      Service
+        │
+       Pods</div>
+      <div class="boundary"><strong>核心区别</strong>API Gateway 是一种架构组件或产品；Kubernetes Gateway API 是描述服务网络入口与路由的资源标准。一些 API Gateway 产品可以实现 Gateway API，但二者不是同义词。</div>
+    </section>
+
+    <section class="chapter" id="service-mesh">
+      <div class="chapter-head">
+        <span class="chapter-no">04—F</span>
+        <div><h2>Service Mesh：把网关能力铺到服务之间</h2><p>API Gateway 主要守入口；Service Mesh 主要治理内部调用。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 23</span>
+          <h3>Service Mesh（服务网格）</h3>
+          <p>用基础设施代理统一处理服务间身份、mTLS、流量策略与观测，尽量不让业务代码重复实现。</p>
+          <div class="case"><strong>案例</strong>订单服务无须自己写证书轮换，就能与支付服务建立 mTLS。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 24</span>
+          <h3>Sidecar Proxy（边车代理）</h3>
+          <p>每个工作负载旁运行一个代理，应用进出流量经过它。</p>
+          <div class="plain"><strong>通俗解释</strong>每家店门口都配一名统一培训的保安，而不是只在商场总门口安排保安。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 25</span>
+          <h3>Ambient / Node Proxy（环境式或节点代理）</h3>
+          <p>不为每个 Pod 单独部署完整 Sidecar，而在节点或共享层拦截流量，减少资源和注入复杂度。</p>
+          <div class="case"><strong>案例</strong>同一节点上的多个服务共享基础四层安全代理，七层能力按需增加。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 26</span>
+          <h3>Workload Identity（工作负载身份）</h3>
+          <p>为服务实例提供可验证身份，而不是依赖易变化的 IP。</p>
+          <div class="case"><strong>案例</strong>只允许身份为 <code>order-service</code> 的工作负载调用 payment-service。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 27</span>
+          <h3>Zero Trust（零信任）</h3>
+          <p>不因为流量来自内网就自动信任；每次通信都验证身份、权限和上下文。</p>
+          <div class="case"><strong>案例</strong>即使攻击者进入集群网络，没有合法工作负载证书也无法调用支付服务。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 28</span>
+          <h3>Mesh Control Plane</h3>
+          <p>向大量代理分发服务发现、证书和流量政策；代理构成数据面。</p>
+          <div class="case"><strong>案例</strong>控制面下发“订单 v2 接 5% 流量”，所有相关代理执行一致规则。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="protocols">
+      <div class="chapter-head">
+        <span class="chapter-no">04—G</span>
+        <div><h2>不同协议对网关提出不同要求</h2><p>不能用普通短请求的默认值处理所有通信。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 29</span>
+          <h3>REST / HTTP</h3>
+          <p>请求—响应模型清晰，适合路径路由、缓存和常规认证。</p>
+          <div class="case"><strong>案例</strong><code>GET /orders/123</code> 可按 HTTP 方法和资源路径路由。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 30</span>
+          <h3>gRPC</h3>
+          <p>基于 HTTP/2 和 Protobuf，支持流式调用；网关需要理解服务/方法、HTTP/2 与 gRPC 状态。</p>
+          <div class="case"><strong>案例</strong>外部调用 <code>OrderService/GetOrder</code>，网关按 gRPC 方法分流。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 31</span>
+          <h3>WebSocket 与 SSE</h3>
+          <p>WebSocket 是长连接双向通信；SSE 是服务器到客户端的单向流。超时、连接数、负载均衡和部署摘流必须单独设计。</p>
+          <div class="case"><strong>案例</strong>LLM 流式输出使用 SSE，网关不能沿用普通 API 的 5 秒总超时。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 32</span>
+          <h3>TCP / UDP Gateway</h3>
+          <p>对数据库、自定义协议、游戏或 DNS 等非 HTTP 流量进行四层转发。</p>
+          <div class="case"><strong>案例</strong>TCP Gateway 把 PostgreSQL 连接送到主库或只读库入口，但不理解 SQL 业务含义。</div>
+        </article>
+        <article class="concept wide">
+          <span class="term">Related Concept</span>
+          <h3>Message / Event Gateway（消息或事件网关）</h3>
+          <p>在外部生产者与内部消息系统之间处理协议适配、身份、主题映射和流量控制。它与同步 API Gateway 类似，但处理的是消息发布/订阅语义。</p>
+          <div class="case"><strong>案例</strong>IoT 设备通过 MQTT Gateway 发布传感器事件，网关验证设备证书后映射到 Kafka Topic。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="topologies">
+      <div class="chapter-head">
+        <span class="chapter-no">04—H</span>
+        <div><h2>常见部署拓扑</h2><p>没有一个“标准网关图”适合所有规模。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>拓扑</th><th>适合</th><th>代价</th><th>案例</th></tr></thead>
+        <tbody>
+          <tr><td>单入口网关</td><td>小型系统、政策统一</td><td>故障域与发布耦合较大</td><td>一个 Nginx 前接一个 FastAPI 单体</td></tr>
+          <tr><td>边缘网关 + BFF</td><td>多客户端体验差异大</td><td>多一层服务与契约</td><td>小程序和管理后台各有 BFF</td></tr>
+          <tr><td>外部网关 + 内部网关</td><td>内外安全边界明确</td><td>政策协调更复杂</td><td>伙伴 API 与公司内部 API 分离</td></tr>
+          <tr><td>Ingress + Service Mesh</td><td>服务多、内部治理要求高</td><td>资源和运维复杂度高</td><td>Kubernetes 中入口 Envoy 加内部 Mesh</td></tr>
+          <tr><td>全局网关 + 区域网关</td><td>多区域、全球用户</td><td>数据一致性与跨区故障复杂</td><td>全球流量先选区域，再进区域网关</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="quiz">
+      <div class="chapter-head">
+        <span class="chapter-no">04—I</span>
+        <div><h2>检索练习</h2><p>把相似概念放在一起比较。</p></div>
+      </div>
+      <div class="quiz">
+        <details><summary>1. BFF 与 API Gateway 的主要边界是什么？</summary><p>API Gateway 负责跨服务公共入口政策；BFF 负责某类前端的数据组合和体验适配。</p></details>
+        <details><summary>2. Kubernetes Ingress YAML 为什么不能单独转发流量？</summary><p>它是期望状态声明，需要 Ingress Controller 读取并配置真实代理或负载均衡器。</p></details>
+        <details><summary>3. GatewayClass、Gateway、HTTPRoute 分别是谁管什么？</summary><p>GatewayClass 定义实现类型；Gateway 定义入口和监听；HTTPRoute 定义具体请求如何去后端。</p></details>
+        <details><summary>4. API Gateway 和 Service Mesh 的主要流量方向差别是什么？</summary><p>API Gateway 多治理外部到应用的南北向入口；Service Mesh 多治理内部服务之间的东西向通信。</p></details>
+        <details><summary>5. 为什么 LLM 流式响应不能照搬普通 REST 超时？</summary><p>流式连接可能持续很久，但仍在不断传输数据，需要区分总超时与空闲超时，并正确处理连接排空。</p></details>
+      </div>
+    </section>
+
+    <aside class="sources">
+      <h2>本课主参考</h2>
+      <p><a href="https://gateway-api.sigs.k8s.io/docs/introduction/">Kubernetes Gateway API Introduction</a> 与 <a href="https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/">API Overview</a>。官方文档明确区分 Gateway API 这一配置接口与 API Gateway 产品。</p>
+    </aside>
+
+    <nav class="pager" aria-label="前后课程">
+      <a href="0003-api-gateway-policies-and-resilience.html"><small>上一课 03</small><strong>← API 治理、安全与韧性</strong></a>
+      <a href="0005-ai-gateway-design-and-troubleshooting.html"><small>下一课 05</small><strong>AI Gateway、选型与排障 →</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

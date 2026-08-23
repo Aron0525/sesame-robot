@@ -1,0 +1,11 @@
+Modified firmware source files:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/device_config.cpp
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/transport_policy.cpp
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/include/sesame_transport/transport_policy.h
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/test/test_transport_policy.cpp
+
+Behavior:
+- An absent gateway_url uses the existing mDNS discovery route.
+- A discovered host becomes wss://<hostname>.local:<port>/v1/device-stream.
+- The application update writes only 0x10000 and retains NVS and model partitions.

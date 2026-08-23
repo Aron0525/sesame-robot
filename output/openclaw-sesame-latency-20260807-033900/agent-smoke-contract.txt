@@ -1,0 +1,4 @@
+agent-contract-turn-1.json: contract PASS; reply_chars=10
+agent-contract-turn-2.json: contract PASS; reply_chars=11
+trace:{"thinkLevel": "low", "reasoningLevel": "off", "fastMode": false}
+trace:{"thinkLevel": "low", "reasoningLevel": "off", "fastMode": false}

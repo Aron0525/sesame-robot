@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sesame Robot V3 从源码阅读到运行状态的文件、类和数据流字典。">
+  <title>Sesame V3 代码地图</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="MAP">
+  <nav class="course-nav" aria-label="课程导航"><div class="course-nav__inner">
+    <a class="course-mark" href="../lessons/0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+    <div class="lesson-tabs"><a href="../lessons/0013-sesame-v15-project-compass.html" title="项目罗盘">13</a><a href="../lessons/0014-sesame-reproducible-architecture.html" title="可复现架构">14</a><a href="../lessons/0015-sesame-code-reading-first-tour.html" title="源码第一游">15</a></div>
+    <div class="reading-progress" aria-hidden="true"></div>
+  </div></nav>
+  <main>
+    <header class="hero" data-lesson="MAP"><div>
+      <p class="kicker">Sesame Robot V3 · 源码速查</p>
+      <h1>代码地图：<br>先读哪里，后读哪里</h1>
+      <p class="lead">给第一次接手项目的人准备的文件字典。它不替代源码，而是指出每个文件拥有哪一段状态、被谁调用、什么时候值得打开。</p>
+      <div class="lesson-meta"><span>ESP-IDF 固件</span><span>Python Gateway</span><span>当前工作树为准</span></div>
+    </div></header>
+
+    <section class="chapter" id="owners"><div class="chapter-head"><span class="chapter-no">MAP—A</span><div><h2>读代码先找“谁拥有状态”</h2><p>比起逐行翻译，更重要的是知道一段数据由谁保存、谁有权改、何时失效。</p></div></div>
+      <div class="diagram">长期对象（上电到重启）
+app_main() → display / robot_driver / legacy_motion / robot / web_control / audio / voice
+
+一条设备连接（WSS 断开即失效）
+Gateway DeviceSession → session_id / sequence / 当前音频包 / 当前异步 turn / send_lock
+
+一次对话回合（listen.start 到 tts.stop 或 interrupt）
+VoiceController → turn_id / capture / generation / queues
+ConversationPipeline → PCM / transcript / AgentResult / TTS Opus packets
+
+规则：跨函数、跨回调、跨任务的信息，应该能在以上持有者的字段中找到。</div>
+      <div class="plain"><strong>正式源代码的位置</strong><code>/Users/mac/Desktop/2/firmware/esp32_voice_idf</code> 是正式 ESP-IDF 固件；<code>firmware/arduino</code> 是迁移来源。分析当前行为时，前者优先。</div>
+    </section>
+
+    <section class="chapter" id="firmware-tree"><div class="chapter-head"><span class="chapter-no">MAP—B</span><div><h2>固件目录：七个组件，而不是一大坨程序</h2><p><code>main</code> 只负责装配；功能被拆进有明确边界的 CMake component。</p></div></div>
+      <table class="comparison"><thead><tr><th>组件</th><th>先读文件</th><th>拥有的职责</th><th>不负责什么</th></tr></thead><tbody>
+        <tr><td><code>main</code></td><td><code>main/app_main.cpp</code></td><td>创建长期对象、启动顺序、降级策略。</td><td>不编码音频、不做云端对话。</td></tr>
+        <tr><td><code>sesame_audio</code></td><td><code>audio_hal.cpp</code>、<code>opus_codec.cpp</code></td><td>I2S 读写、PCM 转换、Opus 编解码。</td><td>不知道 Wi‑Fi 或舵机。</td></tr>
+        <tr><td><code>sesame_protocol</code></td><td><code>audio_frame.cpp</code>、<code>control_event.cpp</code></td><td>SSM1 音频头、JSON 控制帧、回合状态机。</td><td>不打开 WebSocket。</td></tr>
+        <tr><td><code>sesame_transport</code></td><td><code>device_config.cpp</code>、<code>gateway_client.cpp</code></td><td>NVS、Wi‑Fi、mDNS、TLS、WSS。</td><td>不理解 ASR/LLM/TTS 业务。</td></tr>
+        <tr><td><code>sesame_voice</code></td><td><code>voice_controller.cpp</code></td><td>把按键、唤醒、录音、协议、播放串成一轮。</td><td>不保存云 API 密钥。</td></tr>
+        <tr><td><code>sesame_robot</code></td><td><code>esp32_servo_driver.cpp</code>、<code>motion_plan.cpp</code></td><td>PWM、舵机所有权、急停、原生姿势。</td><td>不相信模型字符串就是动作。</td></tr>
+        <tr><td><code>sesame_ui</code> / <code>sesame_web</code></td><td><code>oled_expression_display.cpp</code>、<code>web_control_server.cpp</code></td><td>表情动画、设备本地 HTTP、旧动作表兼容。</td><td>不需要 Gateway 才能启动。</td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="chapter" id="entry"><div class="chapter-head"><span class="chapter-no">MAP—C</span><div><h2><code>app_main()</code>：启动顺序本身就是设计</h2><p>文件：<code>firmware/esp32_voice_idf/main/app_main.cpp</code>。</p></div></div>
+      <ol class="checklist">
+        <li><code>initArduino()</code>：正式固件仍复用部分 Arduino 兼容动作代码。</li>
+        <li>初始化 <code>esp_netif</code> 和默认事件循环，给 Wi‑Fi 和本地网页共用。</li>
+        <li>初始化 OLED；失败只警告，所以无屏幕时其他模块仍可继续。</li>
+        <li>初始化舵机 PWM；失败直接返回，因为机器人输出端没有可靠基础。</li>
+        <li>启动本地 <code>WebControlServer</code>；语音失败时也尽量保留手动控制。</li>
+        <li>初始化 <code>AudioHal</code>；失败时网页仍在，语音停止。</li>
+        <li>启动 <code>VoiceController</code>；它才创建语音任务、队列并加载 NVS。</li>
+      </ol>
+      <div class="memory"><h3><code>static</code> 在这里是什么意思</h3><p><code>static AudioHal audio</code>、<code>static VoiceController voice</code> 表示这些对象在 <code>app_main()</code> 返回后仍然有效，直到设备重启。FreeRTOS 任务持有它们的地址；若是普通局部变量，函数返回后任务会访问悬空内存。</p></div>
+    </section>
+
+    <section class="chapter" id="voice"><div class="chapter-head"><span class="chapter-no">MAP—D</span><div><h2>VoiceController：语音总调度器</h2><p>精读顺序：头文件字段 → <code>start()</code> → <code>run()</code> → <code>start_listening()</code> → <code>capture_and_send()</code>。</p></div></div>
+      <table class="comparison"><thead><tr><th>字段/结构</th><th>通俗解释</th><th>工程目的</th></tr></thead><tbody>
+        <tr><td><code>session_id_</code> / <code>turn_id_</code></td><td>“这条连接是谁”与“这句话是哪一轮”。</td><td>让断线、取消、迟到消息精确归属。</td></tr>
+        <tr><td><code>TurnStateMachine</code></td><td>Idle / Listening / Thinking / Speaking。</td><td>禁止矛盾组合，例如一边播放一边当作普通空闲录音。</td></tr>
+        <tr><td><code>CaptureSession</code></td><td>录音是否正在进行，来源是按键、唤醒词还是追问。</td><td>BOOT 与唤醒词共享一条生命周期，而非两个易冲突的布尔值。</td></tr>
+        <tr><td><code>WakeVadEngine</code></td><td>端侧唤醒词和 VAD（语音活动检测）。</td><td>决定自然语音何时开始/结束，不等于云端 ASR。</td></tr>
+        <tr><td><code>PcmPreRollBuffer</code></td><td>最近 500 ms、25 帧 PCM 的环形缓冲。</td><td>补偿 VAD 判定延迟，避免吞掉第一个音节。</td></tr>
+        <tr><td>三条 queue</td><td>下行音频、Gateway 控制回调、上行待发送帧。</td><td>网络、音频和控制互不挤占；对端洪泛也有上限。</td></tr>
+      </tbody></table>
+      <div class="diagram">VoiceController::run() 的一轮循环
+取 Gateway 控制事件 → 处理断线/重连 → 读 GPIO0 去抖按键
+→ 判断是否武装唤醒词 → 读 20 ms I2S PCM
+→ 预录缓存 / VAD / 上行编码 → 下行 Opus 解码播放 → TTS 收尾</div>
+    </section>
+
+    <section class="chapter" id="freertos"><div class="chapter-head"><span class="chapter-no">MAP—E</span><div><h2>FreeRTOS 任务：并发的真实清单</h2><p>ESP32-S3 在 ESP-IDF 中以双核 FreeRTOS 运行。项目把不同延迟特征的工作显式拆开。</p></div></div>
+      <table class="comparison"><thead><tr><th>任务名</th><th>创建位置</th><th>亲和性 / 优先级</th><th>主要工作</th></tr></thead><tbody>
+        <tr><td><code>sesame_voice</code></td><td><code>VoiceController::start()</code></td><td>Core 1 / 7；PSRAM 32 KiB 栈</td><td>主语音循环、I2S、状态机、下行播放。</td></tr>
+        <tr><td><code>sesame_uplink</code></td><td><code>VoiceController::start()</code></td><td>Core 0 / 5；24 KiB 栈</td><td>消费待发队列，执行 WSS/TLS send。</td></tr>
+        <tr><td><code>wake_vad_work</code></td><td><code>WakeVadEngine::start()</code></td><td>Core 1 / 5；12 KiB 栈</td><td>ESP-SR AFE VAD 与 MultiNet 唤醒词识别。</td></tr>
+        <tr><td><code>sesame_servo</code></td><td><code>Esp32ServoDriver::initialize()</code></td><td>Core 1 / 5；4 KiB 栈</td><td>消费原生动作队列，按时间推进姿势。</td></tr>
+        <tr><td><code>sesame_web_motion</code></td><td><code>LegacyMotionRunner::start()</code></td><td>Core 1 / 5；动作期间临时创建</td><td>运行迁移来的复杂动作表，20 ms 切片检查取消。</td></tr>
+        <tr><td><code>conversation_nvs</code></td><td><code>ConversationStore::start()</code></td><td>Core 0 / 4；内部 RAM</td><td>异步持久化最新 conversation ID，避开语音任务里的 Flash 操作。</td></tr>
+        <tr><td><code>sesame_oled_anim</code></td><td><code>OledExpressionDisplay::initialize()</code></td><td>不绑定核心 / 3</td><td>每 20 ms 推进表情帧；以 mutex 保护 I²C。</td></tr>
+      </tbody></table>
+      <div class="case"><strong>“丢帧”与“失败重连”不是同一件事</strong>上行队列满时项目会丢一个 20 ms 音频帧，优先保障实时性；但 WSS send 失败会让会话重连，而不是继续发送后续序号。因为控制/序号已经不连续，继续发送只会造成不可验证的回合混淆。</div>
+    </section>
+
+    <section class="chapter" id="hardware"><div class="chapter-head"><span class="chapter-no">MAP—F</span><div><h2>硬件怎样出现在源代码里</h2><p>以下是代码常量，不是“接线已经验收”的结论。</p></div></div>
+      <table class="comparison"><thead><tr><th>硬件</th><th>代码接口</th><th>具体细节</th></tr></thead><tbody>
+        <tr><td>麦克风/功放</td><td><code>sesame_audio/audio_contract.h</code>、<code>audio_hal.cpp</code></td><td>BCLK=14，WS=47，麦克风数据=48，扬声器数据=2，功放使能=1；16 kHz、20 ms、320 个 S16LE 样本、640 bytes。</td></tr>
+        <tr><td>BOOT</td><td><code>recording_button.cpp</code></td><td>GPIO0；80 ms 去抖；重置时按住不算一次用户按键。</td></tr>
+        <tr><td>八路舵机</td><td><code>esp32_servo_driver.cpp</code></td><td>GPIO 4,5,6,7,10,11,12,13；50 Hz PWM；初始输出 duty 为 0，即释放而非强制保持姿态。</td></tr>
+        <tr><td>OLED</td><td><code>oled_expression_display.cpp</code></td><td>I²C SDA=8、SCL=9、0x3C、400 kHz；128×64 bitmap 转 SSD1306 页格式。</td></tr>
+      </tbody></table>
+      <div class="danger"><strong>机械安全需要实测</strong>代码里 R3/L4 常规会限制到 150°，急停会释放 PWM；但舵机独立供电、共地、机械干涉、真实姿态和急停效果不能只从源码判断。</div>
+    </section>
+
+    <section class="chapter" id="gateway"><div class="chapter-head"><span class="chapter-no">MAP—G</span><div><h2>Gateway：按文件分工理解 Python</h2><p>入口是 <code>gateway/apps/voice_gateway/src/sesame_voice_gateway/app.py</code>，但语音业务没有塞进一个文件。</p></div></div>
+      <table class="comparison"><thead><tr><th>文件</th><th>关键对象</th><th>责任</th></tr></thead><tbody>
+        <tr><td><code>config.py</code></td><td><code>Settings</code></td><td>读 <code>SESAME_*</code> 环境变量；启动前拒绝缺 TLS、未明确同意远程语音、缺 Key、OpenClaw 不在 loopback 等配置。</td></tr>
+        <tr><td><code>app.py</code></td><td><code>DeviceSession</code></td><td>FastAPI/WSS、认证、设备序号、音频收集、取消、TTS 下发、本地控制路由。</td></tr>
+        <tr><td><code>pipeline.py</code></td><td><code>ConversationPipeline</code></td><td>一轮：Opus decode → 隐私限制 → ASR → OpenClaw → TTS → Opus encode。</td></tr>
+        <tr><td><code>protocol/audio.py</code> / <code>control.py</code></td><td><code>AudioFrame</code> / <code>ControlEvent</code></td><td>SSM1 与 JSON Schema 的严格编解码，超限/未知结构失败。</td></tr>
+        <tr><td><code>openclaw/client.py</code></td><td><code>OpenClawAgentProvider</code></td><td>本机连接、chat.send、超时重试、严格 JSON、request/turn 关联检查。</td></tr>
+        <tr><td><code>privacy.py</code> / <code>policy.py</code></td><td>限制函数</td><td>30 秒音频、4,000 字 TTS、表情/语速/声音白名单。</td></tr>
+      </tbody></table>
+      <div class="diagram">Gateway 收到设备消息
+bytes → unpack_audio_frame() → DeviceSession.opus_packets.append(payload)
+text  → parse_control_event() → listen.start / listen.stop / interrupt
+
+listen.stop → 创建 asyncio Task _run_turn()
+_run_turn → pipeline.process_turn()
+成功 → response.plan → tts.start → 每 20 ms 下行 SSM1 → tts.stop</div>
+    </section>
+
+    <section class="chapter" id="contracts"><div class="chapter-head"><span class="chapter-no">MAP—H</span><div><h2>最关键的两个数据结构</h2><p>控制 JSON 与音频二进制包各自解决不同问题。</p></div></div>
+      <div class="concept-grid">
+        <article class="concept"><span class="term">ControlEvent</span><h3>有业务含义的控制帧</h3><p>固定字段：<code>v</code>、<code>type</code>、<code>session_id</code>、<code>turn_id</code>、<code>request_id</code>、<code>sequence</code>、<code>timestamp_ms</code>、<code>payload</code>。</p><p><code>listen.start</code> 的意思是“开始允许收这一轮音频”；它本身不是音频。</p></article>
+        <article class="concept"><span class="term">AudioFrame</span><h3>可排序的声音包</h3><p>固定 32-byte 头：<code>SSM1</code>、版本、方向、flags、stream ID、generation、sequence、时间戳、payload 长度，之后才是至多 1,500 bytes 的 Opus。</p><p><code>generation</code> 分开不同回合；<code>sequence</code> 找同一回合内部的丢包和乱序。</p></article>
+      </div>
+      <div class="boundary"><strong>当前 AI 的动作权限</strong>动作白名单和机器人动作类仍存在，用于本地操作员控制和兼容；但当前 <code>openclaw/client.py</code> 把 Agent 的 <code>actions</code> 设为空，<code>app.py</code> 下发前又固定 <code>action = None</code>。因此当前 AI 回复不能让物理舵机动作。</div>
+    </section>
+
+    <section class="chapter" id="config"><div class="chapter-head"><span class="chapter-no">MAP—I</span><div><h2>配置不是源码：具体到文件</h2><p>排错时先分清“需要重新生成的秘密”与“可以修改并提交的实现”。</p></div></div>
+      <table class="comparison"><thead><tr><th>文件/产物</th><th>是否应提交</th><th>读/写者</th><th>含义</th></tr></thead><tbody>
+        <tr><td><code>gateway/.env</code></td><td>否</td><td><code>Settings</code></td><td>设备映射、DashScope、OpenClaw、TLS、mDNS；没有它 Gateway 会在启动校验中失败。</td></tr>
+        <tr><td><code>provisioning/device-config.example.json</code></td><td>模板可提交</td><td><code>generate_nvs.py</code></td><td>单台设备的 Wi‑Fi、device/gateway ID、token、根 CA 来源。</td></tr>
+        <tr><td><code>device-nvs.bin</code></td><td>否</td><td><code>generate_nvs.py</code></td><td>每台设备独立秘密；生成器把权限设为 0600，烧录偏移 0x9000。</td></tr>
+        <tr><td><code>partitions.csv</code></td><td>是</td><td>ESP-IDF</td><td>定义 NVS 0x9000 / 0x6000、固件、模型、存储等 Flash 布局。</td></tr>
+        <tr><td><code>local-device-config.h</code></td><td>否</td><td><code>generate_local_device_config.py</code></td><td>编译期注入替代 NVS；只适用于受控本机开发，不应带到共享仓库。</td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="chapter" id="path"><div class="chapter-head"><span class="chapter-no">MAP—J</span><div><h2>第一次读源码的 90 分钟路线</h2><p>目标不是读完，而是能准确画出并解释一次回合。</p></div></div>
+      <ol class="checklist">
+        <li>读 <code>main/app_main.cpp</code>，圈出创建的长期对象。</li>
+        <li>读 <code>voice_controller.h</code>，把字段归为硬件资源、会话、队列、任务、序号。</li>
+        <li>读 <code>VoiceController::start()</code>、<code>run()</code>，画出任务/队列关系。</li>
+        <li>读 <code>start_listening()</code>、<code>capture_and_send()</code>，确认按钮如何变成 SSM1 上行。</li>
+        <li>读 <code>app.py::_authenticate_session()</code>、<code>_receive_audio()</code>、<code>_run_turn()</code>，确认 Gateway 拒绝什么。</li>
+        <li>读 <code>pipeline.py::process_turn()</code>，确认 ASR/OpenClaw/TTS 的先后和失败输出。</li>
+        <li>最后读 <code>legacy_movement_sequences.h</code> 与网页 HTML；它们是动作内容，不是语音主链路。</li>
+      </ol>
+    </section>
+    <section class="sources"><h2>证据与扩展阅读</h2><p>本地图基于当前 <code>/Users/mac/Desktop/2</code> 工作树的源码、构建文件和合同；不代表实机已经验收。任务亲和性、队列和双核细节请对照 <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos_idf.html">ESP-IDF FreeRTOS 官方文档</a>；FastAPI 长连接部分请对照 <a href="https://fastapi.tiangolo.com/advanced/websockets/">FastAPI WebSocket 官方文档</a>。</p></section>
+  </main>
+</body>
+</html>

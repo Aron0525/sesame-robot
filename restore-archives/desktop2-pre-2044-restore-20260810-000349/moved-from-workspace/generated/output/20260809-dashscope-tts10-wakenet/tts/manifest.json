@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "purpose": "DashScope TTS ten-positive extension for 你好芝麻 WakeNet retraining",
+  "training_records": 8,
+  "holdout_records": 2,
+  "records": [
+    {
+      "id": "dashscope_01_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "train",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 0.82,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_01_nihao_zhima.wav",
+      "sha256": "1093d1bb0dd9d6cf88c288a8a21b7e979f0034d16204194e1629a54a7c09bc72",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 19884,
+        "duration_ms": 1242.75
+      }
+    },
+    {
+      "id": "dashscope_02_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "train",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 0.86,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_02_nihao_zhima.wav",
+      "sha256": "04d19b5f7558bf6e8b4b7a8fcaf2acc529deb172b2821b1217a4ffe3e6e0277b",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 17438,
+        "duration_ms": 1089.88
+      }
+    },
+    {
+      "id": "dashscope_03_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "train",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 0.9,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_03_nihao_zhima.wav",
+      "sha256": "48cc065af2771a0c428087b8e344146e50c9e57aa70489f0a6450c13c43d3695",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 18050,
+        "duration_ms": 1128.12
+      }
+    },
+    {
+      "id": "dashscope_04_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "train",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 0.94,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_04_nihao_zhima.wav",
+      "sha256": "050adb46c2e9f66022ab88e268578881b591f2c5ebcd3c9e248e4b2713493762",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 16080,
+        "duration_ms": 1005.0
+      }
+    },
+    {
+      "id": "dashscope_05_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "train",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 0.98,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_05_nihao_zhima.wav",
+      "sha256": "9bdb7f65e9a33c7ded74a5176782d9267731c460b0ec78f8c1776a6006fae783",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 16948,
+        "duration_ms": 1059.25
+      }
+    },
+    {
+      "id": "dashscope_06_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "train",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 1.02,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_06_nihao_zhima.wav",
+      "sha256": "d61da6c3e6f605a6b667bfe0d47e4810dc7e5a4c4f84308fd79a4f1b5c2725ce",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 15970,
+        "duration_ms": 998.12
+      }
+    },
+    {
+      "id": "dashscope_07_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "train",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 1.06,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_07_nihao_zhima.wav",
+      "sha256": "58432bd7b6c84072c488f17214b2b439cc4e444db3b0859b92a645594c987da8",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 15480,
+        "duration_ms": 967.5
+      }
+    },
+    {
+      "id": "dashscope_08_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "train",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 1.1,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_08_nihao_zhima.wav",
+      "sha256": "b064080d010116dbb73d06e3f5b78b0d40b0caaa41c4d9db62ca8372b306ef22",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 14991,
+        "duration_ms": 936.94
+      }
+    },
+    {
+      "id": "dashscope_09_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "holdout",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 1.14,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/holdout/dashscope_09_nihao_zhima.wav",
+      "sha256": "349efd585cddfd96ada0bffa5773328b84c544fd62f8dd7d9172a3a6854d4d51",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 13321,
+        "duration_ms": 832.56
+      }
+    },
+    {
+      "id": "dashscope_10_nihao_zhima",
+      "category": "target",
+      "label": 1,
+      "text": "你好，芝麻",
+      "split": "holdout",
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice_id": "longanhuan_v3.6",
+      "rate": 1.18,
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/holdout/dashscope_10_nihao_zhima.wav",
+      "sha256": "70f95ac0a94619c7aae616b0b6e341072c000038299d05d38705a6dc7e59451c",
+      "format": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 16000,
+        "frames": 13034,
+        "duration_ms": 814.62
+      }
+    }
+  ]
+}

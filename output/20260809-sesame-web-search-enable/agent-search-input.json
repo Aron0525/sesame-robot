@@ -1,0 +1,1 @@
+{"v":1,"request_id":"web-search-contract-20260809","conversation_id":"verify","turn_id":"turn-search-1","input":{"text":"请联网搜索 OpenClaw Web Search 的官方文档，用一句中文说明它能做什么。"},"capabilities":{"expressions":["default","thinking"],"actions":[]}}

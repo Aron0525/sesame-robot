@@ -1,0 +1,68 @@
+=== BASELINE (before modification) ===
+$ c++ -std=c++20 -I firmware/esp32_voice_idf/components/sesame_web/include baseline_probe.cpp -o baseline_probe && ./baseline_probe
+90,90,90,90,30,120,10,30
+compile_exit=0 run_exit=0
+$ firmware/esp32_voice_idf/tests/run_host_tests.sh
+zsh:38: permission denied: /Users/mac/Desktop/sesame/firmware/esp32_voice_idf/tests/run_host_tests.sh
+host_tests_exit=126
+$ bash firmware/esp32_voice_idf/tests/run_host_tests.sh
+zsh:6: read-only variable: status
+$ bash firmware/esp32_voice_idf/tests/run_host_tests.sh  # corrected record
+corrected_host_tests_exit=0
+
+=== MODIFIED ===
+$ python3 /Users/mac/Documents/sesame robot/output/servo-angle-pass-through-20260805/verify_source_contract.py
+PASS direct_angle_forwarding=true
+PASS legacy_calibration_deleted=true
+PASS stand_pose_R3_L4=180,180
+PASS arduino_subtrim_deleted=true
+exit=0
+$ bash /Users/mac/Desktop/sesame/firmware/esp32_voice_idf/tests/run_host_tests.sh
+exit=0
+$ source ~/.espressif/frameworks/esp-idf-v5.5.4/export.sh && idf.py build
+Executing action: all (aliases: build)
+Running ninja in directory /Users/mac/Desktop/sesame/firmware/esp32_voice_idf/build
+Executing "ninja all"...
+[1/4] cd /Users/mac/Desktop/sesame/firmware/esp32_voice_idf/build/esp-idf/esptool_py && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/mac/Desktop/sesame/firmware/esp32_voice_idf/build/partition_table/partition-table.bin /Users/mac/Desktop/sesame/firmware/esp32_voice_idf/build/sesame_robot_v3.bin
+sesame_robot_v3.bin binary size 0x154e90 bytes. Smallest app partition is 0x400000 bytes. 0x2ab170 bytes (67%) free.
+[2/4] Performing build step for 'bootloader'
+[1/1] cd /Users/mac/Desktop/sesame/firmware/esp32_voice_idf/build/bootloader/esp-idf/esptool_py && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /Users/mac/Desktop/sesame/firmware/esp32_voice_idf/build/bootloader/bootloader.bin
+Bootloader binary size 0x5160 bytes. 0x2ea0 bytes (36%) free.
+[3/4] No install step for 'bootloader'
+[4/4] Completed 'bootloader'
+
+Project build complete. To flash, run:
+ idf.py flash
+or
+ idf.py -p PORT flash
+or
+ python -m esptool --chip esp32s3 -b 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_size 16MB --flash_freq 80m 0x0 build/bootloader/bootloader.bin 0x8000 build/partition_table/partition-table.bin 0x10000 build/sesame_robot_v3.bin
+or from the "/Users/mac/Desktop/sesame/firmware/esp32_voice_idf/build" directory
+ python -m esptool --chip esp32s3 -b 460800 --before default_reset --after hard_reset write_flash "@flash_args"
+exit=0
+$ arduino-cli compile --fqbn esp32:esp32:esp32s3 firmware/arduino/Sesame_Robot_WiFi_Controller
+Sketch uses 1133876 bytes (86%) of program storage space. Maximum is 1310720 bytes.
+Global variables use 50988 bytes (15%) of dynamic memory, leaving 276692 bytes for local variables. Maximum is 327680 bytes.
+exit=0
+
+=== ROLLBACK TEST ===
+$ REPO=rollback-fixture ./rollback.sh
+rollback_complete=/Users/mac/Documents/sesame robot/output/servo-angle-pass-through-20260805/rollback-fixture
+exit=0
+$ git status --porcelain
+exit=0
+rollback_clean=true
+
+=== FINAL SOURCE STATUS ===
+$ git diff --check
+exit=0
+$ git status --short
+ M firmware/arduino/Sesame_Robot_WiFi_Controller/Sesame_Robot_WiFi_Controller.ino
+ D firmware/esp32_voice_idf/components/sesame_web/include/sesame_web/legacy_motion_calibration.h
+ M firmware/esp32_voice_idf/components/sesame_web/include/sesame_web/legacy_movement_sequences.h
+ M firmware/esp32_voice_idf/components/sesame_web/legacy_motion_runner.cpp
+ M firmware/esp32_voice_idf/tests/test_servo_calibration.cpp
+exit=0
+$ source transform scan
+unexpected_transform_found=false
+exit=0

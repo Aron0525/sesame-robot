@@ -1,0 +1,140 @@
+{
+  "change": "disable OpenClaw-originated robot actions while retaining expressions, TTS, and local operator controls",
+  "modified_artifact": "/Users/mac/Documents/sesame robot/output/20260811-openclaw-disable-actions-v1/finals",
+  "patch": "/Users/mac/Documents/sesame robot/output/20260811-openclaw-disable-actions-v1/openclaw-actions-disabled.patch",
+  "rollback": "/Users/mac/Documents/sesame robot/output/20260811-openclaw-disable-actions-v1/rollback.sh",
+  "apply_final": "/Users/mac/Documents/sesame robot/output/20260811-openclaw-disable-actions-v1/apply-final.sh",
+  "files": [
+    {
+      "target": "/Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/app.py",
+      "storage": "endpoint-gateway/src/sesame_endpoint_gateway/app.py",
+      "original_sha256": "139058c46fd28b56e2b1437719898cdbe4832ec83ec9537603e8d239b0498cb1",
+      "final_sha256": "f95b510eef2eae6e5f9463ab02e00d05b13fa3d1283de80f932cdc4c97a631eb"
+    },
+    {
+      "target": "/Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_device_stream.py",
+      "storage": "endpoint-gateway/tests/test_device_stream.py",
+      "original_sha256": "bc215630aafaf993e198edba7a592e9a0f8663ab32d3664fb10b3fab71576ec4",
+      "final_sha256": "a85d17d9d1a5ffa2d82eb1059598d7533a69a6c7529cd53f239a08226ff25291"
+    },
+    {
+      "target": "/Users/mac/Documents/sesame robot/endpoint-gateway/README.md",
+      "storage": "endpoint-gateway/README.md",
+      "original_sha256": "08a4a4d805dd605cc7310c37c7385cad39427e988ab596a2e1c5972f8e187afa",
+      "final_sha256": "0c911187cecd465222bd89eaf790fdf712ac9374d9906dee3dfb6e88de99bda2"
+    },
+    {
+      "target": "/Users/mac/.openclaw/workspace-sesame/AGENTS.md",
+      "storage": "openclaw/workspace-sesame/AGENTS.md",
+      "original_sha256": "a01577e1bdb5898bb98fcaddcde547eae021d5604f7bb886fb87b74f2347e422",
+      "final_sha256": "e838bf39894ddc1ab739fa34bef46dad5a664a93b7f5e9e689ea044d4daca842"
+    },
+    {
+      "target": "/Users/mac/.openclaw/workspace-sesame-learning/AGENTS.md",
+      "storage": "openclaw/workspace-sesame-learning/AGENTS.md",
+      "original_sha256": "ebfc78d8ba2512c8376505ef600c6e9ba6df4bab9ebbf5d3d742ff8420299620",
+      "final_sha256": "8e6c25916d44b6a925d01bd0a60ddf40f54a19dea836e83dcda00fc8ede99689"
+    },
+    {
+      "target": "/Users/mac/.openclaw/workspace-sesame-children/AGENTS.md",
+      "storage": "openclaw/workspace-sesame-children/AGENTS.md",
+      "original_sha256": "080006b7724ffcac64efeae1ad8677ed920b6ed0edeb0b361bae2c0a16c28c61",
+      "final_sha256": "13be6b1fff0b76358f933eb65a1e83b6e1f1f309a881ed09bc3b31730389b537"
+    },
+    {
+      "target": "/Users/mac/.openclaw/workspace-sesame-work/AGENTS.md",
+      "storage": "openclaw/workspace-sesame-work/AGENTS.md",
+      "original_sha256": "258d0d66f77560a43fca8fd4e8c209ad2a9f75ed3ab3851b06b558e2ac1aa56d",
+      "final_sha256": "beaf88498f47a27b271bde99553fe405faf9c9a318796d224174016ef48cf720"
+    },
+    {
+      "target": "/Users/mac/Desktop/2/gateway/apps/voice_gateway/src/sesame_voice_gateway/openclaw/client.py",
+      "storage": "desktop2-gateway/apps/voice_gateway/src/sesame_voice_gateway/openclaw/client.py",
+      "original_sha256": "3f075bf27865c61b1b09f36d1cc50c66da1f5aed8616be1fea11dcd6b15c6a94",
+      "final_sha256": "41ab21214f776f07961a2e22d52a9947e61f30842d208f60802f63760135036d"
+    },
+    {
+      "target": "/Users/mac/Desktop/2/gateway/apps/voice_gateway/src/sesame_voice_gateway/app.py",
+      "storage": "desktop2-gateway/apps/voice_gateway/src/sesame_voice_gateway/app.py",
+      "original_sha256": "3d2ffa8d64c53b2d6bbff84fcfb0ee028607046382de14ebbdc0ae6e81833f9c",
+      "final_sha256": "a74456395d49b2caf0a24cfaa6956217e40281ca6db8f17a49f0051e89ec0e27"
+    },
+    {
+      "target": "/Users/mac/Desktop/2/gateway/tests/test_response_plan.py",
+      "storage": "desktop2-gateway/tests/test_response_plan.py",
+      "original_sha256": "3d697ee336917fc6e420bd0addfe769d237ed7aeb35d4e9915e5b9d91e3f3369",
+      "final_sha256": "e028bbb46ec4cbb6fe5ed95c831ac6fd5dd7fd67d436e454ce97124741c15cd9"
+    },
+    {
+      "target": "/Users/mac/Desktop/2/gateway/tests/test_device_capabilities.py",
+      "storage": "desktop2-gateway/tests/test_device_capabilities.py",
+      "original_sha256": "67a444a35c0ca59a977e3044967b998d0caa64af143d652ba0908a6f73849b42",
+      "final_sha256": "ad61898dfe74c7ca3d584762198fe3b6c813a19aa1de4ee9628a6949f880db36"
+    },
+    {
+      "target": "/Users/mac/Desktop/2/gateway/tests/test_gateway_protocol_hardening.py",
+      "storage": "desktop2-gateway/tests/test_gateway_protocol_hardening.py",
+      "original_sha256": "7ab1c29862c7f6a833a01844866faa31a20add7a3d66c3186ec22679e0ed5b3c",
+      "final_sha256": "b5c093fdfa509a1ab9db46b0123ce4c2a1edf4fc8f3c0dbe89e3b1e5cdd33d07"
+    },
+    {
+      "target": "/Users/mac/Desktop/2/contracts/schemas/agent-request.v1.schema.json",
+      "storage": "desktop2-contracts/schemas/agent-request.v1.schema.json",
+      "original_sha256": "aeb7e57c38a9bb14c938f547c8594ba42317186c74c5969d891607846c5aad05",
+      "final_sha256": "52a0c9729b878fc7235d539fbb9ab9aa3589d3d4e489d487dbfb6a6a44749fbd"
+    }
+  ],
+  "verification": [
+    {
+      "name": "rollback restored every preserved source",
+      "command": "\"/Users/mac/Documents/sesame robot/output/20260811-openclaw-disable-actions-v1/rollback.sh\"",
+      "inputs": "/Users/mac/Documents/sesame robot/output/20260811-openclaw-disable-actions-v1/changed-files.tsv",
+      "literal_output": "139058c46fd28b56e2b1437719898cdbe4832ec83ec9537603e8d239b0498cb1  /Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/app.py\nbc215630aafaf993e198edba7a592e9a0f8663ab32d3664fb10b3fab71576ec4  /Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_device_stream.py\n08a4a4d805dd605cc7310c37c7385cad39427e988ab596a2e1c5972f8e187afa  /Users/mac/Documents/sesame robot/endpoint-gateway/README.md\na01577e1bdb5898bb98fcaddcde547eae021d5604f7bb886fb87b74f2347e422  /Users/mac/.openclaw/workspace-sesame/AGENTS.md\nebfc78d8ba2512c8376505ef600c6e9ba6df4bab9ebbf5d3d742ff8420299620  /Users/mac/.openclaw/workspace-sesame-learning/AGENTS.md\n080006b7724ffcac64efeae1ad8677ed920b6ed0edeb0b361bae2c0a16c28c61  /Users/mac/.openclaw/workspace-sesame-children/AGENTS.md\n258d0d66f77560a43fca8fd4e8c209ad2a9f75ed3ab3851b06b558e2ac1aa56d  /Users/mac/.openclaw/workspace-sesame-work/AGENTS.md\n3f075bf27865c61b1b09f36d1cc50c66da1f5aed8616be1fea11dcd6b15c6a94  /Users/mac/Desktop/2/gateway/apps/voice_gateway/src/sesame_voice_gateway/openclaw/client.py\n3d2ffa8d64c53b2d6bbff84fcfb0ee028607046382de14ebbdc0ae6e81833f9c  /Users/mac/Desktop/2/gateway/apps/voice_gateway/src/sesame_voice_gateway/app.py\n3d697ee336917fc6e420bd0addfe769d237ed7aeb35d4e9915e5b9d91e3f3369  /Users/mac/Desktop/2/gateway/tests/test_response_plan.py\n67a444a35c0ca59a977e3044967b998d0caa64af143d652ba0908a6f73849b42  /Users/mac/Desktop/2/gateway/tests/test_device_capabilities.py\n7ab1c29862c7f6a833a01844866faa31a20add7a3d66c3186ec22679e0ed5b3c  /Users/mac/Desktop/2/gateway/tests/test_gateway_protocol_hardening.py\naeb7e57c38a9bb14c938f547c8594ba42317186c74c5969d891607846c5aad05  /Users/mac/Desktop/2/contracts/schemas/agent-request.v1.schema.json\n",
+      "exit_status": 0,
+      "verified_hash_count": 13
+    },
+    {
+      "name": "apply restored every final source",
+      "command": "\"/Users/mac/Documents/sesame robot/output/20260811-openclaw-disable-actions-v1/apply-final.sh\"",
+      "inputs": "/Users/mac/Documents/sesame robot/output/20260811-openclaw-disable-actions-v1/changed-files.tsv",
+      "literal_output": "f95b510eef2eae6e5f9463ab02e00d05b13fa3d1283de80f932cdc4c97a631eb  /Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/app.py\na85d17d9d1a5ffa2d82eb1059598d7533a69a6c7529cd53f239a08226ff25291  /Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_device_stream.py\n0c911187cecd465222bd89eaf790fdf712ac9374d9906dee3dfb6e88de99bda2  /Users/mac/Documents/sesame robot/endpoint-gateway/README.md\ne838bf39894ddc1ab739fa34bef46dad5a664a93b7f5e9e689ea044d4daca842  /Users/mac/.openclaw/workspace-sesame/AGENTS.md\n8e6c25916d44b6a925d01bd0a60ddf40f54a19dea836e83dcda00fc8ede99689  /Users/mac/.openclaw/workspace-sesame-learning/AGENTS.md\n13be6b1fff0b76358f933eb65a1e83b6e1f1f309a881ed09bc3b31730389b537  /Users/mac/.openclaw/workspace-sesame-children/AGENTS.md\nbeaf88498f47a27b271bde99553fe405faf9c9a318796d224174016ef48cf720  /Users/mac/.openclaw/workspace-sesame-work/AGENTS.md\n41ab21214f776f07961a2e22d52a9947e61f30842d208f60802f63760135036d  /Users/mac/Desktop/2/gateway/apps/voice_gateway/src/sesame_voice_gateway/openclaw/client.py\na74456395d49b2caf0a24cfaa6956217e40281ca6db8f17a49f0051e89ec0e27  /Users/mac/Desktop/2/gateway/apps/voice_gateway/src/sesame_voice_gateway/app.py\ne028bbb46ec4cbb6fe5ed95c831ac6fd5dd7fd67d436e454ce97124741c15cd9  /Users/mac/Desktop/2/gateway/tests/test_response_plan.py\nad61898dfe74c7ca3d584762198fe3b6c813a19aa1de4ee9628a6949f880db36  /Users/mac/Desktop/2/gateway/tests/test_device_capabilities.py\nb5c093fdfa509a1ab9db46b0123ce4c2a1edf4fc8f3c0dbe89e3b1e5cdd33d07  /Users/mac/Desktop/2/gateway/tests/test_gateway_protocol_hardening.py\n52a0c9729b878fc7235d539fbb9ab9aa3589d3d4e489d487dbfb6a6a44749fbd  /Users/mac/Desktop/2/contracts/schemas/agent-request.v1.schema.json\n",
+      "exit_status": 0,
+      "verified_hash_count": 13
+    },
+    {
+      "name": "Desktop2 Gateway test suite",
+      "command": "cd '/Users/mac/Desktop/2/gateway' && PYTHONPATH=apps/voice_gateway/src ./.venv/bin/python -m unittest discover -s tests -v",
+      "inputs": "Gateway source and tests after final apply",
+      "literal_output": "/Users/mac/Desktop/2/gateway/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n  from starlette.testclient import TestClient as TestClient  # noqa\ntest_trace_events_are_coalesced_and_timeline_is_bounded (test_console_render_budget.ConsoleRenderBudgetTest.test_trace_events_are_coalesced_and_timeline_is_bounded) ... ok\ntest_console_and_local_control_are_available_only_to_the_local_browser (test_console_routes.ConsoleRoutesTest.test_console_and_local_control_are_available_only_to_the_local_browser) ... ok\ntest_device_dispatch_uses_the_existing_control_protocol (test_console_routes.ConsoleRoutesTest.test_device_dispatch_uses_the_existing_control_protocol) ... ok\ntest_local_control_accepts_expression_and_motion_settings (test_console_routes.ConsoleRoutesTest.test_local_control_accepts_expression_and_motion_settings) ... ok\ntest_local_control_rejects_a_lan_browser (test_console_routes.ConsoleRoutesTest.test_local_control_rejects_a_lan_browser) ... ok\ntest_trace_events_update_device_and_turn_cards_without_a_page_reload (test_dashboard_live_updates.DashboardLiveUpdateTest.test_trace_events_update_device_and_turn_cards_without_a_page_reload) ... ok\ntest_dashboard_accepts_the_computers_lan_address (test_dashboard_routes.DashboardRoutesTest.test_dashboard_accepts_the_computers_lan_address) ... ok\ntest_dashboard_and_snapshot_are_available_to_a_local_browser (test_dashboard_routes.DashboardRoutesTest.test_dashboard_and_snapshot_are_available_to_a_local_browser) ... ok\ntest_dashboard_rejects_a_lan_browser (test_dashboard_routes.DashboardRoutesTest.test_dashboard_rejects_a_lan_browser) ... ok\ntest_keeps_audio_when_stream_only_has_a_terminal_block (test_dashscope_tts_stream.DashScopeTtsStreamTest.test_keeps_audio_when_stream_only_has_a_terminal_block) ... ok\ntest_skips_the_terminal_cumulative_audio_block (test_dashscope_tts_stream.DashScopeTtsStreamTest.test_skips_the_terminal_cumulative_audio_block) ... ok\ntest_agent_actions_are_dropped_before_reaching_the_plan (test_device_capabilities.DeviceCapabilityContractTest.test_agent_actions_are_dropped_before_reaching_the_plan) ... ok\ntest_agent_prompt_requires_a_real_expression_and_forbids_actions (test_device_capabilities.DeviceCapabilityContractTest.test_agent_prompt_requires_a_real_expression_and_forbids_actions) ... ok\ntest_legacy_default_expression_is_normalized_to_idle (test_device_capabilities.DeviceCapabilityContractTest.test_legacy_default_expression_is_normalized_to_idle) ... ok\ntest_model_action_capability_is_empty (test_device_capabilities.DeviceCapabilityContractTest.test_model_action_capability_is_empty) ... ok\ntest_openclaw_metadata_does_not_break_the_device_response_contract (test_device_capabilities.DeviceCapabilityContractTest.test_openclaw_metadata_does_not_break_the_device_response_contract) ... ok\ntest_openclaw_receives_no_actions_and_the_expression_catalog (test_device_capabilities.DeviceCapabilityContractTest.test_openclaw_receives_no_actions_and_the_expression_catalog) ... ok\ntest_current_underscore_style_id_remains_supported (test_device_id_policy.DeviceIdPolicyTest.test_current_underscore_style_id_remains_supported) ... ok\ntest_protocol_rejects_a_device_id_longer_than_one_mdns_label (test_device_id_policy.DeviceIdPolicyTest.test_protocol_rejects_a_device_id_longer_than_one_mdns_label) ... ok\ntest_protocol_rejects_a_device_id_that_firmware_cannot_publish_as_mdns (test_device_id_policy.DeviceIdPolicyTest.test_protocol_rejects_a_device_id_that_firmware_cannot_publish_as_mdns) ... ok\ntest_rejects_device_ids_that_cannot_be_made_into_an_esp32_mdns_hostname (test_device_id_policy.DeviceIdPolicyTest.test_rejects_device_ids_that_cannot_be_made_into_an_esp32_mdns_hostname) ... ok\ntest_rejects_device_ids_that_collide_after_mdns_normalization (test_device_id_policy.DeviceIdPolicyTest.test_rejects_device_ids_that_collide_after_mdns_normalization) ... ok\ntest_action_result_is_a_metadata_only_audit_event (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_action_result_is_a_metadata_only_audit_event) ... ok\ntest_audio_is_bounded_before_pipeline_processing (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_audio_is_bounded_before_pipeline_processing) ... ok\ntest_audio_requires_opus_uplink_stream_one_and_single_generation (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_audio_requires_opus_uplink_stream_one_and_single_generation) ... ok\ntest_audited_control_identifiers_cannot_contain_free_text (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_audited_control_identifiers_cannot_contain_free_text) ... ok\ntest_authenticated_unknown_or_expired_conversation_is_reissued (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_authenticated_unknown_or_expired_conversation_is_reissued) ... ok\ntest_device_control_sequence_is_strict_and_replay_safe (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_device_control_sequence_is_strict_and_replay_safe) ... ok\ntest_foreign_conversation_is_not_reissued (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_foreign_conversation_is_not_reissued) ... ok\ntest_hello_must_start_control_sequence_at_zero (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_hello_must_start_control_sequence_at_zero) ... ok\ntest_listen_start_requires_a_capture_trigger (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_listen_start_requires_a_capture_trigger) ... ok\ntest_only_one_live_connection_can_claim_a_device (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_only_one_live_connection_can_claim_a_device) ... ok\ntest_operator_control_ack_is_visible_without_a_voice_turn (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_operator_control_ack_is_visible_without_a_voice_turn) ... ok\ntest_response_plan_omits_an_agent_action_and_its_deadline (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_response_plan_omits_an_agent_action_and_its_deadline) ... ok\ntest_second_authenticated_connection_is_rejected_for_the_same_device (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_second_authenticated_connection_is_rejected_for_the_same_device) ... ok\ntest_unexpected_provider_error_returns_only_generic_error (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_unexpected_provider_error_returns_only_generic_error) ... voice_pipeline_failed device_id=device_001 session_id=ses_001 error_type=KeyError\nok\ntest_websocket_transport_has_an_outer_frame_size_limit (test_gateway_protocol_hardening.GatewayProtocolHardeningTest.test_websocket_transport_has_an_outer_frame_size_limit) ... ok\ntest_downlink_opus_is_paced_at_20ms (test_interruptible_turns.InterruptibleTurnTest.test_downlink_opus_is_paced_at_20ms) ... ok\ntest_interrupt_cancels_processing_turn_and_flushes_device (test_interruptible_turns.InterruptibleTurnTest.test_interrupt_cancels_processing_turn_and_flushes_device) ... ok\ntest_auto_address_prefers_hostname_lan_address_over_vpn_route (test_mdns_refresh.MdnsRefreshTest.test_auto_address_prefers_hostname_lan_address_over_vpn_route) ... ok\ntest_refresh_republishes_when_the_automatic_lan_address_changes (test_mdns_refresh.MdnsRefreshTest.test_refresh_republishes_when_the_automatic_lan_address_changes) ... ok\ntest_start_recovers_from_a_stale_mdns_instance_name (test_mdns_refresh.MdnsRefreshTest.test_start_recovers_from_a_stale_mdns_instance_name) ... ok\ntest_marks_an_active_turn_failed_when_its_device_disconnects (test_observability.ObservabilityStoreTest.test_marks_an_active_turn_failed_when_its_device_disconnects) ... ok\ntest_marks_turn_completed_after_tts_stops (test_observability.ObservabilityStoreTest.test_marks_turn_completed_after_tts_stops) ... ok\ntest_tracks_current_stage_and_redacts_content_by_default (test_observability.ObservabilityStoreTest.test_tracks_current_stage_and_redacts_content_by_default) ... ok\ntest_abort_request_always_names_one_run (test_openclaw_retry.OpenClawRetryTest.test_abort_request_always_names_one_run) ... ok\ntest_cancel_aborts_only_the_current_run (test_openclaw_retry.OpenClawRetryTest.test_cancel_aborts_only_the_current_run) ... ok\ntest_caps_retry_delay (test_openclaw_retry.OpenClawRetryTest.test_caps_retry_delay) ... ok\ntest_device_receives_a_retryable_openclaw_error (test_openclaw_retry.OpenClawRetryTest.test_device_receives_a_retryable_openclaw_error) ... OpenClaw was unavailable before a safe response was produced\nok\ntest_does_not_retry_a_protocol_error (test_openclaw_retry.OpenClawRetryTest.test_does_not_retry_a_protocol_error) ... ok\ntest_exhausted_transport_failure_becomes_safe_provider_error (test_openclaw_retry.OpenClawRetryTest.test_exhausted_transport_failure_becomes_safe_provider_error) ... ok\ntest_retries_a_transient_network_failure_with_exponential_backoff (test_openclaw_retry.OpenClawRetryTest.test_retries_a_transient_network_failure_with_exponential_backoff) ... ok\ntest_total_timeout_covers_all_attempts_and_requests_abort (test_openclaw_retry.OpenClawRetryTest.test_total_timeout_covers_all_attempts_and_requests_abort) ... ok\ntest_accepts_only_web_search_when_the_gateway_enabled_it (test_openclaw_tool_calls.OpenClawToolCallTest.test_accepts_only_web_search_when_the_gateway_enabled_it) ... ok\ntest_rejects_tool_calls_after_the_gateway_has_returned_search_evidence (test_openclaw_tool_calls.OpenClawToolCallTest.test_rejects_tool_calls_after_the_gateway_has_returned_search_evidence) ... ok\ntest_web_search_prompt_lists_the_only_allowed_freshness_values (test_openclaw_tool_calls.OpenClawToolCallTest.test_web_search_prompt_lists_the_only_allowed_freshness_values) ... ok\ntest_dashboard_text_is_visible_by_default (test_privacy_pipeline.PrivacyAndPipelineTest.test_dashboard_text_is_visible_by_default) ... ok\ntest_dashscope_urls_must_use_tls (test_privacy_pipeline.PrivacyAndPipelineTest.test_dashscope_urls_must_use_tls) ... ok\ntest_each_turn_gets_a_fresh_opus_codec (test_privacy_pipeline.PrivacyAndPipelineTest.test_each_turn_gets_a_fresh_opus_codec) ... ok\ntest_pipeline_completes_a_synthetic_turn_without_external_data (test_privacy_pipeline.PrivacyAndPipelineTest.test_pipeline_completes_a_synthetic_turn_without_external_data) ... ok\ntest_pipeline_emits_stage_events_for_the_dashboard (test_privacy_pipeline.PrivacyAndPipelineTest.test_pipeline_emits_stage_events_for_the_dashboard) ... ok\ntest_pipeline_executes_one_web_search_then_generates_the_final_reply (test_privacy_pipeline.PrivacyAndPipelineTest.test_pipeline_executes_one_web_search_then_generates_the_final_reply) ... ok\ntest_pipeline_replies_when_asr_returns_no_speech (test_privacy_pipeline.PrivacyAndPipelineTest.test_pipeline_replies_when_asr_returns_no_speech) ... ok\ntest_remote_audio_has_a_30_second_limit (test_privacy_pipeline.PrivacyAndPipelineTest.test_remote_audio_has_a_30_second_limit) ... ok\ntest_remote_speech_requires_explicit_consent (test_privacy_pipeline.PrivacyAndPipelineTest.test_remote_speech_requires_explicit_consent) ... ok\ntest_serial_monitor_requires_a_registered_device (test_privacy_pipeline.PrivacyAndPipelineTest.test_serial_monitor_requires_a_registered_device) ... ok\ntest_gateway_drops_agent_action_before_sending_plan (test_response_plan.ResponsePlanProtocolTest.test_gateway_drops_agent_action_before_sending_plan) ... ok\ntest_response_plan_allows_expression_without_an_action (test_response_plan.ResponsePlanProtocolTest.test_response_plan_allows_expression_without_an_action) ... ok\ntest_response_plan_rejects_partial_action (test_response_plan.ResponsePlanProtocolTest.test_response_plan_rejects_partial_action) ... ok\ntest_chooses_the_unique_espressif_port_dynamically (test_serial_monitor.FirmwareSerialMonitorTest.test_chooses_the_unique_espressif_port_dynamically) ... ok\ntest_ignores_macos_builtin_pseudo_serial_ports (test_serial_monitor.FirmwareSerialMonitorTest.test_ignores_macos_builtin_pseudo_serial_ports) ... ok\ntest_ignores_unmapped_firmware_log_lines (test_serial_monitor.FirmwareSerialMonitorTest.test_ignores_unmapped_firmware_log_lines) ... ok\ntest_keeps_an_explicit_port_override (test_serial_monitor.FirmwareSerialMonitorTest.test_keeps_an_explicit_port_override) ... ok\ntest_publishes_a_structured_device_event (test_serial_monitor.FirmwareSerialMonitorTest.test_publishes_a_structured_device_event) ... ok\ntest_requires_an_explicit_port_when_multiple_unknown_devices_exist (test_serial_monitor.FirmwareSerialMonitorTest.test_requires_an_explicit_port_when_multiple_unknown_devices_exist) ... ok\ntest_translates_boot_and_playback_logs_without_retaining_raw_lines (test_serial_monitor.FirmwareSerialMonitorTest.test_translates_boot_and_playback_logs_without_retaining_raw_lines) ... ok\ntest_uses_the_only_usb_serial_port_when_board_vid_is_unknown (test_serial_monitor.FirmwareSerialMonitorTest.test_uses_the_only_usb_serial_port_when_board_vid_is_unknown) ... ok\ntest_pipeline_skips_wakeword_turns_in_manual_only_mode (test_test_recordings.TestRecordingPipelineTest.test_pipeline_skips_wakeword_turns_in_manual_only_mode) ... ok\ntest_pipeline_writes_the_decoded_uplink_pcm_when_enabled (test_test_recordings.TestRecordingPipelineTest.test_pipeline_writes_the_decoded_uplink_pcm_when_enabled) ... ok\ntest_test_recordings_are_disabled_by_default (test_test_recordings.TestRecordingSettingsTest.test_test_recordings_are_disabled_by_default) ... ok\ntest_factory_creates_a_store_only_when_test_retention_is_enabled (test_test_recordings.TestRecordingStoreTest.test_factory_creates_a_store_only_when_test_retention_is_enabled) ... ok\ntest_saves_pcm_as_wav_and_appends_a_manifest_entry (test_test_recordings.TestRecordingStoreTest.test_saves_pcm_as_wav_and_appends_a_manifest_entry) ... ok\ntest_stops_writing_after_the_configured_limit (test_test_recordings.TestRecordingStoreTest.test_stops_writing_after_the_configured_limit) ... ok\ntest_accepts_a_bounded_search_query (test_web_search_tools.WebSearchToolTest.test_accepts_a_bounded_search_query) ... ok\ntest_rejects_unknown_fields_and_an_unbounded_query (test_web_search_tools.WebSearchToolTest.test_rejects_unknown_fields_and_an_unbounded_query) ... ok\ntest_settings_enable_qwen_plus_web_search_explicitly (test_web_search_tools.WebSearchToolTest.test_settings_enable_qwen_plus_web_search_explicitly) ... ok\ntest_uses_qwen_plus_and_returns_a_bounded_source_list (test_web_search_tools.WebSearchToolTest.test_uses_qwen_plus_and_returns_a_bounded_source_list) ... ok\n\n----------------------------------------------------------------------\nRan 87 tests in 0.424s\n\nOK\n",
+      "exit_status": 0
+    },
+    {
+      "name": "Documents endpoint Gateway test suite",
+      "command": "cd '/Users/mac/Documents/sesame robot/endpoint-gateway' && PYTHONPATH=src ./.venv/bin/python -m unittest discover -s tests -v",
+      "inputs": "Endpoint Gateway source and tests after final apply",
+      "literal_output": "test_authenticated_hello_returns_negotiated_audio_contract (test_device_stream.DeviceStreamTests) ... ok\ntest_console_rejects_unknown_actions_and_broadcasts_device_status (test_device_stream.DeviceStreamTests) ... ok\ntest_console_serves_a_single_site_and_forwards_allowed_action (test_device_stream.DeviceStreamTests) ... ok\ntest_malformed_or_downlink_audio_is_rejected_at_gateway_boundary (test_device_stream.DeviceStreamTests) ... ok\ntest_unauthenticated_connection_is_rejected_before_hello (test_device_stream.DeviceStreamTests) ... ok\ntest_openclaw_can_select_learning_scene_and_console_observes_profile (test_device_stream.SceneControlTests) ... ok\ntest_openclaw_feedback_forwards_expression_and_ignores_actions (test_device_stream.SceneControlTests) ... ok\ntest_openclaw_feedback_rejects_stale_agent_after_mode_switch (test_device_stream.SceneControlTests) ... ok\ntest_openclaw_scene_control_rejects_invalid_scene_and_bad_token (test_device_stream.SceneControlTests) ... ok\ntest_console_can_return_from_a_scene_to_independent_normal_mode (test_scene_profiles.ModeSelectionTests) ... ok\ntest_console_rejects_unknown_mode (test_scene_profiles.ModeSelectionTests) ... ok\ntest_console_starts_in_normal_mode_and_can_select_learning (test_scene_profiles.SceneProfileTests) ... ok\ntest_every_scene_maps_to_its_own_agent_and_future_knowledge_base (test_scene_profiles.SceneProfileTests) ... ok\ntest_normal_mode_is_separate_from_the_three_scenes (test_scene_profiles.SceneProfileTests) ... ok\n\n----------------------------------------------------------------------\nRan 14 tests in 0.132s\n\nOK\n",
+      "exit_status": 0
+    },
+    {
+      "name": "OpenClaw action path",
+      "command": "build Agent request; parse an old action-bearing result; emit response.plan from an action-bearing AgentResult",
+      "inputs": "request text=请挥手; action={name: wave, duration_ms: 1000}",
+      "literal_output": "{\n  \"openclaw_capability_actions\": [],\n  \"legacy_agent_action_count_after_parse\": 0,\n  \"response_plan_action_id\": null,\n  \"response_plan_action_request_id\": null,\n  \"response_plan_action_duration_ms\": null,\n  \"response_plan_action_deadline_ms\": null,\n  \"response_plan_expression_id\": \"happy\"\n}\n",
+      "exit_status": 0
+    },
+    {
+      "name": "running voice gateway",
+      "command": "launchctl kickstart -k gui/$(id -u)/com.sesame.voice-gateway",
+      "inputs": "LaunchAgent com.sesame.voice-gateway",
+      "literal_output": "{\n  \"launch_agent_pid\": 18323,\n  \"gateway_process_pid\": 18329,\n  \"listener\": \"0.0.0.0:8765\"\n}\n",
+      "exit_status": 0
+    },
+    {
+      "name": "loaded Gateway source contract",
+      "command": "cd '/Users/mac/Desktop/2/gateway' && ./.venv/bin/python -c '<import OpenClaw client and schema>'",
+      "inputs": "editable Gateway package currently used by LaunchAgent",
+      "literal_output": "ALLOWED_ACTIONS=[]\nschema_actions={'const': []}\n",
+      "exit_status": 0
+    }
+  ]
+}

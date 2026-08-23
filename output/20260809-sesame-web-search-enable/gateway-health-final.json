@@ -1,0 +1,181 @@
+{
+  "ok": true,
+  "ts": 1786333665673,
+  "durationMs": 40,
+  "eventLoop": {
+    "degraded": false,
+    "reasons": [],
+    "intervalMs": 6474,
+    "delayP99Ms": 85.5,
+    "delayMaxMs": 416.8,
+    "utilization": 0.166,
+    "cpuCoreRatio": 0.174
+  },
+  "plugins": {
+    "loaded": [
+      "memory-core",
+      "parallel",
+      "wecom-openclaw-plugin"
+    ],
+    "errors": []
+  },
+  "configReload": {
+    "hotReloadStatus": "active"
+  },
+  "modelPricing": {
+    "state": "ok",
+    "sources": []
+  },
+  "channels": {
+    "wecom": {
+      "accountId": "default",
+      "name": "企业微信",
+      "enabled": true,
+      "configured": true,
+      "running": true,
+      "lastStartAt": 1786333659673,
+      "lastStopAt": null,
+      "lastError": null,
+      "accounts": {
+        "default": {
+          "accountId": "default",
+          "name": "企业微信",
+          "enabled": true,
+          "configured": true,
+          "running": true,
+          "lastStartAt": 1786333659673,
+          "lastStopAt": null,
+          "lastError": null
+        }
+      }
+    }
+  },
+  "channelOrder": [
+    "wecom"
+  ],
+  "channelLabels": {
+    "wecom": "企业微信"
+  },
+  "heartbeatSeconds": 1800,
+  "defaultAgentId": "main",
+  "agents": [
+    {
+      "agentId": "main",
+      "isDefault": true,
+      "heartbeat": {
+        "enabled": true,
+        "every": "30m",
+        "everyMs": 1800000,
+        "prompt": "Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.",
+        "target": "none",
+        "ackMaxChars": 300
+      },
+      "sessions": {
+        "path": "/Users/mac/.openclaw/agents/main/sessions/sessions.json",
+        "count": 5,
+        "recent": [
+          {
+            "key": "agent:main:main",
+            "updatedAt": 1785123380970,
+            "age": 1210284663
+          },
+          {
+            "key": "agent:main:sesame:usr_001:dev_001",
+            "updatedAt": 1784945004239,
+            "age": 1388661394
+          },
+          {
+            "key": "agent:main:sesame-integration-probe",
+            "updatedAt": 1784944951739,
+            "age": 1388713894
+          },
+          {
+            "key": "agent:main:codex-config-check-final",
+            "updatedAt": 1784790390243,
+            "age": 1543275390
+          },
+          {
+            "key": "agent:main:codex-config-check",
+            "updatedAt": 1784788311342,
+            "age": 1545354291
+          }
+        ]
+      }
+    },
+    {
+      "agentId": "sesame",
+      "name": "Sesame Robot",
+      "isDefault": false,
+      "heartbeat": {
+        "enabled": false,
+        "every": "disabled",
+        "everyMs": null,
+        "prompt": "Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.",
+        "target": "none",
+        "ackMaxChars": 300
+      },
+      "sessions": {
+        "path": "/Users/mac/.openclaw/agents/sesame/sessions/sessions.json",
+        "count": 87,
+        "recent": [
+          {
+            "key": "agent:sesame:web-search-contract-final-20260809",
+            "updatedAt": 1786333432943,
+            "age": 232690
+          },
+          {
+            "key": "agent:sesame:web-search-contract-20260809",
+            "updatedAt": 1786333326875,
+            "age": 338758
+          },
+          {
+            "key": "agent:sesame:expression-contract-20260809",
+            "updatedAt": 1786332480579,
+            "age": 1185054
+          },
+          {
+            "key": "agent:sesame:conversation:aad0b5d5d9211f8d3f90d40da708d77b",
+            "updatedAt": 1786331761421,
+            "age": 1904212
+          },
+          {
+            "key": "agent:sesame:conversation:a6f5369d371a16aac7088ee729376114",
+            "updatedAt": 1786330000657,
+            "age": 3664976
+          }
+        ]
+      }
+    }
+  ],
+  "sessions": {
+    "path": "/Users/mac/.openclaw/agents/main/sessions/sessions.json",
+    "count": 5,
+    "recent": [
+      {
+        "key": "agent:main:main",
+        "updatedAt": 1785123380970,
+        "age": 1210284663
+      },
+      {
+        "key": "agent:main:sesame:usr_001:dev_001",
+        "updatedAt": 1784945004239,
+        "age": 1388661394
+      },
+      {
+        "key": "agent:main:sesame-integration-probe",
+        "updatedAt": 1784944951739,
+        "age": 1388713894
+      },
+      {
+        "key": "agent:main:codex-config-check-final",
+        "updatedAt": 1784790390243,
+        "age": 1543275390
+      },
+      {
+        "key": "agent:main:codex-config-check",
+        "updatedAt": 1784788311342,
+        "age": 1545354291
+      }
+    ]
+  }
+}

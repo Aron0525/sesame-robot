@@ -1,0 +1,7 @@
+2026-08-05 23:26:08 STAND {"kind":"action","action":"stand"}
+2026-08-05 23:26:11 STOP {"kind":"stop"}
+2026-08-05 23:26:40 STAND_RETRY {"kind":"action","action":"stand"}
+2026-08-05 23:26:42 STOP_AFTER_RETRY {"kind":"stop"}
+2026-08-05 23:27:08 R3_LOGICAL_180_PWM_180 {"kind":"servo","servo":6,"angle":180}
+2026-08-05 23:27:10 L4_LOGICAL_180_PWM_180 {"kind":"servo","servo":8,"angle":180}
+2026-08-05 23:27:12 STOP_AFTER_PWM_TEST {"kind":"stop"}

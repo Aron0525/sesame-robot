@@ -1,0 +1,2480 @@
+{
+  "schema_version": 2,
+  "target_wake_word": "你好芝麻",
+  "training_scope": "Existing TTS-v2 corpus plus eight newly generated DashScope positive recordings; the two remaining DashScope clips are reserved for test only.",
+  "hard_negative_policy": "你好小智 is label 0 to suppress false wakeups on the reference phrase.",
+  "source_counts": {
+    "target": 24,
+    "hard_negative_nihaoxiaozhi": 24,
+    "general_negative": 72,
+    "dashscope_target_added": 8
+  },
+  "source_total": 128,
+  "source_format": {
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "encoding": "pcm_s16le"
+  },
+  "augmentation_contract": {
+    "implemented_by": "tools/train_wakeword_tts_v2.py",
+    "speed": [
+      0.84,
+      1.18
+    ],
+    "gain_db": [
+      -16,
+      6
+    ],
+    "pitch_source": [
+      -8,
+      8
+    ],
+    "noise_snr_db": [
+      8,
+      38
+    ],
+    "room_echo_ms": [
+      12,
+      78
+    ],
+    "background": [
+      "white",
+      "pink",
+      "hum"
+    ]
+  },
+  "records": [
+    {
+      "id": "v2_01_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/target/v2_01_target.wav",
+      "sha256": "3e9fb4ec284cba82bd39887240c63a162d8f108f588aa3a923c6aecfe79df260",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_01_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_01_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "eafded1b6ac7225911a8412fd129bb73d5490e856c1c86b5fe65eb6675ac75f4",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_02_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/target/v2_02_target.wav",
+      "sha256": "b855f3b9521300f509db86aec1ffd31954d8e4f45740698bee7b690d4ff7a9e1",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_02_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_02_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "a290b0d20c9b8ff6b53eea04964c692191740f261bd3a77753f002af9bbc4f93",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_03_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/target/v2_03_target.wav",
+      "sha256": "f8d83ae0d9fdd573e3c154c4692fe4de80338a822819bf9127bdddbdae3eb4c5",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_03_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_03_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "ba7f323cf2310286e996d5c4d0923014b298071175f60cb6b18c48eb1a23ee91",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_04_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/target/v2_04_target.wav",
+      "sha256": "0ea672ff99df81c88ebd0cf26bba626281188b2d1978f1d334eb056ad44dd4ab",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_04_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_04_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "46fa21c7cf71f76e2cee325005ba731385b95cd03ed605afda7bbabe8938cb69",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_05_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/target/v2_05_target.wav",
+      "sha256": "91c36e4f6f745778c62d438694302933ccd85a8318d40170ce962fed7f5ff64a",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_05_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_05_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "6e2501587c739350d9dc757b1f4625f285eba8119de61c9d588eac9dcfba9965",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_06_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/target/v2_06_target.wav",
+      "sha256": "d3dfe9149e41008b7a40f072465887405718cbd3aa3c6cf8de490260935f3030",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_06_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_06_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "eee81b3fdf7101074c6aac6339ab2144345b4ddecf5bbdd5c1f91373afdb1cf2",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_07_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/target/v2_07_target.wav",
+      "sha256": "475733285726017fde592211385a6e58d9e83e92856fe162f45e328f928f53cf",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_07_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_07_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "7e49258da8071e58585ea2b21b88b9669313e21cec2853f9e1db31c9063bd388",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_08_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/target/v2_08_target.wav",
+      "sha256": "874ee852caab65abe577b916ae0e4816cd5c675211d2831d3d6587a1a9f40670",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_08_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_08_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "8b036d0e10296eab6e95a27d67b0fdaa7333f9e92c6826d7e9774328cdb27a20",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_09_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/target/v2_09_target.wav",
+      "sha256": "6c581c79fdb8d2013125893a0f69a8a4703ee1906ff3d9545104d3e640b7fd31",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_09_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_09_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "b76b663d51df70b8df96d5c661c218182be16c3b0f600f66fcf501ff7cb33820",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_10_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/target/v2_10_target.wav",
+      "sha256": "fa8fd881a63113cad23460474a48aabeeee1c8e04ec8314e67198ca3bef92752",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_10_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_10_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "7718a58f54d780216659d3e0e1807929f6d214b6a04d9b20d1f7fe51a01cb863",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_11_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/target/v2_11_target.wav",
+      "sha256": "17fdfddf0a2d218cb2968dc444916f4272e589bde6b2478d6534c3d977f24a7d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_11_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_11_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "ef1f6be596a0070c326b8708babd66e39a5775c9b6ad25b336c408d42e4546c2",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_12_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/target/v2_12_target.wav",
+      "sha256": "61db6c9a3ec9928ea7d6e3b9067a8e4a478b89fbb5b36c1aea56e044678e76fe",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_12_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_12_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "67639ede42e1a1d4087b98a8d27c9833f7c60f975b3fe0a0bab235165c33993a",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_13_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/target/v2_13_target.wav",
+      "sha256": "d939219248adfecd65d719c6408e61713de14b57f915df35e99c2cedd1c02466",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_13_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_13_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "90f2cffdeaaf8a1688d4c57d40d7a42b73cf65f0b46c20f74ef2c1255f9b2aa6",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_14_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/target/v2_14_target.wav",
+      "sha256": "ff178d1aae2f1582252744388f7af81792ab97d6dbd95265e184ba0b3337d94c",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_14_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_14_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "5c9d6a35c841e32be16aa2e6a9e87e7407aca0f5eea8545653baabab5f8734b6",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_15_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/target/v2_15_target.wav",
+      "sha256": "f91d70eeef42e4380189c32c4d1624fa2023931ef54d789d44aebced1646a08e",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_15_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_15_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "56817d48fc00362582a43e55cede88aac991d180a92d456c7246b6b98f097305",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_16_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/target/v2_16_target.wav",
+      "sha256": "0c2412152c991ab0c2a30f4dac998df5851efc9b0eae639200bc73f7c119fe59",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_16_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_16_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "cb9929189577305ad67d042c7c22bf3797a7e843136cac929b0f69fd9b630cf5",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_17_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/target/v2_17_target.wav",
+      "sha256": "d6ee65f445dc55633fb7ab9f6832cab6cf25f940faa336ef87cddfd3011c2dc6",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_17_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "slow_low",
+      "rate": "-16%",
+      "pitch": "-8Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_17_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "6abbd9c35af748330e5667e317ae45a74c9c5d10e19bfb0adf5b91643e69a7e5",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_18_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/target/v2_18_target.wav",
+      "sha256": "80bb5ed0e888fba18a885fb9231f97eb1d1fe078222524e6435c1c2f4811dfc6",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_18_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "fast_high",
+      "rate": "+18%",
+      "pitch": "+8Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_18_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "3ad7c91956788d3ce480a0bbfcaf665020eaef7e498527a89d851f52d001b1f0",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_19_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "macOS speech synthesizer",
+      "voice": "Tingting",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Tingting",
+      "path": "audio/tts_v2/wav/target/v2_19_target.wav",
+      "sha256": "f3d1cfda3deaefb4cc52fafe26e14f0b50f939babfd5959506b9ef28a68f0e75",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_19_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Tingting",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Tingting",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_19_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "d79e5dfd2a1dba55d2f3296e9971c643ed119331be3965eb4c70f13fc9993179",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_20_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "macOS speech synthesizer",
+      "voice": "Meijia",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Meijia",
+      "path": "audio/tts_v2/wav/target/v2_20_target.wav",
+      "sha256": "85189dede876fa3a35b15aadef239b3ec5adffe082ca8c3292c8d5228dd5d9ee",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_20_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Meijia",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Meijia",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_20_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "39599bbaf58124eeba43047e2e8e605329734ffd10736674cec4a4315dc02e23",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_21_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "macOS speech synthesizer",
+      "voice": "Sinji",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Sinji",
+      "path": "audio/tts_v2/wav/target/v2_21_target.wav",
+      "sha256": "d6ba0d7626ce8111268d18cc9fb27e58c854fbcd17a57e7c44705fbf9e77eca2",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_21_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Sinji",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Sinji",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_21_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "b56c0dfed13db08a659889cf0f90532a61eea5619bb380767fee9aeeaded6d21",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_22_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Google gTTS",
+      "voice": "com",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com",
+      "path": "audio/tts_v2/wav/target/v2_22_target.wav",
+      "sha256": "f044fcd00ff8d0c82ba55e77e945f24e7708e60e0beac766f4a9702075851788",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_22_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_22_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "5df4c1a1c3e9436040ae4b354106f922ad7ecbe8db466e0f2a05f16758e51f0d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_23_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Google gTTS",
+      "voice": "com.tw",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.tw",
+      "path": "audio/tts_v2/wav/target/v2_23_target.wav",
+      "sha256": "a76e04a1ae3bd3928e1c16f020981a1686c7c28f61ebcdd47566ec6e68bc893d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_23_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.tw",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.tw",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_23_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "5df4c1a1c3e9436040ae4b354106f922ad7ecbe8db466e0f2a05f16758e51f0d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_24_target",
+      "category": "target",
+      "phrase": "你好芝麻",
+      "label": 1,
+      "engine": "Google gTTS",
+      "voice": "com.hk",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.hk",
+      "path": "audio/tts_v2/wav/target/v2_24_target.wav",
+      "sha256": "f044fcd00ff8d0c82ba55e77e945f24e7708e60e0beac766f4a9702075851788",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_24_hard_negative_nihaoxiaozhi",
+      "category": "hard_negative_nihaoxiaozhi",
+      "phrase": "你好小智",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.hk",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.hk",
+      "path": "audio/tts_v2/wav/hard_negative_nihaoxiaozhi/v2_24_hard_negative_nihaoxiaozhi.wav",
+      "sha256": "f7e6d61f06e5503a01a48e4264144130f4889a4c44c00105890847fc1b41abf3",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_01_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_01_01.wav",
+      "sha256": "b6169f1fae154b912dcc225951413d557efcec80063885b4a65af5c80a2c0a3d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_01_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_01_02.wav",
+      "sha256": "5b64260b0933cc1b154ece8460989e3873d9a3bc19dc83b1d394400e89ae89fd",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_01_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_01_03.wav",
+      "sha256": "c55b661becc914b62ece114f57d3f86dff1cb823e444fd81b7d111c28d5beec3",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_01_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_01_04.wav",
+      "sha256": "8f3b0872c23c66c482b38ccd4d13b8ea50912c0ddbf1bd0a1f48138e158772cb",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_01_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_01_05.wav",
+      "sha256": "a04b0def5e48984852b7e0703378389964911ed18a2a75117074c17ae1af491b",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_01_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoxiaoNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_01_06.wav",
+      "sha256": "fe921ccc3c008bf0a7c7b6c0275fd96aa748d0be79d6c983076da46d81c9fb5d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_02_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_02_01.wav",
+      "sha256": "2c4af5661f8487ecb2633f28f67daba9cec0456e282b382ceec2097dcff652ab",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_02_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_02_02.wav",
+      "sha256": "188e98d41e0c05af246e2e3fee96029708df1037cef841f26bc8dfa0dd28f22c",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_02_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_02_03.wav",
+      "sha256": "d9b20c1ccad2f2cda173fa4b9f8df2fab9bc0f325ccc820887c0d4b1a07f57c5",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_02_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_02_04.wav",
+      "sha256": "1a9b7ae1ee5f6c6b6083e6ecfd09fc61c32933566223ed1f7062c63223787654",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_02_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_02_05.wav",
+      "sha256": "b74d8286c2adf41b69ee8bce4930091f5b77ba5246e296e4adc89c90904e8a06",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_02_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-XiaoyiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-XiaoyiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_02_06.wav",
+      "sha256": "93c19e6b01687af5fa43db0611ddb58ac3a4f0ce40851fdc0e913b68499ad7f8",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_03_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_03_01.wav",
+      "sha256": "c1c016813562a313e8f65a08b792948580c45df2ccad1dd57b1efea39731c9db",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_03_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_03_02.wav",
+      "sha256": "2e47c0ea22a6c08dc160a1299528163e3b5121bd85acced4b60f1915ee1a18be",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_03_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_03_03.wav",
+      "sha256": "44695c25d89db970550dfe32291e97f44eaa8a7c66d6d13f6c362fe2846e22ca",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_03_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_03_04.wav",
+      "sha256": "fbf5090e3c61bf4c286079db08226c448d6392ced9b6541c6bc6c6551751274c",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_03_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_03_05.wav",
+      "sha256": "8a820e281f7c67ca20707c02ba100a422bbb3d010407ca785245f8f3a0853b3d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_03_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunjianNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunjianNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_03_06.wav",
+      "sha256": "98400449dbcac13a92b9879375be753a258f2c8fe72fa7644a2d37d266acf407",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_04_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_04_01.wav",
+      "sha256": "b21a1b4c024b56c616073aa3d8a7c5d25460f1d4fd743bd7f04efcf4387872c7",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_04_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_04_02.wav",
+      "sha256": "27f4cff990377aae55909b2b7dc210db480a7aa1703fd6fd9f28c196db07d282",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_04_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_04_03.wav",
+      "sha256": "325fab29442ac70d28e85bedcc7785bd37b7756f57f3ab0aaa843d40ae11470a",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_04_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_04_04.wav",
+      "sha256": "afd203abcc924c12277da2e3a8ec774401dab89c99e5c4766e66fa4a1a6fc3b0",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_04_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_04_05.wav",
+      "sha256": "afa139107209188ba39204317454c73ab196bce20f7c8b78b470732d4abc6571",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_04_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_04_06.wav",
+      "sha256": "320565171812c04d45ce3e14be5aafbcfd29bc922a6716caceaaef604b0b040f",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_05_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_05_01.wav",
+      "sha256": "2782f216a5341542cf97f98ea6eeec0062e192435c78987951996a25ece74977",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_05_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_05_02.wav",
+      "sha256": "c3e3806ad305039206dca83cc8a58ef2b7f89776403d2d92d3b2a4bac16f2bf6",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_05_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_05_03.wav",
+      "sha256": "c8802122485cfc93c7a3d7e0d1841684a38a16017cf86e6e0126edb37f650319",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_05_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_05_04.wav",
+      "sha256": "20670eeaca91706219855c330991ccf6b688316fb4bf8e1194d7120a301e9c9a",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_05_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_05_05.wav",
+      "sha256": "a5978d6e6dc5355bc40244b40eb740b50756bfa207ea01c29fc661a6f744b4dd",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_05_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunxiaNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunxiaNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_05_06.wav",
+      "sha256": "bbc9a30982ce188dcb6d607d5149f5c9b54ee248e801434680c308917e46c28e",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_06_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_06_01.wav",
+      "sha256": "9a00da2134edc38f46bef62d7e3f1255852a270e4a0663ed00e3e33bf902a6b0",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_06_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_06_02.wav",
+      "sha256": "8c1c2182c145fb98970a12290fffbd1a189d0ec49fb455245011120713f1c5c1",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_06_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_06_03.wav",
+      "sha256": "93e536295b557da033bb0b6867a6c50c356f45de5d03e98265786a9c0db25753",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_06_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_06_04.wav",
+      "sha256": "803424cdc2d9e204acd9ca8834179b6533b8f2742eefcaa75a95eff884375bc2",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_06_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_06_05.wav",
+      "sha256": "dcce6bd83a25380c08e0fa186acc7703929e4d09dc9837dc33c66ac0c8550641",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_06_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Azure Edge Neural TTS",
+      "voice": "zh-CN-YunyangNeural",
+      "profile": "neutral",
+      "rate": "+0%",
+      "pitch": "+0Hz",
+      "split_group": "edge:zh-CN-YunyangNeural",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_06_06.wav",
+      "sha256": "0ee78ec3adaa5f781cea61df36c6c6e4a7edd1ca23271770c076de1cbec53158",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_07_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Tingting",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Tingting",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_07_01.wav",
+      "sha256": "49f041011c3cb82f47d2cebbfa509756b6ea282493cd7892e8bfa6c08b7cce9f",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_07_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Tingting",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Tingting",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_07_02.wav",
+      "sha256": "10525de9a169f7ad27addb4f2c139215edab990af869b32af1d49eb9385eb770",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_07_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Tingting",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Tingting",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_07_03.wav",
+      "sha256": "e8adec2d37eebaea201ab4964fcaa0b5c01641d511ea692b7895cd52a8427091",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_07_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Tingting",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Tingting",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_07_04.wav",
+      "sha256": "7da18e8856e6fe80c4c3a0ee70452f4917a8af17b1bb9b5e195b98627d27a3bc",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_07_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Tingting",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Tingting",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_07_05.wav",
+      "sha256": "67794d148cf7199d8cae03c749b3257c940b3543ec56db0e329d52a3b93922f3",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_07_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Tingting",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Tingting",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_07_06.wav",
+      "sha256": "b6549d3767e53b0064f0c972fc6f45904ae2ba5f3851c9a54cbd06b0be0144f3",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_08_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Meijia",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Meijia",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_08_01.wav",
+      "sha256": "516b627fd562b2ba3de28379f92cc9fb367752e9e80a0e3b2fad2178fce287f1",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_08_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Meijia",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Meijia",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_08_02.wav",
+      "sha256": "a7d688ea018426011ade330518866c2430aef94754f8f98496692a141bfff017",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_08_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Meijia",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Meijia",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_08_03.wav",
+      "sha256": "97235c40a47607b70bbc2ca158818ec1c46c3f0d88c97c1380ef489225811654",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_08_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Meijia",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Meijia",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_08_04.wav",
+      "sha256": "fa8b21ffe5ae64ed253826e86636901920f770f6a2f35f5e1544af957af9b00f",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_08_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Meijia",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Meijia",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_08_05.wav",
+      "sha256": "ed7f203703ec96d1bee0320fe4e7d71e9b9874880a8efb9644a58e894bc77c80",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_08_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Meijia",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Meijia",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_08_06.wav",
+      "sha256": "de5e2dc1f6f99626194777381342b09a38c6204213479976abfc8f4bd06cb1ad",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_09_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Sinji",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Sinji",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_09_01.wav",
+      "sha256": "faf6832e12fd39b8c53ef512e903793dafde13a10fea29db794bb739db61f519",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_09_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Sinji",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Sinji",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_09_02.wav",
+      "sha256": "97ce8fde0b928b0a13a1ae946be827d93f6a07215b3815555b821d80a6c8be69",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_09_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Sinji",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Sinji",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_09_03.wav",
+      "sha256": "2c6a53538811e204fb130ea4bb9539b837282448acc3b78d86b5816c48382997",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_09_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Sinji",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Sinji",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_09_04.wav",
+      "sha256": "c4b0093707cde36eef15bdadbaabf07dbfdec576f6e3dac9d2d30fe9cab5e2fd",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_09_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Sinji",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Sinji",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_09_05.wav",
+      "sha256": "0dc76e8415dbe9130b9184d26c98da8b0f2e16e2186fcdf6c404d2dd756aaeef",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_09_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "macOS speech synthesizer",
+      "voice": "Sinji",
+      "profile": "neutral",
+      "rate": 185,
+      "pitch": "native",
+      "split_group": "mac:Sinji",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_09_06.wav",
+      "sha256": "6e78453282760c3d4bd2291098f55f0f8da7808051fb29ee71583e77e603d452",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_10_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_10_01.wav",
+      "sha256": "47f9df3300ef9799c0880dc38306237eee24d1fac9fd4559c13c200d0a6dc1ce",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_10_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_10_02.wav",
+      "sha256": "390fcff775702c8a685c6c806567cfb164cd0d12fe5a47772902ce3020d63731",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_10_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_10_03.wav",
+      "sha256": "2cea7b92f64ed797a9b4c9b10e57810bbf4b67b30e970248629f7b9d20b6c399",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_10_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_10_04.wav",
+      "sha256": "b57b3aa2b0f48438f6e020b5ab13527f0ed3c7b82180f2fcdabbd1028ba2145d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_10_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_10_05.wav",
+      "sha256": "4fef82cde9a0adbc6485608ed8fc5048be848ebe28b288bc2a3af997266bdbf3",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_10_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_10_06.wav",
+      "sha256": "ba71d20776395b7cf6596740e8ad5eb977f4d080a31960cca7bd6d915c614d6a",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_11_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.tw",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.tw",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_11_01.wav",
+      "sha256": "3ec1b48c4b1cb47cd17a9171844ecf7f5a712df11694dec0ccaddeca494fbf28",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_11_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.tw",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.tw",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_11_02.wav",
+      "sha256": "a9e5f96396bb60f3ff913ea2960bd7449821cc7d11f07e41b504c46c178f333a",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_11_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.tw",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.tw",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_11_03.wav",
+      "sha256": "2cea7b92f64ed797a9b4c9b10e57810bbf4b67b30e970248629f7b9d20b6c399",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_11_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.tw",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.tw",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_11_04.wav",
+      "sha256": "a3b643e686c7ca2029e0b967c9ede434c94fb26dae57b5ad8afb8e686580ebfd",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_11_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.tw",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.tw",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_11_05.wav",
+      "sha256": "846b6bea7820a64e8a43cf006a37542221f6956f6bdbbf067ed011796fb01b93",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_11_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.tw",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.tw",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_11_06.wav",
+      "sha256": "ba71d20776395b7cf6596740e8ad5eb977f4d080a31960cca7bd6d915c614d6a",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_12_01",
+      "category": "general_negative",
+      "phrase": "打开台灯",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.hk",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.hk",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_12_01.wav",
+      "sha256": "3be275db7a8333f60c30bbdc4f967672fe67ccfdb97578a4670be838e5b6a61e",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_12_02",
+      "category": "general_negative",
+      "phrase": "关闭音乐",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.hk",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.hk",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_12_02.wav",
+      "sha256": "a9e5f96396bb60f3ff913ea2960bd7449821cc7d11f07e41b504c46c178f333a",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_12_03",
+      "category": "general_negative",
+      "phrase": "今天天气不错",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.hk",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.hk",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_12_03.wav",
+      "sha256": "24d0870a6732749ab4d0fbfb637f9859051e198f307a839188e90222f6f54d27",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_12_04",
+      "category": "general_negative",
+      "phrase": "请继续说话",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.hk",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.hk",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_12_04.wav",
+      "sha256": "b57b3aa2b0f48438f6e020b5ab13527f0ed3c7b82180f2fcdabbd1028ba2145d",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_12_05",
+      "category": "general_negative",
+      "phrase": "停止播放",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.hk",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.hk",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_12_05.wav",
+      "sha256": "846b6bea7820a64e8a43cf006a37542221f6956f6bdbbf067ed011796fb01b93",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "v2_general_12_06",
+      "category": "general_negative",
+      "phrase": "稍后提醒我",
+      "label": 0,
+      "engine": "Google gTTS",
+      "voice": "com.hk",
+      "profile": "neutral",
+      "rate": "native",
+      "pitch": "native",
+      "split_group": "gtts:com.hk",
+      "path": "audio/tts_v2/wav/general_negative/v2_general_12_06.wav",
+      "sha256": "b3415d4955b90a92e2aa60b9fa4b389d9c4fc9745705d43f4770487b9ad40be5",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "dashscope_01_nihao_zhima",
+      "category": "target",
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice": "longanhuan_v3.6",
+      "profile": "rate_0.82",
+      "rate": 0.82,
+      "pitch": "service-controlled",
+      "split_group": "dashscope:runtime",
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_01_nihao_zhima.wav",
+      "sha256": "1093d1bb0dd9d6cf88c288a8a21b7e979f0034d16204194e1629a54a7c09bc72",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "dashscope_02_nihao_zhima",
+      "category": "target",
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice": "longanhuan_v3.6",
+      "profile": "rate_0.86",
+      "rate": 0.86,
+      "pitch": "service-controlled",
+      "split_group": "dashscope:runtime",
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_02_nihao_zhima.wav",
+      "sha256": "04d19b5f7558bf6e8b4b7a8fcaf2acc529deb172b2821b1217a4ffe3e6e0277b",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "dashscope_03_nihao_zhima",
+      "category": "target",
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice": "longanhuan_v3.6",
+      "profile": "rate_0.9",
+      "rate": 0.9,
+      "pitch": "service-controlled",
+      "split_group": "dashscope:runtime",
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_03_nihao_zhima.wav",
+      "sha256": "48cc065af2771a0c428087b8e344146e50c9e57aa70489f0a6450c13c43d3695",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "dashscope_04_nihao_zhima",
+      "category": "target",
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice": "longanhuan_v3.6",
+      "profile": "rate_0.94",
+      "rate": 0.94,
+      "pitch": "service-controlled",
+      "split_group": "dashscope:runtime",
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_04_nihao_zhima.wav",
+      "sha256": "050adb46c2e9f66022ab88e268578881b591f2c5ebcd3c9e248e4b2713493762",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "dashscope_05_nihao_zhima",
+      "category": "target",
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice": "longanhuan_v3.6",
+      "profile": "rate_0.98",
+      "rate": 0.98,
+      "pitch": "service-controlled",
+      "split_group": "dashscope:runtime",
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_05_nihao_zhima.wav",
+      "sha256": "9bdb7f65e9a33c7ded74a5176782d9267731c460b0ec78f8c1776a6006fae783",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "dashscope_06_nihao_zhima",
+      "category": "target",
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice": "longanhuan_v3.6",
+      "profile": "rate_1.02",
+      "rate": 1.02,
+      "pitch": "service-controlled",
+      "split_group": "dashscope:runtime",
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_06_nihao_zhima.wav",
+      "sha256": "d61da6c3e6f605a6b667bfe0d47e4810dc7e5a4c4f84308fd79a4f1b5c2725ce",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "dashscope_07_nihao_zhima",
+      "category": "target",
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice": "longanhuan_v3.6",
+      "profile": "rate_1.06",
+      "rate": 1.06,
+      "pitch": "service-controlled",
+      "split_group": "dashscope:runtime",
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_07_nihao_zhima.wav",
+      "sha256": "58432bd7b6c84072c488f17214b2b439cc4e444db3b0859b92a645594c987da8",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    },
+    {
+      "id": "dashscope_08_nihao_zhima",
+      "category": "target",
+      "phrase": "你好，芝麻",
+      "label": 1,
+      "engine": "DashScope qwen-audio-3.0-tts-flash",
+      "voice": "longanhuan_v3.6",
+      "profile": "rate_1.1",
+      "rate": 1.1,
+      "pitch": "service-controlled",
+      "split_group": "dashscope:runtime",
+      "path": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/train/dashscope_08_nihao_zhima.wav",
+      "sha256": "b064080d010116dbb73d06e3f5b78b0d40b0caaa41c4d9db62ca8372b306ef22",
+      "format": {
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "encoding": "pcm_s16le"
+      }
+    }
+  ]
+}

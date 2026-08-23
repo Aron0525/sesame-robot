@@ -1,0 +1,43 @@
+--- /Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/originals/README.md	2026-08-09 22:27:19
++++ /Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/final/repo/README.md	2026-08-09 22:35:05
+@@ -47,17 +47,17 @@
+ 
+ 当前测试只使用虚构设备 token，绝不使用真实凭据。
+ 
+-## 场景与人设：由 OpenClaw 切换
++## 正常模式与场景：由 Gateway 切换
+ 
+-机器人有一个不变的核心身份：**可靠的桌面机器人**。场景只改变对话目标和表达方式，硬件动作、表情和安全限制仍使用原有白名单。
++机器人默认处于**正常模式**：它是独立的基础对话状态，不属于下面三个场景，也不绑定场景知识库。三个场景只改变对话目标、独立 Agent 和未来知识库命名空间；硬件动作、表情和限制仍使用原有白名单。
+ 
+-| 场景 ID | 名称 | 人设 | 语言重点 |
+-| --- | --- | --- | --- |
+-| `office` | 办公 | 办公协作桌面机器人 | 清楚、短句、先给下一步，聚焦任务与节奏。 |
+-| `parenting` | 育儿 | 亲子陪伴与家庭节奏机器人 | 温和、具体、一次一个可执行步骤。 |
+-| `companion` | 陪伴（默认） | 可靠的陪伴型桌面机器人 | 先回应，再自然追问。 |
++| 场景 ID | 名称 | OpenClaw Agent | 未来知识库 | 语言重点 |
++| --- | --- | --- | --- | --- |
++| `learning` | 学习 | `sesame-learning` | `kb-learning` | 结论、原因、一个下一步或小问题。 |
++| `children` | 儿童 | `sesame-children` | `kb-children` | 亲切短句、故事问答、一次一个小任务。 |
++| `work` | 工作 | `sesame-work` | `kb-work` | 结论优先、待办、风险、下一步。 |
+ 
+-切换状态保存到网关的当前设备会话中；控制台会显示并实时更新它。OpenClaw 通过专用 MCP 工具选择场景，工具桥只允许读取或切换这三个 ID，不能控制舵机或访问通用系统能力。
++控制台可以切回 `normal`，也可以切换到三个场景。每个场景各自保存 Agent 会话与重点记忆；知识库接口目前只预留命名空间，尚未接入检索。OpenClaw MCP 工具只可读取或切换三个场景，不能控制舵机或访问通用系统能力。
+ 
+ ### 运行配置
+ 
+@@ -68,10 +68,10 @@
+ export SESAME_SCENE_GATEWAY_URL='http://127.0.0.1:8788'
+ ```
+ 
+-Gateway 新增两个只供该 bridge 使用的受限端点：
++Gateway 为 bridge 提供：
+ 
+-- `GET /v1/openclaw/scenes`：读取全部已注册场景；
+-- `GET /v1/openclaw/scene/{device_id}`：读取当前场景；
+-- `POST /v1/openclaw/scene`：切换场景，正文为 `{"device_id":"sesame-v3-001","scene_id":"office"}`。
++- `GET /v1/openclaw/scenes`：读取三个场景；
++- `GET /v1/openclaw/scene/{device_id}`：读取当前正常模式或场景；
++- `POST /v1/openclaw/scene`：切换场景，正文为 `{"device_id":"sesame-v3-001","scene_id":"learning"}`。
+ 
+ 所有端点要求 `Authorization: Bearer $SESAME_SCENE_CONTROL_TOKEN`。使用 `python -m sesame_endpoint_gateway.openclaw_scene_mcp` 启动 MCP bridge 后，在 OpenClaw 中只暴露 `list_scenes`、`get_scene` 和 `select_scene` 三个工具。

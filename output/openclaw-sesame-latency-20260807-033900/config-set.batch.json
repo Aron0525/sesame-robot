@@ -1,0 +1,40 @@
+[
+  {
+    "path": "agents.list[1].thinkingDefault",
+    "value": "low"
+  },
+  {
+    "path": "agents.list[1].contextInjection",
+    "value": "continuation-skip"
+  },
+  {
+    "path": "agents.list[1].bootstrapMaxChars",
+    "value": 3500
+  },
+  {
+    "path": "agents.list[1].bootstrapTotalMaxChars",
+    "value": 5500
+  },
+  {
+    "path": "agents.list[1].contextTokens",
+    "value": 32768
+  },
+  {
+    "path": "agents.list[1].contextLimits",
+    "value": {
+      "postCompactionMaxChars": 1200
+    }
+  },
+  {
+    "path": "agents.list[1].tools.allow",
+    "value": [
+      "read"
+    ]
+  },
+  {
+    "path": "agents.list[1].tools.sandbox.tools.allow",
+    "value": [
+      "read"
+    ]
+  }
+]

@@ -1,0 +1,17 @@
+test_authenticated_hello_returns_negotiated_audio_contract (test_device_stream.DeviceStreamTests) ... ok
+test_console_rejects_unknown_actions_and_broadcasts_device_status (test_device_stream.DeviceStreamTests) ... ok
+test_console_serves_a_single_site_and_forwards_allowed_action (test_device_stream.DeviceStreamTests) ... ok
+test_malformed_or_downlink_audio_is_rejected_at_gateway_boundary (test_device_stream.DeviceStreamTests) ... ok
+test_unauthenticated_connection_is_rejected_before_hello (test_device_stream.DeviceStreamTests) ... ok
+test_openclaw_can_select_learning_scene_and_console_observes_profile (test_device_stream.SceneControlTests) ... ok
+test_openclaw_scene_control_rejects_invalid_scene_and_bad_token (test_device_stream.SceneControlTests) ... ok
+test_console_can_return_from_a_scene_to_independent_normal_mode (test_scene_profiles.ModeSelectionTests) ... ok
+test_console_rejects_unknown_mode (test_scene_profiles.ModeSelectionTests) ... ok
+test_console_starts_in_normal_mode_and_can_select_learning (test_scene_profiles.SceneProfileTests) ... ok
+test_every_scene_maps_to_its_own_agent_and_future_knowledge_base (test_scene_profiles.SceneProfileTests) ... ok
+test_normal_mode_is_separate_from_the_three_scenes (test_scene_profiles.SceneProfileTests) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.113s
+
+OK

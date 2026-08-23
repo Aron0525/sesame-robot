@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "operations": 1,
+  "configPath": "~/.openclaw/openclaw.json",
+  "inputModes": [
+    "json"
+  ],
+  "checks": {
+    "schema": true,
+    "resolvability": true,
+    "resolvabilityComplete": true
+  },
+  "refsChecked": 0,
+  "skippedExecRefs": 0
+}

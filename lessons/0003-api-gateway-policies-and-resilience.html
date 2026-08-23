@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="网关五课教材第三课：API 路由、认证授权、限流配额、幂等、超时重试、熔断、发布与可观测性。">
+  <title>第三课｜API 治理、安全与韧性</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="3">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>×5</span></a>
+      <div class="lesson-tabs">
+        <a href="0001-gateway-foundations.html" title="第一课">01</a>
+        <a href="0002-proxies-routing-and-load-balancing.html" title="第二课">02</a>
+        <a href="0003-api-gateway-policies-and-resilience.html" aria-current="page" title="第三课">03</a>
+        <a href="0004-cloud-kubernetes-and-service-mesh.html" title="第四课">04</a>
+        <a href="0005-ai-gateway-design-and-troubleshooting.html" title="第五课">05</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="3">
+      <div>
+        <p class="kicker">第三课 · API 治理</p>
+        <h1>安全、流量与系统韧性</h1>
+        <p class="lead">API 网关真正的价值，不是“多转发一跳”，而是把公共规则变成可执行、可观察、可回滚的策略。</p>
+        <div class="lesson-meta"><span>约 50 分钟</span><span>38 个概念</span><span>6 个练习</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="api-contract">
+      <div class="chapter-head">
+        <span class="chapter-no">03—A</span>
+        <div><h2>API 路由与契约</h2><p>网关首先要准确识别“这是什么调用”，才能执行正确政策。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 01</span>
+          <h3>API Endpoint（API 端点）</h3>
+          <p>由协议、域名、路径和方法共同标识的可调用能力。</p>
+          <div class="case"><strong>案例</strong><code>POST https://api.example.com/v1/orders</code> 表示创建订单，不只是一个 URL 字符串。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 02</span>
+          <h3>Route Matching（路由匹配）</h3>
+          <p>按 Host、路径、方法、Header 或查询参数选择规则。更具体的规则通常应优先。</p>
+          <div class="case"><strong>案例</strong><code>GET /users/*</code> 去用户服务；带 <code>X-Canary: true</code> 的请求去候选版本。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 03</span>
+          <h3>Schema Validation（结构校验）</h3>
+          <p>根据 OpenAPI、JSON Schema 或 Protobuf 检查请求结构、类型和大小。</p>
+          <div class="case"><strong>案例</strong>人数必须是整数；上传体不能超过 10 MB。网关可提前拒绝明显无效请求。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 04</span>
+          <h3>API Versioning（API 版本管理）</h3>
+          <p>让新旧契约在迁移期并存，常用路径、Header 或媒体类型表达版本。</p>
+          <div class="case"><strong>案例</strong><code>/v1/orders</code> 保持旧字段，<code>/v2/orders</code> 返回新的状态模型。</div>
+        </article>
+        <article class="concept wide">
+          <span class="term">Concept 05</span>
+          <h3>API Inventory & Deprecation（接口清单与弃用）</h3>
+          <p>知道哪些 API、版本、调用者和后端仍在使用，才能安全下线旧接口。网关日志是重要证据，但不能代替正式契约管理。</p>
+          <div class="case"><strong>案例</strong>准备删除 v1 前，先查 30 天调用记录；发现旧版小程序仍在用，就必须继续兼容或推动升级。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="identity">
+      <div class="chapter-head">
+        <span class="chapter-no">03—B</span>
+        <div><h2>身份：认证与授权绝不能混</h2><p>“你是谁”和“你能做什么”是两次不同判断。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 06</span>
+          <h3>Authentication（认证）</h3>
+          <p>验证调用者身份。结果通常是一个主体：用户、服务、设备或应用。</p>
+          <div class="case"><strong>案例</strong>网关验证 JWT 签名、过期时间、签发者和受众，确认调用者是用户 123。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 07</span>
+          <h3>Authorization（授权）</h3>
+          <p>身份确定后，判断主体是否允许执行某个动作或访问某个资源。</p>
+          <div class="case"><strong>案例</strong>用户 123 可以查看自己的订单，但不能读取用户 456 的订单。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 08</span>
+          <h3>API Key</h3>
+          <p>常用于识别调用项目、合作方或客户端应用，便于配额和计费；通常不应单独作为最终用户登录身份。</p>
+          <div class="case"><strong>案例</strong>地图合作商 A 使用一个 API Key，平台据此计算它每月调用量。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 09</span>
+          <h3>Session / Cookie（会话与 Cookie）</h3>
+          <p>服务端保存会话状态，客户端通过 Cookie 携带随机会话标识。网关可验证或转发，但要处理 CSRF、安全属性和注销。</p>
+          <div class="case"><strong>案例</strong>浏览器登录后携带 <code>HttpOnly; Secure</code> Cookie，网关查询集中会话存储。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 10</span>
+          <h3>JWT（JSON Web Token）</h3>
+          <p>一种可签名的 Token 格式。它不是完整认证协议；安全性取决于签名验证、密钥、有效期、受众和撤销策略。</p>
+          <div class="danger"><strong>反例</strong>只解码 JWT 内容、不验证签名，相当于相信用户自己写的身份证。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 11</span>
+          <h3>OAuth 2.0 与 OpenID Connect</h3>
+          <p>OAuth 2.0 核心是授权委托；OpenID Connect 在其上增加身份层，用 ID Token 表达登录身份。</p>
+          <div class="plain"><strong>通俗解释</strong>OAuth 像“允许打印店读取你的云盘文件”；OIDC 像“用某身份平台登录这个网站”。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 12</span>
+          <h3>RBAC 与 ABAC</h3>
+          <p>RBAC 按角色授权；ABAC 按用户、资源、环境等属性计算政策。</p>
+          <div class="case"><strong>案例</strong>RBAC：“管理员可查看全部订单”；ABAC：“同一租户且订单归属本人时可查看”。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 13</span>
+          <h3>对象级授权</h3>
+          <p>是否能访问某一个具体对象，通常需要业务数据。网关可做粗粒度检查，但业务服务必须再次校验资源归属。</p>
+          <div class="boundary"><strong>职责边界</strong>网关能判断“用户角色允许访问订单 API”；订单服务判断“这张订单是否属于该用户”。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="traffic-control">
+      <div class="chapter-head">
+        <span class="chapter-no">03—C</span>
+        <div><h2>流量治理：不只是“每分钟几次”</h2><p>数量、速度、并发、体积和成本是不同维度。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 14</span>
+          <h3>Rate Limit（速率限制）</h3>
+          <p>限制单位时间内的请求速率，保护服务并建立公平性。</p>
+          <div class="case"><strong>案例</strong>每个用户每分钟最多发送 20 条聊天消息，超出返回 429。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 15</span>
+          <h3>Throttle（节流）</h3>
+          <p>把过快流量延迟或压低到允许速率，而不是立即全部拒绝。</p>
+          <div class="plain"><strong>通俗解释</strong>限流像门票售罄后拒绝入场；节流像地铁闸机控制放行速度。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 16</span>
+          <h3>Quota（配额）</h3>
+          <p>较长周期内允许使用的总量，例如每天、每月的调用次数或 token。</p>
+          <div class="case"><strong>案例</strong>免费合作方每月有 10 万次地图查询额度。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 17</span>
+          <h3>Concurrency Limit（并发限制）</h3>
+          <p>限制同时正在执行的请求数量，对耗时任务比单纯 QPS 更有效。</p>
+          <div class="case"><strong>案例</strong>一次模型推理要 20 秒，即使每秒只来 2 个，也可能累积 40 个并发。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 18</span>
+          <h3>Token Bucket / Leaky Bucket</h3>
+          <p>令牌桶允许一定突发流量；漏桶更强调稳定输出速率。</p>
+          <div class="case"><strong>案例</strong>令牌桶容量 10、每秒补 1 个：用户可以瞬间发 10 次，之后约每秒一次。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 19</span>
+          <h3>Resource Limit（资源限制）</h3>
+          <p>限制请求体、分页大小、执行时间、文件数和解压后体积，防止资源耗尽。</p>
+          <div class="case"><strong>案例</strong>攻击者把 <code>page_size</code> 从 100 改成 1,000,000，可能拖垮数据库。</div>
+        </article>
+        <article class="concept wide">
+          <span class="term">Knowledge Point</span>
+          <h3>限流键（Rate-limit Key）决定公平性</h3>
+          <p>可以按 IP、用户、租户、API Key、路径或它们的组合限流。只按 IP 可能误伤公司共享出口；只按用户无法限制未登录攻击。</p>
+          <div class="case"><strong>案例</strong>登录接口同时按 IP 和账号限制；普通 API 按租户加用户限制；昂贵的模型接口再加 token 成本限制。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="resilience">
+      <div class="chapter-head">
+        <span class="chapter-no">03—D</span>
+        <div><h2>韧性：失败时别让整个系统一起倒</h2><p>分布式系统一定会失败，网关的目标是约束失败范围。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 20</span>
+          <h3>Timeout（超时）</h3>
+          <p>等待超过预算便停止。应区分连接超时、首字节超时、请求总超时和空闲超时。</p>
+          <div class="case"><strong>案例</strong>连接上游最多等 1 秒，整个普通 API 最多等 5 秒；流式聊天用更长的空闲超时。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 21</span>
+          <h3>Timeout Budget（超时预算）</h3>
+          <p>整条链路的总预算要在各调用层分配，外层不应比内层更早放弃却让内层继续浪费资源。</p>
+          <div class="case"><strong>案例</strong>客户端预算 8 秒，网关 7 秒，服务 6 秒，数据库 3 秒，并保留返回时间。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 22</span>
+          <h3>Retry（重试）</h3>
+          <p>对暂时性失败再次尝试。只能在明确错误类型、有限次数、剩余预算充足且操作安全时使用。</p>
+          <div class="danger"><strong>反例</strong>创建订单超时后无条件重试，第一次其实已成功，最终生成两张订单。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 23</span>
+          <h3>Backoff & Jitter（退避与抖动）</h3>
+          <p>重试间隔逐渐增大，并加入随机量，避免大量客户端同一时刻再次冲击服务。</p>
+          <div class="plain"><strong>通俗解释</strong>商店临时关门时，不要让所有顾客每秒整点同时撞门；每个人随机晚一点再来。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 24</span>
+          <h3>Idempotency（幂等）</h3>
+          <p>相同操作执行多次，业务结果仍等价。写操作常使用幂等键和服务端结果记录实现。</p>
+          <div class="case"><strong>案例</strong>客户端用同一 <code>Idempotency-Key</code> 重试支付，服务端返回第一次结果而不重复扣款。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 25</span>
+          <h3>Circuit Breaker（熔断器）</h3>
+          <p>上游持续失败时暂时停止新调用，快速失败；一段时间后少量试探，恢复后重新放行。</p>
+          <div class="plain"><strong>通俗解释</strong>电路短路时保险丝先断开，避免整栋楼持续烧毁。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 26</span>
+          <h3>Bulkhead（舱壁隔离）</h3>
+          <p>把连接池、线程、并发或租户容量隔开，防止一个故障域耗尽全部资源。</p>
+          <div class="case"><strong>案例</strong>文件上传使用独立连接池，即使上传拥堵，也不占满登录 API 的全部连接。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 27</span>
+          <h3>Load Shedding（过载丢弃）</h3>
+          <p>系统接近极限时主动拒绝低优先级工作，保住核心能力。</p>
+          <div class="case"><strong>案例</strong>高峰期暂停推荐刷新，但继续允许支付和订单查询。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 28</span>
+          <h3>Fallback（降级）</h3>
+          <p>主能力不可用时返回简化结果、缓存结果或切换备用服务。</p>
+          <div class="case"><strong>案例</strong>推荐服务故障时显示热门商品，而不是让整个首页 500。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="release">
+      <div class="chapter-head">
+        <span class="chapter-no">03—E</span>
+        <div><h2>发布流量：新版本怎样安全进入生产</h2><p>网关是流量开关，但发布决策必须由指标和回滚能力支撑。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 29</span>
+          <h3>Canary Release（金丝雀发布）</h3>
+          <p>先让小比例真实流量进入新版本，根据错误率和延迟逐步扩大。</p>
+          <div class="case"><strong>案例</strong>v2 先接 1%，稳定后依次升到 10%、50%、100%。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 30</span>
+          <h3>Blue-Green Deployment（蓝绿部署）</h3>
+          <p>准备两套完整环境，验证新环境后一次切换入口，出现问题再切回。</p>
+          <div class="case"><strong>案例</strong>蓝环境运行 v1，绿环境部署 v2；网关把全部流量从蓝切到绿。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 31</span>
+          <h3>Traffic Mirroring（流量镜像）</h3>
+          <p>复制真实请求给候选系统，但候选响应不返回用户。适合验证兼容性。</p>
+          <div class="danger"><strong>注意</strong>镜像写请求可能产生副作用，必须脱敏并确保影子环境不会真的扣款或发消息。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 32</span>
+          <h3>Feature Flag（功能开关）</h3>
+          <p>按用户、租户或比例启用功能。它可能与网关分流配合，但业务功能开关通常属于应用层。</p>
+          <div class="case"><strong>案例</strong>网关把测试租户送到 v2；应用内开关只对该租户显示新工作流。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="observability">
+      <div class="chapter-head">
+        <span class="chapter-no">03—F</span>
+        <div><h2>可观测性：从“挂了”到“哪一段为什么慢”</h2><p>日志、指标和追踪不是三个同义词。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 33</span>
+          <h3>Access Log（访问日志）</h3>
+          <p>记录一次请求发生了什么，例如时间、路径、状态码、延迟、调用者和上游。</p>
+          <div class="case"><strong>案例</strong>查某个 Request ID，发现请求在网关排队 20 ms、上游执行 4.8 秒。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 34</span>
+          <h3>Metrics（指标）</h3>
+          <p>对大量请求聚合统计，常关注流量、错误、延迟和饱和度。</p>
+          <div class="case"><strong>案例</strong>过去 5 分钟 5xx 比例从 0.2% 升到 8%，P99 延迟达到 6 秒。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 35</span>
+          <h3>Distributed Trace（分布式追踪）</h3>
+          <p>把一次请求跨网关和多个服务的各段操作组织成 Trace；每一段工作叫 Span。</p>
+          <div class="case"><strong>案例</strong>Trace 显示总耗时 3 秒，其中订单服务 100 ms，外部地图 API 占 2.7 秒。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 36</span>
+          <h3>Context Propagation（上下文传播）</h3>
+          <p>把 Trace ID、租户或请求上下文安全地传到后续服务，使各段记录能关联。</p>
+          <div class="case"><strong>案例</strong>网关生成 Trace ID，FastAPI、LangGraph 和工具服务都在日志中携带它。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 37</span>
+          <h3>SLI / SLO</h3>
+          <p>SLI 是实际指标，例如成功率；SLO 是目标，例如“每月 99.9% 请求成功”。</p>
+          <div class="case"><strong>案例</strong>发布网关规则后，如果 5 分钟成功率低于 99.5%，自动回滚。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 38</span>
+          <h3>High-cardinality（高基数标签）</h3>
+          <p>用户 ID、完整 URL 等取值数量巨大，不适合直接作为指标标签，否则成本和查询压力暴涨。</p>
+          <div class="boundary"><strong>实践</strong>指标用规范化路由 <code>/orders/{id}</code>；具体订单 ID 放日志或 Trace。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="planes">
+      <div class="chapter-head">
+        <span class="chapter-no">03—G</span>
+        <div><h2>控制面、数据面与策略顺序</h2><p>现代网关不只是一个进程，而是一套配置和执行系统。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Architecture</span>
+          <h3>Control Plane（控制面）</h3>
+          <p>管理路由、证书、服务发现、插件和政策，并把配置下发到执行节点。</p>
+          <div class="case"><strong>案例</strong>GitOps 合并一条 HTTPRoute 后，控制器生成网关配置并灰度下发。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Architecture</span>
+          <h3>Data Plane（数据面）</h3>
+          <p>真正处理每个连接和请求，必须低延迟、高可用，并在控制面短暂失败时继续使用最后有效配置。</p>
+          <div class="case"><strong>案例</strong>Envoy 进程是数据面；管理它的 xDS 服务属于控制面。</div>
+        </article>
+        <article class="concept wide">
+          <span class="term">Knowledge Point</span>
+          <h3>策略执行顺序</h3>
+          <p>典型顺序是：连接与 TLS → 请求大小 → WAF → 认证 → 授权 → 限流 → 路由 → 上游保护 → 响应政策 → 观测记录。实际产品不同，但顺序必须显式设计。</p>
+          <div class="case"><strong>案例</strong>如果先把大型请求完整读入内存再检查大小，攻击者已经消耗资源；如果先缓存私人响应再计算用户身份，可能泄露数据。</div>
+        </article>
+      </div>
+      <div class="diagram">配置作者 ──▶ 控制面 ── 配置版本 / 校验 / 下发 ──▶ 数据面
+                                                     │
+客户端 ── TLS ── 认证 ── 授权 ── 限流 ── 路由 ───────┼──▶ 上游
+                                                     │
+                                  Logs / Metrics / Traces</div>
+    </section>
+
+    <section class="chapter" id="quiz">
+      <div class="chapter-head">
+        <span class="chapter-no">03—H</span>
+        <div><h2>检索练习</h2><p>本课信息密度最高，练习用于暴露概念混淆。</p></div>
+      </div>
+      <div class="quiz">
+        <details><summary>1. API Key、OAuth、OIDC 分别更接近什么用途？</summary><p>API Key 常识别调用项目；OAuth 处理授权委托；OIDC 在 OAuth 2.0 上提供最终用户身份认证层。</p></details>
+        <details><summary>2. 网关验证用户角色后，订单服务还需检查什么？</summary><p>对象级授权，例如订单是否属于该用户或同一租户。网关不能仅凭角色替代业务数据校验。</p></details>
+        <details><summary>3. Rate Limit、Quota、Concurrency Limit 的区别是什么？</summary><p>分别限制单位时间速率、长周期总量和同时执行数量。</p></details>
+        <details><summary>4. 为什么重试要配合退避、抖动和幂等？</summary><p>退避减少持续压力，抖动避免同步重试风暴，幂等防止重复写入产生多次业务结果。</p></details>
+        <details><summary>5. 熔断与限流的差别是什么？</summary><p>限流控制进入系统的负载；熔断根据上游失败状态暂停调用，避免级联故障。</p></details>
+        <details><summary>6. 日志、指标、追踪分别回答什么问题？</summary><p>日志描述具体事件；指标展示总体趋势；追踪展示单次请求跨组件的完整路径。</p></details>
+      </div>
+    </section>
+
+    <aside class="sources">
+      <h2>本课主参考</h2>
+      <p><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html">AWS API Gateway 概览</a>、<a href="https://owasp.org/API-Security/">OWASP API Security</a>、<a href="https://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect Core</a> 与 <a href="https://opentelemetry.io/docs/concepts/signals/">OpenTelemetry Signals</a>。</p>
+    </aside>
+
+    <nav class="pager" aria-label="前后课程">
+      <a href="0002-proxies-routing-and-load-balancing.html"><small>上一课 02</small><strong>← 代理、TLS 与负载均衡</strong></a>
+      <a href="0004-cloud-kubernetes-and-service-mesh.html"><small>下一课 04</small><strong>微服务、Kubernetes 与 Mesh →</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

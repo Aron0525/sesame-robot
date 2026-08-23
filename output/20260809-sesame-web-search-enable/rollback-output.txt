@@ -1,0 +1,12 @@
+{"valid":true,"path":"/Users/mac/.openclaw/openclaw.json","warnings":[]}
+{
+  "action": "restart",
+  "ok": true,
+  "result": "restarted",
+  "service": {
+    "label": "LaunchAgent",
+    "loaded": true,
+    "loadedText": "loaded",
+    "notLoadedText": "not loaded"
+  }
+}

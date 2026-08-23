@@ -1,0 +1,1058 @@
+ninja: warning: premature end of file; recovering
+Executing action: all (aliases: build)
+Running ninja in directory '/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build'
+Executing "ninja all"...
+[1/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/activation_functions/esp_nn_relu_ansi.c.obj
+[2/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/common/esp_nn_mean_ansi.c.obj
+[3/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/activation_functions/esp_nn_hard_swish_ansi.c.obj
+[4/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/basic_math/esp_nn_add_ansi.c.obj
+[5/832] Building C object esp-idf/espressif__dl_fft/CMakeFiles/__idf_espressif__dl_fft.dir/base/dl_fft_base.c.obj
+[6/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/basic_math/esp_nn_mul_ansi.c.obj
+[7/832] Building C object esp-idf/espressif__dl_fft/CMakeFiles/__idf_espressif__dl_fft.dir/base/dl_fft2r_fc32_ansi.c.obj
+[8/832] Building C object esp-idf/espressif__dl_fft/CMakeFiles/__idf_espressif__dl_fft.dir/base/dl_fft2r_sc16_dif_ansi.c.obj
+[9/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_ansi.c.obj
+[10/832] Building C object esp-idf/espressif__dl_fft/CMakeFiles/__idf_espressif__dl_fft.dir/base/dl_fft2r_sc16_ansi.c.obj
+[11/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/fully_connected/esp_nn_fully_connected_ansi.c.obj
+[12/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_ansi.c.obj
+[13/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/logistic/esp_nn_logistic_ansi.c.obj
+[14/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/common/esp_nn_common_functions_esp32s3.S.obj
+[15/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_opt.c.obj
+[16/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/pooling/esp_nn_avg_pool_ansi.c.obj
+[17/832] Building C object esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/cJSON/cJSON.c.obj
+[18/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/pooling/esp_nn_max_pool_ansi.c.obj
+[19/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/common/esp_nn_dot_s8_esp32s3.S.obj
+[20/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/common/esp_nn_multiply_by_quantized_mult_esp32s3.S.obj
+[21/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/common/esp_nn_multiply_by_quantized_mult_ver1_esp32s3.S.obj
+[22/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/activation_functions/esp_nn_relu_s8_esp32s3.S.obj
+[23/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/activation_functions/esp_nn_hard_swish_s8_esp32s3.c.obj
+[24/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/basic_math/esp_nn_add_s8_esp32s3.S.obj
+[25/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/basic_math/esp_nn_mul_broadcast_s8_esp32s3.S.obj
+[26/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/softmax/esp_nn_softmax_opt.c.obj
+[27/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/basic_math/esp_nn_mul_s8_esp32s3.S.obj
+[28/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/softmax/esp_nn_softmax_ansi.c.obj
+[29/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_s16_mult8_esp32s3.S.obj
+[30/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_s8_mult8_1x1_esp32s3.S.obj
+[31/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/common/esp_nn_mean_s8_esp32s3.c.obj
+[32/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_s8_filter_aligned_input_padded_esp32s3.S.obj
+[33/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_s16_mult4_1x1_esp32s3.S.obj
+[34/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_s8_3x3_opt_esp32s3.c.obj
+[35/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_s8_mult1_3x3_padded_esp32s3.S.obj
+[36/832] Building C object esp-idf/espressif__esp_websocket_client/CMakeFiles/__idf_espressif__esp_websocket_client.dir/esp_websocket_client.c.obj
+[37/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_opt.c.obj
+[38/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_s16_mult1_esp32s3.S.obj
+[39/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_s16_mult1_3x3_esp32s3.S.obj
+[40/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_s16_mult1_3x3_no_pad_esp32s3.S.obj
+[41/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_s16_mult8_3x3_esp32s3.S.obj
+[42/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_s16_mult8_esp32s3.S.obj
+[43/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_s16_mult4_esp32s3.S.obj
+[44/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_s8_1x1_esp32s3.c.obj
+[45/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/fully_connected/esp_nn_fully_connected_s8_esp32s3.S.obj
+[46/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/fully_connected/esp_nn_fully_connected_per_ch_s8_esp32s3.S.obj
+[47/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/fully_connected/esp_nn_fc_s8_mac16_esp32s3.S.obj
+[48/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_conv_esp32s3.c.obj
+[49/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/pooling/esp_nn_avg_pool_s8_esp32s3.S.obj
+[50/832] Building ASM object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/pooling/esp_nn_max_pool_s8_esp32s3.S.obj
+[51/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/pooling/esp_nn_avg_pool_s8_esp32s3.c.obj
+[52/832] Building C object esp-idf/esp_hid/CMakeFiles/__idf_esp_hid.dir/src/esp_hidd.c.obj
+[53/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/fully_connected/esp_nn_fully_connected_esp32s3.c.obj
+[54/832] Building C object esp-idf/esp_hid/CMakeFiles/__idf_esp_hid.dir/src/esp_hid_common.c.obj
+[55/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/diskio/diskio.c.obj
+[56/832] Building C object esp-idf/esp_hid/CMakeFiles/__idf_esp_hid.dir/src/esp_hidh.c.obj
+[57/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/diskio/diskio_wl.c.obj
+[58/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/diskio/diskio_rawflash.c.obj
+[59/832] Building C object esp-idf/esp_driver_touch_sens/CMakeFiles/__idf_esp_driver_touch_sens.dir/common/touch_sens_common.c.obj
+[60/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/convolution/esp_nn_depthwise_conv_s8_esp32s3.c.obj
+[61/832] Building C object esp-idf/esp_driver_touch_sens/CMakeFiles/__idf_esp_driver_touch_sens.dir/hw_ver2/touch_version_specific.c.obj
+[62/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/src/ffunicode.c.obj
+[63/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/port/freertos/ffsystem.c.obj
+[64/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/diskio/diskio_sdmmc.c.obj
+[65/832] Building C object esp-idf/espressif__esp-nn/CMakeFiles/__idf_espressif__esp-nn.dir/src/softmax/esp_nn_softmax_s8_esp32s3.c.obj
+[66/832] Building C object esp-idf/usb/CMakeFiles/__idf_usb.dir/hub.c.obj
+[67/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/vfs/vfs_fat_spiflash.c.obj
+[68/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/vfs/vfs_fat_sdmmc.c.obj
+[69/832] Building C object esp-idf/usb/CMakeFiles/__idf_usb.dir/usb_helpers.c.obj
+[70/832] Building C object esp-idf/usb/CMakeFiles/__idf_usb.dir/enum.c.obj
+[71/832] Building C object esp-idf/usb/CMakeFiles/__idf_usb.dir/usb_private.c.obj
+[72/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/vfs/vfs_fat.c.obj
+[73/832] Building C object esp-idf/chmorgan__esp-libhelix-mp3/CMakeFiles/__idf_chmorgan__esp-libhelix-mp3.dir/libhelix-mp3/mp3dec.c.obj
+[74/832] Building C object esp-idf/chmorgan__esp-libhelix-mp3/CMakeFiles/__idf_chmorgan__esp-libhelix-mp3.dir/libhelix-mp3/real/buffers.c.obj
+[75/832] Building C object esp-idf/usb/CMakeFiles/__idf_usb.dir/usb_phy.c.obj
+[76/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/common/esp_modbus_common.c.obj
+[77/832] Building C object esp-idf/usb/CMakeFiles/__idf_usb.dir/usbh.c.obj
+[78/832] Building C object esp-idf/usb/CMakeFiles/__idf_usb.dir/usb_host.c.obj
+[79/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/common/esp_modbus_master_serial.c.obj
+[80/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/common/esp_modbus_slave_serial.c.obj
+[81/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/common/esp_modbus_master_tcp.c.obj
+[82/832] Building C object esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/src/ff.c.obj
+[83/832] Building C object esp-idf/usb/CMakeFiles/__idf_usb.dir/hcd_dwc.c.obj
+[84/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/common/esp_modbus_slave_tcp.c.obj
+[85/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/common/esp_modbus_master.c.obj
+[86/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/common/esp_modbus_slave.c.obj
+[87/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfunc_handling.c.obj
+[88/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfunccoils.c.obj
+[89/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/serial/mbc_serial_slave.c.obj
+[90/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfunccoils_master.c.obj
+[91/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/tcp/mbc_tcp_slave.c.obj
+[92/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/mb_slave.c.obj
+[93/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/mb_master.c.obj
+[94/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfuncdisc_master.c.obj
+[95/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/serial/mbc_serial_master.c.obj
+[96/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfuncdisc.c.obj
+[97/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfuncholding.c.obj
+[98/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfuncinput_master.c.obj
+[99/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfuncholding_master.c.obj
+[100/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfuncinput.c.obj
+[101/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_controller/tcp/mbc_tcp_master.c.obj
+[102/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbfuncother.c.obj
+[103/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_objects/functions/mbutils.c.obj
+[104/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/common/port_other.c.obj
+[105/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/common/port_event.c.obj
+[106/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/common/port_timer.c.obj
+[107/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/common/mb_transaction.c.obj
+[108/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/serial/port_serial.c.obj
+[109/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_transports/rtu/mbcrc.c.obj
+[110/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_transports/rtu/rtu_master.c.obj
+[111/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_transports/rtu/rtu_slave.c.obj
+[112/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_transports/ascii/ascii_slave.c.obj
+[113/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_transports/ascii/ascii_master.c.obj
+[114/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_transports/ascii/ascii_lrc.c.obj
+[115/832] Building CXX object esp-idf/espressif__esp-dsp/CMakeFiles/__idf_espressif__esp-dsp.dir/modules/kalman/ekf/common/ekf.cpp.obj
+[116/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/tcp/port_tcp_master.c.obj
+[117/832] Building CXX object esp-idf/espressif__esp-dsp/CMakeFiles/__idf_espressif__esp-dsp.dir/modules/kalman/ekf_imu13states/ekf_imu13states.cpp.obj
+[118/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_aead/xchacha20poly1305/aead_xchacha20poly1305.c.obj
+[119/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_transports/tcp/tcp_slave.c.obj
+[120/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_aead/chacha20poly1305/aead_chacha20poly1305.c.obj
+[121/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_aead/aegis256/aead_aegis256.c.obj
+[122/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/tcp/port_tcp_slave.c.obj
+[123/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_transports/tcp/tcp_master.c.obj
+[124/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/tcp/port_tcp_driver.c.obj
+[125/832] Building C object esp-idf/espressif__esp-modbus/CMakeFiles/__idf_espressif__esp-modbus.dir/modbus/mb_ports/tcp/port_tcp_utils.c.obj
+[126/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_auth/crypto_auth.c.obj
+[127/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_aead/aegis128l/aead_aegis128l.c.obj
+[128/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c.obj
+[129/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c.obj
+[130/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_auth/hmacsha512256/auth_hmacsha512256.c.obj
+[131/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_box/crypto_box_seal.c.obj
+[132/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_box/crypto_box.c.obj
+[133/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_box/crypto_box_easy.c.obj
+[134/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_box/curve25519xchacha20poly1305/box_seal_curve25519xchacha20poly1305.c.obj
+[135/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_aead/aegis256/aegis256_soft.c.obj
+[136/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_box/curve25519xchacha20poly1305/box_curve25519xchacha20poly1305.c.obj
+[137/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_box/curve25519xsalsa20poly1305/box_curve25519xsalsa20poly1305.c.obj
+[138/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/hsalsa20/core_hsalsa20.c.obj
+[139/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/keccak1600/keccak1600.c.obj
+[140/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/ed25519/core_ed25519.c.obj
+[141/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/hsalsa20/ref2/core_hsalsa20_ref2.c.obj
+[142/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/hchacha20/core_hchacha20.c.obj
+[143/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/salsa/ref/core_salsa_ref.c.obj
+[144/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/ed25519/core_ristretto255.c.obj
+[145/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_generichash/blake2b/generichash_blake2.c.obj
+[146/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_aead/aegis128l/aegis128l_soft.c.obj
+[147/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-avx2.c.obj
+[148/832] Building CXX object esp-idf/espressif__esp-dsp/CMakeFiles/__idf_espressif__esp-dsp.dir/modules/matrix/mat/mat.cpp.obj
+[149/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/softaes/softaes.c.obj
+[150/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ssse3.c.obj
+[151/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c.obj
+[152/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_generichash/crypto_generichash.c.obj
+[153/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_hash/crypto_hash.c.obj
+[154/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_hash/sha256/hash_sha256.c.obj
+[155/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_ipcrypt/crypto_ipcrypt.c.obj
+[156/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_hash/sha512/hash_sha512.c.obj
+[157/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_hash/sha3/hash_sha3.c.obj
+[158/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_generichash/blake2b/ref/blake2b-ref.c.obj
+[159/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kdf/blake2b/kdf_blake2b.c.obj
+[160/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kdf/crypto_kdf.c.obj
+[161/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kem/crypto_kem.c.obj
+[162/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kem/mlkem768/kem_mlkem768.c.obj
+[163/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha256.c.obj
+[164/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kdf/hkdf/kdf_hkdf_sha512.c.obj
+[165/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_onetimeauth/crypto_onetimeauth.c.obj
+[166/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kem/xwing/kem_xwing.c.obj
+[167/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kx/crypto_kx.c.obj
+[168/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c.obj
+[169/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/argon2-fill-block-avx2.c.obj
+[170/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/argon2-encoding.c.obj
+[171/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_ipcrypt/ipcrypt_soft.c.obj
+[172/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna.c.obj
+[173/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/argon2-fill-block-avx512f.c.obj
+[174/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_kem/mlkem768/ref/kem_mlkem768_ref.c.obj
+[175/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/argon2-fill-block-ssse3.c.obj
+[176/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/argon2-core.c.obj
+[177/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/blake2b-long.c.obj
+[178/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/argon2.c.obj
+[179/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/crypto_pwhash.c.obj
+[180/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c.obj
+[181/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/pwhash_argon2id.c.obj
+[182/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/pwhash_argon2i.c.obj
+[183/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.c.obj
+[184/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/scryptsalsa208sha256/scrypt_platform.c.obj
+[185/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/scryptsalsa208sha256/pwhash_scryptsalsa208sha256.c.obj
+[186/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/scryptsalsa208sha256/nosse/pwhash_scryptsalsa208sha256_nosse.c.obj
+[187/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_scalarmult/crypto_scalarmult.c.obj
+[188/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_scalarmult/curve25519/sandy2x/curve25519_sandy2x.c.obj
+[189/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_scalarmult/curve25519/sandy2x/fe_frombytes_sandy2x.c.obj
+[190/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c.obj
+[191/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51_invert.c.obj
+[192/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_scalarmult/ristretto255/ref10/scalarmult_ristretto255_ref10.c.obj
+[193/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_secretbox/crypto_secretbox.c.obj
+[194/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c.obj
+[195/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_secretbox/crypto_secretbox_easy.c.obj
+[196/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_secretbox/xchacha20poly1305/secretbox_xchacha20poly1305.c.obj
+[197/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_shorthash/crypto_shorthash.c.obj
+[198/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_shorthash/siphash24/shorthash_siphash24.c.obj
+[199/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_secretbox/xsalsa20poly1305/secretbox_xsalsa20poly1305.c.obj
+[200/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_shorthash/siphash24/shorthash_siphashx24.c.obj
+[201/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_secretstream/xchacha20poly1305/secretstream_xchacha20poly1305.c.obj
+[202/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphash24_ref.c.obj
+[203/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_sign/crypto_sign.c.obj
+[204/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphashx24_ref.c.obj
+[205/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_sign/ed25519/sign_ed25519.c.obj
+[206/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_sign/ed25519/ref10/obsolete.c.obj
+[207/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-ssse3.c.obj
+[208/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_sign/ed25519/ref10/open.c.obj
+[209/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_sign/ed25519/ref10/sign.c.obj
+[210/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-avx2.c.obj
+[211/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_pwhash/argon2/argon2-fill-block-ref.c.obj
+[212/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/chacha20/ref/chacha20_ref.c.obj
+[213/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.c.obj
+[214/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa20/ref/salsa20_ref.c.obj
+[215/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_sign/ed25519/ref10/keypair.c.obj
+[216/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/chacha20/stream_chacha20.c.obj
+[217/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.c.obj
+[218/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-sse2.c.obj
+[219/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-avx2.c.obj
+[220/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/crypto_stream.c.obj
+[221/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa20/stream_salsa20.c.obj
+[222/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa2012/ref/stream_salsa2012_ref.c.obj
+[223/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa2012/stream_salsa2012.c.obj
+[224/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa208/ref/stream_salsa208_ref.c.obj
+[225/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_xof/shake128/xof_shake128.c.obj
+[226/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_verify/verify.c.obj
+[227/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/salsa208/stream_salsa208.c.obj
+[228/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_xof/shake128/ref/shake128_ref.c.obj
+[229/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_xof/turboshake128/xof_turboshake128.c.obj
+[230/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_xof/shake256/xof_shake256.c.obj
+[231/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c.obj
+[232/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_stream/xchacha20/stream_xchacha20.c.obj
+[233/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_xof/shake256/ref/shake256_ref.c.obj
+[234/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_xof/turboshake128/ref/turboshake128_ref.c.obj
+[235/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_xof/turboshake256/xof_turboshake256.c.obj
+[236/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_xof/turboshake256/ref/turboshake256_ref.c.obj
+[237/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/sodium/version.c.obj
+[238/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/sodium/runtime.c.obj
+[239/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/port/randombytes_esp32.c.obj
+[240/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/port/crypto_hash_mbedtls/crypto_hash_sha256_mbedtls.c.obj
+[241/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/sodium/core.c.obj
+[242/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/randombytes/randombytes.c.obj
+[243/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/port/crypto_hash_mbedtls/crypto_hash_sha512_mbedtls.c.obj
+[244/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/sodium/utils.c.obj
+[245/832] Linking C static library esp-idf/espressif__cjson/libespressif__cjson.a
+[246/832] Linking C static library esp-idf/espressif__dl_fft/libespressif__dl_fft.a
+[247/832] Building C object esp-idf/espressif__esp_insights/CMakeFiles/__idf_espressif__esp_insights.dir/src/esp_insights_transport.c.obj
+[248/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/sodium/codecs.c.obj
+[249/832] Building C object esp-idf/espressif__esp-sr/CMakeFiles/__idf_espressif__esp-sr.dir/src/esp_process_sdkconfig.c.obj
+[250/832] Building C object esp-idf/espressif__esp_insights/CMakeFiles/__idf_espressif__esp_insights.dir/src/esp_insights_cmd_resp.c.obj
+[251/832] Building C object esp-idf/espressif__esp_insights/CMakeFiles/__idf_espressif__esp_insights.dir/src/esp_insights_client_data.c.obj
+[252/832] Building C object esp-idf/espressif__esp_insights/CMakeFiles/__idf_espressif__esp_insights.dir/src/esp_insights_encoder.c.obj
+[253/832] Building C object esp-idf/espressif__esp-sr/CMakeFiles/__idf_espressif__esp-sr.dir/src/esp_mn_speech_commands.c.obj
+[254/832] Building C object esp-idf/espressif__esp_insights/CMakeFiles/__idf_espressif__esp_insights.dir/src/esp_insights.c.obj
+[255/832] Building C object esp-idf/espressif__esp_insights/CMakeFiles/__idf_espressif__esp_insights.dir/src/esp_insights_cbor_encoder.c.obj
+[256/832] Building C object esp-idf/espressif__esp-sr/CMakeFiles/__idf_espressif__esp-sr.dir/src/model_path.c.obj
+[257/832] Building C object esp-idf/espressif__esp_insights/CMakeFiles/__idf_espressif__esp_insights.dir/src/transport/esp_insights_https.c.obj
+[258/832] Building C object esp-idf/espressif__esp_insights/CMakeFiles/__idf_espressif__esp_insights.dir/src/esp_insights_cbor_decoder.c.obj
+[259/832] Linking C static library esp-idf/espressif__esp-dsp/libespressif__esp-dsp.a
+[260/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ref.c.obj
+[261/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_primitives_freertos.cpp.obj
+[262/832] Building C object esp-idf/espressif__libsodium/CMakeFiles/__idf_espressif__libsodium.dir/libsodium/src/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c.obj
+[263/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_api_target.cpp.obj
+[264/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_uart.cpp.obj
+[265/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_netif.cpp.obj
+[266/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_term_uart.cpp.obj
+[267/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_dce.cpp.obj
+[268/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_factory.cpp.obj
+[269/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_node.c.obj
+[270/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_core.c.obj
+[271/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_cmux.cpp.obj
+[272/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_device.c.obj
+[273/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_dte.cpp.obj
+[274/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_client_data.c.obj
+[275/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_node_config.c.obj
+[276/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_system_service.c.obj
+[277/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_time_service.c.obj
+[278/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_api.cpp.obj
+[279/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_param.c.obj
+[280/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_user_mapping.pb-c.c.obj
+[281/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_cmd_resp_manager.c.obj
+[282/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_term_fs.cpp.obj
+[283/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_secure_boot_digest.c.obj
+[284/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_user_mapping.c.obj
+[285/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_node_auth.c.obj
+[286/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_scenes.c.obj
+[287/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_schedule.c.obj
+[288/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_c_api.cpp.obj
+[289/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_command_library.cpp.obj
+[290/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/mqtt/esp_rmaker_mqtt.c.obj
+[291/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/ota/esp_rmaker_ota_using_params.c.obj
+[292/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/standard_types/esp_rmaker_standard_params.c.obj
+[293/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/mqtt/esp_rmaker_mqtt_budget.c.obj
+[294/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/standard_types/esp_rmaker_standard_devices.c.obj
+[295/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/console/esp_rmaker_console.c.obj
+[296/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/standard_types/esp_rmaker_standard_services.c.obj
+[297/832] Building C object esp-idf/espressif__qrcode/CMakeFiles/__idf_espressif__qrcode.dir/esp_qrcode_wrapper.c.obj
+[298/832] Building C object esp-idf/espressif__qrcode/CMakeFiles/__idf_espressif__qrcode.dir/esp_qrcode_main.c.obj
+[299/832] Building C object esp-idf/joltwallet__littlefs/CMakeFiles/__idf_joltwallet__littlefs.dir/src/littlefs/lfs_util.c.obj
+[300/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/ota/esp_rmaker_ota_using_topics.c.obj
+[301/832] Building C object esp-idf/joltwallet__littlefs/CMakeFiles/__idf_joltwallet__littlefs.dir/src/lfs_config.c.obj
+[302/832] Building C object esp-idf/joltwallet__littlefs/CMakeFiles/__idf_joltwallet__littlefs.dir/src/littlefs_esp_part.c.obj
+[303/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/core/esp_rmaker_claim.c.obj
+[304/832] Building C object esp-idf/espressif__qrcode/CMakeFiles/__idf_espressif__qrcode.dir/qrcodegen.c.obj
+[305/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/console/esp_rmaker_commands.c.obj
+[306/832] Building C object esp-idf/espressif__esp_rainmaker/CMakeFiles/__idf_espressif__esp_rainmaker.dir/src/ota/esp_rmaker_ota.c.obj
+[307/832] Building CXX object esp-idf/sesame_audio/CMakeFiles/__idf_sesame_audio.dir/opus_codec.cpp.obj
+[308/832] Building CXX object esp-idf/sesame_protocol/CMakeFiles/__idf_sesame_protocol.dir/control_event.cpp.obj
+[309/832] Building CXX object esp-idf/sesame_protocol/CMakeFiles/__idf_sesame_protocol.dir/audio_frame.cpp.obj
+[310/832] Linking C static library esp-idf/espressif__esp_websocket_client/libespressif__esp_websocket_client.a
+[311/832] Building CXX object esp-idf/sesame_audio/CMakeFiles/__idf_sesame_audio.dir/audio_hal.cpp.obj
+[312/832] Building C object esp-idf/joltwallet__littlefs/CMakeFiles/__idf_joltwallet__littlefs.dir/src/esp_littlefs.c.obj
+[313/832] Building CXX object esp-idf/sesame_robot/CMakeFiles/__idf_sesame_robot.dir/action_policy.cpp.obj
+[314/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/debug_log.cc.obj
+[315/832] Building CXX object esp-idf/sesame_robot/CMakeFiles/__idf_sesame_robot.dir/robot_adapter.cpp.obj
+[316/832] Linking C static library esp-idf/espressif__esp-nn/libespressif__esp-nn.a
+[317/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_vfs_uart_creator.cpp.obj
+[318/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/src/esp_modem_vfs_socket_creator.cpp.obj
+[319/832] Building CXX object esp-idf/sesame_transport/CMakeFiles/__idf_sesame_transport.dir/device_config.cpp.obj
+[320/832] Building C object esp-idf/joltwallet__littlefs/CMakeFiles/__idf_joltwallet__littlefs.dir/src/littlefs/lfs.c.obj
+[321/832] Building CXX object esp-idf/sesame_transport/CMakeFiles/__idf_sesame_transport.dir/transport_policy.cpp.obj
+[322/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_log.cc.obj
+[323/832] Building CXX object esp-idf/espressif__esp_modem/CMakeFiles/__idf_espressif__esp_modem.dir/command/src/esp_modem_modules.cpp.obj
+[324/832] Building CXX object esp-idf/sesame_transport/CMakeFiles/__idf_sesame_transport.dir/gateway_client.cpp.obj
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp: In member function 'esp_err_t sesame::transport::GatewayClient::start(const sesame::transport::StoredDeviceConfig&, sesame::transport::GatewayObserver*)':
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::host' [-Wmissing-field-initializers]
+  301 |   };
+      |   ^
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::port' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::username' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::password' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::path' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::task_core_id_set' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::task_core_id' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::cert_len' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::client_cert' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::client_cert_len' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::client_key' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::client_key_len' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::client_ds_data' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::transport' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::subprotocol' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::user_agent' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::use_global_ca_store' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::crt_bundle_attach' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::cert_common_name' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::skip_cert_common_name_check' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::if_name' [-Wmissing-field-initializers]
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/gateway_client.cpp:301:3: warning: missing initializer for member 'esp_websocket_client_config_t::ext_transport' [-Wmissing-field-initializers]
+[325/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_profiler.cc.obj
+[326/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/memory_helpers.cc.obj
+[327/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/system_setup.cc.obj
+[328/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/esp/micro_time.cc.obj
+[329/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_context.cc.obj
+[330/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_op_resolver.cc.obj
+[331/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/flatbuffer_utils.cc.obj
+[332/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_interpreter_context.cc.obj
+[333/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_utils.cc.obj
+[334/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_resource_variable.cc.obj
+[335/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_allocation_info.cc.obj
+[336/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/recording_micro_allocator.cc.obj
+[337/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_interpreter_graph.cc.obj
+[338/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_allocator.cc.obj
+[339/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/micro_interpreter.cc.obj
+[340/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/activations.cc.obj
+[341/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/add_common.cc.obj
+[342/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/activations_common.cc.obj
+[343/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/assign_variable.cc.obj
+[344/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/add_n.cc.obj
+[345/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/call_once.cc.obj
+[346/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/arg_min_max.cc.obj
+[347/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/broadcast_args.cc.obj
+[348/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/batch_to_space_nd.cc.obj
+[349/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/broadcast_to.cc.obj
+[350/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/batch_matmul.cc.obj
+[351/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/batch_matmul_common.cc.obj
+[352/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/ceil.cc.obj
+[353/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/circular_buffer_common.cc.obj
+[354/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/circular_buffer.cc.obj
+[355/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/decompress.cc.obj
+[356/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/decompress_common.cc.obj
+[357/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/cast.cc.obj
+[358/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/decode.cc.obj
+[359/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/conv_common.cc.obj
+[360/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/decode_state.cc.obj
+[361/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/cumsum.cc.obj
+[362/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/decode_state_huffman.cc.obj
+[363/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/concatenation.cc.obj
+[364/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/decode_state_lut.cc.obj
+[365/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/depthwise_conv_common.cc.obj
+[366/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/depth_to_space.cc.obj
+[367/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/decode_state_prune.cc.obj
+[368/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/ethosu.cc.obj
+[369/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/comparisons.cc.obj
+[370/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/dequantize_common.cc.obj
+[371/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/dequantize.cc.obj
+[372/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/elu.cc.obj
+[373/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/dynamic_update_slice.cc.obj
+[374/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/div.cc.obj
+[375/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/detection_postprocess.cc.obj
+[376/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/elementwise.cc.obj
+[377/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/embedding_lookup.cc.obj
+[378/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/fill.cc.obj
+[379/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/expand_dims.cc.obj
+[380/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/exp.cc.obj
+[381/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/floor.cc.obj
+[382/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/floor_mod.cc.obj
+[383/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/floor_div.cc.obj
+[384/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/fully_connected_common.cc.obj
+[385/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/gather.cc.obj
+[386/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/hard_swish_common.cc.obj
+[387/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/gather_nd.cc.obj
+[388/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/hard_swish.cc.obj
+[389/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/if.cc.obj
+[390/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/kernel_runner.cc.obj
+[391/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/kernel_util.cc.obj
+[392/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/l2_pool_2d.cc.obj
+[393/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/micro_tensor_utils.cc.obj
+[394/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/l2norm.cc.obj
+[395/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/leaky_relu.cc.obj
+[396/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/leaky_relu_common.cc.obj
+[397/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/logical.cc.obj
+[398/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/log_softmax.cc.obj
+[399/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/logical_common.cc.obj
+[400/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/logistic_common.cc.obj
+[401/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/logistic.cc.obj
+[402/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/lstm_eval.cc.obj
+In file included from /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/micro/kernels/lstm_eval.cc:25:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:150:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  150 |       [](const ArithmeticParams& params, const uint8_t input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:126:56: note: shadowed declaration is here
+  126 | inline void BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:209:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  209 |       [](const ArithmeticParams& params, const T input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:171:44: note: shadowed declaration is here
+  171 | BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                    ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:249:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  249 |       [](const ArithmeticParams& params, const std::complex<float> input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:221:56: note: shadowed declaration is here
+  221 | inline void BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+[403/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/lstm_eval_common.cc.obj
+[404/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/mirror_pad.cc.obj
+[405/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/neg.cc.obj
+[406/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/maximum_minimum.cc.obj
+[407/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/pack.cc.obj
+[408/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/pad_common.cc.obj
+[409/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/mul_common.cc.obj
+In file included from /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/micro/kernels/mul_common.cc:19:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:150:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  150 |       [](const ArithmeticParams& params, const uint8_t input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:126:56: note: shadowed declaration is here
+  126 | inline void BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:209:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  209 |       [](const ArithmeticParams& params, const T input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:171:44: note: shadowed declaration is here
+  171 | BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                    ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:249:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  249 |       [](const ArithmeticParams& params, const std::complex<float> input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:221:56: note: shadowed declaration is here
+  221 | inline void BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+[410/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/pooling_common.cc.obj
+[411/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/prelu.cc.obj
+[412/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/prelu_common.cc.obj
+[413/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/quantize.cc.obj
+[414/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/pad.cc.obj
+[415/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/read_variable.cc.obj
+[416/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/quantize_common.cc.obj
+[417/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/reshape.cc.obj
+[418/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/reduce.cc.obj
+[419/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/reduce_common.cc.obj
+[420/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/reshape_common.cc.obj
+[421/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/round.cc.obj
+[422/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/resize_bilinear.cc.obj
+[423/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/resize_nearest_neighbor.cc.obj
+[424/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/shape.cc.obj
+[425/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/reverse.cc.obj
+[426/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/softmax_common.cc.obj
+[427/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/space_to_depth.cc.obj
+[428/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/select.cc.obj
+[429/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/slice.cc.obj
+[430/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/space_to_batch_nd.cc.obj
+[431/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/split.cc.obj
+[432/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/split_v.cc.obj
+[433/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/squeeze.cc.obj
+[434/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/strided_slice_common.cc.obj
+[435/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/sub_common.cc.obj
+In file included from /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/micro/kernels/sub_common.cc:22:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:264:62: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  264 |       [](T input1_val, T input2_val, const ArithmeticParams& params) {
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:256:47: note: shadowed declaration is here
+  256 | void BroadcastSubSlow(const ArithmeticParams& params,
+      |                       ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:284:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  284 |          const ArithmeticParams& params) {
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:272:59: note: shadowed declaration is here
+  272 | inline void BroadcastSub16POTSlow(const ArithmeticParams& params,
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:308:62: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  308 |       [](T input1_val, T input2_val, const ArithmeticParams& params) {
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:298:52: note: shadowed declaration is here
+  298 | void BroadcastQuantSubSlow(const ArithmeticParams& params,
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:420:62: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  420 |       [](T input1_val, T input2_val, const ArithmeticParams& params) {
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:413:34: note: shadowed declaration is here
+  413 | void Sub(const ArithmeticParams& params, const RuntimeShape& input1_shape,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+[436/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/squared_difference.cc.obj
+[437/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/svdf.cc.obj
+[438/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/svdf_common.cc.obj
+[439/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/tanh.cc.obj
+[440/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/tflite_bridge/micro_error_reporter.cc.obj
+[441/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/transpose_common.cc.obj
+[442/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/transpose.cc.obj
+[443/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/strided_slice.cc.obj
+[444/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/sub.cc.obj
+In file included from /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/micro/kernels/sub.cc:24:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:264:62: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  264 |       [](T input1_val, T input2_val, const ArithmeticParams& params) {
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:256:47: note: shadowed declaration is here
+  256 | void BroadcastSubSlow(const ArithmeticParams& params,
+      |                       ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:284:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  284 |          const ArithmeticParams& params) {
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:272:59: note: shadowed declaration is here
+  272 | inline void BroadcastSub16POTSlow(const ArithmeticParams& params,
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:308:62: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  308 |       [](T input1_val, T input2_val, const ArithmeticParams& params) {
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:298:52: note: shadowed declaration is here
+  298 | void BroadcastQuantSubSlow(const ArithmeticParams& params,
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:420:62: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  420 |       [](T input1_val, T input2_val, const ArithmeticParams& params) {
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/sub.h:413:34: note: shadowed declaration is here
+  413 | void Sub(const ArithmeticParams& params, const RuntimeShape& input1_shape,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+[445/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/transpose_conv.cc.obj
+[446/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/unidirectional_sequence_lstm.cc.obj
+[447/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/var_handle.cc.obj
+[448/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/while.cc.obj
+[449/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/unpack.cc.obj
+[450/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/zeros_like.cc.obj
+[451/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/tflite_bridge/flatbuffer_conversions_bridge.cc.obj
+[452/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/esp_nn/fully_connected.cc.obj
+[453/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/esp_nn/conv.cc.obj
+[454/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/esp_nn/depthwise_conv.cc.obj
+[455/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/esp_nn/add.cc.obj
+[456/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/esp_nn/mul.cc.obj
+In file included from /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/micro/kernels/esp_nn/mul.cc:21:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:150:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  150 |       [](const ArithmeticParams& params, const uint8_t input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:126:56: note: shadowed declaration is here
+  126 | inline void BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:209:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  209 |       [](const ArithmeticParams& params, const T input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:171:44: note: shadowed declaration is here
+  171 | BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                    ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h: In lambda function:
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:249:34: warning: declaration of 'const tflite::ArithmeticParams& params' shadows a parameter [-Wshadow]
+  249 |       [](const ArithmeticParams& params, const std::complex<float> input1_val,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp-tflite-micro/tensorflow/lite/kernels/internal/reference/mul.h:221:56: note: shadowed declaration is here
+  221 | inline void BroadcastMul6DSlow(const ArithmeticParams& params,
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+[457/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/esp_nn/pooling.cc.obj
+[458/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/delay.cc.obj
+[459/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/fft_auto_scale_common.cc.obj
+[460/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/energy.cc.obj
+[461/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/kernels/esp_nn/softmax.cc.obj
+[462/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/fft_auto_scale_kernel.cc.obj
+[463/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/filter_bank.cc.obj
+[464/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/circular_buffer.cc.obj
+[465/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/energy.cc.obj
+[466/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/fft_auto_scale.cc.obj
+[467/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/filter_bank.cc.obj
+[468/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/filter_bank_log.cc.obj
+[469/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/filter_bank_spectral_subtraction.cc.obj
+[470/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/filter_bank_square_root.cc.obj
+[471/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/irfft_float.cc.obj
+[472/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/irfft_int16.cc.obj
+[473/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/irfft_int32.cc.obj
+[474/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/log.cc.obj
+[475/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/max_abs.cc.obj
+[476/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/msb_32.cc.obj
+[477/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/msb_64.cc.obj
+[478/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/overlap_add.cc.obj
+[479/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/pcan_argc_fixed.cc.obj
+[480/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/filter_bank_log.cc.obj
+[481/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/rfft_float.cc.obj
+[482/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/filter_bank_spectral_subtraction.cc.obj
+[483/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/rfft_int16.cc.obj
+[484/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/rfft_int32.cc.obj
+[485/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/square_root_32.cc.obj
+[486/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/square_root_64.cc.obj
+[487/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/window.cc.obj
+[488/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/filter_bank_square_root.cc.obj
+[489/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/kiss_fft_wrappers/kiss_fft_float.cc.obj
+[490/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/filter_bank_square_root_common.cc.obj
+[491/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/memory_planner/linear_memory_planner.cc.obj
+[492/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/kiss_fft_wrappers/kiss_fft_int16.cc.obj
+[493/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/memory_planner/greedy_memory_planner.cc.obj
+[494/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/arena_allocator/recording_single_arena_buffer_allocator.cc.obj
+[495/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/src/kiss_fft_wrappers/kiss_fft_int32.cc.obj
+[496/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/kernels/kernel_util.cc.obj
+[497/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/framer.cc.obj
+[498/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/core/c/common.cc.obj
+[499/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/core/api/tensor_utils.cc.obj
+[500/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/kernels/internal/common.cc.obj
+[501/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/kernels/internal/quantization_util.cc.obj
+[502/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/kernels/internal/portable_tensor_utils.cc.obj
+[503/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/kernels/internal/tensor_utils.cc.obj
+[504/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/kernels/internal/tensor_ctypes.cc.obj
+[505/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/pcan.cc.obj
+[506/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/compiler/mlir/lite/core/api/error_reporter.cc.obj
+[507/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/kernels/internal/reference/comparisons.cc.obj
+[508/832] Building C object esp-idf/unity/CMakeFiles/__idf_unity.dir/unity/src/unity.c.obj
+[509/832] Building C object esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_compat.c.obj
+[510/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/window.cc.obj
+[511/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/irfft.cc.obj
+[512/832] Building C object esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_runner.c.obj
+[513/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/stacker.cc.obj
+[514/832] Building C object esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_utils_freertos.c.obj
+[515/832] Building C object esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_utils_cache.c.obj
+[516/832] Building C object esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_utils_memory.c.obj
+[517/832] Building C object esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_port_esp32.c.obj
+[518/832] Building C object esp-idf/unity/CMakeFiles/__idf_unity.dir/port/esp/unity_utils_memory_esp.c.obj
+[519/832] Linking C static library esp-idf/esp_driver_touch_sens/libesp_driver_touch_sens.a
+[520/832] Linking C static library esp-idf/esp_hid/libesp_hid.a
+[521/832] Linking C static library esp-idf/fatfs/libfatfs.a
+[522/832] Linking C static library esp-idf/usb/libusb.a
+[523/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/overlap_add.cc.obj
+[524/832] Linking C static library esp-idf/chmorgan__esp-libhelix-mp3/libchmorgan__esp-libhelix-mp3.a
+[525/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/signal/micro/kernels/rfft.cc.obj
+[526/832] Linking C static library esp-idf/espressif__esp-sr/libespressif__esp-sr.a
+[527/832] Linking C static library esp-idf/espressif__esp_insights/libespressif__esp_insights.a
+[528/832] Linking C static library esp-idf/espressif__esp-modbus/libespressif__esp-modbus.a
+[529/832] Linking C static library esp-idf/espressif__qrcode/libespressif__qrcode.a
+[530/832] Linking C static library esp-idf/joltwallet__littlefs/libjoltwallet__littlefs.a
+[531/832] Linking C static library esp-idf/espressif__esp_modem/libespressif__esp_modem.a
+[532/832] Linking C static library esp-idf/espressif__esp_rainmaker/libespressif__esp_rainmaker.a
+[533/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/ColorFormat.c.obj
+[534/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/cbuf.cpp.obj
+[535/832] Linking C static library esp-idf/espressif__libsodium/libespressif__libsodium.a
+[536/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-adc.c.obj
+[537/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-bt.c.obj
+[538/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-hosted.c.obj
+[539/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-cpu.c.obj
+[540/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-i2c.c.obj
+[541/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-gpio.c.obj
+[542/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-log-wrapper.c.obj
+[543/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/kernels/internal/reference/portable_tensor_utils.cc.obj
+[544/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-i2c-ng.c.obj
+[545/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-ledc.c.obj
+[546/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-i2c-slave.c.obj
+[547/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-matrix.c.obj
+[548/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-periman.c.obj
+[549/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-ldo.c.obj
+[550/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-misc.c.obj
+[551/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-psram.c.obj
+[552/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-rgb-led.c.obj
+[553/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-sigmadelta.c.obj
+[554/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-tinyusb.c.obj
+[555/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-timer.c.obj
+[556/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-time.c.obj
+[557/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-touch-ng.c.obj
+[558/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-spi.c.obj
+[559/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-rmt.c.obj
+[560/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/base64.cpp.obj
+[561/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/freertos_stats.cpp.obj
+[562/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/chip-debug-report.cpp.obj
+[563/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/idf_openthread_mpool_wrapper.c.obj
+[564/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/esp32-hal-uart.c.obj
+[565/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/HashBuilder.cpp.obj
+[566/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/HEXBuilder.cpp.obj
+[567/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/arena_allocator/persistent_arena_buffer_allocator.cc.obj
+[568/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/arena_allocator/non_persistent_arena_buffer_allocator.cc.obj
+[569/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/MD5Builder.cpp.obj
+[570/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/micro/arena_allocator/single_arena_buffer_allocator.cc.obj
+[571/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/IPAddress.cpp.obj
+[572/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/stdlib_noniso.c.obj
+[573/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/StringUtils.cpp.obj
+[574/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/FunctionalInterrupt.cpp.obj
+[575/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/USB.cpp.obj
+[576/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/USBCDC.cpp.obj
+[577/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/compiler/mlir/lite/schema/schema_utils.cc.obj
+[578/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/USBMSC.cpp.obj
+[579/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/FirmwareMSC.cpp.obj
+[580/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/HardwareSerial.cpp.obj
+[581/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/firmware_msc_fat.c.obj
+[582/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/wiring_pulse.c.obj
+[583/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/WMath.cpp.obj
+[584/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/wiring_shift.c.obj
+[585/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/MacAddress.cpp.obj
+[586/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/main.cpp.obj
+[587/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLE2901.cpp.obj
+[588/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLE2902.cpp.obj
+[589/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLE2904.cpp.obj
+[590/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEAddress.cpp.obj
+[591/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEAdvertisedDevice.cpp.obj
+[592/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEAdvertising.cpp.obj
+[593/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEBeacon.cpp.obj
+[594/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLECharacteristic.cpp.obj
+[595/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLECharacteristicMap.cpp.obj
+[596/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/Print.cpp.obj
+[597/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/StreamString.cpp.obj
+[598/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEClient.cpp.obj
+[599/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEDescriptor.cpp.obj
+[600/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/Stream.cpp.obj
+[601/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEDescriptorMap.cpp.obj
+[602/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEDevice.cpp.obj
+[603/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEEddystoneTLM.cpp.obj
+[604/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/Tone.cpp.obj
+[605/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEEddystoneURL.cpp.obj
+[606/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEExceptions.cpp.obj
+[607/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEHIDDevice.cpp.obj
+[608/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLERemoteCharacteristic.cpp.obj
+[609/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLERemoteDescriptor.cpp.obj
+[610/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEScan.cpp.obj
+[611/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLESecurity.cpp.obj
+[612/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLERemoteService.cpp.obj
+[613/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEServer.cpp.obj
+[614/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEService.cpp.obj
+[615/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEUtils.cpp.obj
+[616/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEServiceMap.cpp.obj
+[617/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEValue.cpp.obj
+[618/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/BLEUUID.cpp.obj
+[619/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BluetoothSerial/src/BTAddress.cpp.obj
+[620/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/HWCDC.cpp.obj
+[621/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BluetoothSerial/src/BTAdvertisedDeviceSet.cpp.obj
+[622/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BluetoothSerial/src/BTScanResultsSet.cpp.obj
+[623/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BluetoothSerial/src/BluetoothSerial.cpp.obj
+[624/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/Esp.cpp.obj
+In file included from /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spi_flash_ll.h:17,
+                 from /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__arduino-esp32/cores/esp32/Esp.cpp:41:
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h: In function 'void gpspi_flash_ll_read_phase(spi_dev_t*)':
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::doutdin' [-Wmissing-field-initializers]
+  191 |     };
+      |     ^
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::reserved1' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::qpi_mode' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::opi_mode' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::tsck_i_edge' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::cs_hold' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::cs_setup' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::rsck_i_edge' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::ck_out_edge' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::reserved10' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::fwrite_dual' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::fwrite_quad' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::fwrite_oct' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::usr_conf_nxt' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::reserved16' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::sio' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::reserved18' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::usr_miso_highpart' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::usr_mosi_highpart' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::usr_dummy_idle' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:191:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::usr_dummy' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h: In function 'void gpspi_flash_ll_set_command(spi_dev_t*, uint8_t, uint32_t)':
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:309:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::reserved16' [-Wmissing-field-initializers]
+  309 |     };
+      |     ^
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/gpspi_flash_ll.h:309:5: warning: missing initializer for member 'spi_dev_s::<unnamed union>::<unnamed struct>::mst_rempty_err_end_en' [-Wmissing-field-initializers]
+In file included from /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spi_flash_ll.h:18:
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h: In function 'void spimem_flash_ll_read_phase(spi_mem_dev_t*)':
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::reserved0' [-Wmissing-field-initializers]
+  425 |     };
+      |     ^
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::cs_hold' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::cs_setup' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::reserved8' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::ck_out_edge' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::reserved10' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::fwrite_dual' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::fwrite_quad' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::fwrite_dio' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::fwrite_qio' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::reserved16' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::usr_miso_highpart' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::usr_mosi_highpart' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::usr_dummy_idle' [-Wmissing-field-initializers]
+/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/hal/esp32s3/include/hal/spimem_flash_ll.h:425:5: warning: missing initializer for member 'spi_mem_dev_s::<unnamed union>::<unnamed struct>::usr_dummy' [-Wmissing-field-initializers]
+[625/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/cores/esp32/WString.cpp.obj
+[626/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/AsyncUDP/src/AsyncUDP.cpp.obj
+[627/832] Building CXX object esp-idf/espressif__esp-tflite-micro/CMakeFiles/__idf_espressif__esp-tflite-micro.dir/tensorflow/lite/core/api/flatbuffer_conversions.cc.obj
+[628/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/ESP_HostedOTA/src/ESP_HostedOTA.cpp.obj
+[629/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/ESP_NOW/src/ESP32_NOW_Serial.cpp.obj
+[630/832] Building C object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/ESP_SR/src/esp32-hal-sr.c.obj
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__arduino-esp32/libraries/ESP_SR/src/esp32-hal-sr.c:10:2: warning: #warning Compatible partition must be selected for ESP_SR to work [-Wcpp]
+   10 | #warning Compatible partition must be selected for ESP_SR to work
+      |  ^~~~~~~
+[631/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/EEPROM/src/EEPROM.cpp.obj
+[632/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/ESP_I2S/src/ESP_I2S.cpp.obj
+[633/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/ArduinoOTA/src/ArduinoOTA.cpp.obj
+[634/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/ESP_NOW/src/ESP32_NOW.cpp.obj
+[635/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/ESP_SR/src/ESP_SR.cpp.obj
+[636/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Hash/src/SHA2Builder.cpp.obj
+[637/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/ESPmDNS/src/ESPmDNS.cpp.obj
+[638/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Hash/src/SHA3Builder.cpp.obj
+[639/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Insights/src/Insights.cpp.obj
+[640/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/FreeRTOS.cpp.obj
+[641/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterGenericSwitch.cpp.obj
+[642/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterOnOffLight.cpp.obj
+[643/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterDimmableLight.cpp.obj
+[644/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Console/src/Console.cpp.obj
+[645/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterColorTemperatureLight.cpp.obj
+[646/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/DNSServer/src/DNSServer.cpp.obj
+[647/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/BLE/src/GeneralUtils.cpp.obj
+[648/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterColorLight.cpp.obj
+[649/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterEnhancedColorLight.cpp.obj
+[650/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterFan.cpp.obj
+[651/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterTemperatureSensor.cpp.obj
+[652/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterTemperatureControlledCabinet.cpp.obj
+[653/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterWaterLeakDetector.cpp.obj
+[654/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterContactSensor.cpp.obj
+[655/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterHumiditySensor.cpp.obj
+[656/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Hash/src/SHA1Builder.cpp.obj
+[657/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterWaterFreezeDetector.cpp.obj
+[658/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterRainSensor.cpp.obj
+[659/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterOccupancySensor.cpp.obj
+[660/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterPressureSensor.cpp.obj
+[661/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterDimmablePlugin.cpp.obj
+[662/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterOnOffPlugin.cpp.obj
+[663/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterThermostat.cpp.obj
+[664/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterWindowCovering.cpp.obj
+[665/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndpoints/MatterLightSensor.cpp.obj
+[666/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/MatterEndPoint.cpp.obj
+[667/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Matter/src/Matter.cpp.obj
+[668/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Hash/src/PBKDF2_HMACBuilder.cpp.obj
+[669/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Ethernet/src/ETH.cpp.obj
+[670/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/FS/src/FS.cpp.obj
+[671/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/OpenThread/src/OThread.cpp.obj
+[672/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/OpenThread/src/OThreadCLI.cpp.obj
+[673/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/OpenThread/src/OThreadCLI_Util.cpp.obj
+[674/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/FS/src/vfs_api.cpp.obj
+[675/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/NetBIOS/src/NetBIOS.cpp.obj
+[676/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/LittleFS/src/LittleFS.cpp.obj
+[677/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Network/src/NetworkManager.cpp.obj
+[678/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Network/src/NetworkInterface.cpp.obj
+[679/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/HTTPUpdate/src/HTTPUpdate.cpp.obj
+[680/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Network/src/NetworkEvents.cpp.obj
+[681/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Network/src/NetworkUdp.cpp.obj
+[682/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/HTTPClient/src/HTTPClient.cpp.obj
+[683/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/RainMaker/src/RMakerNode.cpp.obj
+[684/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/RainMaker/src/AppInsights.cpp.obj
+[685/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Preferences/src/Preferences.cpp.obj
+[686/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/RainMaker/src/RMakerParam.cpp.obj
+[687/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/SimpleBLE/src/SimpleBLE.cpp.obj
+[688/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/RainMaker/src/RMakerType.cpp.obj
+[689/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/RainMaker/src/RMakerDevice.cpp.obj
+[690/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Network/src/NetworkServer.cpp.obj
+[691/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Network/src/NetworkClient.cpp.obj
+[692/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/RainMaker/src/RMaker.cpp.obj
+[693/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBAudioCard.cpp.obj
+[694/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBHID.cpp.obj
+[695/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/PPP/src/PPP.cpp.obj
+[696/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Ticker/src/Ticker.cpp.obj
+[697/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBHIDMouse.cpp.obj
+[698/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBHIDKeyboard.cpp.obj
+[699/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Update/src/HttpsOTAUpdate.cpp.obj
+[700/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/RainMaker/src/RMakerUtils.cpp.obj
+[701/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/RainMaker/src/RMakerQR.cpp.obj
+[702/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/SD/src/sd_diskio.cpp.obj
+[703/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBMIDI.cpp.obj
+[704/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/SPI/src/SPI.cpp.obj
+[705/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Update/src/Updater.cpp.obj
+[706/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/SD/src/SD.cpp.obj
+[707/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_da_DK.cpp.obj
+[708/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_de_DE.cpp.obj
+[709/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/SD_MMC/src/SD_MMC.cpp.obj
+[710/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_es_ES.cpp.obj
+[711/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_en_US.cpp.obj
+[712/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBHIDGamepad.cpp.obj
+[713/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/SPIFFS/src/SPIFFS.cpp.obj
+[714/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBHIDConsumerControl.cpp.obj
+[715/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_fr_CH.cpp.obj
+[716/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBHIDSystemControl.cpp.obj
+[717/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBHIDVendor.cpp.obj
+[718/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_fr_FR.cpp.obj
+[719/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_hu_HU.cpp.obj
+[720/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_it_IT.cpp.obj
+[721/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/USBVendor.cpp.obj
+[722/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_ja_JP.cpp.obj
+[723/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WebServer/src/middleware/MiddlewareChain.cpp.obj
+[724/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_pt_BR.cpp.obj
+[725/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_pt_PT.cpp.obj
+[726/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/USB/src/keyboardLayout/KeyboardLayout_sv_SE.cpp.obj
+[727/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/NetworkClientSecure/src/ssl_client.cpp.obj
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__arduino-esp32/libraries/NetworkClientSecure/src/ssl_client.cpp:28:2: warning: #warning "Please call `idf.py menuconfig` then go to Component config -> mbedTLS -> TLS Key Exchange Methods -> Enable pre-shared-key ciphersuites and then check `Enable PSK based ciphersuite modes`. Save and Quit." [-Wcpp]
+   28 | #warning \
+      |  ^~~~~~~
+[728/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WebServer/src/middleware/CorsMiddleware.cpp.obj
+[729/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WebServer/src/middleware/AuthenticationMiddleware.cpp.obj
+[730/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WebServer/src/middleware/LoggingMiddleware.cpp.obj
+[731/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WebServer/src/Parsing.cpp.obj
+[732/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFi/src/WiFiAP.cpp.obj
+[733/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/NetworkClientSecure/src/NetworkClientSecure.cpp.obj
+[734/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFi/src/WiFi.cpp.obj
+[735/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WebServer/src/WebServer.cpp.obj
+[736/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFi/src/WiFiGeneric.cpp.obj
+[737/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFi/src/WiFiScan.cpp.obj
+[738/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeDimmableLight.cpp.obj
+[739/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeColorDimmerSwitch.cpp.obj
+[740/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeLight.cpp.obj
+[741/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeSwitch.cpp.obj
+[742/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFi/src/WiFiMulti.cpp.obj
+[743/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeTempSensor.cpp.obj
+[744/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeThermostat.cpp.obj
+[745/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeFlowSensor.cpp.obj
+[746/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeePressureSensor.cpp.obj
+[747/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeOccupancySensor.cpp.obj
+[748/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeCarbonDioxideSensor.cpp.obj
+[749/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeContactSwitch.cpp.obj
+[750/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeDoorWindowHandle.cpp.obj
+[751/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeWindowCovering.cpp.obj
+[752/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeVibrationSensor.cpp.obj
+[753/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeAnalog.cpp.obj
+[754/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeRangeExtender.cpp.obj
+[755/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeGateway.cpp.obj
+[756/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeWindSpeedSensor.cpp.obj
+[757/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeIlluminanceSensor.cpp.obj
+[758/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeElectricalMeasurement.cpp.obj
+[759/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeePM25Sensor.cpp.obj
+[760/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeBinary.cpp.obj
+[761/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFi/src/WiFiSTA.cpp.obj
+[762/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeePowerOutlet.cpp.obj
+[763/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeFanControl.cpp.obj
+[764/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeMultistate.cpp.obj
+[765/832] Linking C static library esp-idf/sesame_audio/libsesame_audio.a
+[766/832] Linking C static library esp-idf/sesame_protocol/libsesame_protocol.a
+[767/832] Linking C static library esp-idf/sesame_robot/libsesame_robot.a
+[768/832] Linking C static library esp-idf/sesame_transport/libsesame_transport.a
+[769/832] Building CXX object esp-idf/sesame_voice/CMakeFiles/__idf_sesame_voice.dir/recording_button.cpp.obj
+[770/832] Building CXX object esp-idf/sesame_voice/CMakeFiles/__idf_sesame_voice.dir/voice_turn_detector.cpp.obj
+[771/832] Building CXX object esp-idf/sesame_voice/CMakeFiles/__idf_sesame_voice.dir/zhima_wakeword_model_data.cpp.obj
+[772/832] Building C object esp-idf/app_trace/CMakeFiles/__idf_app_trace.dir/app_trace.c.obj
+[773/832] Building C object esp-idf/app_trace/CMakeFiles/__idf_app_trace.dir/app_trace_util.c.obj
+[774/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ZigbeeCore.cpp.obj
+[775/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Wire/src/Wire.cpp.obj
+[776/832] Building C object esp-idf/app_trace/CMakeFiles/__idf_app_trace.dir/host_file_io.c.obj
+[777/832] Building C object esp-idf/app_trace/CMakeFiles/__idf_app_trace.dir/port/port_uart.c.obj
+[778/832] Linking C static library esp-idf/unity/libunity.a
+[779/832] Building C object esp-idf/cmock/CMakeFiles/__idf_cmock.dir/CMock/src/cmock.c.obj
+[780/832] Linking C static library esp-idf/espressif__esp-tflite-micro/libespressif__esp-tflite-micro.a
+[781/832] Building C object esp-idf/esp_driver_cam/CMakeFiles/__idf_esp_driver_cam.dir/dvp_share_ctrl.c.obj
+[782/832] Building C object esp-idf/esp_driver_cam/CMakeFiles/__idf_esp_driver_cam.dir/esp_cam_ctlr.c.obj
+[783/832] Building C object esp-idf/esp_driver_cam/CMakeFiles/__idf_esp_driver_cam.dir/dvp/src/esp_cam_ctlr_dvp_gdma.c.obj
+[784/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ZigbeeEP.cpp.obj
+[785/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/src/esp_lcd_common.c.obj
+[786/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ZigbeeHandlers.cpp.obj
+[787/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/src/esp_lcd_panel_io.c.obj
+[788/832] Building CXX object esp-idf/sesame_voice/CMakeFiles/__idf_sesame_voice.dir/voice_controller.cpp.obj
+[789/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/src/esp_lcd_panel_nt35510.c.obj
+[790/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/src/esp_lcd_panel_ssd1306.c.obj
+[791/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/Zigbee/src/ep/ZigbeeColorDimmableLight.cpp.obj
+[792/832] Building C object esp-idf/esp_driver_cam/CMakeFiles/__idf_esp_driver_cam.dir/dvp/src/esp_cam_ctlr_dvp_cam.c.obj
+[793/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/src/esp_lcd_panel_ops.c.obj
+[794/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/src/esp_lcd_panel_st7789.c.obj
+[795/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/i2c/esp_lcd_panel_io_i2c_v1.c.obj
+[796/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/i2c/esp_lcd_panel_io_i2c_v2.c.obj
+[797/832] Building C object esp-idf/perfmon/CMakeFiles/__idf_perfmon.dir/xtensa_perfmon_access.c.obj
+[798/832] Building C object esp-idf/nvs_sec_provider/CMakeFiles/__idf_nvs_sec_provider.dir/nvs_sec_provider.c.obj
+[799/832] Building C object esp-idf/perfmon/CMakeFiles/__idf_perfmon.dir/xtensa_perfmon_apis.c.obj
+[800/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/spi/esp_lcd_panel_io_spi.c.obj
+[801/832] Building C object esp-idf/rt/CMakeFiles/__idf_rt.dir/FreeRTOS_POSIX_utils.c.obj
+[802/832] Building C object esp-idf/rt/CMakeFiles/__idf_rt.dir/FreeRTOS_POSIX_mqueue.c.obj
+[803/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/i80/esp_lcd_panel_io_i80.c.obj
+[804/832] Building C object esp-idf/touch_element/CMakeFiles/__idf_touch_element.dir/touch_button.c.obj
+[805/832] Linking C static library esp-idf/app_trace/libapp_trace.a
+[806/832] Linking C static library esp-idf/cmock/libcmock.a
+[807/832] Building C object esp-idf/touch_element/CMakeFiles/__idf_touch_element.dir/touch_slider.c.obj
+[808/832] Building C object esp-idf/touch_element/CMakeFiles/__idf_touch_element.dir/touch_matrix.c.obj
+[809/832] Linking C static library esp-idf/esp_driver_cam/libesp_driver_cam.a
+[810/832] Linking C static library esp-idf/nvs_sec_provider/libnvs_sec_provider.a
+[811/832] Building C object esp-idf/touch_element/CMakeFiles/__idf_touch_element.dir/touch_element.c.obj
+[812/832] Linking C static library esp-idf/perfmon/libperfmon.a
+[813/832] Linking C static library esp-idf/rt/librt.a
+[814/832] Linking C static library esp-idf/touch_element/libtouch_element.a
+[815/832] Performing build step for 'bootloader'
+[1/1] cd "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py" && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/bootloader.bin
+Bootloader binary size 0x5160 bytes. 0x2ea0 bytes (36%) free.
+[816/832] Building C object esp-idf/esp_lcd/CMakeFiles/__idf_esp_lcd.dir/rgb/esp_lcd_panel_rgb.c.obj
+[817/832] No install step for 'bootloader'
+[818/832] Completed 'bootloader'
+[819/832] Linking C static library esp-idf/esp_lcd/libesp_lcd.a
+[820/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFi/src/AP.cpp.obj
+[821/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFi/src/STA.cpp.obj
+[822/832] Building CXX object esp-idf/espressif__arduino-esp32/CMakeFiles/__idf_espressif__arduino-esp32.dir/libraries/WiFiProv/src/WiFiProv.cpp.obj
+[823/832] Building CXX object esp-idf/main/CMakeFiles/__idf_main.dir/app_main.cpp.obj
+[824/832] Linking C static library esp-idf/espressif__arduino-esp32/libespressif__arduino-esp32.a
+[825/832] Building CXX object esp-idf/sesame_voice/CMakeFiles/__idf_sesame_voice.dir/wake_vad_engine.cpp.obj
+[826/832] Linking C static library esp-idf/sesame_voice/libsesame_voice.a
+[827/832] Linking C static library esp-idf/main/libmain.a
+[828/832] Generating esp-idf/esp_system/ld/sections.ld
+[829/832] Building C object CMakeFiles/sesame_robot_v3.elf.dir/project_elf_src_esp32s3.c.obj
+[830/832] Linking CXX executable sesame_robot_v3.elf
+[831/832] Generating binary image from built executable
+esptool.py v4.12.0
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Generated /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/sesame_robot_v3.bin
+[832/832] cd "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/esp-idf/esptool_py" && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/partition_table/partition-table.bin /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/sesame_robot_v3.bin
+sesame_robot_v3.bin binary size 0x199650 bytes. Smallest app partition is 0x300000 bytes. 0x1669b0 bytes (47%) free.
+
+Project build complete. To flash, run:
+ idf.py flash
+or
+ idf.py -p PORT flash
+or
+ python -m esptool --chip esp32s3 -b 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_size 4MB --flash_freq 80m 0x0 build/bootloader/bootloader.bin 0x8000 build/partition_table/partition-table.bin 0x10000 build/sesame_robot_v3.bin 0x310000 build/srmodels/srmodels.bin
+or from the "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build" directory
+ python -m esptool --chip esp32s3 -b 460800 --before default_reset --after hard_reset write_flash "@flash_args"

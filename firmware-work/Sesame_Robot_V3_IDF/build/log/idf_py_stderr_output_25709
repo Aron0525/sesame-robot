@@ -1,0 +1,395 @@
+Command: /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/tools/idf_monitor.py -p /dev/cu.usbmodem101 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/sesame_robot_v3.elf /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/bootloader.elf -m '/Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python' '/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/tools/idf.py' '-p' '/dev/cu.usbmodem101'
+[0;33m--- esp-idf-monitor 1.9.0 on /dev/cu.usbmodem101 115200[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H[0m
+[0m--- 0x40385d34: [0;33mesp_log_timestamp[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/log/src/os/log_timestamp.c[0m[0m:[1;31m16[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m.[0m[0;33m[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0;33m.[0m[0;33m[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0;33m.[0m[0;33m[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0;33m.[0m[0;33m.[0m[0;33m.[0m[0;33m[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0;33m.[0m[0;33m[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0;33m.[0m[0;33m[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0;33m.[0m[0;33m[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0;33m.[0m[0;33m[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0;33m.[0m[0;33m[0m
+[1;31m--- Error: read failed: [Errno 6] Device not configured[0m
+[0;33m--- Waiting for the device to reconnect[0m[0;33m.[0m[0;33m[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/list.c[0m[0m:[1;31m210[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037b43a: [0;33mgdma_stop[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_hw_support/dma/gdma.c[0m[0m:[1;31m563[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8920: [0;33mesp_bootloader_get_description[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_bootloader_format/esp_bootloader_desc.c[0m[0m:[1;31m40[0m
+[0;33m--- Warning: Checksum mismatch between flashed and built applications. Checksum of built application is 6305083f62599012fb69a177fe4cd1af797adf036bf09671bbd192912fe76ce4[0m
+[0m--- 0x4037f419: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1846[0m
+[0m--- 0x4037f3e1: [0;33mxQueueSemaphoreTake[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/freertos/FreeRTOS-Kernel/queue.c[0m[0m:[1;31m1819[0m
+[0m--- 0x40387d15: [0;33mlmacAdjustTimestamp[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x40378662: [0;33mspi_flash_disable_interrupts_caches_and_other_cpu[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/cache_utils.c[0m[0m:[1;31m129[0m
+[0m--- 0x403789fb: [0;33mspi1_start[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_os_func_app.c[0m[0m:[1;31m116[0m
+[0m--- 0x40378a09: [0;33mspi1_start[0m[0m at [0;32mspi_flash_os_func_app.c[0m[0m:[1;31m?[0m
+[0m--- 0x4038c2b1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m440[0m
+[0m--- 0x4038c2e1: [0;33mspi_flash_chip_generic_wait_idle[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m458[0m
+[0m--- 0x4038bf23: [0;33mspi_flash_chip_generic_read[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/spi_flash/spi_flash_chip_generic.c[0m[0m:[1;31m297[0m
+[0m--- 0x420a0599: [0;33mnvs::PageManager::load(nvs::Partition*, unsigned long, unsigned long)[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/nvs_flash/src/nvs_pagemanager.cpp[0m[0m:[1;31m114[0m
+[0m--- 0x420a812b: [0;33mudp_sendto[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m596[0m
+[0m--- 0x420a5eb2: [0;33mtcp_write_checks[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m313[0m
+[0m--- 0x420a61a5: [0;33mtcp_output_alloc_header_common[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_out.c[0m[0m:[1;31m1837[0m
+[0m--- 0x420a7c98: [0;33mudp_bind[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1015[0m
+[0m--- 0x420a7dd3: [0;33mudp_sendto_if_src[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m768[0m
+[0m--- 0x420a83e1: [0;33mudp_netif_ip_addr_changed[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/udp.c[0m[0m:[1;31m1301[0m
+[0m--- 0x420a59d6: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m280[0m
+[0m--- 0x420a5a3b: [0;33mtcp_input[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/lwip/lwip/src/core/tcp_in.c[0m[0m:[1;31m297[0m
+[0m--- 0x421277d3: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m290[0m
+[0m--- 0x42127851: [0;33m__gethex[0m[0m at [0;32m/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdlib/gdtoa-gethex.c[0m[0m:[1;31m325[0m
+[0m--- 0x421006d9: [0;33mwDev_SnifferRxData[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x42100b06: [0;33mwDev_Rxbuf_Deinit[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x420c92d5: [0;33mssl_parse_server_key_exchange[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/mbedtls/mbedtls/library/ssl_tls12_client.c[0m[0m:[1;31m2418[0m
+[0m--- 0x4203507a: [0;33mdl_nn_pointwise_conv1d[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_pointwise_conv1d.c[0m[0m:[1;31m310[0m
+[0m--- 0x420352ee: [0;33mdl_nn_swish_i8_shift[0m[0m at [0;32m/home/sunxiangyu/workspace/esp_sr_lib/components/dl_lib/nn/dl_nn_activation.c[0m[0m:[1;31m827[0m
+[0m--- 0x4200d282: [0;33musb_serial_jtag_get_read_bytes_available[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c[0m[0m:[1;31m372[0m
+[0m--- 0x4200f3d1: [0;33mget_tlv_from_ap[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m254[0m
+[0m--- 0x4200f5bd: [0;33mesp_diag_log_error[0m[0m at [0;32m/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/managed_components/espressif__esp_diagnostics/src/esp_diagnostics_log_hook.c[0m[0m:[1;31m344[0m
+[0m--- 0x403801e5: [0;33muxListRemove[0m[0m at [0;32m/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/f

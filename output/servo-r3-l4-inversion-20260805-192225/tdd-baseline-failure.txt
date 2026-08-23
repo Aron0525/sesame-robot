@@ -1,0 +1,33 @@
+$ g++ -std=c++17 -I tdd-baseline/include firmware/esp32_voice_idf/tests/test_servo_calibration.cpp -o /tmp/test_servo_calibration_baseline
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:8:24: error: no member named 'kL4ServoIndex' in namespace 'sesame::robot'
+    8 |   using sesame::robot::kL4ServoIndex;
+      |         ~~~~~~~~~~~~~~~^
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:9:24: error: no member named 'kMaximumServoAngle' in namespace 'sesame::robot'
+    9 |   using sesame::robot::kMaximumServoAngle;
+      |         ~~~~~~~~~~~~~~~^
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:10:24: error: no member named 'kR3ServoIndex' in namespace 'sesame::robot'
+   10 |   using sesame::robot::kR3ServoIndex;
+      |         ~~~~~~~~~~~~~~~^
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:18:27: error: use of undeclared identifier 'kR3ServoIndex'
+   18 |           (servo_index == kR3ServoIndex || servo_index == kL4ServoIndex)
+      |                           ^~~~~~~~~~~~~
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:18:59: error: use of undeclared identifier 'kL4ServoIndex'
+   18 |           (servo_index == kR3ServoIndex || servo_index == kL4ServoIndex)
+      |                                                           ^~~~~~~~~~~~~
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:19:38: error: use of undeclared identifier 'kMaximumServoAngle'
+   19 |               ? static_cast<uint8_t>(kMaximumServoAngle - logical)
+      |                                      ^~~~~~~~~~~~~~~~~~
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:25:35: error: use of undeclared identifier 'kR3ServoIndex'
+   25 |   assert(physical_angle_for_servo(kR3ServoIndex, 0) == 180);
+      |                                   ^~~~~~~~~~~~~
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:26:35: error: use of undeclared identifier 'kR3ServoIndex'
+   26 |   assert(physical_angle_for_servo(kR3ServoIndex, 180) == 0);
+      |                                   ^~~~~~~~~~~~~
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:27:35: error: use of undeclared identifier 'kL4ServoIndex'
+   27 |   assert(physical_angle_for_servo(kL4ServoIndex, 0) == 180);
+      |                                   ^~~~~~~~~~~~~
+/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp:28:35: error: use of undeclared identifier 'kL4ServoIndex'
+   28 |   assert(physical_angle_for_servo(kL4ServoIndex, 180) == 0);
+      |                                   ^~~~~~~~~~~~~
+10 errors generated.
+EXIT_STATUS=1

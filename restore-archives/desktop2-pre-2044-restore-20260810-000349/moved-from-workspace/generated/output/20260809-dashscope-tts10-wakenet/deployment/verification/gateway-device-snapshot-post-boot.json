@@ -1,0 +1,804 @@
+{
+    "devices": [
+        {
+            "device_id": "dev_001",
+            "online": true,
+            "session_id": "ses_3d39ecbc556441a4870f7732310eb165",
+            "current_turn_id": null,
+            "current_stage": "ready",
+            "updated_at_ms": 1786340641213
+        }
+    ],
+    "turns": [
+        {
+            "device_id": "dev_001",
+            "turn_id": "turn_44e7cd7a_1",
+            "status": "running",
+            "current_stage": "listen",
+            "created_at_ms": 1786339963626,
+            "updated_at_ms": 1786339963626,
+            "uplink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            },
+            "downlink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            }
+        },
+        {
+            "device_id": "dev_001",
+            "turn_id": "turn_ed0baa16_1",
+            "status": "running",
+            "current_stage": "listen",
+            "created_at_ms": 1786339732434,
+            "updated_at_ms": 1786339732434,
+            "uplink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            },
+            "downlink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            }
+        },
+        {
+            "device_id": "dev_001",
+            "turn_id": "turn_7852578e_1",
+            "status": "running",
+            "current_stage": "listen",
+            "created_at_ms": 1786339541856,
+            "updated_at_ms": 1786339541856,
+            "uplink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            },
+            "downlink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            }
+        },
+        {
+            "device_id": "dev_001",
+            "turn_id": "turn_0c7cfdd3_1",
+            "status": "running",
+            "current_stage": "listen",
+            "created_at_ms": 1786339411321,
+            "updated_at_ms": 1786339411321,
+            "uplink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            },
+            "downlink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            }
+        },
+        {
+            "device_id": "dev_001",
+            "turn_id": "turn_43b04306_1",
+            "status": "running",
+            "current_stage": "listen",
+            "created_at_ms": 1786336434878,
+            "updated_at_ms": 1786336434878,
+            "uplink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            },
+            "downlink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            }
+        },
+        {
+            "device_id": "dev_001",
+            "turn_id": "turn_e92ddf0e_1",
+            "status": "running",
+            "current_stage": "listen",
+            "created_at_ms": 1786335283277,
+            "updated_at_ms": 1786335283277,
+            "uplink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            },
+            "downlink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            }
+        },
+        {
+            "device_id": "dev_001",
+            "turn_id": "turn_58bff665_1",
+            "status": "running",
+            "current_stage": "listen",
+            "created_at_ms": 1786335198967,
+            "updated_at_ms": 1786335198967,
+            "uplink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            },
+            "downlink": {
+                "packet_count": 0,
+                "byte_count": 0,
+                "duration_ms": 0
+            }
+        }
+    ],
+    "events": [
+        {
+            "id": 1,
+            "timestamp_ms": 1786334399853,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 2,
+            "timestamp_ms": 1786334399853,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 3,
+            "timestamp_ms": 1786334539709,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 4,
+            "timestamp_ms": 1786334544513,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 5,
+            "timestamp_ms": 1786334544513,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 6,
+            "timestamp_ms": 1786334764390,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 7,
+            "timestamp_ms": 1786334767993,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 8,
+            "timestamp_ms": 1786334767993,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 9,
+            "timestamp_ms": 1786335115215,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 10,
+            "timestamp_ms": 1786335118410,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 11,
+            "timestamp_ms": 1786335118410,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 12,
+            "timestamp_ms": 1786335198967,
+            "device_id": "dev_001",
+            "turn_id": "turn_58bff665_1",
+            "stage": "listen",
+            "status": "started",
+            "details": {
+                "trigger": "wakeword"
+            }
+        },
+        {
+            "id": 13,
+            "timestamp_ms": 1786335218425,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 14,
+            "timestamp_ms": 1786335222345,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 15,
+            "timestamp_ms": 1786335222346,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 16,
+            "timestamp_ms": 1786335283277,
+            "device_id": "dev_001",
+            "turn_id": "turn_e92ddf0e_1",
+            "stage": "listen",
+            "status": "started",
+            "details": {
+                "trigger": "wakeword"
+            }
+        },
+        {
+            "id": 17,
+            "timestamp_ms": 1786335302297,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 18,
+            "timestamp_ms": 1786335305959,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 19,
+            "timestamp_ms": 1786335305959,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 20,
+            "timestamp_ms": 1786336286062,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 21,
+            "timestamp_ms": 1786336287609,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 22,
+            "timestamp_ms": 1786336287609,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 23,
+            "timestamp_ms": 1786336307668,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 24,
+            "timestamp_ms": 1786336310288,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 25,
+            "timestamp_ms": 1786336310288,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 26,
+            "timestamp_ms": 1786336354469,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 27,
+            "timestamp_ms": 1786336359630,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 28,
+            "timestamp_ms": 1786336359631,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 29,
+            "timestamp_ms": 1786336434878,
+            "device_id": "dev_001",
+            "turn_id": "turn_43b04306_1",
+            "stage": "listen",
+            "status": "started",
+            "details": {
+                "trigger": "wakeword"
+            }
+        },
+        {
+            "id": 30,
+            "timestamp_ms": 1786336440278,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 31,
+            "timestamp_ms": 1786336445618,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 32,
+            "timestamp_ms": 1786336445619,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 33,
+            "timestamp_ms": 1786339411321,
+            "device_id": "dev_001",
+            "turn_id": "turn_0c7cfdd3_1",
+            "stage": "listen",
+            "status": "started",
+            "details": {
+                "trigger": "wakeword"
+            }
+        },
+        {
+            "id": 34,
+            "timestamp_ms": 1786339425971,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 35,
+            "timestamp_ms": 1786339428313,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 36,
+            "timestamp_ms": 1786339428314,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 37,
+            "timestamp_ms": 1786339541856,
+            "device_id": "dev_001",
+            "turn_id": "turn_7852578e_1",
+            "stage": "listen",
+            "status": "started",
+            "details": {
+                "trigger": "wakeword"
+            }
+        },
+        {
+            "id": 38,
+            "timestamp_ms": 1786339548156,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 39,
+            "timestamp_ms": 1786339552070,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 40,
+            "timestamp_ms": 1786339552072,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 41,
+            "timestamp_ms": 1786339652116,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 42,
+            "timestamp_ms": 1786339654440,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 43,
+            "timestamp_ms": 1786339654440,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 44,
+            "timestamp_ms": 1786339732434,
+            "device_id": "dev_001",
+            "turn_id": "turn_ed0baa16_1",
+            "stage": "listen",
+            "status": "started",
+            "details": {
+                "trigger": "wakeword"
+            }
+        },
+        {
+            "id": 45,
+            "timestamp_ms": 1786339738081,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 46,
+            "timestamp_ms": 1786339743116,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 47,
+            "timestamp_ms": 1786339743116,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 48,
+            "timestamp_ms": 1786339963626,
+            "device_id": "dev_001",
+            "turn_id": "turn_44e7cd7a_1",
+            "stage": "listen",
+            "status": "started",
+            "details": {
+                "trigger": "wakeword"
+            }
+        },
+        {
+            "id": 49,
+            "timestamp_ms": 1786339983161,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 50,
+            "timestamp_ms": 1786339986425,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 51,
+            "timestamp_ms": 1786339986425,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 52,
+            "timestamp_ms": 1786340608947,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 53,
+            "timestamp_ms": 1786340614380,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 54,
+            "timestamp_ms": 1786340614380,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 55,
+            "timestamp_ms": 1786340635929,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 56,
+            "timestamp_ms": 1786340641213,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 57,
+            "timestamp_ms": 1786340641213,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        }
+    ],
+    "debug_content": true
+}

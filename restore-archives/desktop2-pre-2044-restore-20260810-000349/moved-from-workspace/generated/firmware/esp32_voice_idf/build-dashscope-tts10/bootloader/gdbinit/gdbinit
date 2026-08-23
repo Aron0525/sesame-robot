@@ -1,0 +1,2 @@
+source /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/bootloader/gdbinit/symbols
+source /Users/mac/Desktop/2/firmware/esp32_voice_idf/build-dashscope-tts10/bootloader/gdbinit/connect

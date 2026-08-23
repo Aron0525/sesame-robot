@@ -1,0 +1,2 @@
+[      93ms] [LOG] Face status unavailable: SyntaxError: Unexpected token '<', "
+<!DOCTYPE "... is not valid JSON @ http://127.0.0.1:4173/:702

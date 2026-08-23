@@ -1,0 +1,12 @@
+{
+  "prompt_contract_checks": "passed (4/4)",
+  "live_agent": "sesame",
+  "input": "请你挥手欢迎我",
+  "elapsed_seconds": 0.001,
+  "reply": "{\"v\":1,\"request_id\":\"verify-motion-off\",\"turn_id\":\"verify-motion-off\",\"status\":\"completed\",\"reply\":{\"text\":\"当前动作反馈已关闭，我暂时无法挥手，不过很高兴见到你。\"},\"voice\":{\"voice_id\":\"sesame_default\",\"style\":\"happy\",\"speed\":1.0},\"expression\":{\"name\":\"default\",\"ttl_ms\":3000},\"actions\":[]}",
+  "assertions": [
+    "actions is []",
+    "expression is default",
+    "expression ttl_ms is 3000"
+  ]
+}

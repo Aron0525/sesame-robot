@@ -1,0 +1,1 @@
+Applied 1 config update(s). Change will apply without restarting the gateway.

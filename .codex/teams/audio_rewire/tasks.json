@@ -1,0 +1,39 @@
+{
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Audit exposed pins and safe independent-hardware wiring options",
+      "owner": "hardware",
+      "status": "completed",
+      "depends_on": [],
+      "notes": [
+        {
+          "at": "2026-08-18T02:11:07.344535+00:00",
+          "text": "Recommended conditional mapping: INMP441 stays 14/47/48; SPEAKER2 moves to GPIO1/2/3. GPIO3 is a JTAG strapping pin, so add external 10 kΩ pull-up to 3V3 and validate reset/USB JTAG. GPIO45 is excluded because it straps VDD_SPI. Strict no-strap mapping is impossible with only 1,2,14,47,48 available. Docs do not themselves prove GPIO3/45 exposure or speaker power rail."
+        },
+        {
+          "at": "2026-08-18T02:12:39.628974+00:00",
+          "text": "Hardware audit completed: independent mapping requires exposed GPIO3 and 5V regulated speaker rail; GPIO45 rejected."
+        }
+      ],
+      "created_at": "2026-08-18T02:07:42.208553+00:00",
+      "updated_at": "2026-08-18T02:12:39.629225+00:00"
+    },
+    {
+      "id": "task-2",
+      "title": "Audit ESP32-S3 I2S controller assignment and required firmware changes",
+      "owner": "audio",
+      "status": "completed",
+      "depends_on": [],
+      "notes": [
+        {
+          "at": "2026-08-18T02:12:39.695618+00:00",
+          "text": "Audio audit completed: I2S0 RX microphone and I2S1 TX speaker, with firmware/resampling changes required."
+        }
+      ],
+      "created_at": "2026-08-18T02:07:42.272045+00:00",
+      "updated_at": "2026-08-18T02:12:39.695830+00:00"
+    }
+  ],
+  "next_id": 3
+}

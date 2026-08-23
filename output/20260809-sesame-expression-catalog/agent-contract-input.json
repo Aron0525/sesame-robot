@@ -1,0 +1,1 @@
+{"v":1,"request_id":"expr-contract-20260809","conversation_id":"verify","turn_id":"turn-expression-1","input":{"text":"你好呀，今天心情很好"},"capabilities":{"expressions":["default","happy"],"actions":["wave"]}}

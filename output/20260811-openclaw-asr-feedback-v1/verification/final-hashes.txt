@@ -1,0 +1,7 @@
+139058c46fd28b56e2b1437719898cdbe4832ec83ec9537603e8d239b0498cb1  /Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/app.py
+bc215630aafaf993e198edba7a592e9a0f8663ab32d3664fb10b3fab71576ec4  /Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_device_stream.py
+08a4a4d805dd605cc7310c37c7385cad39427e988ab596a2e1c5972f8e187afa  /Users/mac/Documents/sesame robot/endpoint-gateway/README.md
+a01577e1bdb5898bb98fcaddcde547eae021d5604f7bb886fb87b74f2347e422  /Users/mac/.openclaw/workspace-sesame/AGENTS.md
+ebfc78d8ba2512c8376505ef600c6e9ba6df4bab9ebbf5d3d742ff8420299620  /Users/mac/.openclaw/workspace-sesame-learning/AGENTS.md
+080006b7724ffcac64efeae1ad8677ed920b6ed0edeb0b361bae2c0a16c28c61  /Users/mac/.openclaw/workspace-sesame-children/AGENTS.md
+258d0d66f77560a43fca8fd4e8c209ad2a9f75ed3ab3851b06b558e2ac1aa56d  /Users/mac/.openclaw/workspace-sesame-work/AGENTS.md

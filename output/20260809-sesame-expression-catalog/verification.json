@@ -1,0 +1,31 @@
+{
+  "baseline_command": "shasum -a 256 /Users/mac/.openclaw/workspace-sesame/AGENTS.md",
+  "modified_command": "openclaw agent --agent sesame --session-key agent:sesame:expression-contract-20260809 --message-file /Users/mac/Documents/sesame robot/output/20260809-sesame-expression-catalog/agent-contract-input.json --thinking low --json --timeout 60",
+  "exit_status": 0,
+  "thinking": "low",
+  "duration_ms": 3521,
+  "response": {
+    "v": 1,
+    "request_id": "expr-contract-20260809",
+    "turn_id": "turn-expression-1",
+    "status": "completed",
+    "reply": {
+      "text": "你好呀，看到你这么开心，我也跟着高兴起来啦！"
+    },
+    "voice": {
+      "voice_id": "sesame_default",
+      "style": "happy",
+      "speed": 1.0
+    },
+    "expression": {
+      "name": "happy",
+      "ttl_ms": 3000
+    },
+    "actions": [
+      {
+        "name": "wave",
+        "duration_ms": 2000
+      }
+    ]
+  }
+}

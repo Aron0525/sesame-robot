@@ -1,0 +1,154 @@
+/Users/mac/Desktop/test/zhima-wakeword/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+WARNING:absl:At this time, the v2.11+ optimizer `tf.keras.optimizers.Adam` runs slowly on M1/M2 Macs, please use the legacy Keras optimizer instead, located at `tf.keras.optimizers.legacy.Adam`.
+Epoch 1/72
+52/52 - 1s - loss: 0.6727 - accuracy: 0.8116 - val_loss: 0.4382 - val_accuracy: 0.8195 - 688ms/epoch - 13ms/step
+Epoch 2/72
+52/52 - 0s - loss: 0.3402 - accuracy: 0.9306 - val_loss: 0.2400 - val_accuracy: 0.9156 - 279ms/epoch - 5ms/step
+Epoch 3/72
+52/52 - 0s - loss: 0.1928 - accuracy: 0.9626 - val_loss: 0.0978 - val_accuracy: 0.9719 - 281ms/epoch - 5ms/step
+Epoch 4/72
+52/52 - 0s - loss: 0.1168 - accuracy: 0.9793 - val_loss: 0.0873 - val_accuracy: 0.9648 - 278ms/epoch - 5ms/step
+Epoch 5/72
+52/52 - 0s - loss: 0.0848 - accuracy: 0.9857 - val_loss: 0.0953 - val_accuracy: 0.9637 - 278ms/epoch - 5ms/step
+Epoch 6/72
+52/52 - 0s - loss: 0.0620 - accuracy: 0.9875 - val_loss: 0.0453 - val_accuracy: 0.9777 - 277ms/epoch - 5ms/step
+Epoch 7/72
+52/52 - 0s - loss: 0.0521 - accuracy: 0.9893 - val_loss: 0.0391 - val_accuracy: 0.9824 - 278ms/epoch - 5ms/step
+Epoch 8/72
+52/52 - 0s - loss: 0.0338 - accuracy: 0.9933 - val_loss: 0.0315 - val_accuracy: 0.9859 - 285ms/epoch - 5ms/step
+Epoch 9/72
+52/52 - 0s - loss: 0.0193 - accuracy: 0.9976 - val_loss: 0.0214 - val_accuracy: 0.9894 - 279ms/epoch - 5ms/step
+Epoch 10/72
+52/52 - 0s - loss: 0.0185 - accuracy: 0.9970 - val_loss: 0.0700 - val_accuracy: 0.9672 - 276ms/epoch - 5ms/step
+Epoch 11/72
+52/52 - 0s - loss: 0.0231 - accuracy: 0.9954 - val_loss: 0.0160 - val_accuracy: 0.9965 - 302ms/epoch - 6ms/step
+Epoch 12/72
+52/52 - 0s - loss: 0.0286 - accuracy: 0.9948 - val_loss: 0.0184 - val_accuracy: 0.9941 - 302ms/epoch - 6ms/step
+Epoch 13/72
+52/52 - 0s - loss: 0.0115 - accuracy: 0.9982 - val_loss: 0.0129 - val_accuracy: 0.9965 - 294ms/epoch - 6ms/step
+Epoch 14/72
+52/52 - 0s - loss: 0.0102 - accuracy: 0.9985 - val_loss: 0.0135 - val_accuracy: 0.9965 - 282ms/epoch - 5ms/step
+Epoch 15/72
+52/52 - 0s - loss: 0.0122 - accuracy: 0.9979 - val_loss: 0.0060 - val_accuracy: 0.9977 - 294ms/epoch - 6ms/step
+Epoch 16/72
+52/52 - 0s - loss: 0.0156 - accuracy: 0.9970 - val_loss: 0.0064 - val_accuracy: 0.9988 - 302ms/epoch - 6ms/step
+Epoch 17/72
+52/52 - 0s - loss: 0.0059 - accuracy: 0.9991 - val_loss: 0.0079 - val_accuracy: 0.9977 - 281ms/epoch - 5ms/step
+Epoch 18/72
+52/52 - 0s - loss: 0.0040 - accuracy: 0.9997 - val_loss: 0.0054 - val_accuracy: 0.9988 - 291ms/epoch - 6ms/step
+Epoch 19/72
+52/52 - 0s - loss: 0.0036 - accuracy: 0.9997 - val_loss: 0.0072 - val_accuracy: 0.9965 - 339ms/epoch - 7ms/step
+Epoch 20/72
+52/52 - 0s - loss: 0.0042 - accuracy: 1.0000 - val_loss: 0.0120 - val_accuracy: 0.9953 - 300ms/epoch - 6ms/step
+Epoch 21/72
+52/52 - 0s - loss: 0.0031 - accuracy: 1.0000 - val_loss: 0.0063 - val_accuracy: 0.9977 - 296ms/epoch - 6ms/step
+Epoch 22/72
+52/52 - 0s - loss: 0.0019 - accuracy: 1.0000 - val_loss: 0.0082 - val_accuracy: 0.9941 - 291ms/epoch - 6ms/step
+Epoch 23/72
+52/52 - 0s - loss: 0.0042 - accuracy: 0.9994 - val_loss: 0.0113 - val_accuracy: 0.9965 - 278ms/epoch - 5ms/step
+Epoch 24/72
+52/52 - 0s - loss: 0.0038 - accuracy: 0.9997 - val_loss: 0.0080 - val_accuracy: 0.9977 - 286ms/epoch - 5ms/step
+Epoch 25/72
+52/52 - 0s - loss: 0.0152 - accuracy: 0.9970 - val_loss: 0.0090 - val_accuracy: 0.9953 - 289ms/epoch - 6ms/step
+Epoch 26/72
+52/52 - 0s - loss: 0.0049 - accuracy: 0.9994 - val_loss: 0.0108 - val_accuracy: 0.9953 - 281ms/epoch - 5ms/step
+Epoch 27/72
+52/52 - 0s - loss: 0.0045 - accuracy: 0.9994 - val_loss: 0.0185 - val_accuracy: 0.9953 - 284ms/epoch - 5ms/step
+Epoch 28/72
+52/52 - 0s - loss: 0.0050 - accuracy: 0.9997 - val_loss: 0.0093 - val_accuracy: 0.9977 - 293ms/epoch - 6ms/step
+Epoch 29/72
+52/52 - 0s - loss: 0.0032 - accuracy: 0.9991 - val_loss: 0.0181 - val_accuracy: 0.9906 - 292ms/epoch - 6ms/step
+Epoch 30/72
+52/52 - 0s - loss: 0.0030 - accuracy: 0.9997 - val_loss: 0.0042 - val_accuracy: 0.9977 - 284ms/epoch - 5ms/step
+Epoch 31/72
+52/52 - 0s - loss: 0.0013 - accuracy: 1.0000 - val_loss: 0.0032 - val_accuracy: 0.9988 - 296ms/epoch - 6ms/step
+Epoch 32/72
+52/52 - 0s - loss: 0.0016 - accuracy: 0.9997 - val_loss: 0.0039 - val_accuracy: 0.9988 - 294ms/epoch - 6ms/step
+Epoch 33/72
+52/52 - 0s - loss: 0.0021 - accuracy: 1.0000 - val_loss: 0.0049 - val_accuracy: 0.9977 - 286ms/epoch - 6ms/step
+Epoch 34/72
+52/52 - 0s - loss: 6.5266e-04 - accuracy: 1.0000 - val_loss: 0.0046 - val_accuracy: 0.9977 - 293ms/epoch - 6ms/step
+Epoch 35/72
+52/52 - 0s - loss: 0.0053 - accuracy: 0.9988 - val_loss: 0.0296 - val_accuracy: 0.9894 - 313ms/epoch - 6ms/step
+Epoch 36/72
+52/52 - 0s - loss: 0.0116 - accuracy: 0.9976 - val_loss: 0.0623 - val_accuracy: 0.9730 - 444ms/epoch - 9ms/step
+Epoch 37/72
+52/52 - 0s - loss: 0.0133 - accuracy: 0.9976 - val_loss: 0.0089 - val_accuracy: 0.9977 - 296ms/epoch - 6ms/step
+Epoch 38/72
+52/52 - 0s - loss: 0.0040 - accuracy: 0.9988 - val_loss: 0.0120 - val_accuracy: 0.9941 - 285ms/epoch - 5ms/step
+Epoch 39/72
+52/52 - 0s - loss: 0.0016 - accuracy: 0.9997 - val_loss: 0.0051 - val_accuracy: 0.9977 - 286ms/epoch - 6ms/step
+Epoch 40/72
+52/52 - 0s - loss: 0.0012 - accuracy: 0.9997 - val_loss: 0.0044 - val_accuracy: 0.9988 - 290ms/epoch - 6ms/step
+Epoch 41/72
+52/52 - 0s - loss: 0.0030 - accuracy: 1.0000 - val_loss: 0.0037 - val_accuracy: 0.9977 - 294ms/epoch - 6ms/step
+Epoch 42/72
+52/52 - 0s - loss: 0.0017 - accuracy: 0.9997 - val_loss: 0.0042 - val_accuracy: 0.9988 - 289ms/epoch - 6ms/step
+Epoch 43/72
+52/52 - 0s - loss: 0.0017 - accuracy: 0.9994 - val_loss: 0.0054 - val_accuracy: 0.9977 - 297ms/epoch - 6ms/step
+WARNING:absl:At this time, the v2.11+ optimizer `tf.keras.optimizers.RestoredOptimizer` runs slowly on M1/M2 Macs, please use the legacy Keras optimizer instead, located at `tf.keras.optimizers.legacy.RestoredOptimizer`.
+/Users/mac/Desktop/test/zhima-wakeword/.venv/lib/python3.9/site-packages/tensorflow/lite/python/convert.py:953: UserWarning: Statistics for quantized inputs were expected, but not specified; continuing anyway.
+  warnings.warn(
+Summary on the non-converted ops:
+---------------------------------
+ * Accepted dialects: tfl, builtin, func
+ * Non-Converted Ops: 9, Total Ops 20, % non-converted = 45.00 %
+ * 9 ARITH ops
+
+- arith.constant:    9 occurrences  (f32: 8, i32: 1)
+
+
+
+  (f32: 2)
+  (f32: 2)
+  (f32: 2)
+  (f32: 1)
+  (f32: 1)
+fully_quantize: 0, inference_type: 6, input_inference_type: INT8, output_inference_type: INT8
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+{
+  "model": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/model/zhima_wakeword_dashscope10_int8.tflite",
+  "threshold": 0.4,
+  "validation": {
+    "threshold": 0.4,
+    "tp": 8,
+    "fn": 0,
+    "fp": 0,
+    "tn": 32,
+    "recall": 1.0,
+    "false_accept_rate": 0.0,
+    "accuracy": 1.0
+  },
+  "external": {
+    "threshold": 0.4,
+    "tp": 5,
+    "fn": 0,
+    "fp": 0,
+    "tn": 25,
+    "recall": 1.0,
+    "false_accept_rate": 0.0,
+    "accuracy": 1.0
+  },
+  "unseen_edge_voice": {
+    "threshold": 0.4,
+    "tp": 2,
+    "fn": 0,
+    "fp": 0,
+    "tn": 10,
+    "recall": 1.0,
+    "false_accept_rate": 0.0,
+    "accuracy": 1.0
+  },
+  "deployment_gate": {
+    "passed": true,
+    "checks": {
+      "speaker_disjoint_validation_zero_false_accepts": true,
+      "speaker_disjoint_validation_recall_at_least_0_95": true,
+      "unseen_edge_voice_holdout_zero_false_accepts": true,
+      "unseen_edge_voice_holdout_recall_at_least_0_80": true,
+      "int8_tensor_contract": true,
+      "firmware_operator_set": true
+    }
+  }
+}

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sesame Robot 从软件骨架走向真实语音机器人的开发顺序、依赖关系和验收标准。">
+  <title>专题课｜Sesame Robot 接下来做什么</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="9">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+      <div class="lesson-tabs">
+        <a href="0007-sesame-runtime-connections.html" title="Sesame 运行链路">07</a>
+        <a href="0008-sesame-software-bundle-map.html" title="Sesame 软件包地图">08</a>
+        <a href="0009-sesame-next-build-order.html" aria-current="page" title="Sesame 开发路线">09</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="09">
+      <div>
+        <p class="kicker">Sesame Robot · 开发路线</p>
+        <h1>先闭环，再增强</h1>
+        <p class="lead">下一目标不是“完成所有模块”，而是让一台真实 ESP32 在同一 Wi-Fi 下完成一次真实讲话、回答和播放。每次只替换一个 Demo，故障才可定位。</p>
+        <div class="lesson-meta"><span>约 12 分钟</span><span>六个里程碑</span><span>逐层验收</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="status">
+      <div class="chapter-head">
+        <span class="chapter-no">09—A</span>
+        <div><h2>你现在站在哪里</h2><p>软件结构已经有了，但产品核心价值仍由 Demo 代替。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>组件</th><th>当前状态</th><th>缺口</th></tr></thead>
+        <tbody>
+          <tr><td>Voice Gateway</td><td>FastAPI、WebSocket、协议、libopus、测试已实现</td><td><code>.env</code>、常驻启动、错误恢复</td></tr>
+          <tr><td>OpenClaw</td><td>服务和握手已接通，模型能返回结果</td><td>动作 JSON 不合规、延迟/超时、专用 Agent</td></tr>
+          <tr><td>ASR</td><td>Provider 接口已定义</td><td>当前只返回固定“你好”</td></tr>
+          <tr><td>TTS</td><td>Provider 接口已定义</td><td>当前只返回静音 PCM</td></tr>
+          <tr><td>ESP32 网络</td><td>连通性测试固件已编译</td><td>尚未实机烧录和取得 <code>session.ready</code></td></tr>
+          <tr><td>ESP32 音频</td><td>协议已经定义</td><td>I2S、Opus、缓冲、状态机尚未实现</td></tr>
+          <tr><td>安全</td><td>有文档和白名单</td><td>WSS、配对、Sandbox 实际配置尚未完成</td></tr>
+        </tbody>
+      </table>
+      <div class="boundary"><strong>当前结论</strong>你已经完成“可验证的软件骨架”，尚未完成“真实语音产品”。这不是坏事，但下一步必须开始替换 Demo。</div>
+    </section>
+
+    <section class="chapter" id="rule">
+      <div class="chapter-head">
+        <span class="chapter-no">09—B</span>
+        <div><h2>整个项目只遵守一个推进规则</h2><p>每个阶段保持其他组件稳定，只让一个新变量进入系统。</p></div>
+      </div>
+      <div class="diagram">错误做法：
+真实 ESP32 + 真实 ASR + OpenClaw + 真实 TTS + 舵机 + OLED 一次接入
+→ 没有声音时，不知道故障在哪一层
+
+正确做法：
+已通过的闭环
+→ 替换一个 Demo
+→ 给该边界做独立测试
+→ 做端到端回归
+→ 再替换下一个 Demo</div>
+      <div class="memory">
+        <h3>你的第一条产品验收线</h3>
+        <p>真人说一句中文 → ESP32 上传 → 电脑识别 → OpenClaw 回答 → 电脑合成语音 → ESP32 扬声器播出。</p>
+      </div>
+    </section>
+
+    <section class="chapter" id="milestones">
+      <div class="chapter-head">
+        <span class="chapter-no">09—C</span>
+        <div><h2>六个里程碑，严格按顺序</h2><p>前一个阶段没有验收，不进入后一个阶段。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>阶段</th><th>要做什么</th><th>完成条件</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>M0<br>电脑基线</td>
+            <td>建立安全的 <code>.env</code>；固定启动命令；修复 OpenClaw actions 对象、超时和错误事件；创建无工具或最少工具的 Sesame 专用 Agent。</td>
+            <td>ESP32 模拟器在 <code>openclaw</code> 模式收到 <code>asr.final → action/expression → tts.stop</code> 和可解码 Opus。</td>
+          </tr>
+          <tr>
+            <td>M1<br>真机网络</td>
+            <td>烧录 connectivity test；串口配置 Wi-Fi 与设备 token；访问 <code>/healthz</code>；完成 WebSocket 鉴权和 <code>session.ready</code>；再加入 mDNS。</td>
+            <td>拔插、重启、DHCP 地址变化后仍能自动重新找到电脑并连接。</td>
+          </tr>
+          <tr>
+            <td>M2<br>真实本地语音</td>
+            <td>先在电脑上分别实现真实 <code>LocalAsrProvider</code>、<code>LocalTtsProvider</code>；从音频文件测试，不先接 ESP32。首版可用 sherpa-onnx 流式中文 ASR 和轻量中文 TTS。</td>
+            <td>本地 WAV/PCM 能得到正确中文；输入文字能生成可播放、格式严格为 16 kHz mono S16LE 的 PCM。</td>
+          </tr>
+          <tr>
+            <td>M3<br>ESP32 音频</td>
+            <td>先做 I2S 麦克风上行，再做 I2S 扬声器下行；加入 20 ms 环形缓冲、Opus 编解码、sequence 和断线重连。</td>
+            <td>先证明录音可识别，再证明测试语音可播放；最后才合并双向链路。</td>
+          </tr>
+          <tr>
+            <td>M4<br>整机对话</td>
+            <td>接入 VAD（语音活动检测）、会话状态机、队列、TTS generation、取消和打断；测量每段延迟。</td>
+            <td>连续 20 轮对话无死锁、串音、旧音频回放或 session 混淆。</td>
+          </tr>
+          <tr>
+            <td>M5<br>动作与安全</td>
+            <td>把 OpenClaw 意图映射到固件白名单动作和 OLED 表情；加入 deadline、限位、急停和执行回执。</td>
+            <td>未知动作、过期动作和越界参数都被拒绝；语音失败不影响急停。</td>
+          </tr>
+          <tr>
+            <td>M6<br>产品化</td>
+            <td>WSS、首次配对、token 轮换、日志脱敏、升级回滚、观测指标；启用 OpenClaw Sandbox 和最小工具策略；再评估多用户和跨 Wi-Fi。</td>
+            <td>通过断网、重启、错误凭据、恶意 JSON、模型超时和沙盒越权测试。</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="boundary"><strong>部署选择</strong>本课按你最初确定的“ASR/TTS 运行在电脑端”推进。如果当前唯一目标是最快展示，Provider 也允许临时换成云 ASR/TTS；但必须明确标记数据外发，不能把云端结果当成本地能力完成。</div>
+    </section>
+
+    <section class="chapter" id="immediate">
+      <div class="chapter-head">
+        <span class="chapter-no">09—D</span>
+        <div><h2>你现在立刻要做的三件事</h2><p>不是六个阶段同时开工，只做当前最近的三个可验证结果。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Now 01</span>
+          <h3>修完 OpenClaw 契约</h3>
+          <p>让 <code>actions</code> 固定输出对象，给结构错误一次受限修复机会，失败则返回 <code>agent.error</code>，不能直接断设备 WebSocket。</p>
+        </article>
+        <article class="concept">
+          <span class="term">Now 02</span>
+          <h3>完成真机网络握手</h3>
+          <p>重新连接 ESP32，烧录已经编译的连通性固件，取得 <code>WIFI_CONNECTED / HTTP_HEALTH_OK / SESAME_WS_READY</code> 三条实机证据。</p>
+        </article>
+        <article class="concept wide">
+          <span class="term">Now 03</span>
+          <h3>在电脑上实现真实 ASR/TTS</h3>
+          <p>模型先只处理本地音频文件。ASR 和 TTS 各自通过独立 contract test 后，再替换 Pipeline 里的 Demo Provider。官方 sherpa-onnx 同时提供流式识别、中文模型和 TTS 运行能力，适合作为第一版统一运行时。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="not-now">
+      <div class="chapter-head">
+        <span class="chapter-no">09—E</span>
+        <div><h2>现在明确不做什么</h2><p>这些都重要，但会让第一条真实闭环推迟。</p></div>
+      </div>
+      <div class="diagram">暂不做：
+× 公网服务器和跨 Wi-Fi 中继
+× 多用户云端部署和自动扩容
+× 真正同时说和听的全双工 AEC
+× 大量 OpenClaw 工具、长期记忆和自动化
+× 漂亮控制台、手机 App 和 OTA 平台
+× 复杂舞蹈、丰富表情和全部舵机动作</div>
+      <div class="danger"><strong>安全例外</strong>在 OpenClaw 获得任何电脑工具权限之前，必须先设置工具 deny/allow 和 Sandbox。官方说明 Sandbox 决定工具在哪里运行，tool policy 决定工具是否可调用；两层不能互相替代。</div>
+    </section>
+
+    <section class="chapter" id="sources">
+      <div class="chapter-head">
+        <span class="chapter-no">09—F</span>
+        <div><h2>继续实现时读什么</h2><p>优先读项目契约和官方运行时资料，不先看零散教程。</p></div>
+      </div>
+      <ul class="checklist">
+        <li><a href="0007-sesame-runtime-connections.html">第 7 课：本地封装与连接通路</a></li>
+        <li><a href="0008-sesame-software-bundle-map.html">第 8 课：软件包地图</a></li>
+        <li><a href="https://k2-fsa.github.io/sherpa/onnx/index.html">sherpa-onnx 官方文档：本地 ASR/TTS 运行时与模型</a></li>
+        <li><a href="https://docs.openclaw.ai/gateway/sandbox-vs-tool-policy-vs-elevated">OpenClaw 官方文档：Sandbox、tool policy 与 elevated 的边界</a></li>
+        <li><a href="https://docs.openclaw.ai/gateway/security">OpenClaw 官方安全说明</a></li>
+      </ul>
+      <p>如果某一步的输入、输出或验收条件仍不清楚，继续向我追问该阶段，不要同时展开后面的阶段。</p>
+    </section>
+
+    <section class="chapter" id="recall">
+      <div class="chapter-head">
+        <span class="chapter-no">09—G</span>
+        <div><h2>一分钟自测</h2><p>先自己回答，再展开答案。</p></div>
+      </div>
+      <details><summary>为什么不是先做 ESP32 麦克风和扬声器？</summary><p>因为 OpenClaw 契约和电脑真实 ASR/TTS 还没有稳定。先把电脑端变成可替换、可测试的稳定目标，ESP32 音频接入后才能明确定位问题。</p></details>
+      <details><summary>沙盒应该什么时候做？</summary><p>文本回答闭环可以先用无工具 Agent 验证；任何电脑工具对 OpenClaw 开放之前，必须完成 Sandbox 和工具白名单。</p></details>
+      <details><summary>第一条真正有产品意义的验收线是什么？</summary><p>一台真机在同一 Wi-Fi 下完成“真人讲话 → 本地识别 → OpenClaw 回答 → 本地合成 → 扬声器播放”。</p></details>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sesame V3 的已记录接线、供电边界和实物确认状态。">
+  <title>Sesame V3 接线核对图</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="WIRE">
+  <nav class="course-nav" aria-label="课程导航"><div class="course-nav__inner">
+    <a class="course-mark" href="../lessons/0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+    <div class="lesson-tabs"><a href="../lessons/0014-sesame-reproducible-architecture.html" title="可复现架构">14</a><a href="../lessons/0015-sesame-code-reading-first-tour.html" title="源码第一游">15</a><a href="../lessons/0016-sesame-current-wiring.html" title="接线核对">16</a></div>
+    <div class="reading-progress" aria-hidden="true"></div>
+  </div></nav>
+  <main>
+    <header class="hero" data-lesson="WIRE"><div>
+      <p class="kicker">Sesame Robot V3 · 硬件核对</p>
+      <h1>接线图，<br>但不假装看见了实物。</h1>
+      <p class="lead">本图把“固件和硬件清单定义的目标接线”与“仓库有实机证据确认的状态”分开。照表核线前，先断开舵机高电流电源。</p>
+      <div class="lesson-meta"><span>GPIO 信号</span><span>供电边界</span><span>待实机核验</span></div>
+    </div></header>
+
+    <section class="chapter" id="status"><div class="chapter-head"><span class="chapter-no">WIRE—A</span><div><h2>先读状态：哪些是事实，哪些只是目标</h2><p>代码常量能证明固件会用某 GPIO，不能证明杜邦线现在仍插在这里。</p></div></div>
+      <table class="comparison"><thead><tr><th>项目</th><th>记录状态</th><th>能得出的结论</th></tr></thead><tbody>
+        <tr><td>ESP32-S3</td><td>实机启动记录确认 16 MB Flash、8 MB OPI PSRAM。</td><td>主控板与基本启动已被记录。</td></tr>
+        <tr><td>8 个 SG90S 舵机</td><td>用户确认实际型号为 SG90S；固件为 S0–S7 预留 8 路 PWM。</td><td>型号和目标 GPIO 已知；每根实际信号线是否对应仍须目测核对。</td></tr>
+        <tr><td>INMP441</td><td>固件和硬件表已定义；硬件表要求实机录音再确认。</td><td>可按本图核线，不能宣称当前收音已验收。</td></tr>
+        <tr><td>MAX98357A + 扬声器</td><td>硬件表记录为此前未安装。</td><td>当前不能把下方“功放接法”当成已接好的实物事实。</td></tr>
+        <tr><td>OLED</td><td>固件已配置；修正版实机显示未完成验证。</td><td>目标 I²C 线明确，实物显示/供电仍须核对。</td></tr>
+        <tr><td>串口节点</td><td>硬件表记录暂未恢复。</td><td>不能通过当前串口日志反向证明整机的外设接线。</td></tr>
+      </tbody></table>
+      <div class="danger"><strong>安全起点</strong>在改线、插拔舵机或检查电源时，先让 <code>5V_SERVO</code> / 外部舵机电源断电；只保留 ESP32 的 USB 数据线用于观察。八路 SG90S 的电流不能由普通 ESP32 USB 供电承担。</div>
+    </section>
+
+    <section class="chapter" id="signals"><div class="chapter-head"><span class="chapter-no">WIRE—B</span><div><h2>全部 GPIO 信号线</h2><p>下表同时来自正式固件 <code>audio_contract.h</code>、舵机驱动和 OLED 驱动。</p></div></div>
+      <table class="comparison"><thead><tr><th>ESP32-S3 GPIO</th><th>去向</th><th>模块端标号</th><th>方向/含义</th></tr></thead><tbody>
+        <tr><td>GPIO 0</td><td>板载 BOOT</td><td>BOOT</td><td>低电平按下；运行时是录音开始/结束，烧录时也是下载键。不要把它长期外接拉低。</td></tr>
+        <tr><td>GPIO 1</td><td>MAX98357A</td><td>SD、EN 或 SD_MODE</td><td>功放使能；固件开始播放才拉高，停播/初始化时拉低静音。</td></tr>
+        <tr><td>GPIO 2</td><td>MAX98357A</td><td>DIN</td><td>ESP32 → 功放的 I2S 音频数据。</td></tr>
+        <tr><td>GPIO 4</td><td>S0</td><td>舵机 signal</td><td>50 Hz PWM。</td></tr>
+        <tr><td>GPIO 5</td><td>S1</td><td>舵机 signal</td><td>50 Hz PWM。</td></tr>
+        <tr><td>GPIO 6</td><td>S2</td><td>舵机 signal</td><td>50 Hz PWM。</td></tr>
+        <tr><td>GPIO 7</td><td>S3</td><td>舵机 signal</td><td>50 Hz PWM。</td></tr>
+        <tr><td>GPIO 8</td><td>SSD1306 OLED</td><td>SDA</td><td>I²C data，地址为 <code>0x3C</code>。</td></tr>
+        <tr><td>GPIO 9</td><td>SSD1306 OLED</td><td>SCL</td><td>I²C clock，400 kHz。</td></tr>
+        <tr><td>GPIO 10</td><td>S4</td><td>舵机 signal</td><td>50 Hz PWM。</td></tr>
+        <tr><td>GPIO 11</td><td>S5</td><td>舵机 signal</td><td>50 Hz PWM。</td></tr>
+        <tr><td>GPIO 12</td><td>S6</td><td>舵机 signal</td><td>50 Hz PWM。</td></tr>
+        <tr><td>GPIO 13</td><td>S7</td><td>舵机 signal</td><td>50 Hz PWM。</td></tr>
+        <tr><td>GPIO 14</td><td>INMP441 + MAX98357A</td><td>SCK/BCLK</td><td>共享 I2S 位时钟；ESP32 → 两个模块。</td></tr>
+        <tr><td>GPIO 47</td><td>INMP441 + MAX98357A</td><td>WS / LRCLK / LRC</td><td>共享 I2S 左右声道时钟；ESP32 → 两个模块。</td></tr>
+        <tr><td>GPIO 48</td><td>INMP441</td><td>SD</td><td>麦克风 I2S 数据：INMP441 → ESP32。</td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="chapter" id="audio"><div class="chapter-head"><span class="chapter-no">WIRE—C</span><div><h2>音频：共用两根时钟，绝不能共用数据线</h2><p>这是项目最容易接错的一组线。</p></div></div>
+      <div class="diagram">ESP32-S3                  INMP441
+3V3       ───────────────→ VDD     （目标低压数字电源）
+GND       ───────────────→ GND
+GND       ───────────────→ L/R     （选 left slot；固件只读左声道）
+GPIO 14   ───────────────→ SCK/BCLK
+GPIO 47   ───────────────→ WS
+GPIO 48   ←─────────────── SD
+
+ESP32-S3                  MAX98357A + speaker
+GPIO 14   ───────────────→ BCLK
+GPIO 47   ───────────────→ LRC/LRCLK
+GPIO 2    ───────────────→ DIN
+GPIO 1    ───────────────→ SD/EN
+GND       ───────────────→ GND
+电源轨    ───────────────→ VIN/VDD  （当前项目未记录最终实际轨）
+OUT+ / OUT− ─────────────→ 扬声器两端；扬声器不是接 GND。</div>
+      <p>INMP441 与 MAX98357A 共享 BCLK 和 WS 是正确的：一个模块只输出自己的 <code>SD</code> 到 GPIO48，另一个模块只接收 GPIO2 的 <code>DIN</code>。固件在 16 kHz、32-bit stereo I2S 总线上工作，麦克风从左声道取样，播放时把单声道样本复制到左右 slot。</p>
+      <div class="boundary"><strong>这里的“3V3 / 电源轨”是目标，不是已实测线色</strong>项目电源图明确把 INMP441 放在 3V3 数字域；但没有保存实物照片来证明你当前模块的 VDD/GND 究竟接到了哪一个排针。MAX98357A 的最终供电轨更被硬件文档明确标为“仍需按实物补录”。MAX98357A 芯片可在 2.5–5.5 V 单电源工作，并以 BCLK、LRCLK、DIN 接收 I2S；但你手中 breakout 的 VIN、GAIN、SD 标注和接法必须以实物丝印为准。[MAX98357A 官方资料](https://www.analog.com/en/products/max98357a.html)</div>
+    </section>
+
+    <section class="chapter" id="power"><div class="chapter-head"><span class="chapter-no">WIRE—D</span><div><h2>电源：信号线与供电线必须分开理解</h2><p>ESP32 的 GPIO 只发控制信号；它不应该承担八个舵机的电流。</p></div></div>
+      <div class="diagram">记录中的目标电源树：
+7.4 V 电池 或 USB-C PD → LTC4416 电源选择 → VSYS
+                                             ├→ SY8120B1 → 3V3 → ESP32 / INMP441 / OLED
+                                             └→ TPS54531 → 5V_SERVO → 八个舵机 V+
+
+所有低压模块的 GND 与 ESP32 GND 必须共地。
+舵机的 V+ 来自 5V_SERVO；舵机 signal 仅分别来自 GPIO 4/5/6/7/10/11/12/13。</div>
+      <p>硬件清单描述 Distro V3 用 TPS54531 从 VSYS 产生 <code>5V_SERVO</code>，典型计算值约 5.76 V。正式固件 README 说“独立 5–6 V 舵机电源、禁止 USB 给八路舵机供电”。这两句并不必然冲突：板载 <code>5V_SERVO</code> 可以是独立高电流轨，但前提是它由合格的电池或 USB-C PD 经 VSYS 供电，而不是只靠 ESP32 的 USB Serial/JTAG 线。</p>
+      <div class="danger"><strong>尚未确认的关键事实</strong>仓库没有证明当前 7.4 V 电池、USB-C PD、LTC4416、TPS54531 和每个舵机的红/棕线已经实际连通。更没有证明 5.76 V 在带载时稳定。不要把“代码使用八路 PWM”误读为“八个 SG90S 同时堵转安全”。</div>
+    </section>
+
+    <section class="chapter" id="servos"><div class="chapter-head"><span class="chapter-no">WIRE—E</span><div><h2>八个 SG90S：每个都有三条线</h2><p>杜邦线最常见的错误是只追信号线，漏掉共地或把供电接到 ESP32。</p></div></div>
+      <table class="comparison"><thead><tr><th>舵机端线</th><th>目标去向</th><th>项目意义</th></tr></thead><tbody>
+        <tr><td>Signal（通常黄/橙，实际以你的线束为准）</td><td>S0..S7 对应 GPIO 4, 5, 6, 7, 10, 11, 12, 13。</td><td>只传 50 Hz PWM 控制信号。</td></tr>
+        <tr><td>V+（通常红）</td><td><code>5V_SERVO</code> 正电源轨。</td><td>供给舵机电机电流，不能接 ESP32 的 3V3，也不应由普通 USB 供电。</td></tr>
+        <tr><td>GND（通常棕/黑）</td><td>舵机电源地，并与 ESP32 GND 共地。</td><td>没有共地，PWM 的电压参考不存在，舵机可能抖动、失控或完全不响应。</td></tr>
+      </tbody></table>
+      <p>固件启动时把 8 路 PWM duty 设为 0，并调用 <code>release_all()</code>，因此正常上电不应自动把机器人摆到某个姿势。网页动作或本地操作者控制才会申请 PWM 所有权；<code>STOP ALL</code> 会释放这些输出。</p>
+    </section>
+
+    <section class="chapter" id="check"><div class="chapter-head"><span class="chapter-no">WIRE—F</span><div><h2>对着实物核对的安全顺序</h2><p>这不是上电测试顺序；是先断电目测、再最小化上电的顺序。</p></div></div>
+      <ol class="checklist">
+        <li>断开舵机高电流电源，只保留 USB 数据线；拍一张 ESP32 与 Distro V3 正反面清晰照片。</li>
+        <li>只核 INMP441：VDD、GND、L/R→GND、GPIO14/47/48；确认没有把 SD 接到 GPIO2。</li>
+        <li>核 OLED：GND、低压 VCC、GPIO8 SDA、GPIO9 SCL；不要仅因模块能接受 5 V 就把 I²C 上拉到 5 V。</li>
+        <li>核每个舵机的三线：S0–S7 信号顺序、统一 V+、统一 GND、ESP32 与舵机地共地。</li>
+        <li>最后才装 MAX98357A 和扬声器：先确认 breakout 丝印和电源轨，再接 BCLK/LRC/DIN/EN；扬声器两端只接 OUT+/OUT−。</li>
+        <li>确认所有线无误后，再单独接入舵机供电；先测试 STOP，再测试单舵机小角度，而不是直接运行走路动作。</li>
+      </ol>
+      <div class="quiz"><details><summary>为什么 GPIO14/47 可以同时接麦克风和功放？</summary><p>它们是由 ESP32 输出的 I2S 时钟，多个从设备可以监听同一时钟。数据线不能这样共享：INMP441 的 SD 是输入到 ESP32，MAX98357A 的 DIN 是从 ESP32 输出。</p></details><details><summary>为什么舵机能有独立 5V 供电，却还必须和 ESP32 共地？</summary><p>PWM 是相对地的电压信号。两边没有共同参考，舵机无法可靠判定 GPIO 的高低电平。</p></details></div>
+    </section>
+    <section class="sources"><h2>证据</h2><p>项目内事实来自 <code>Desktop/2/docs/hardware_modules.md</code>、<code>firmware/esp32_voice_idf/README.md</code> 与正式固件的音频、OLED、舵机代码。INMP441 的 L/R 选左声道与 I²S 角色也与其数据手册一致；MAX98357A 的电气范围和 I²S 引脚定义以 <a href="https://www.analog.com/media/en/technical-documentation/data-sheets/MAX98357A-MAX98357B.pdf">官方数据手册</a>为准。若要回答“你此刻真实接在哪个排针”，还需用设备正反面照片逐条勾掉上述未确认项。</p></section>
+  </main>
+</body>
+</html>

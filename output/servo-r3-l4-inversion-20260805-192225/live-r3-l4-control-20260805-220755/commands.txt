@@ -1,0 +1,6 @@
+> {"kind":"servo","servo":6,"angle":45}
+
+> {"kind":"servo","servo":8,"angle":135}
+
+> {"kind":"stop"}
+

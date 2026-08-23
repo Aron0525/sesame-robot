@@ -1,0 +1,20 @@
+--- host calibration tests ---
+
+--- explicit R3/L4 mapping probe ---
+input=0 R3(S5/GPIO11)=180 L4(S7/GPIO13)=180
+input=45 R3(S5/GPIO11)=135 L4(S7/GPIO13)=135
+input=90 R3(S5/GPIO11)=90 L4(S7/GPIO13)=90
+input=135 R3(S5/GPIO11)=45 L4(S7/GPIO13)=45
+input=180 R3(S5/GPIO11)=0 L4(S7/GPIO13)=0
+
+--- current flashed-build identity ---
+e5fa48615b18d8aec74732c0d64d7f4c86d8c7834a68b6fc3000e06bf3e48878  /Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/build/sesame_robot_v3.bin
+86b585883e53b2890b4b3ab9fd9abab50d3377b57481838aa228752faf35c259  /Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/build-p1/sesame_robot_v3.bin
+
+--- latest successful flash evidence ---
+Hash of data verified.
+Wrote 1856224 bytes (1077533 compressed) at 0x00010000 in 9.5 seconds (effective 1568.5 kbit/s)...
+Hash of data verified.
+Hash of data verified.
+Hash of data verified.
+Hard resetting via RTS pin...

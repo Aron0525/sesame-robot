@@ -1,0 +1,61 @@
+{
+  "behavior": {
+    "after_tts_drained": "firmware emits listen.start for a new turn automatically",
+    "if_speech_starts_within_ms": 3000,
+    "endpoint_after_silence_ms": 800,
+    "maximum_listen_ms": 10000,
+    "if_no_speech": "firmware emits listen.stop with reason follow_up_timeout and returns to wake-word standby",
+    "continuity": "the device session_id and persisted conversation_id are retained; only turn_id advances"
+  },
+  "modified_artifacts": [
+    "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/include/sesame_voice/voice_turn_detector.h",
+    "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/voice_turn_detector.cpp",
+    "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/test/test_voice_turn_detector.cpp",
+    "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/include/sesame_voice/voice_controller.h",
+    "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_voice/voice_controller.cpp"
+  ],
+  "modified_firmware": "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/sesame_robot_v3.bin",
+  "modified_firmware_sha256": "65d6458c7c064eb538ab2b30b4b23f745b38849690c67043a8c442777a632001",
+  "patch": "/Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/tts-follow-up-listening.patch",
+  "rollback": "/Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/rollback.sh",
+  "apply_final": "/Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/apply-final.sh",
+  "verification": [
+    {
+      "command": "c++ -std=c++20 -Wall -Wextra -Werror -Icomponents/sesame_voice/include components/sesame_voice/test/test_voice_turn_detector.cpp components/sesame_voice/voice_turn_detector.cpp -o build-host-tests/test_voice_turn_detector_follow_up && build-host-tests/test_voice_turn_detector_follow_up",
+      "cwd": "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF",
+      "input": "follow-up opens; no speech at 2.999 seconds; timeout at 3.000 seconds; speech at 0.5 seconds then endpoint at 0.8 seconds of silence",
+      "literal_output": "voice_turn_detector_follow_up_test=passed",
+      "exit_status": 0
+    },
+    {
+      "command": "bash tests/run_host_tests.sh",
+      "cwd": "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF",
+      "input": "all host firmware contracts",
+      "stdout_file": "/Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/verification/host-tests.txt",
+      "literal_output": "wakeword asset and trained contract verified: bytes=22528 sha256=9c20563309845fa620296a278e94877d15de0e0c23fee9bcd156388b764f1949\nWi-Fi policy verified: STA power saving preserved\n",
+      "exit_status": 0
+    },
+    {
+      "command": "cmake --build build --target app -- -j2",
+      "cwd": "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF",
+      "input": "ESP-IDF app target",
+      "stdout_file": "/Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/verification/firmware-build.txt",
+      "literal_output": "Successfully created esp32s3 image; Generated build/sesame_robot_v3.bin; 47% app partition free.",
+      "exit_status": 0
+    },
+    {
+      "command": "/Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/rollback.sh; /Users/mac/Documents/sesame robot/output/20260811-tts-follow-up-listening/apply-final.sh",
+      "cwd": "/Users/mac/Documents/sesame robot",
+      "input": "five firmware source/test files",
+      "literal_output": "rollback_hash_verification=passed (5/5); final_hash_verification=passed (5/5)",
+      "exit_status": 0
+    }
+  ],
+  "deployment": {
+    "serial_ports_seen": [
+      "/dev/cu.Bluetooth-Incoming-Port",
+      "/dev/cu.debug-console"
+    ],
+    "flash_status": "not flashed: no robot serial port enumerated during verification"
+  }
+}

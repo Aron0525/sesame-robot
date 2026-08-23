@@ -1,0 +1,126 @@
+Command: ninja flash
+[1/5] cd "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/esp-idf/esptool_py" && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/partition_table/partition-table.bin /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/sesame_robot_v3.bin
+sesame_robot_v3.bin binary size 0x199ad0 bytes. Smallest app partition is 0x300000 bytes. 0x166530 bytes (47%) free.
+[2/5] Performing build step for 'bootloader'
+[1/1] cd "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py" && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/bootloader.bin
+Bootloader binary size 0x5160 bytes. 0x2ea0 bytes (36%) free.
+[3/5] No install step for 'bootloader'
+[4/5] Completed 'bootloader'
+[4/5] cd /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esptool_py && /opt/homebrew/bin/cmake -D IDF_PATH=/Users/mac/.espressif/frameworks/esp-idf-v5.5.4 -D "SERIAL_TOOL=/Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python;;/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esptool_py/esptool/esptool.py;--chip;esp32s3" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D "WORKING_DIRECTORY=/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build" -P /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/esptool_py/run_serial_tool.cmake
+esptool.py --chip esp32s3 -p /dev/cu.usbmodem101 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 4MB 0x0 bootloader/bootloader.bin 0x10000 sesame_robot_v3.bin 0x8000 partition_table/partition-table.bin 0x310000 srmodels/srmodels.bin
+esptool.py v4.12.0
+Serial port /dev/cu.usbmodem101
+Connecting...
+Chip is ESP32-S3 (QFN56) (revision v0.2)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: 28:84:85:a4:ef:04
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00005fff...
+Flash will be erased from 0x00010000 to 0x001a9fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x00310000 to 0x00375fff...
+SHA digest in image updated
+Compressed 20832 bytes to 13348...
+Writing at 0x00000000... (100 %)
+Wrote 20832 bytes (13348 compressed) at 0x00000000 in 0.2 seconds (effective 674.8 kbit/s)...
+Hash of data verified.
+Compressed 1678032 bytes to 1017818...
+Writing at 0x00010000... (1 %)
+Writing at 0x0001cd49... (3 %)
+Writing at 0x0002a438... (4 %)
+Writing at 0x00030ea2... (6 %)
+Writing at 0x000369ad... (7 %)
+Writing at 0x0003b416... (9 %)
+Writing at 0x00042860... (11 %)
+Writing at 0x0004bafa... (12 %)
+Writing at 0x000540a1... (14 %)
+Writing at 0x0005a318... (15 %)
+Writing at 0x00060f76... (17 %)
+Writing at 0x00066f45... (19 %)
+Writing at 0x0006cd7f... (20 %)
+Writing at 0x00072066... (22 %)
+Writing at 0x000781a4... (23 %)
+Writing at 0x0007dc03... (25 %)
+Writing at 0x00084c67... (26 %)
+Writing at 0x000a0f58... (28 %)
+Writing at 0x000ab5f3... (30 %)
+Writing at 0x000b061c... (31 %)
+Writing at 0x000b55ac... (33 %)
+Writing at 0x000ba75f... (34 %)
+Writing at 0x000bf608... (36 %)
+Writing at 0x000c4b88... (38 %)
+Writing at 0x000ca206... (39 %)
+Writing at 0x000cf149... (41 %)
+Writing at 0x000d474c... (42 %)
+Writing at 0x000da353... (44 %)
+Writing at 0x000dfb45... (46 %)
+Writing at 0x000e4e7f... (47 %)
+Writing at 0x000ea6b9... (49 %)
+Writing at 0x000f06d1... (50 %)
+Writing at 0x000f611a... (52 %)
+Writing at 0x000fbdce... (53 %)
+Writing at 0x00101dbb... (55 %)
+Writing at 0x001080c6... (57 %)
+Writing at 0x0010deef... (58 %)
+Writing at 0x00114162... (60 %)
+Writing at 0x00119d40... (61 %)
+Writing at 0x0011fb68... (63 %)
+Writing at 0x00125c77... (65 %)
+Writing at 0x0012bcf8... (66 %)
+Writing at 0x001311f8... (68 %)
+Writing at 0x0013636c... (69 %)
+Writing at 0x0013ba70... (71 %)
+Writing at 0x00141212... (73 %)
+Writing at 0x001466b1... (74 %)
+Writing at 0x0014ba49... (76 %)
+Writing at 0x0015104b... (77 %)
+Writing at 0x001570a0... (79 %)
+Writing at 0x0015ca64... (80 %)
+Writing at 0x00162795... (82 %)
+Writing at 0x00168495... (84 %)
+Writing at 0x0016db2a... (85 %)
+Writing at 0x00174019... (87 %)
+Writing at 0x0017bf9f... (88 %)
+Writing at 0x00183cea... (90 %)
+Writing at 0x00189e38... (92 %)
+Writing at 0x00190f64... (93 %)
+Writing at 0x00197041... (95 %)
+Writing at 0x0019d14a... (96 %)
+Writing at 0x001a332d... (98 %)
+Writing at 0x001a8c46... (100 %)
+Wrote 1678032 bytes (1017818 compressed) at 0x00010000 in 9.7 seconds (effective 1385.9 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 120...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (120 compressed) at 0x00008000 in 0.0 seconds (effective 534.1 kbit/s)...
+Hash of data verified.
+Compressed 414016 bytes to 275588...
+Writing at 0x00310000... (5 %)
+Writing at 0x00314d0a... (11 %)
+Writing at 0x0031952f... (17 %)
+Writing at 0x0031e1b4... (23 %)
+Writing at 0x003236e4... (29 %)
+Writing at 0x00328213... (35 %)
+Writing at 0x0032cf49... (41 %)
+Writing at 0x003331ce... (47 %)
+Writing at 0x0033b956... (52 %)
+Writing at 0x00341a24... (58 %)
+Writing at 0x0034716e... (64 %)
+Writing at 0x00350e56... (70 %)
+Writing at 0x003598f2... (76 %)
+Writing at 0x0035f497... (82 %)
+Writing at 0x00363d45... (88 %)
+Writing at 0x003698e9... (94 %)
+Writing at 0x00370ab7... (100 %)
+Wrote 414016 bytes (275588 compressed) at 0x00310000 in 2.4 seconds (effective 1376.6 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...

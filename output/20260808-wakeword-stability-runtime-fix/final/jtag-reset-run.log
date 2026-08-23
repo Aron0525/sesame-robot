@@ -1,0 +1,35 @@
+Open On-Chip Debugger v0.12.0-esp32-20251215 (2025-12-15-18:17)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : esp_usb_jtag: VID set to 0x303a and PID to 0x1001
+Info : esp_usb_jtag: capabilities descriptor set to 0x2000
+Info : esp_usb_jtag: serial (28:84:85:A4:EF:1C)
+Info : esp_usb_jtag: Device found. Base speed 40000KHz, div range 1 to 255
+Info : clock speed 40000 kHz
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] Examination succeed
+Info : [esp32s3.cpu1] Examination succeed
+Info : [esp32s3.cpu0] starting gdb server on 3333
+Info : Listening on port 3333 for gdb connections
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] requesting target halt and executing a soft reset
+Info : [esp32s3.cpu0] Target halted, PC=0x4037E7AF, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : Set GDB target to 'esp32s3.cpu0'
+Info : [esp32s3.cpu1] Target halted, PC=0x4037B0DA, debug_reason=00000000
+Info : [esp32s3.cpu1] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Debug controller was reset.
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x500000EF, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu1] Debug controller was reset.
+Info : [esp32s3.cpu1] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x40041A76, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu1] Target halted, PC=0x40043A3B, debug_reason=00000000
+Info : [esp32s3.cpu1] Reset cause (3) - (Software core reset)
+shutdown command invoked

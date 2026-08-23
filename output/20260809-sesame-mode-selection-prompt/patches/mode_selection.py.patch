@@ -1,0 +1,61 @@
+--- /dev/null	2026-08-09 22:43:58
++++ /Users/mac/Documents/sesame robot/output/20260809-sesame-mode-selection-prompt/final/repo/mode_selection.py	2026-08-09 22:43:58
+@@ -0,0 +1,58 @@
++"""Hard-coded voice commands for selecting Sesame robot modes."""
++
++from __future__ import annotations
++
++from typing import Literal, Optional
++
++MODE_SELECTION_ANNOUNCEMENT = (
++    "可以切换到学习模式、儿童模式或工作模式。请说“选择学习”“选择儿童”或“选择工作”；"
++    "也可以说“切换回正常模式”。"
++)
++
++ModeInputAction = Literal["prompt", "switch", "reprompt", "ignored"]
++
++
++def classify_mode_input(text: str, *, selection_pending: bool) -> tuple[ModeInputAction, Optional[str]]:
++    """Map a small fixed Chinese command set to a mode-selection action."""
++    normalized = "".join(text.strip().lower().split())
++    if not normalized:
++        return "ignored", None
++
++    direct_modes = {
++        "切换到学习模式": "learning",
++        "切换学习模式": "learning",
++        "切换到学习": "learning",
++        "切换到儿童模式": "children",
++        "切换儿童模式": "children",
++        "切换到儿童": "children",
++        "切换到工作模式": "work",
++        "切换工作模式": "work",
++        "切换到工作": "work",
++        "切换回正常模式": "normal",
++        "回到正常模式": "normal",
++        "切换到正常模式": "normal",
++    }
++    for phrase, mode_id in direct_modes.items():
++        if phrase in normalized:
++            return "switch", mode_id
++
++    if "切换" in normalized and "模式" in normalized:
++        return "prompt", None
++
++    if not selection_pending:
++        return "ignored", None
++
++    choices = {
++        "选择学习": "learning",
++        "学习模式": "learning",
++        "选择儿童": "children",
++        "儿童模式": "children",
++        "选择工作": "work",
++        "工作模式": "work",
++        "选择正常": "normal",
++        "正常模式": "normal",
++    }
++    for phrase, mode_id in choices.items():
++        if phrase in normalized:
++            return "switch", mode_id
++    return "reprompt", None

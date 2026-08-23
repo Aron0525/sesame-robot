@@ -1,0 +1,4 @@
+e9b8242ac8a94567343fa4de899193561a9cc5e9502895f49f9d5592ab074268  /Users/mac/.openclaw/workspace-sesame/AGENTS.md
+57ed5aa5dc81542413c2e07854ab4630799dd18ca280f23f60d03ba8ed0a5821  /Users/mac/.openclaw/workspace-sesame-learning/AGENTS.md
+2088b0afa92199dba09e8e8827273f718a54272a740fd667a3293c8c7125524a  /Users/mac/.openclaw/workspace-sesame-children/AGENTS.md
+424756b71054053ec57953a3961c6c51095d2aab2b01175df2d0e95847cfcc53  /Users/mac/.openclaw/workspace-sesame-work/AGENTS.md

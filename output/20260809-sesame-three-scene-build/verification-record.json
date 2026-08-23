@@ -1,0 +1,116 @@
+{
+  "status": "passed",
+  "scope": {
+    "base_mode": {
+      "id": "normal",
+      "agentId": "sesame",
+      "knowledgeBase": null
+    },
+    "scenes": {
+      "learning": {
+        "agentId": "sesame-learning",
+        "knowledgeBase": "kb-learning"
+      },
+      "children": {
+        "agentId": "sesame-children",
+        "knowledgeBase": "kb-children"
+      },
+      "work": {
+        "agentId": "sesame-work",
+        "knowledgeBase": "kb-work"
+      }
+    },
+    "knowledgeBaseState": "namespaces reserved; retrieval is not connected"
+  },
+  "modified_artifacts": {
+    "gateway_scene_registry": "/Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/scenes.py",
+    "gateway_mode_router": "/Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/app.py",
+    "mcp_scene_contract": "/Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/openclaw_scene_mcp.py",
+    "console": "/Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/static/index.html",
+    "openclaw_config": "/Users/mac/.openclaw/openclaw.json",
+    "workspaces": [
+      "/Users/mac/.openclaw/workspace-sesame-learning",
+      "/Users/mac/.openclaw/workspace-sesame-children",
+      "/Users/mac/.openclaw/workspace-sesame-work"
+    ]
+  },
+  "patch": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/three-scenes.patch",
+  "verification": {
+    "gateway_tests": {
+      "command": "cd /Users/mac/Documents/sesame robot/endpoint-gateway && PYTHONPATH=src ./.venv/bin/python -m unittest discover -s tests -v",
+      "exit_status": 0,
+      "literal_output": "Ran 12 tests in 0.103s — OK",
+      "output_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/test-after-restore.txt"
+    },
+    "console_browser": {
+      "command": "npx --yes agent-browser@latest --session sesame-scene-ui open http://127.0.0.1:8799; snapshot -i; get count [data-mode]; screenshot --full",
+      "exit_status": 0,
+      "literal_output": {
+        "normal_plus_scene_buttons": 4,
+        "selectable_scenes": 3,
+        "active_text": "正常 · 可靠的桌面机器人"
+      },
+      "output_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/test-console-browser.txt",
+      "screenshot_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/console-three-scenes.png"
+    },
+    "openclaw_config": {
+      "command": "openclaw config validate --json && openclaw agents list --json",
+      "exit_status": 0,
+      "agents": [
+        "sesame",
+        "sesame-learning",
+        "sesame-children",
+        "sesame-work"
+      ],
+      "gateway_health": true,
+      "config_output_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/openclaw-config-validate-restored.json",
+      "agents_output_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/openclaw-agents-restored.json"
+    },
+    "scene_agents": {
+      "command": "openclaw agent --agent sesame-{learning,children,work} --session-key scene-verification-20260809 --thinking low --json",
+      "exit_status": 0,
+      "results": {
+        "learning": {
+          "durationMs": 7243,
+          "workspace": "/Users/mac/.openclaw/sandboxes/agent-sesame-learning-scene-veri-b3aaa198",
+          "reply": "分数表示把一个整体平均分成若干份，取其中一份或几份的数，比如把蛋糕平均分成4份，取1份就是四分之一。最简单的小题：把一个月饼平均分成2份，每份是几分之几？",
+          "expression": "happy",
+          "toolCalls": 0
+        },
+        "children": {
+          "durationMs": 4251,
+          "workspace": "/Users/mac/.openclaw/sandboxes/agent-sesame-children-scene-veri-7465ccbb",
+          "reply": "小树和小鸟是好朋友，每天小鸟都在小树上唱歌。下雨了，小树就用叶子给小鸟撑伞。你想不想也和小鸟做朋友呀？",
+          "expression": "happy",
+          "toolCalls": 0
+        },
+        "work": {
+          "durationMs": 7048,
+          "workspace": "/Users/mac/.openclaw/sandboxes/agent-sesame-work-scene-verifica-d7e2835c",
+          "reply": "建议顺序：1）回复客户（时效性高、涉及外部等待）；2）完成报告（核心交付物）；3）整理会议记录（可最后收尾）。告诉我各任务的截止时间，我可以帮你细化每个任务的步骤。",
+          "expression": "thinking",
+          "toolCalls": 1
+        }
+      },
+      "output_directory": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/agent-tests"
+    },
+    "mcp_contract": {
+      "select_scene_enum": [
+        "learning",
+        "children",
+        "work"
+      ],
+      "output_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/mcp-tools-verified.json"
+    }
+  },
+  "rollback": {
+    "path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/rollback.sh",
+    "exit_status": 0,
+    "baseline_hashes_verified": true,
+    "literal_output_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/rollback-output.txt",
+    "restore_final_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/restore-final.sh",
+    "final_hashes_restored": true,
+    "restore_output_path": "/Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/restore-final-output.txt"
+  },
+  "note": "Tests modified during this task are included in the patch; their pre-change artifact was deterministically reconstructed after the initial source inspection."
+}

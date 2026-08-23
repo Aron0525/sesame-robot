@@ -1,0 +1,13 @@
+{"valid":true,"path":"/Users/mac/.openclaw/openclaw.json","warnings":[]}
+[restart] killing 1 stale gateway process(es) before restart: 55117
+{
+  "action": "restart",
+  "ok": true,
+  "result": "restarted",
+  "service": {
+    "label": "LaunchAgent",
+    "loaded": true,
+    "loadedText": "loaded",
+    "notLoadedText": "not loaded"
+  }
+}

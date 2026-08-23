@@ -1,0 +1,8 @@
+Would restore source files:
+  components/sesame_transport/device_config.cpp
+  components/sesame_transport/transport_policy.cpp
+  components/sesame_transport/include/sesame_transport/transport_policy.h
+  components/sesame_transport/gateway_client.cpp
+  components/sesame_transport/test/test_transport_policy.cpp
+Would run: idf.py build
+Would verify and flash the restored app at 0x10000 through USB-JTAG.

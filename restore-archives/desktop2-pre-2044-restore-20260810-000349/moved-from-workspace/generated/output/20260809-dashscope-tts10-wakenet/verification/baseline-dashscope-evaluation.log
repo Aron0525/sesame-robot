@@ -1,0 +1,96 @@
+/Users/mac/Desktop/test/zhima-wakeword/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+{
+  "model": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/original/current-deployed-wakenet.tflite",
+  "model_sha256": "79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065",
+  "threshold": 0.85,
+  "samples": [
+    {
+      "id": "dashscope_01_nihao_zhima",
+      "split": "train",
+      "rate": 0.82,
+      "duration_ms": 1242.75,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_02_nihao_zhima",
+      "split": "train",
+      "rate": 0.86,
+      "duration_ms": 1089.88,
+      "score": 0.0,
+      "trigger_at_0_85": false
+    },
+    {
+      "id": "dashscope_03_nihao_zhima",
+      "split": "train",
+      "rate": 0.9,
+      "duration_ms": 1128.12,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    },
+    {
+      "id": "dashscope_04_nihao_zhima",
+      "split": "train",
+      "rate": 0.94,
+      "duration_ms": 1005.0,
+      "score": 0.01171875,
+      "trigger_at_0_85": false
+    },
+    {
+      "id": "dashscope_05_nihao_zhima",
+      "split": "train",
+      "rate": 0.98,
+      "duration_ms": 1059.25,
+      "score": 0.01171875,
+      "trigger_at_0_85": false
+    },
+    {
+      "id": "dashscope_06_nihao_zhima",
+      "split": "train",
+      "rate": 1.02,
+      "duration_ms": 998.12,
+      "score": 0.0,
+      "trigger_at_0_85": false
+    },
+    {
+      "id": "dashscope_07_nihao_zhima",
+      "split": "train",
+      "rate": 1.06,
+      "duration_ms": 967.5,
+      "score": 0.0078125,
+      "trigger_at_0_85": false
+    },
+    {
+      "id": "dashscope_08_nihao_zhima",
+      "split": "train",
+      "rate": 1.1,
+      "duration_ms": 936.94,
+      "score": 0.0,
+      "trigger_at_0_85": false
+    },
+    {
+      "id": "dashscope_09_nihao_zhima",
+      "split": "holdout",
+      "rate": 1.14,
+      "duration_ms": 832.56,
+      "score": 0.0,
+      "trigger_at_0_85": false
+    },
+    {
+      "id": "dashscope_10_nihao_zhima",
+      "split": "holdout",
+      "rate": 1.18,
+      "duration_ms": 814.62,
+      "score": 0.99609375,
+      "trigger_at_0_85": true
+    }
+  ],
+  "holdout": {
+    "count": 2,
+    "triggers": 1,
+    "recall": 0.5,
+    "passed": false
+  }
+}

@@ -1,0 +1,18 @@
+Command: ninja all
+[1/9] Performing build step for 'bootloader'
+[1/1] cd "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/esp-idf/esptool_py" && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/bootloader.bin
+Bootloader binary size 0x5160 bytes. 0x2ea0 bytes (36%) free.
+[2/9] No install step for 'bootloader'
+[3/9] Completed 'bootloader'
+[4/9] Building CXX object esp-idf/sesame_voice/CMakeFiles/__idf_sesame_voice.dir/wake_vad_engine.cpp.obj
+[5/9] Linking C static library esp-idf/sesame_voice/libsesame_voice.a
+[6/9] Generating esp-idf/esp_system/ld/sections.ld
+[7/9] Linking CXX executable sesame_robot_v3.elf
+[8/9] Generating binary image from built executable
+esptool.py v4.12.0
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Generated /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/sesame_robot_v3.bin
+[9/9] cd "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/esp-idf/esptool_py" && /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/partition_table/partition-table.bin /Users/mac/Documents/sesame\ robot/firmware-work/Sesame_Robot_V3_IDF/build/sesame_robot_v3.bin
+sesame_robot_v3.bin binary size 0x199650 bytes. Smallest app partition is 0x300000 bytes. 0x1669b0 bytes (47%) free.

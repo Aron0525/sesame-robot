@@ -1,0 +1,66 @@
+R3/L4 反转与无偏置验证记录
+项目：/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目
+
+修改范围
+- ESP-IDF 中央输出映射：servo_calibration.h
+- ESP-IDF 断言测试：test_servo_calibration.cpp
+- Arduino 直写输出路径：Sesame_Robot_WiFi_Controller.ino
+
+行为
+- R3（通道 5）和 L4（通道 7）：输出 = 180 - 输入；0 -> 180，180 -> 0，90 -> 90。
+- 其余六路：输出 = 输入。
+- 角度偏置/trim/subtrim 关键模式扫描结果为空；0..180 的输入范围校验仍保留。
+
+TDD 基线命令与结果
+$ g++ -std=c++17 -I tdd-baseline/include firmware/esp32_voice_idf/tests/test_servo_calibration.cpp -o /tmp/test_servo_calibration_baseline
+EXIT_STATUS=1
+完整输出：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/tdd-baseline-failure.txt
+
+修改后单元测试
+$ g++ -std=c++17 -Icomponents/sesame_robot/include tests/test_servo_calibration.cpp -o /tmp/test_servo_calibration && /tmp/test_servo_calibration
+EXIT_STATUS=0
+输入：通道 0..7；角度 [0,45,90,135,180]；R3/L4 另有 0/180 端点断言。
+完整输出：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/host-test-and-offset-scan.txt
+
+ESP-IDF 构建
+$ source /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/export.sh && idf.py build
+输出：Generated /Users/mac/Desktop/1_副本/SesameV3_语音机器人项目/firmware/esp32_voice_idf/build/sesame_robot_v3.bin
+EXIT_STATUS=0
+完整输出：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/esp-idf-build.txt
+
+Arduino 构建
+$ arduino-cli compile --fqbn esp32:esp32:esp32s3 firmware/arduino/Sesame_Robot_WiFi_Controller
+输出：Sketch uses 1133888 bytes (86%) of program storage space. Maximum is 1310720 bytes.
+输出：Global variables use 50988 bytes (15%) of dynamic memory, leaving 276692 bytes for local variables. Maximum is 327680 bytes.
+EXIT_STATUS=0
+完整输出：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/arduino-build-retry.txt
+
+源码与补丁检查
+$ git -C PROJECT diff --check -- TARGET_FILES
+EXIT_STATUS=0
+$ rg -n -i 'servoSubtrim|adjustedAngle|legacy_motion_calibration|physical_angle_for_legacy_motion|angle\s*[+]-=|angle\s*[+-]\s*[0-9]+' firmware
+输出：无匹配
+EXIT_STATUS=0
+完整输出：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/final-source-validation.txt
+
+回滚
+$ /Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/rollback.sh '/Users/mac/Desktop/1_副本/SesameV3_语音机器人项目'
+已在独立 rollback-fixture 上完成：正向补丁、反向补丁和三文件逐字节 cmp 比对均为 EXIT_STATUS=0。
+完整输出：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/rollback-verification.txt
+
+映射探针
+$ g++ -std=c++17 -I firmware/esp32_voice_idf/components/sesame_robot/include mapping-probe.cpp -o mapping-probe && ./mapping-probe
+输出：R3 0 -> 180；L4 0 -> 180；R3/L4 90 -> 90；R3/L4 180 -> 0；R2 45 -> 45。
+EXIT_STATUS=0
+完整输出：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/mapping-probe.txt
+
+ESP32-S3 实机烧录与应用区校验
+端口：/dev/cu.usbmodem101
+芯片：ESP32-S3（MAC 28:84:85:a4:ef:1c）
+低速烧录命令：esptool.py --chip esp32s3 --port /dev/cu.usbmodem101 --baud 115200 --before default_reset --after hard_reset write_flash @flash_args
+应用镜像写入：0x10000，1772608 字节，写入进度 100%。
+应用区校验命令：esptool.py --no-stub --chip esp32s3 --port /dev/cu.usbmodem101 --baud 115200 verify_flash 0x10000 sesame_robot_v3.bin
+输出：-- verify OK (digest matched)
+EXIT_STATUS=0
+烧录日志：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/esp32s3-flash-115200.txt
+校验日志：/Users/mac/Documents/sesame robot/output/servo-r3-l4-inversion-20260805-192225/esp32s3-app-verify-no-stub.txt

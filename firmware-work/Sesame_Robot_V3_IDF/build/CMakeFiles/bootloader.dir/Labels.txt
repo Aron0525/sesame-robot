@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/CMakeFiles/bootloader
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/CMakeFiles/bootloader.rule
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/CMakeFiles/bootloader-complete.rule
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

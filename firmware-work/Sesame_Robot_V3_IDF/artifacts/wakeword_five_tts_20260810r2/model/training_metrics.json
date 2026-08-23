@@ -1,0 +1,315 @@
+{
+  "model_name": "zhima_wakeword_five_tts_int8",
+  "target_wake_word": "你好，芝麻",
+  "source": {
+    "selected_tts_voices": [
+      "Eddy",
+      "Flo",
+      "Tingting",
+      "Meijia",
+      "Sinji",
+      "Eddy"
+    ],
+    "train_records": 40,
+    "holdout_records": 40
+  },
+  "feature_contract": {
+    "sample_rate_hz": 16000,
+    "clip_samples": 16000,
+    "frame_size": 480,
+    "frame_count": 33,
+    "frequency_dft_bins": [
+      6,
+      10,
+      13,
+      17,
+      21,
+      24,
+      28,
+      32,
+      35,
+      39,
+      43,
+      46,
+      50,
+      54,
+      57,
+      61,
+      65,
+      69,
+      72,
+      76,
+      80,
+      83,
+      87,
+      91,
+      94,
+      98,
+      102,
+      105,
+      109,
+      113,
+      116,
+      120
+    ],
+    "normalization_mean": -18.19845199584961,
+    "normalization_std": 2.824858234954834,
+    "clip_range": [
+      -6.0,
+      6.0
+    ]
+  },
+  "training": {
+    "seed": 20260810,
+    "epochs_run": 26,
+    "train_examples": 1920,
+    "holdout_augmented_examples": 960
+  },
+  "tflite": {
+    "path": "/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/artifacts/wakeword_five_tts_20260810r2/model/zhima_wakeword_five_tts_int8.tflite",
+    "bytes": 22528,
+    "sha256": "21178c10e63dc6378a8a8446de372c6864c6925f95f943804fc1917beb93c1d8",
+    "input": {
+      "shape": [
+        1,
+        33,
+        32,
+        1
+      ],
+      "dtype": "<class 'numpy.int8'>",
+      "scale": 0.024203822016716003,
+      "zero_point": -91
+    },
+    "output": {
+      "shape": [
+        1,
+        2
+      ],
+      "dtype": "<class 'numpy.int8'>",
+      "operators": [
+        "CONV_2D",
+        "MAX_POOL_2D",
+        "CONV_2D",
+        "MAX_POOL_2D",
+        "RESHAPE",
+        "FULLY_CONNECTED",
+        "FULLY_CONNECTED",
+        "SOFTMAX",
+        "DELEGATE"
+      ]
+    }
+  },
+  "threshold": 0.5800000000000003,
+  "holdout": {
+    "threshold": 0.58,
+    "tp": 3,
+    "fn": 2,
+    "fp": 0,
+    "tn": 35,
+    "recall": 0.6,
+    "accepted": false,
+    "rows": [
+      {
+        "id": "eddy_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.5703125
+      },
+      {
+        "id": "eddy_holdout_你好_小智",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "eddy_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "eddy_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "eddy_holdout_今天天气很好",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "eddy_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "eddy_holdout_小智你好",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "eddy_holdout_你好_小明",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "flo_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.5703125
+      },
+      {
+        "id": "flo_holdout_你好_小智",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "flo_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "flo_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "flo_holdout_今天天气很好",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "flo_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "flo_holdout_小智你好",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "flo_holdout_你好_小明",
+        "label": 0,
+        "score": 0.5703125
+      },
+      {
+        "id": "tingting_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.99609375
+      },
+      {
+        "id": "tingting_holdout_你好_小智",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "tingting_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "tingting_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "tingting_holdout_今天天气很好",
+        "label": 0,
+        "score": 0.00390625
+      },
+      {
+        "id": "tingting_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "tingting_holdout_小智你好",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "tingting_holdout_你好_小明",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "meijia_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.99609375
+      },
+      {
+        "id": "meijia_holdout_你好_小智",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "meijia_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "meijia_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "meijia_holdout_今天天气很好",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "meijia_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "meijia_holdout_小智你好",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "meijia_holdout_你好_小明",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_holdout_你好_芝麻",
+        "label": 1,
+        "score": 0.98828125
+      },
+      {
+        "id": "sinji_holdout_你好_小智",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_holdout_你好_机器人",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_holdout_芝麻开门",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_holdout_今天天气很好",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_holdout_请播放音乐",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_holdout_小智你好",
+        "label": 0,
+        "score": 0.0
+      },
+      {
+        "id": "sinji_holdout_你好_小明",
+        "label": 0,
+        "score": 0.0078125
+      }
+    ]
+  },
+  "deployment_gate": false
+}

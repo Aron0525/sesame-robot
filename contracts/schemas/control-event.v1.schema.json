@@ -1,0 +1,947 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sesame.local/schemas/control-event.v1.schema.json",
+  "title": "Sesame Control Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "type",
+    "session_id",
+    "turn_id",
+    "request_id",
+    "sequence",
+    "timestamp_ms",
+    "payload"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "session.hello"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "session_id": {
+            "const": null
+          },
+          "turn_id": {
+            "const": null
+          },
+          "request_id": {
+            "const": null
+          },
+          "sequence": {
+            "const": 0
+          },
+          "payload": {
+            "$ref": "#/$defs/sessionHelloPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "session.ready"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/sessionReadyPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "listen.start"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/listenStartPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "listen.stop",
+              "interrupt"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/emptyPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "asr.partial",
+              "asr.final"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/asrPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "agent.reply"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/agentReplyPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "response.plan"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/responsePlanPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "turn.complete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/turnCompletePayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "tts.start",
+              "tts.flush",
+              "tts.pause",
+              "tts.resume"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/generationPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "tts.stop"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/ttsStopPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "expression.set"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/expressionPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "action.execute"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/actionExecutePayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "operator.control"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "turn_id": {
+            "const": null
+          },
+          "request_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "payload": {
+            "$ref": "#/$defs/operatorControlPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "action.result"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/actionResultPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "playback.stats"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/playbackStatsPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "error"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/errorPayload"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "v": {
+      "const": 1
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "session.hello",
+        "session.ready",
+        "listen.start",
+        "listen.stop",
+        "interrupt",
+        "asr.partial",
+        "asr.final",
+        "agent.reply",
+        "response.plan",
+        "turn.complete",
+        "tts.start",
+        "tts.stop",
+        "tts.flush",
+        "tts.pause",
+        "tts.resume",
+        "expression.set",
+        "action.execute",
+        "operator.control",
+        "action.result",
+        "playback.stats",
+        "error"
+      ]
+    },
+    "session_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+    },
+    "turn_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+    },
+    "request_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "timestamp_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "payload": {
+      "type": "object",
+      "maxProperties": 32
+    }
+  },
+  "$defs": {
+    "audioFormat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "codec",
+        "sample_rate",
+        "channels",
+        "frame_duration_ms"
+      ],
+      "properties": {
+        "codec": {
+          "const": "opus"
+        },
+        "sample_rate": {
+          "const": 16000
+        },
+        "channels": {
+          "const": 1
+        },
+        "frame_duration_ms": {
+          "const": 20
+        }
+      }
+    },
+    "sessionHelloPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "device_id",
+        "gateway_id",
+        "conversation_id",
+        "protocol_version",
+        "audio"
+      ],
+      "properties": {
+        "device_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[A-Za-z0-9]([A-Za-z0-9_-]{0,61}[A-Za-z0-9])?$"
+        },
+        "gateway_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "conversation_id": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "protocol_version": {
+          "const": 1
+        },
+        "audio": {
+          "$ref": "#/$defs/audioFormat"
+        }
+      }
+    },
+    "sessionReadyPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gateway_id",
+        "conversation_id",
+        "protocol_version",
+        "audio"
+      ],
+      "properties": {
+        "gateway_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "conversation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "protocol_version": {
+          "const": 1
+        },
+        "audio": {
+          "$ref": "#/$defs/audioFormat"
+        }
+      }
+    },
+    "emptyPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 0
+    },
+    "listenStartPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trigger"
+      ],
+      "properties": {
+        "trigger": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "wakeword",
+            "followup"
+          ]
+        }
+      }
+    },
+    "asrPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "agentReplyPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16000
+        }
+      }
+    },
+    "responsePlanPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generation_id",
+        "expression_id",
+        "expression_ttl_ms",
+        "action_id",
+        "action_request_id",
+        "action_duration_ms",
+        "action_deadline_ms"
+      ],
+      "properties": {
+        "generation_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "expression_id": {
+          "type": "string",
+          "enum": [
+            "default",
+            "idle",
+            "happy",
+            "sad",
+            "angry",
+            "surprised",
+            "sleepy",
+            "love",
+            "excited",
+            "confused",
+            "thinking"
+          ]
+        },
+        "expression_ttl_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 10000
+        },
+        "action_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "stop",
+            "wave",
+            "rest",
+            "stand",
+            null
+          ]
+        },
+        "action_request_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100
+        },
+        "action_duration_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 100,
+          "maximum": 5000
+        },
+        "action_deadline_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action_id": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "action_request_id": {
+                "type": "null"
+              },
+              "action_duration_ms": {
+                "type": "null"
+              },
+              "action_deadline_ms": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "action_request_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "action_duration_ms": {
+                "type": "integer"
+              },
+              "action_deadline_ms": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "generationPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generation_id"
+      ],
+      "properties": {
+        "generation_id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        }
+      }
+    },
+    "turnCompletePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "reason"
+      ],
+      "properties": {
+        "outcome": {
+          "const": "discard"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "asr_no_speech",
+            "blank",
+            "filler_only"
+          ]
+        }
+      }
+    },
+    "ttsStopPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generation_id",
+        "reason"
+      ],
+      "properties": {
+        "generation_id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "interrupted",
+            "failed"
+          ]
+        }
+      }
+    },
+    "expressionPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expression",
+        "ttl_ms"
+      ],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "enum": [
+            "default",
+            "idle",
+            "happy",
+            "sad",
+            "angry",
+            "surprised",
+            "sleepy",
+            "love",
+            "excited",
+            "confused",
+            "thinking"
+          ]
+        },
+        "ttl_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 10000
+        }
+      }
+    },
+    "actionExecutePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "duration_ms",
+        "deadline_ms"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "stop",
+            "wave",
+            "rest",
+            "stand"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 5000
+        },
+        "deadline_ms": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "operatorControlPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "action",
+            "expression",
+            "servo",
+            "settings",
+            "wakeword_settings",
+            "stop"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "expression": {
+          "type": "string",
+          "maxLength": 24
+        },
+        "servo": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "angle": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 180
+        },
+        "frame_delay_ms": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 1000
+        },
+        "walk_cycles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "motor_current_delay_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
+        },
+        "wake_threshold_hundredths": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 95
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "action"}}},
+          "then": {"required": ["action"]}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "expression"}}},
+          "then": {"required": ["expression"]}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "servo"}}},
+          "then": {"required": ["servo", "angle"]}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "settings"}}},
+          "then": {
+            "required": [
+              "frame_delay_ms",
+              "walk_cycles",
+              "motor_current_delay_ms"
+            ]
+          }
+        },
+        {
+          "if": {"properties": {"kind": {"const": "wakeword_settings"}}},
+          "then": {"required": ["wake_threshold_hundredths"]}
+        }
+      ]
+    },
+    "actionResultPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "error_code"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "accepted",
+            "running",
+            "completed",
+            "rejected",
+            "interrupted",
+            "failed",
+            "expired"
+          ]
+        },
+        "error_code": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100
+        }
+      }
+    },
+    "playbackStatsPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generation_id",
+        "buffered_packets",
+        "buffered_ms",
+        "startup_packets",
+        "low_watermark_packets",
+        "high_watermark_packets",
+        "min_buffered_packets",
+        "max_buffered_packets",
+        "underflow_count",
+        "dropped_packet_count",
+        "stale_generation_count",
+        "out_of_order_count",
+        "sequence_discontinuity_count",
+        "playback_started",
+        "paused",
+        "decode_last_us",
+        "decode_max_us",
+        "decode_avg_us",
+        "i2s_last_us",
+        "i2s_max_us",
+        "i2s_avg_us",
+        "rendered_frames",
+        "playback_complete"
+      ],
+      "properties": {
+        "generation_id": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+        "buffered_packets": {"type": "integer", "minimum": 0, "maximum": 60},
+        "buffered_ms": {"type": "integer", "minimum": 0, "maximum": 1200},
+        "startup_packets": {"type": "integer", "minimum": 1, "maximum": 60},
+        "low_watermark_packets": {"type": "integer", "minimum": 1, "maximum": 60},
+        "high_watermark_packets": {"type": "integer", "minimum": 1, "maximum": 60},
+        "min_buffered_packets": {"type": "integer", "minimum": 0, "maximum": 60},
+        "max_buffered_packets": {"type": "integer", "minimum": 0, "maximum": 60},
+        "underflow_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "dropped_packet_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "stale_generation_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "out_of_order_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "sequence_discontinuity_count": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "playback_started": {"type": "boolean"},
+        "paused": {"type": "boolean"},
+        "decode_last_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "decode_max_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "decode_avg_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "i2s_last_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "i2s_max_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "i2s_avg_us": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "rendered_frames": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "playback_complete": {"type": "boolean"}
+      }
+    },
+    "errorPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/components/sesame_transport/test/test_transport_policy.cpp:29:10: error: use of undeclared identifier 'format_discovered_gateway_uri'
+   29 |   assert(format_discovered_gateway_uri("sesame-gateway", 8765,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.

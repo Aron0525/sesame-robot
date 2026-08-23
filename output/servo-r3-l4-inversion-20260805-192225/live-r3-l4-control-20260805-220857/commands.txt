@@ -1,0 +1,6 @@
+> {"kind":"servo","servo":6,"angle":45}
+{"status":"accepted","device_id":"dev_001","kind":"servo"}
+> {"kind":"servo","servo":8,"angle":135}
+{"status":"accepted","device_id":"dev_001","kind":"servo"}
+> {"kind":"stop"}
+{"status":"accepted","device_id":"dev_001","kind":"stop"}

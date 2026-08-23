@@ -1,0 +1,257 @@
+- generic [active] [ref=e1]:
+  - navigation "课程导航" [ref=e2]:
+    - generic [ref=e3]:
+      - link "GATEWAY×5" [ref=e4] [cursor=pointer]:
+        - /url: 0001-gateway-foundations.html
+      - generic [ref=e5]:
+        - link "01" [ref=e6] [cursor=pointer]:
+          - /url: 0001-gateway-foundations.html
+        - link "02" [ref=e7] [cursor=pointer]:
+          - /url: 0002-proxies-routing-and-load-balancing.html
+        - link "03" [ref=e8] [cursor=pointer]:
+          - /url: 0003-api-gateway-policies-and-resilience.html
+        - link "04" [ref=e9] [cursor=pointer]:
+          - /url: 0004-cloud-kubernetes-and-service-mesh.html
+        - link "05" [ref=e10] [cursor=pointer]:
+          - /url: 0005-ai-gateway-design-and-troubleshooting.html
+  - main [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: 第一课 · 心智模型
+        - heading "网关的本质与网络基础" [level=1] [ref=e15]
+        - paragraph [ref=e16]: 先不背产品名。我们从“边界、代理、策略”三个词出发，把家庭路由器、Nginx、API Gateway 和 AI Gateway 放进同一个模型。
+        - generic [ref=e17]:
+          - generic [ref=e18]: 约 25 分钟
+          - generic [ref=e19]: 15 个概念
+          - generic [ref=e20]: 4 个练习
+      - text: "1"
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: 01—A
+        - generic [ref=e24]:
+          - heading "一个能覆盖所有网关的定义" [level=2] [ref=e25]
+          - paragraph [ref=e26]: 先抓住不随产品变化的本质，再理解不同形态。
+      - generic [ref=e27]:
+        - heading "本课总纲" [level=3] [ref=e28]
+        - paragraph [ref=e29]: 网关是位于两个通信域边界上的中介节点。它代表一侧接收通信，按照统一策略决定拒绝、转换、路由或转发，再把通信交给另一侧。
+      - generic [ref=e30]:
+        - article [ref=e31]:
+          - generic [ref=e32]: Concept 01
+          - heading "通信域（Communication Domain）" [level=3] [ref=e33]
+          - paragraph [ref=e34]: 一组遵守相近规则、能直接通信的参与者。公网与公司内网是两个通信域；用户应用与模型供应商也可以看成两个通信域。
+          - generic [ref=e35]:
+            - strong [ref=e36]: 通俗解释
+            - text: 像两栋门禁规则不同的办公楼。楼内可以自由走动，跨楼则必须经过门口。
+        - article [ref=e37]:
+          - generic [ref=e38]: Concept 02
+          - heading "边界（Boundary）" [level=3] [ref=e39]
+          - paragraph [ref=e40]: 两个通信域相接的位置。边界意味着信任、协议、地址或管理责任发生变化。
+          - generic [ref=e41]:
+            - strong [ref=e42]: 案例
+            - text: 浏览器属于不可信公网，订单服务属于私有网络；公网入口就是安全边界。
+        - article [ref=e43]:
+          - generic [ref=e44]: Concept 03
+          - heading "代理（Proxy）" [level=3] [ref=e45]
+          - paragraph [ref=e46]: 调用者不直接接触真实处理者，而由中间节点代表一方完成通信。网关通常具有代理性质。
+          - generic [ref=e47]:
+            - strong [ref=e48]: 通俗解释
+            - text: 你不直接进入仓库取货，而是把取货单交给窗口，窗口人员替你到仓库办理。
+        - article [ref=e49]:
+          - generic [ref=e50]: Concept 04
+          - heading "策略（Policy）" [level=3] [ref=e51]
+          - paragraph [ref=e52]: 网关处理通信时执行的规则，例如谁能进、每分钟能进几次、请求应送到哪里。
+          - generic [ref=e53]:
+            - strong [ref=e54]: 案例
+            - text: “普通用户每分钟最多调用聊天接口 20 次”就是一条网关策略。
+        - article [ref=e55]:
+          - generic [ref=e56]: Concept 05
+          - heading "网关是一种角色，不是一种固定产品" [level=3] [ref=e57]
+          - paragraph [ref=e58]: 路由器、Nginx、Envoy、Kong、AWS API Gateway 都可能扮演网关。判断依据不是软件名，而是它在当前架构中是否位于边界、代理通信并执行统一策略。
+          - generic [ref=e59]:
+            - strong [ref=e60]: 案例
+            - text: 同一台 Nginx 在博客系统里可能只是静态 Web Server；在微服务前面接收全部 API 请求时，它就在扮演网关。
+    - generic [ref=e61]:
+      - generic [ref=e62]:
+        - generic [ref=e63]: 01—B
+        - generic [ref=e64]:
+          - heading "描述流量时必须掌握的语言" [level=2] [ref=e65]
+          - paragraph [ref=e66]: 这些词会贯穿后面四课。
+      - generic [ref=e67]:
+        - article [ref=e68]:
+          - generic [ref=e69]: Concept 06
+          - heading "下游（Downstream）与上游（Upstream）" [level=3] [ref=e70]
+          - paragraph [ref=e71]: 连接到网关、发起请求的一侧叫下游；接收网关转发请求的一侧叫上游。它们是相对于当前代理而言的。
+          - generic [ref=e72]:
+            - strong [ref=e73]: 案例
+            - text: 浏览器 → Nginx → FastAPI。对 Nginx 而言，浏览器是下游，FastAPI 是上游。
+        - article [ref=e74]:
+          - generic [ref=e75]: Concept 07
+          - heading "入口（Ingress）与出口（Egress）" [level=3] [ref=e76]
+          - paragraph [ref=e77]: Ingress 表示流量进入一个受管理区域；Egress 表示流量离开该区域。它们描述方向，不必然指某个产品。
+          - generic [ref=e78]:
+            - strong [ref=e79]: 案例
+            - text: 用户访问集群是 Ingress；Agent 从集群调用外部搜索 API 是 Egress。
+        - article [ref=e80]:
+          - generic [ref=e81]: Concept 08
+          - heading "数据包、连接与请求" [level=3] [ref=e82]
+          - paragraph [ref=e83]: 数据包是网络层传输单元；TCP 连接是一段可靠通信通道；HTTP 请求是在连接上承载的应用消息。不同网关处理的对象不同。
+          - generic [ref=e84]:
+            - strong [ref=e85]: 通俗解释
+            - text: 数据包像一辆辆货车，连接像固定运输线路，请求像一张完整订单。
+        - article [ref=e86]:
+          - generic [ref=e87]: Concept 09
+          - heading "端点（Endpoint）" [level=3] [ref=e88]
+          - paragraph [ref=e89]: 可以被访问的具体网络位置，通常由 IP、端口或 URL 表示。一个服务可能有多个实例，也就有多个端点。
+          - generic [ref=e90]:
+            - strong [ref=e91]: 案例
+            - text: 订单服务有三个实例：
+            - code [ref=e92]: 10.0.1.8:8000
+            - text: 、
+            - code [ref=e93]: 10.0.1.9:8000
+            - text: 、
+            - code [ref=e94]: 10.0.1.10:8000
+            - text: 。
+      - generic [ref=e95]: 下游客户端 网关 上游服务 Browser ── HTTP Request ──▶ Listener ── Route ──▶ Endpoint 进入（Ingress） 真实处理者
+    - generic [ref=e96]:
+      - generic [ref=e97]:
+        - generic [ref=e98]: 01—C
+        - generic [ref=e99]:
+          - heading "L3、L4、L7：网关到底看得多深" [level=2] [ref=e100]
+          - paragraph [ref=e101]: 层次决定网关可以根据什么信息做决策。
+      - table [ref=e102]:
+        - rowgroup [ref=e103]:
+          - row [ref=e104]:
+            - columnheader "层次" [ref=e105]
+            - columnheader "网关能看见" [ref=e106]
+            - columnheader "典型决策" [ref=e107]
+            - columnheader "案例" [ref=e108]
+        - rowgroup [ref=e109]:
+          - row [ref=e110]:
+            - cell "L3 网络层" [ref=e111]
+            - cell "源/目标 IP、数据包" [ref=e112]
+            - cell "下一跳路由" [ref=e113]
+            - cell "把去公网的数据包交给家庭路由器" [ref=e114]
+          - row [ref=e115]:
+            - cell "L4 传输层" [ref=e116]
+            - cell "TCP/UDP、IP、端口、连接" [ref=e117]
+            - cell "连接分发" [ref=e118]
+            - cell "把 443 端口的新连接分给一台服务器" [ref=e119]
+          - row [ref=e120]:
+            - cell "L7 应用层" [ref=e121]
+            - cell "HTTP 路径、方法、Header、身份" [ref=e122]
+            - cell "API 路由与治理" [ref=e123]
+            - cell [ref=e124]:
+              - code [ref=e125]: /orders
+              - text: 去订单服务，
+              - code [ref=e126]: /chat
+              - text: 去 Agent 服务
+      - generic [ref=e127]:
+        - article [ref=e128]:
+          - generic [ref=e129]: Concept 10
+          - heading "网络层网关（L3 Gateway）" [level=3] [ref=e130]
+          - paragraph [ref=e131]: 根据 IP 路由表决定数据包的下一跳，不理解订单、用户或 HTTP 路径。
+          - generic [ref=e132]:
+            - strong [ref=e133]: 案例
+            - text: 电脑发现目标 IP 不在本地网段，于是把数据包发给默认网关
+            - code [ref=e134]: 192.168.1.1
+            - text: 。
+        - article [ref=e135]:
+          - generic [ref=e136]: Concept 11
+          - heading "传输层网关或四层代理" [level=3] [ref=e137]
+          - paragraph [ref=e138]: 根据 IP、端口和连接状态转发 TCP/UDP 流量，性能高，但通常不知道 HTTP 路径。
+          - generic [ref=e139]:
+            - strong [ref=e140]: 案例
+            - text: 云负载均衡器把所有到 443 端口的 TCP 连接分给四台 Nginx。
+        - article [ref=e141]:
+          - generic [ref=e142]: Concept 12
+          - heading "应用层网关（L7 Gateway）" [level=3] [ref=e143]
+          - paragraph [ref=e144]: 理解 HTTP、gRPC、WebSocket 等应用协议，因此能依据路径、方法、Header、Cookie、用户身份和消息内容做决策。
+          - generic [ref=e145]:
+            - strong [ref=e146]: 案例
+            - code [ref=e147]: GET /products
+            - text: 可公开访问；
+            - code [ref=e148]: POST /admin/products
+            - text: 必须是管理员，并且每分钟最多 30 次。
+    - generic [ref=e149]:
+      - generic [ref=e150]:
+        - generic [ref=e151]: 01—D
+        - generic [ref=e152]:
+          - heading "默认网关、路由器、NAT 与防火墙" [level=2] [ref=e153]
+          - paragraph [ref=e154]: 这些词经常与“网关”一起出现，但并不等同。
+      - generic [ref=e155]:
+        - article [ref=e156]:
+          - generic [ref=e157]: Concept 13
+          - heading "默认网关（Default Gateway）" [level=3] [ref=e158]
+          - paragraph [ref=e159]: 主机找不到更具体路由时，把数据包交给的默认下一跳。
+          - generic [ref=e160]:
+            - strong [ref=e161]: 通俗解释
+            - text: 你不知道某个快递的专用通道时，就统一先交给小区大门的快递站。
+        - article [ref=e162]:
+          - generic [ref=e163]: Concept 14
+          - heading "路由与下一跳（Route / Next Hop）" [level=3] [ref=e164]
+          - paragraph [ref=e165]: 路由表把目标网段映射到下一跳或网络接口。网关通常根据路由表转发，但“路由器”强调转发网络包，“网关”强调跨边界角色。
+          - generic [ref=e166]:
+            - strong [ref=e167]: 案例
+            - code [ref=e168]: 10.0.0.0/8
+            - text: 走公司 VPN；其他目标走家庭默认网关。
+        - article [ref=e169]:
+          - generic [ref=e170]: Concept 15
+          - heading "NAT（网络地址转换）" [level=3] [ref=e171]
+          - paragraph [ref=e172]: 把内部私有地址转换成公网地址。家庭路由器常同时提供默认网关、NAT、防火墙和 Wi-Fi，所以这些概念容易被混为一谈。
+          - generic [ref=e173]:
+            - strong [ref=e174]: 案例
+            - text: 家中三台设备使用不同私有 IP，却通过路由器的同一个公网 IP 访问互联网。
+        - article [ref=e175]:
+          - generic [ref=e176]: Adjacent Concept
+          - heading "防火墙与 DNS 不是网关的同义词" [level=3] [ref=e177]
+          - paragraph [ref=e178]: 防火墙的核心是允许或阻止流量；DNS 的核心是名称解析。它们可以与网关集成，但职责不同。
+          - generic [ref=e179]:
+            - strong [ref=e180]: 案例
+            - text: DNS 把
+            - code [ref=e181]: api.example.com
+            - text: 解析到网关 IP；防火墙只允许 443；网关再把请求路由到订单服务。
+    - generic [ref=e182]:
+      - generic [ref=e183]:
+        - generic [ref=e184]: 01—E
+        - generic [ref=e185]:
+          - heading "识别任何网关的四步法" [level=2] [ref=e186]
+          - paragraph [ref=e187]: 以后看到陌生产品，不要先看功能表，先问下面四个问题。
+      - list [ref=e188]:
+        - listitem [ref=e189]: □ 它位于哪两个通信域之间？
+        - listitem [ref=e190]: □ 它代表哪一侧接收或发起通信？
+        - listitem [ref=e191]: □ 它处理的是数据包、连接，还是应用请求？
+        - listitem [ref=e192]: □ 它执行哪些公共策略，又有哪些业务规则不应放进去？
+      - generic [ref=e193]:
+        - strong [ref=e194]: 综合案例
+        - text: “Agent 应用通过一个组件调用 OpenAI 和本地模型。”边界是应用与模型供应商；组件代表应用发起请求；处理对象是 L7 模型 API；公共策略包括密钥隔离、模型路由和成本统计——因此它是 AI Gateway。
+    - generic [ref=e195]:
+      - generic [ref=e196]:
+        - generic [ref=e197]: 01—F
+        - generic [ref=e198]:
+          - heading "检索练习" [level=2] [ref=e199]
+          - paragraph [ref=e200]: 先自己回答，再展开答案。主动回忆比重复阅读更容易形成长期记忆。
+      - generic [ref=e201]:
+        - group [ref=e202]:
+          - generic "1. DNS 把域名解析成 IP，所以 DNS 就是网关吗？" [ref=e203] [cursor=pointer]
+        - group [ref=e204]:
+          - generic "2. 为什么说“网关是一种角色”比“网关是一种软件”更准确？" [ref=e205] [cursor=pointer]
+        - group [ref=e206]:
+          - generic [ref=e207] [cursor=pointer]:
+            - text: 3. L4 网关为什么不能按
+            - code [ref=e208]: /orders
+            - text: 和
+            - code [ref=e209]: /chat
+            - text: 分流？
+        - group [ref=e210]:
+          - generic "4. 浏览器 → Nginx → FastAPI 中，谁是上游？" [ref=e211] [cursor=pointer]
+    - complementary [ref=e212]:
+      - heading "本课主参考" [level=2] [ref=e213]
+      - paragraph [ref=e214]:
+        - link "Envoy Terminology" [ref=e215] [cursor=pointer]:
+          - /url: https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/intro/terminology
+        - text: ：下游、上游、Listener、Cluster 等代理术语。建议先记住概念关系，不必现在学习 Envoy 配置。
+    - navigation "前后课程" [ref=e216]:
+      - link "下一课 02 代理、TLS 与负载均衡 →" [ref=e217] [cursor=pointer]:
+        - /url: 0002-proxies-routing-and-load-balancing.html
+        - generic [ref=e218]: 下一课 02
+        - strong [ref=e219]: 代理、TLS 与负载均衡 →

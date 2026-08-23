@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="网关五课教材第五课：AI Gateway、模型路由、成本安全、架构选型、高可用、HTTP 状态码与故障排查。">
+  <title>第五课｜AI Gateway、选型与排障</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="5">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>×5</span></a>
+      <div class="lesson-tabs">
+        <a href="0001-gateway-foundations.html" title="第一课">01</a>
+        <a href="0002-proxies-routing-and-load-balancing.html" title="第二课">02</a>
+        <a href="0003-api-gateway-policies-and-resilience.html" title="第三课">03</a>
+        <a href="0004-cloud-kubernetes-and-service-mesh.html" title="第四课">04</a>
+        <a href="0005-ai-gateway-design-and-troubleshooting.html" aria-current="page" title="第五课">05</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="5">
+      <div>
+        <p class="kicker">第五课 · 工程落地</p>
+        <h1>AI Gateway、选型与排障</h1>
+        <p class="lead">最后把全部概念落到 LLM/Agent 系统：怎样治理模型调用、怎样决定是否需要网关、怎样让网关自己不成为最脆弱的一环。</p>
+        <div class="lesson-meta"><span>约 50 分钟</span><span>35 个概念</span><span>综合设计题</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="ai-boundary">
+      <div class="chapter-head">
+        <span class="chapter-no">05—A</span>
+        <div><h2>AI Gateway 的边界</h2><p>它不是把普通 API Gateway 改个名字，而是治理一类成本高、延迟长、供应商差异大的调用。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 01</span>
+          <h3>AI Gateway</h3>
+          <p>位于应用和模型供应商之间，统一处理模型接入、路由、凭据、成本、观测和安全政策。</p>
+          <div class="case"><strong>案例</strong>LangGraph Agent 只调用公司 AI Gateway，不直接保存 OpenAI、Anthropic 和本地模型的密钥。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 02</span>
+          <h3>Provider Adapter（供应商适配器）</h3>
+          <p>把不同供应商的请求、响应、错误和流式格式归一化。</p>
+          <div class="case"><strong>案例</strong>应用统一发送 messages，适配器分别转换成不同厂商的 API 格式。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 03</span>
+          <h3>Model Catalog（模型目录）</h3>
+          <p>记录可用模型、能力、上下文长度、价格、区域、合规属性和当前状态。</p>
+          <div class="case"><strong>案例</strong>“代码生成”任务只能选择支持工具调用且已批准处理公司代码的模型。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 04</span>
+          <h3>Model Routing（模型路由）</h3>
+          <p>根据任务、成本、延迟、能力、数据敏感度或租户政策选择模型。</p>
+          <div class="case"><strong>案例</strong>简单分类走低成本模型，复杂规划走强模型，敏感数据走本地部署模型。</div>
+        </article>
+      </div>
+      <div class="diagram">用户
+  │
+API Gateway：用户身份、API 路由、请求限流
+  ▼
+Agent / LLM Application：工作流、工具、业务规则
+  │
+AI Gateway：模型路由、密钥、成本、模型观测
+  ▼
+OpenAI / Anthropic / Azure / 本地模型</div>
+      <div class="boundary"><strong>职责边界</strong>API Gateway 管“用户怎样访问应用”；Agent 管“任务怎样完成”；AI Gateway 管“应用怎样调用模型”。</div>
+    </section>
+
+    <section class="chapter" id="ai-routing">
+      <div class="chapter-head">
+        <span class="chapter-no">05—B</span>
+        <div><h2>模型路由与故障处理</h2><p>模型不是完全可互换的数据库副本，切换前必须检查能力和语义。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 05</span>
+          <h3>Static Routing（静态路由）</h3>
+          <p>由应用明确指定模型或模型别名，行为可预测。</p>
+          <div class="case"><strong>案例</strong><code>model=reasoning-large</code> 固定映射到经过评测的生产模型版本。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 06</span>
+          <h3>Policy-based Routing（策略路由）</h3>
+          <p>根据租户、任务标签、区域和数据分类执行规则。</p>
+          <div class="case"><strong>案例</strong>欧盟租户只能路由到允许的数据驻留区域。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 07</span>
+          <h3>Capability Routing（能力路由）</h3>
+          <p>根据视觉、工具调用、结构化输出、上下文长度等能力选择模型。</p>
+          <div class="case"><strong>案例</strong>上传图片的请求只在支持视觉输入的模型集合中选择。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 08</span>
+          <h3>Fallback Chain（备用链）</h3>
+          <p>主模型失败时按预设顺序切换兼容模型。必须评估输出契约、工具格式和安全政策是否一致。</p>
+          <div class="danger"><strong>反例</strong>主模型支持严格 JSON Schema，备用模型不支持，却直接切换，导致下游解析崩溃。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 09</span>
+          <h3>Hedged Request（对冲请求）</h3>
+          <p>主请求迟迟未返回时，向备用目标发第二份请求，采用先成功者。降低尾延迟但增加成本。</p>
+          <div class="case"><strong>案例</strong>超过 P95 首 token 延迟后才启动备用模型，而不是每次都双发。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 10</span>
+          <h3>Model Version Pinning（模型版本固定）</h3>
+          <p>固定经过验证的模型版本，避免供应商“同名模型”更新导致行为漂移。</p>
+          <div class="case"><strong>案例</strong>生产路由使用明确版本；新版本先跑回归评测再切换别名。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="cost-quota">
+      <div class="chapter-head">
+        <span class="chapter-no">05—C</span>
+        <div><h2>token、成本与租户治理</h2><p>普通 API 常按请求计数；模型调用还要考虑输入、输出、缓存和工具调用成本。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 11</span>
+          <h3>Token Metering（token 计量）</h3>
+          <p>记录输入、输出、缓存命中和推理 token，映射到模型价格。</p>
+          <div class="case"><strong>案例</strong>一次请求只有 1 次 HTTP 调用，却消耗 80,000 输入 token，不能只按 QPS 管理。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 12</span>
+          <h3>Budget（预算）</h3>
+          <p>为用户、团队、租户、Agent 或环境设置成本上限和告警。</p>
+          <div class="case"><strong>案例</strong>测试环境每日模型预算 50 美元，达到 80% 告警，达到 100% 后仅允许低成本模型。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 13</span>
+          <h3>Per-tenant Quota（租户配额）</h3>
+          <p>不同客户使用独立配额和限流键，避免大客户耗尽共享容量。</p>
+          <div class="case"><strong>案例</strong>企业版租户有更高 token/minute，免费租户有更低上限。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 14</span>
+          <h3>Chargeback / Showback（成本归属）</h3>
+          <p>把模型费用分摊或展示给业务团队，推动真实成本责任。</p>
+          <div class="case"><strong>案例</strong>仪表盘显示客服 Agent、研发助手和数据分析 Agent 各自月度花费。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="ai-cache">
+      <div class="chapter-head">
+        <span class="chapter-no">05—D</span>
+        <div><h2>缓存、流式传输与重试</h2><p>模型输出不是普通静态 JSON，优化错误会改变语义或重复副作用。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 15</span>
+          <h3>Exact Cache（精确缓存）</h3>
+          <p>输入和关键参数完全一致时复用结果，容易理解但命中率有限。</p>
+          <div class="case"><strong>案例</strong>系统 Prompt、用户输入、模型版本和温度全部相同才命中。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 16</span>
+          <h3>Semantic Cache（语义缓存）</h3>
+          <p>问题含义足够相似时复用已有答案。命中率更高，但有陈旧、权限和误匹配风险。</p>
+          <div class="danger"><strong>反例</strong>“我的订单在哪里”语义相似，但不同用户的答案绝不能共享。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 17</span>
+          <h3>Streaming（流式响应）</h3>
+          <p>模型逐步返回 token。需要监控首 token 延迟、流中断、客户端取消和空闲超时。</p>
+          <div class="case"><strong>案例</strong>用户关闭页面后，网关把取消信号传给模型，避免继续产生无用成本。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 18</span>
+          <h3>Retry After Partial Output（部分输出后的重试）</h3>
+          <p>已向用户发送一部分内容后，透明切换模型很难保证文本连续，也可能重复工具调用。</p>
+          <div class="boundary"><strong>实践</strong>流开始前可安全切换；流开始后应显式终止、由应用决定续写或重启，而不是网关悄悄拼接。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="ai-security">
+      <div class="chapter-head">
+        <span class="chapter-no">05—E</span>
+        <div><h2>AI 安全与隐私边界</h2><p>网关能执行公共防线，但不能独自解决 Agent 的全部安全问题。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 19</span>
+          <h3>Secret Management（密钥管理）</h3>
+          <p>供应商密钥保存在安全存储，由网关按目标注入；应用只获得调用权限，不直接获得密钥。</p>
+          <div class="case"><strong>案例</strong>开发者可以调用 <code>model-prod</code>，但无法读取底层供应商 API Key。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 20</span>
+          <h3>PII Detection & Redaction（个人信息识别与脱敏）</h3>
+          <p>在发送模型前识别手机号、身份证等敏感信息，并根据政策阻断、替换或标记。</p>
+          <div class="case"><strong>案例</strong>日志把手机号保存为 <code>138****5678</code>，模型请求则根据业务授权决定是否保留。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 21</span>
+          <h3>Data Residency & Retention（数据驻留与保留）</h3>
+          <p>控制数据在哪个区域处理、供应商是否保留，以及网关日志保存多久。</p>
+          <div class="case"><strong>案例</strong>医疗租户的数据只能发往批准区域，Prompt 原文不写入普通访问日志。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 22</span>
+          <h3>Content Safety（内容安全）</h3>
+          <p>对输入或输出执行分类、阻断、标注或人工复核。政策应区分场景，避免一个阈值覆盖所有业务。</p>
+          <div class="case"><strong>案例</strong>儿童产品采用更严格输出政策；内部安全研究工具采用另一套审批流程。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 23</span>
+          <h3>Prompt Injection（提示注入）</h3>
+          <p>不可信内容诱导模型偏离指令或泄露数据。网关可扫描和标记，但真正防护依赖工具权限、数据隔离和人工确认。</p>
+          <div class="danger"><strong>关键边界</strong>不能指望一条网关正则表达式彻底解决 Prompt Injection。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 24</span>
+          <h3>Tool-call Policy（工具调用政策）</h3>
+          <p>Agent 调用支付、邮件、文件等工具前需要参数校验、最小权限和高风险确认。</p>
+          <div class="case"><strong>案例</strong>模型提出“删除全部文件”，应用策略层要求明确目录范围和人工批准；AI Gateway 只负责记录模型调用。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="ai-observability">
+      <div class="chapter-head">
+        <span class="chapter-no">05—F</span>
+        <div><h2>模型调用的专属可观测指标</h2><p>普通 HTTP 延迟不够解释用户为何觉得“AI 很慢”。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 25</span>
+          <h3>TTFT（Time to First Token，首 token 延迟）</h3>
+          <p>从发出请求到用户看到第一个 token 的时间，直接影响“开始响应快不快”。</p>
+          <div class="case"><strong>案例</strong>总耗时 20 秒，但 800 ms 就开始流式输出，体感可能比 8 秒后一次返回更好。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 26</span>
+          <h3>Tokens per Second（每秒 token）</h3>
+          <p>流开始后的生成速度，反映“说得快不快”。</p>
+          <div class="case"><strong>案例</strong>TTFT 正常但生成速度从 60 token/s 降到 8 token/s，可能是模型容量问题。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 27</span>
+          <h3>Model Error Taxonomy（模型错误分类）</h3>
+          <p>区分限流、内容拒绝、上下文过长、供应商故障、无效工具调用和解析失败。</p>
+          <div class="case"><strong>案例</strong>“模型拒答”不是 500；“上下文过长”也不应盲目重试同一请求。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 28</span>
+          <h3>Quality Signal（质量信号）</h3>
+          <p>延迟和成功码无法说明答案是否正确，需要离线评测、用户反馈和任务成功率。</p>
+          <div class="case"><strong>案例</strong>廉价模型 HTTP 成功率 100%，但工具参数正确率只有 72%，不适合作为生产回退。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="selection">
+      <div class="chapter-head">
+        <span class="chapter-no">05—G</span>
+        <div><h2>是否需要独立网关：选型方法</h2><p>不要从产品列表开始，要从问题和成本开始。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>阶段</th><th>建议</th><th>案例</th></tr></thead>
+        <tbody>
+          <tr><td>一个前端 + 一个单体</td><td>Caddy/Nginx + 应用中间件</td><td>小型 FastAPI MVP</td></tr>
+          <tr><td>多个服务 + 统一入口政策</td><td>轻量 API Gateway 或云托管网关</td><td>用户、订单、Agent 服务分离</td></tr>
+          <tr><td>合作伙伴 API + 配额计费</td><td>完整 API Management</td><td>开发者门户、API Key、套餐与审计</td></tr>
+          <tr><td>Kubernetes 多团队</td><td>Gateway API 实现或成熟 Ingress</td><td>平台团队管入口，应用团队管 Route</td></tr>
+          <tr><td>大量内部服务需 mTLS</td><td>评估 Service Mesh</td><td>数十服务跨团队调用</td></tr>
+          <tr><td>多个模型供应商与成本政策</td><td>AI Gateway</td><td>Agent 平台统一模型路由和密钥</td></tr>
+        </tbody>
+      </table>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Decision 01</span>
+          <h3>自建还是托管</h3>
+          <p>托管服务减少运维但有成本和平台约束；自建更灵活但必须承担升级、高可用和安全响应。</p>
+          <div class="case"><strong>案例</strong>小团队优先云托管；需要私有部署和深度插件的企业可能选择 APISIX、Kong 或 Envoy 体系。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Decision 02</span>
+          <h3>配置式还是代码式</h3>
+          <p>路由、证书和公共政策适合声明配置；复杂前端聚合和业务流程适合代码服务。</p>
+          <div class="case"><strong>案例</strong>路径重写写配置；订单详情多服务聚合写 BFF 代码并测试。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Decision 03</span>
+          <h3>集中式还是联邦式</h3>
+          <p>集中平台统一政策；联邦模式允许团队管理自己的 Route 与服务，同时由平台控制共享边界。</p>
+          <div class="case"><strong>案例</strong>平台团队提供 GatewayClass 和安全基线，业务团队提交自己的 HTTPRoute。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Decision 04</span>
+          <h3>不要重复建设</h3>
+          <p>CDN、云负载均衡、Ingress、API Gateway 和 Service Mesh 可能功能重叠。每条政策要指定唯一权威执行层。</p>
+          <div class="danger"><strong>反例</strong>客户端、CDN、网关和服务各重试 3 次，一次失败最终可能放大成 81 次调用。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="ha">
+      <div class="chapter-head">
+        <span class="chapter-no">05—H</span>
+        <div><h2>网关自身怎样高可用</h2><p>统一入口也是集中风险，必须按关键基础设施设计。</p></div>
+      </div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Concept 29</span>
+          <h3>Stateless Data Plane（无状态数据面）</h3>
+          <p>请求处理节点不依赖单机持久状态，任何副本都能接流量。</p>
+          <div class="case"><strong>案例</strong>限流计数放共享存储或分布式限流服务，而不是只存在某个网关进程内。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 30</span>
+          <h3>Horizontal Scaling（水平扩容）</h3>
+          <p>增加数据面副本承载更多连接，并由前置负载均衡器分配。</p>
+          <div class="case"><strong>案例</strong>CPU 或连接数达到阈值时从 4 个网关实例扩到 8 个。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 31</span>
+          <h3>Graceful Drain（优雅摘流）</h3>
+          <p>发布或缩容前停止接新连接，等待已有请求或长连接完成。</p>
+          <div class="case"><strong>案例</strong>网关升级时，WebSocket 连接有 60 秒迁移窗口，而不是立刻全部断开。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 32</span>
+          <h3>Configuration Validation（配置校验）</h3>
+          <p>上线前检查语法、冲突、证书、路由覆盖和安全政策，避免错误配置同时影响所有服务。</p>
+          <div class="case"><strong>案例</strong>阻止一个误写的通配路由 <code>/*</code> 抢走全部 API 流量。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 33</span>
+          <h3>Versioned Rollout & Rollback（配置版本与回滚）</h3>
+          <p>每次策略变更都有版本、审计和分批下发，异常时恢复上一有效版本。</p>
+          <div class="case"><strong>案例</strong>新限流规则先下发 5% 网关节点，确认 429 没异常上升再全量。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Concept 34</span>
+          <h3>Multi-zone / Multi-region（多可用区与多区域）</h3>
+          <p>避免一个机房或区域故障让入口完全消失，但必须同时解决配置、证书和数据一致性。</p>
+          <div class="case"><strong>案例</strong>每个可用区至少两个数据面副本；全局流量管理在区域故障时切换。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="status-codes">
+      <div class="chapter-head">
+        <span class="chapter-no">05—I</span>
+        <div><h2>用状态码定位故障层</h2><p>状态码是线索，不是根因；同一状态仍需结合网关和上游日志。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>状态</th><th>含义</th><th>案例与优先检查</th></tr></thead>
+        <tbody>
+          <tr><td>400</td><td>请求格式错误</td><td>JSON 无效、必需 Header 缺失</td></tr>
+          <tr><td>401</td><td>缺少有效认证凭据</td><td>Token 过期、签名或受众错误</td></tr>
+          <tr><td>403</td><td>已识别但禁止访问</td><td>角色、Scope、资源权限不足</td></tr>
+          <tr><td>404</td><td>资源或路由不存在</td><td>路径错误，或为避免泄露而隐藏资源</td></tr>
+          <tr><td>409</td><td>与当前资源状态冲突</td><td>重复创建、版本冲突</td></tr>
+          <tr><td>413</td><td>请求体过大</td><td>网关上传限制或上游限制</td></tr>
+          <tr><td>415</td><td>媒体类型不支持</td><td>Content-Type 错误</td></tr>
+          <tr><td>422</td><td>内容语义无法处理</td><td>字段结构正确但业务输入无效</td></tr>
+          <tr><td>429</td><td>请求过多或配额受限</td><td>限流键、配额、供应商限流</td></tr>
+          <tr><td>499*</td><td>客户端提前关闭</td><td>用户取消、客户端超时；非 IETF 标准码</td></tr>
+          <tr><td>500</td><td>当前处理者内部错误</td><td>网关插件或业务服务异常</td></tr>
+          <tr><td>502</td><td>网关收到无效上游响应</td><td>连接重置、协议不匹配、上游崩溃</td></tr>
+          <tr><td>503</td><td>当前无法处理</td><td>无健康实例、过载、维护或主动降载</td></tr>
+          <tr><td>504</td><td>网关未及时收到上游响应</td><td>慢查询、依赖超时、预算配置</td></tr>
+        </tbody>
+      </table>
+      <div class="plain"><strong>记忆法</strong>502 是“上游说了坏话”，503 是“现在没人能接”，504 是“上游一直没及时说话”。</div>
+    </section>
+
+    <section class="chapter" id="troubleshooting">
+      <div class="chapter-head">
+        <span class="chapter-no">05—J</span>
+        <div><h2>标准排障路径</h2><p>沿请求方向逐层验证，不要一看到 502 就重启全部服务。</p></div>
+      </div>
+      <ol class="checklist">
+        <li>DNS 是否解析到预期入口？证书域名和有效期是否正确？</li>
+        <li>请求是否真正到达网关？查看接入日志和连接指标。</li>
+        <li>Listener、Host、路径、方法和协议是否匹配正确 Route？</li>
+        <li>WAF、认证、授权、限流、请求大小是否提前拒绝？</li>
+        <li>服务发现是否返回正确端点？健康检查是否把实例摘除？</li>
+        <li>网关能否连接上游？TLS、DNS、端口和网络策略是否正确？</li>
+        <li>超时发生在哪一层？客户端、网关、服务、数据库还是外部依赖？</li>
+        <li>使用 Trace ID 关联网关日志、服务日志、指标和 Trace。</li>
+        <li>检查最近的配置、证书、发布与依赖变更，必要时回滚。</li>
+      </ol>
+      <div class="case"><strong>排障案例</strong>全部请求 503，但订单 Pod 正常。检查发现 HTTPRoute 指向 <code>order-service:8080</code>，Service 实际端口是 8000。问题属于路由到上游端口配置错误，不是应用崩溃。</div>
+    </section>
+
+    <section class="chapter" id="capstone">
+      <div class="chapter-head">
+        <span class="chapter-no">05—K</span>
+        <div><h2>综合案例：设计一个 Agent 应用网关体系</h2><p>把五课概念放进一条真实链路。</p></div>
+      </div>
+      <div class="diagram">Web / 小程序
+   │  HTTPS, JWT
+   ▼
+CDN + WAF
+   │  缓存静态资源、阻断明显攻击
+   ▼
+API Gateway
+   │  认证、租户限流、路由、Trace ID、上传限制
+   ├──────────────▶ File Service
+   └──────────────▶ Agent API / BFF
+                       │  会话、LangGraph、业务权限、人工确认
+                       ├──────────▶ MCP / Tools
+                       │
+                       ▼
+                    AI Gateway
+                       │  模型路由、密钥、预算、PII 政策、TTFT
+                       ├──────────▶ Cloud Model A
+                       ├──────────▶ Cloud Model B
+                       └──────────▶ Local Model</div>
+      <div class="concept-grid">
+        <article class="concept">
+          <span class="term">Design Choice</span>
+          <h3>API Gateway 做什么</h3>
+          <p>验证用户身份、限制每用户请求、路由聊天和文件 API、生成 Trace ID、限制上传体积。</p>
+          <div class="case"><strong>案例</strong>未登录用户不能进入 <code>/api/chat</code>；单文件最大 20 MB。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Design Choice</span>
+          <h3>Agent 服务做什么</h3>
+          <p>保存会话、运行 LangGraph、决定工具、校验业务对象权限和处理人工确认。</p>
+          <div class="case"><strong>案例</strong>“发送邮件”必须先展示收件人和正文，请用户确认。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Design Choice</span>
+          <h3>AI Gateway 做什么</h3>
+          <p>统一模型接口、选择模型、隔离供应商密钥、统计 token、执行模型调用政策和故障切换。</p>
+          <div class="case"><strong>案例</strong>复杂规划使用强模型；摘要使用便宜模型；敏感数据使用本地模型。</div>
+        </article>
+        <article class="concept">
+          <span class="term">Design Choice</span>
+          <h3>不放在哪里</h3>
+          <p>API Gateway 不决定 Agent 工作流；AI Gateway 不批准工具副作用；Agent 不直接保存所有供应商密钥。</p>
+          <div class="boundary"><strong>原则</strong>公共通信政策靠网关，领域和任务语义靠应用。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter" id="final-check">
+      <div class="chapter-head">
+        <span class="chapter-no">05—L</span>
+        <div><h2>毕业检查：你是否真正理解网关</h2><p>能回答这些问题，才算从“知道名词”进入“能做架构”。</p></div>
+      </div>
+      <div class="quiz">
+        <details><summary>1. 为什么 AI Gateway 不能替 Agent 完成 Prompt Injection 防护？</summary><p>网关只能做公共扫描和政策；真正安全还取决于数据隔离、工具最小权限、参数校验和高风险人工确认。</p></details>
+        <details><summary>2. 一个 FastAPI MVP 什么时候不需要独立 API Gateway？</summary><p>服务和调用方少、政策简单时，反向代理加应用中间件通常足够，独立网关会增加运维复杂度。</p></details>
+        <details><summary>3. 为什么配置错误可能比单个服务 Bug 影响更大？</summary><p>网关位于共享入口，一条通配路由、证书或授权错误可能同时影响多个服务和所有调用者。</p></details>
+        <details><summary>4. 502、503、504 怎样快速区分？</summary><p>502 是无效上游响应，503 是当前无法处理或没有可用实例，504 是等待上游超时。</p></details>
+        <details><summary>5. 设计网关前最重要的五个问题是什么？</summary><p>边界在哪里；谁调用谁；处理哪种协议；公共政策有哪些；哪些业务逻辑必须留在服务内。</p></details>
+      </div>
+      <div class="memory">
+        <h3>全课程最终结论</h3>
+        <p>网关是系统边界上的通信代理和公共策略执行点。它把请求安全、可控、可观察地送到正确处理者；它的价值来自职责清晰，而不是功能堆叠。</p>
+      </div>
+    </section>
+
+    <aside class="sources">
+      <h2>本课主参考</h2>
+      <p><a href="https://datatracker.ietf.org/doc/rfc9110/">IETF RFC 9110</a> 用于 HTTP 状态语义；AI Gateway 目前缺少跨厂商统一标准，因此本课将稳定的网关原则应用到模型调用，并明确区分行业惯例与正式标准。</p>
+    </aside>
+
+    <nav class="pager" aria-label="前后课程">
+      <a href="0004-cloud-kubernetes-and-service-mesh.html"><small>上一课 04</small><strong>← 微服务、Kubernetes 与 Mesh</strong></a>
+      <a href="0001-gateway-foundations.html"><small>回到起点</small><strong>重新复习第一课 ↻</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

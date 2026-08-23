@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32 Wi-Fi 断线速查表</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+  <main>
+    <header class="hero" data-lesson="WiFi">
+      <div>
+        <p class="kicker">Sesame Robot · 速查</p>
+        <h1>ESP32 Wi-Fi<br>断线速查表</h1>
+        <p class="lead">先判断是不是重启，再看 reason，最后才改设置。</p>
+      </div>
+    </header>
+    <section class="chapter">
+      <table class="comparison">
+        <thead><tr><th>现象/原因</th><th>含义</th><th>第一步</th></tr></thead>
+        <tbody>
+          <tr><td>重新出现开机日志 / brownout</td><td>供电问题</td><td>测芯片近端 3.3 V</td></tr>
+          <tr><td><code>BEACON_TIMEOUT</code></td><td>收不到 AP 信标</td><td>RSSI、天线、距离、干扰</td></tr>
+          <tr><td><code>NO_AP_FOUND</code></td><td>找不到目标 AP</td><td>独立 2.4 GHz SSID</td></tr>
+          <tr><td><code>AUTH_FAIL</code></td><td>认证失败</td><td>密码、WPA、PMF</td></tr>
+          <tr><td><code>ASSOC_TOOMANY</code></td><td>AP 客户端已满</td><td>路由器接入上限</td></tr>
+        </tbody>
+      </table>
+      <div class="diagram">断线 → 记录 reason/RSSI/BSSID
+      → 1/2/4/8 秒有界重连
+      → GOT_IP
+      → 重建 WSS / TCP 业务连接</div>
+      <p><strong>当前项目专有结论：</strong>先修复 Wi-Fi handler 在初次 GOT_IP 后被注销的问题；否则后面的重连策略不会在运行期生效。</p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,12 @@
+test_authenticated_hello_returns_negotiated_audio_contract (test_device_stream.DeviceStreamTests) ... ok
+test_console_rejects_unknown_actions_and_broadcasts_device_status (test_device_stream.DeviceStreamTests) ... ok
+test_console_serves_a_single_site_and_forwards_allowed_action (test_device_stream.DeviceStreamTests) ... ok
+test_malformed_or_downlink_audio_is_rejected_at_gateway_boundary (test_device_stream.DeviceStreamTests) ... ok
+test_unauthenticated_connection_is_rejected_before_hello (test_device_stream.DeviceStreamTests) ... ok
+test_openclaw_can_select_office_scene_and_console_observes_profile (test_device_stream.SceneControlTests) ... ok
+test_openclaw_scene_control_rejects_invalid_scene_and_bad_token (test_device_stream.SceneControlTests) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.094s
+
+OK

@@ -1,0 +1,6 @@
+> {"kind":"servo","servo":6,"angle":45}
+{"detail":"device is offline"}
+> {"kind":"servo","servo":8,"angle":135}
+{"detail":"device is offline"}
+> {"kind":"stop"}
+{"detail":"device is offline"}

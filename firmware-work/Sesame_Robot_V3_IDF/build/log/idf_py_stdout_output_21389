@@ -1,0 +1,209 @@
+Command: /Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python /Users/mac/.espressif/frameworks/esp-idf-v5.5.4/tools/idf_monitor.py -p /dev/cu.usbmodem101 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/sesame_robot_v3.elf /Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/build/bootloader/bootloader.elf -m '/Users/mac/.espressif/python_env/idf5.5_py3.9_env/bin/python' '/Users/mac/.espressif/frameworks/esp-idf-v5.5.4/tools/idf.py' '-p' '/dev/cu.usbmodem101'
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x2a (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037b0da
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x14f0
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2ef0
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.4 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Aug  8 2026 22:24:02[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (28) boot: efuse block revision: v1.4[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 4MB[0m
+[0;32mI (43) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00300000[0m
+[0;32mI (75) boot:  3 model            Unknown data     01 82 00310000 000f0000[0m
+[0;32mI (82) boot: End of partition table[0m
+[0;32mI (85) esp_image: segment 0: paddr=00010020 vaddr=3c140020 size=3a8f8h (239864) map[0m
+[0;32mI (135) esp_image: segment 1: paddr=0004a920 vaddr=3fc9d600 size=056f8h ( 22264) load[0m
+[0;32mI (140) esp_image: segment 2: paddr=00050020 vaddr=42000020 size=13e3d0h (1303504) map[0m
+[0;32mI (370) esp_image: segment 3: paddr=0018e3f8 vaddr=3fca2cf8 size=0213ch (  8508) load[0m
+[0;32mI (372) esp_image: segment 4: paddr=0019053c vaddr=40374000 size=19544h (103748) load[0m
+[0;32mI (396) esp_image: segment 5: paddr=001a9a88 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (407) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (407) boot: Disabling RNG early entropy source...[0m
+[0;32mI (418) octal_psram: vendor id    : 0x0d (AP)[0m
+[0;32mI (418) octal_psram: dev id       : 0x02 (generation 3)[0m
+[0;32mI (418) octal_psram: density      : 0x03 (64 Mbit)[0m
+[0;32mI (420) octal_psram: good-die     : 0x01 (Pass)[0m
+[0;32mI (424) octal_psram: Latency      : 0x01 (Fixed)[0m
+[0;32mI (429) octal_psram: VCC          : 0x01 (3V)[0m
+[0;32mI (433) octal_psram: SRF          : 0x01 (Fast Refresh)[0m
+[0;32mI (438) octal_psram: BurstType    : 0x01 (Hybrid Wrap)[0m
+[0;32mI (442) octal_psram: BurstLen     : 0x01 (32 Byte)[0m
+[0;32mI (447) octal_psram: Readlatency  : 0x02 (10 cycles@Fixed)[0m
+[0;32mI (452) octal_psram: DriveStrength: 0x00 (1/1)[0m
+[0;32mI (456) esp_psram: Found 8MB PSRAM device[0m
+[0;32mI (460) esp_psram: Speed: 40MHz[0m
+[0;32mI (463) cpu_start: Multicore app[0m
+[0;32mI (1197) esp_psram: SPI SRAM memory test OK[0m
+[0;32mI (1205) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (1206) cpu_start: Pro cpu start user code[0m
+[0;32mI (1206) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (1208) app_init: Application information:[0m
+[0;32mI (1212) app_init: Project name:     sesame_robot_v3[0m
+[0;32mI (1216) app_init: App version:      1[0m
+[0;32mI (1220) app_init: Compile time:     Aug  8 2026 22:22:29[0m
+[0;32mI (1225) app_init: ELF file SHA256:  4667406a8...[0m
+[0;32mI (1229) app_init: ESP-IDF:          v5.5.4[0m
+[0;32mI (1233) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (1237) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (1241) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (1245) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (1252) heap_init: At 3FCAD1E8 len 0003C528 (241 KiB): RAM[0m
+[0;32mI (1257) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (1262) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (1267) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (1273) esp_psram: Adding pool of 8192K of PSRAM memory to heap allocator[0m
+[0;32mI (1280) spi_flash: detected chip: generic[0m
+[0;32mI (1283) spi_flash: flash io: dio[0m
+[0;33mW (1286) spi_flash: Detected size(16384k) larger than the size in the binary image header(4096k). Using the size in the binary image header.[0m
+[0;32mI (1299) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (1305) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (1312) main_task: Started on CPU0[0m
+[0;32mI (1315) esp_psram: Reserving pool of 32K of internal memory for DMA/internal allocations[0m
+[0;32mI (1323) main_task: Calling app_main()[0m
+[0;32mI (1346) uart: queue free spaces: 20[0m
+[0;32mI (1348) sesame_main: Sesame Robot V3 production firmware starting[0m
+[0;32mI (1348) sesame_main: Initial turn state: idle[0m
+[0;32mI (1351) sesame_audio: I2S ready: mic GPIO 14/47/48 on I2S0; speaker GPIO 1/2/3 on I2S1[0m
+[0;32mI (1355) sesame_main: Audio HAL ready[0m
+[0;32mI (1371) wake_vad: custom model ready: zhima_wakeword_five_tts_int8, 22528 bytes, threshold=0.86, arena=98304 bytes[0m
+[0;32mI (1373) MODEL_LOADER: The storage free size is 23040 KB[0m
+[0;32mI (1376) MODEL_LOADER: The partition size is 960 KB[0m
+[0;32mI (1381) MODEL_LOADER: Successfully load srmodels[0m
+[0;32mI (1385) AFE_CONFIG: Set WakeNet Model: wn9s_nihaoxiaozhi[0m
+[0;32mI (1391) AFE_CONFIG: Set VAD Model: vadnet1_medium[0m
+MC Quantized vadnet1:vadnet1_mediumv1_Speech_1_0.5_0.1, min speech:128 ms, min noise:800 ms, mode:0, threshold:0.500, channel:1, tigger:v1 (May 25 2026 15:51:02)
+[0;32mI (1469) AFE: AFE Version: (1MIC_V251128)[0m
+[0;32mI (1472) AFE: Input PCM Config: total 1 channels(1 microphone, 0 playback), sample rate:16000[0m
+[0;32mI (1481) AFE: AFE Pipeline: [input] -> |VAD(vadnet1_medium)| -> [output][0m
+[0;32mI (1487) AFE: AFE Version: (1MIC_V251128)[0m
+[0;32mI (1491) AFE: Input PCM Config: total 1 channels(1 microphone, 0 playback), sample rate:16000[0m
+[0;32mI (1499) AFE: AFE Pipeline: [input] -> |VAD(vadnet1_medium)| -> [output][0m
+[0;32mI (1505) wake_vad: custom TFLite wake word + VAD ready; feed frame=512 samples[0m
+[0;32mI (1521) pp: pp rom version: e7ae62f[0m
+[0;32mI (1522) net80211: net80211 rom version: e7ae62f[0m
+[0;32mI (1524) wifi:wifi driver task: 3fcd5964, prio:23, stack:6656, core=0[0m
+[0;32mI (1537) wifi:wifi firmware version: 0947e8b[0m
+[0;32mI (1537) wifi:wifi certification version: v7.0[0m
+[0;32mI (1538) wifi:config NVS flash: enabled[0m
+[0;32mI (1538) wifi:config nano formatting: disabled[0m
+[0;32mI (1542) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (1547) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (1551) wifi:Init management short buffer num: 32[0m
+[0;32mI (1556) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (1560) wifi:Init static tx FG buffer num: 2[0m
+[0;32mI (1564) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (1568) wifi:Init static rx buffer num: 10[0m
+[0;32mI (1572) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (1577) wifi_init: rx ba win: 6[0m
+[0;32mI (1579) wifi_init: accept mbox: 6[0m
+[0;32mI (1582) wifi_init: tcpip mbox: 32[0m
+[0;32mI (1585) wifi_init: udp mbox: 6[0m
+[0;32mI (1588) wifi_init: tcp mbox: 6[0m
+[0;32mI (1591) wifi_init: tcp tx win: 5760[0m
+[0;32mI (1594) wifi_init: tcp rx win: 5760[0m
+[0;32mI (1597) wifi_init: tcp mss: 1440[0m
+[0;32mI (1601) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (1604) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (1609) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;32mI (1657) wifi:mode : sta (28:84:85:a4:ef:04)[0m
+[0;32mI (1657) wifi:enable tsf[0m
+[0;32mI (1668) wifi:new:<6,0>, old:<1,0>, ap:<255,255>, sta:<6,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1670) wifi:state: init -> auth (0xb0)[0m
+[0;33mW (1687) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (1687) wake_vad: AFE VAD fetch failed[0m
+[0;32mI (1704) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (1742) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (1768) wifi:connected with YuanGuang, aid = 1, channel 6, BW20, bssid = c0:e0:18:ce:70:10[0m
+[0;32mI (1769) wifi:security: WPA2-PSK, phy: bgn, rssi: -48, cipher(pairwise:0x3, group:0x3), pmf:0[0m
+[0;32mI (1777) wifi:pm start, type: 1[0m
+
+[0;32mI (1777) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us[0m
+[0;32mI (1785) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000[0m
+[0;32mI (1795) wifi:<ba-add>idx:0 (ifx:0, c0:e0:18:ce:70:10), tid:6, ssn:2, winSize:64[0m
+[0;32mI (1863) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;33mW (1887) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (1887) wake_vad: AFE VAD fetch failed[0m
+[0;32mI (1969) wifi:<ba-add>idx:1 (ifx:0, c0:e0:18:ce:70:10), tid:0, ssn:0, winSize:64[0m
+[0;33mW (2087) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (2087) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (2287) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (2287) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (2487) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (2487) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (2687) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (2687) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (2887) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (2887) wake_vad: AFE VAD fetch failed[0m
+[0;32mI (2999) esp_netif_handlers: sta ip: 192.168.88.63, mask: 255.255.255.0, gw: 192.168.88.1[0m
+[0;32mI (3000) sesame_transport: Wi-Fi got IP; reconnect backoff reset[0m
+[0;32mI (3004) mdns_mem: mDNS task will be created from internal RAM[0m
+[0;33mW (3087) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (3087) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (3287) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (3287) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (3487) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (3487) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (3687) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (3687) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (3887) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (3887) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (4087) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (4087) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (4287) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (4287) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (4487) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (4487) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (4687) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (4687) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (4887) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (4887) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (5087) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (5087) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (5287) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (5287) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (5487) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (5487) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (5687) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (5687) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (5887) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (5887) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (6087) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (6087) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (6287) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (6287) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (6487) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (6487) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (6687) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (6687) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (6887) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (6887) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (7087) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (7088) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (7288) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (7288) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (7488) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (7488) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (7688) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (7688) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (7888) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (7888) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (8088) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;33mW (8088) wake_vad: AFE VAD fetch failed[0m
+[0;33mW (8288) AFE: Ringbuffer of AFE is empty, Please use feed() to write data[0m
+[0;32mI (8296) AFE: exit[0m
+[1;31mE (8296) sesame_main: Voice runtime did not start. Provision NVS and check gateway: ESP_ERR_NOT_FOUND[0m
+[0;32mI (8296) main_task: Returned from app_main()[0m

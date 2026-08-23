@@ -1,0 +1,11 @@
+--- /Users/mac/Documents/sesame robot/output/20260810-normal-knowledge-and-context/originals/README.md	2026-08-10 01:33:57
++++ /Users/mac/Documents/sesame robot/output/20260810-normal-knowledge-and-context/final/repo/README.md	2026-08-10 01:34:56
+@@ -49,7 +49,7 @@
+ 
+ ## 正常模式与场景：由 Gateway 切换
+ 
+-机器人默认处于**正常模式**：它是独立的基础对话状态，不属于下面三个场景，也不绑定场景知识库。三个场景只改变对话目标、独立 Agent 和未来知识库命名空间；硬件动作、表情和限制仍使用原有白名单。
++机器人默认处于**正常模式**：它是独立的基础对话状态，不属于下面三个场景，并使用自己的知识库命名空间 `kb-normal`。三个场景只改变对话目标、独立 Agent 和未来知识库命名空间；硬件动作、表情和限制仍使用原有白名单。
+ 
+ | 场景 ID | 名称 | OpenClaw Agent | 未来知识库 | 语言重点 |
+ | --- | --- | --- | --- | --- |

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "main",
+    "workspace": "/Users/mac/.openclaw/workspace",
+    "agentDir": "/Users/mac/.openclaw/agents/main/agent",
+    "model": "deepseek/deepseek-v4-flash",
+    "bindings": 1,
+    "isDefault": true
+  },
+  {
+    "id": "sesame",
+    "name": "Sesame Robot",
+    "identityName": "Sesame Robot",
+    "identityEmoji": "🤖",
+    "identitySource": "identity",
+    "workspace": "/Users/mac/.openclaw/workspace-sesame",
+    "agentDir": "/Users/mac/.openclaw/agents/sesame/agent",
+    "model": "deepseek/deepseek-v4-flash",
+    "bindings": 0,
+    "isDefault": false
+  }
+]

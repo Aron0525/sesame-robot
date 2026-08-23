@@ -1,0 +1,11 @@
+{"index": 1, "split": "train", "speed": 0.82, "bytes": 39768, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 19884, "duration_ms": 1242.75}
+{"index": 2, "split": "train", "speed": 0.86, "bytes": 34876, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 17438, "duration_ms": 1089.88}
+{"index": 3, "split": "train", "speed": 0.9, "bytes": 36100, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 18050, "duration_ms": 1128.12}
+{"index": 4, "split": "train", "speed": 0.94, "bytes": 32160, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 16080, "duration_ms": 1005.0}
+{"index": 5, "split": "train", "speed": 0.98, "bytes": 33896, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 16948, "duration_ms": 1059.25}
+{"index": 6, "split": "train", "speed": 1.02, "bytes": 31940, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 15970, "duration_ms": 998.12}
+{"index": 7, "split": "train", "speed": 1.06, "bytes": 30960, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 15480, "duration_ms": 967.5}
+{"index": 8, "split": "train", "speed": 1.1, "bytes": 29982, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 14991, "duration_ms": 936.94}
+{"index": 9, "split": "holdout", "speed": 1.14, "bytes": 26642, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 13321, "duration_ms": 832.56}
+{"index": 10, "split": "holdout", "speed": 1.18, "bytes": 26068, "channels": 1, "sample_width_bytes": 2, "sample_rate_hz": 16000, "frames": 13034, "duration_ms": 814.62}
+{"manifest": "/Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/tts/manifest.json", "samples": 10, "unique_wav_sha256": 10}

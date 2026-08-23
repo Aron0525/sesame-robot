@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>网关术语速查</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Reference · 术语速查</p>
+  <h1>网关核心术语</h1>
+  <p class="lead">用于复习概念边界，不替代完整教材。</p>
+
+  <table>
+    <thead><tr><th>术语</th><th>一句话定义</th><th>关注层次</th></tr></thead>
+    <tbody>
+      <tr><td>Gateway</td><td>位于通信边界、代理流量并执行统一策略的架构角色</td><td>泛称</td></tr>
+      <tr><td>Forward Proxy</td><td>代表客户端访问外部服务</td><td>客户端侧</td></tr>
+      <tr><td>Reverse Proxy</td><td>代表后端服务接收客户端请求</td><td>服务端侧</td></tr>
+      <tr><td>Load Balancer</td><td>在多个后端实例之间选择目标</td><td>L4/L7</td></tr>
+      <tr><td>API Gateway</td><td>统一暴露并治理应用 API 的七层网关</td><td>L7</td></tr>
+      <tr><td>Ingress</td><td>外部流量进入集群或系统的方向与入口</td><td>南北向</td></tr>
+      <tr><td>Egress</td><td>内部流量访问外部系统的方向与出口</td><td>南北向</td></tr>
+      <tr><td>Service Mesh</td><td>治理服务之间通信的基础设施层</td><td>东西向</td></tr>
+      <tr><td>Control Plane</td><td>管理和下发路由、证书与策略配置</td><td>控制面</td></tr>
+      <tr><td>Data Plane</td><td>实际处理每一个连接与请求</td><td>数据面</td></tr>
+      <tr><td>Authentication</td><td>确认调用者是谁</td><td>身份</td></tr>
+      <tr><td>Authorization</td><td>确认调用者能做什么</td><td>权限</td></tr>
+      <tr><td>Rate Limiting</td><td>限制一定时间内的请求数量或速率</td><td>流量治理</td></tr>
+      <tr><td>Circuit Breaker</td><td>上游持续失败时暂时停止调用，避免级联故障</td><td>韧性</td></tr>
+      <tr><td>AI Gateway</td><td>治理应用到模型供应商之间调用的专门网关</td><td>LLM 调用</td></tr>
+    </tbody>
+  </table>
+  <p><a href="../lessons/0001-gateway-foundations.html">返回第一课：网关基础</a></p>
+</main>
+</body>
+</html>

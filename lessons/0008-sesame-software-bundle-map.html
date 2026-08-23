@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="理解 Sesame Robot V3 软件运行包的六个目录、组件关系和实际使用顺序。">
+  <title>专题课｜Sesame V3 软件包地图</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="8">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+      <div class="lesson-tabs">
+        <a href="0006-asr-tts-packaging-boundaries.html" title="ASR/TTS 封装专题">06</a>
+        <a href="0007-sesame-runtime-connections.html" title="Sesame 运行链路">07</a>
+        <a href="0008-sesame-software-bundle-map.html" aria-current="page" title="Sesame 软件包地图">08</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="08">
+      <div>
+        <p class="kicker">Sesame Robot V3 · 软件运行包</p>
+        <h1>六个目录，一条运行链路</h1>
+        <p class="lead">目录不是六套互不相关的程序：Arduino 在机器人端，Voice Gateway 在电脑端居中，ASR/TTS 与 OpenClaw 被它调用，协议文件约束双方，Sesame Studio 负责生成动作代码。</p>
+        <div class="lesson-meta"><span>约 10 分钟</span><span>目录地图</span><span>启动顺序</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="flow">
+      <div class="chapter-head">
+        <span class="chapter-no">08—A</span>
+        <div><h2>先看完整链路</h2><p>每个目录都对应链路中的一个职责。</p></div>
+      </div>
+      <div class="diagram">01 Arduino 固件（ESP32-S3）
+  │  WebSocket：JSON 控制事件 + Opus 音频
+  ▼
+02 Voice Gateway（FastAPI）
+  ├─→ 03 ASR：PCM → 文字
+  ├─→ 04 OpenClaw：文字 → 回答 / 工具调用
+  └─→ 03 TTS：回答文字 → PCM
+  │
+  └─→ 01 Arduino：Opus 音频 + 动作/表情
+
+05 配置与协议：约束上述消息和环境变量
+06 Sesame Studio：生成动作序列，最终放入 Arduino 固件</div>
+      <div class="boundary"><strong>中心组件</strong>Voice Gateway 是软件链路的编排中心。ASR、TTS 和 OpenClaw 不直接与 ESP32 交换音频。</div>
+    </section>
+
+    <section class="chapter" id="folders">
+      <div class="chapter-head">
+        <span class="chapter-no">08—B</span>
+        <div><h2>六个目录分别做什么</h2><p>只记住入口文件，不需要一开始阅读所有文件。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>目录</th><th>职责</th><th>优先打开</th></tr></thead>
+        <tbody>
+          <tr><td><code>01-Arduino-IDE</code></td><td>ESP32-S3 固件、OLED、舵机、网络与 Arduino 库</td><td><code>Sesame_Robot_V3.ino</code></td></tr>
+          <tr><td><code>02-Voice-Gateway</code></td><td>设备 WebSocket、Opus、会话、Provider、OpenClaw Adapter</td><td><code>README.md</code>、<code>app.py</code></td></tr>
+          <tr><td><code>03-ASR-TTS</code></td><td>ASR/TTS 接口、Demo 实现和真实模型接入说明</td><td><code>README.md</code>、<code>base.py</code></td></tr>
+          <tr><td><code>04-OpenClaw</code></td><td>Agent 接入与 MCP/MQTT 设备控制实验</td><td><code>README.md</code></td></tr>
+          <tr><td><code>05-配置与协议</code></td><td>环境变量模板、JSON Schema、通信协议</td><td><code>.env.example</code></td></tr>
+          <tr><td><code>06-Sesame-Studio</code></td><td>图形化编辑舵机角度与动作帧</td><td><code>sesame_studio.py</code></td></tr>
+        </tbody>
+      </table>
+      <div class="danger"><strong>不要误判</strong><code>03-ASR-TTS</code> 当前只有接口和 Demo；真实语音模型尚未接入。</div>
+    </section>
+
+    <section class="chapter" id="gateway">
+      <div class="chapter-head">
+        <span class="chapter-no">08—C</span>
+        <div><h2>Voice Gateway 内部文件</h2><p>按职责理解，不按文件数量理解。</p></div>
+      </div>
+      <div class="diagram">app.py              FastAPI 启动入口和设备 WebSocket
+config.py           读取 .env
+pipeline.py         Opus → ASR → Agent → TTS → Opus
+audio/opus.py       真实 libopus 编解码
+protocol/           JSON 控制帧和 32 字节音频包头
+providers/base.py   ASR / Agent / TTS 稳定接口
+providers/demo.py   不调用模型的测试实现
+openclaw/client.py  OpenClaw Gateway Adapter
+policy.py           动作和表情白名单
+tests/              自动验证上述行为</div>
+    </section>
+
+    <section class="chapter" id="start">
+      <div class="chapter-head">
+        <span class="chapter-no">08—D</span>
+        <div><h2>第一次使用：只跑电脑 Demo</h2><p>暂时不接真实 ESP32、ASR/TTS 或 OpenClaw，先证明中间链路可运行。</p></div>
+      </div>
+      <div class="diagram">终端一：
+cd 02-Voice-Gateway/SesameRobot
+cp .env.example .env
+uv sync --python 3.12
+uv run uvicorn sesame_voice_gateway.app:app \
+  --app-dir apps/voice_gateway/src \
+  --host 0.0.0.0 --port 8765
+
+终端二：
+uv run python apps/esp32_simulator/simulate.py \
+  --url ws://127.0.0.1:8765/v1/device-stream \
+  --gateway-id gw_local_dev \
+  --device-id dev_001 \
+  --token '&lt;与 .env 一致&gt;'</div>
+      <div class="boundary"><strong>这一步验证什么</strong>WebSocket、设备鉴权、JSON/Opus 协议、流水线和返回音频；不验证真实语音模型。</div>
+    </section>
+
+    <section class="chapter" id="progression">
+      <div class="chapter-head">
+        <span class="chapter-no">08—E</span>
+        <div><h2>正确的推进顺序</h2><p>一次只增加一个真实组件，出错时才知道问题在哪一层。</p></div>
+      </div>
+      <div class="diagram">阶段 1：Arduino 固件能编译、上传，串口稳定
+阶段 2：电脑 Demo 闭环通过
+阶段 3：Voice Gateway 接入真实 OpenClaw
+阶段 4：接入真实 ASR Provider
+阶段 5：接入真实 TTS Provider
+阶段 6：真实 ESP32 麦克风/扬声器接入
+阶段 7：Sesame Studio 生成动作并做整机验收</div>
+      <div class="danger"><strong>反例</strong>同时接真实 ESP32、ASR、TTS 和 OpenClaw。一旦没有声音，无法判断是采集、编解码、网络、模型、Agent 还是播放问题。</div>
+    </section>
+
+    <section class="chapter" id="recall">
+      <div class="chapter-head">
+        <span class="chapter-no">08—F</span>
+        <div><h2>一分钟自测</h2><p>先在脑中回答，再展开答案。</p></div>
+      </div>
+      <details><summary>哪个程序是整条语音链路的中心？</summary><p>Voice Gateway。它接收 ESP32 音频，调用 ASR、OpenClaw 和 TTS，再把结果送回 ESP32。</p></details>
+      <details><summary>ASR 能不能直接接收 Opus？</summary><p>当前设计不能。Voice Gateway 先把 Opus 解码成 PCM，ASR Provider 只接收 PCM。</p></details>
+      <details><summary>现在能否声称真实 ASR/TTS 已完成？</summary><p>不能。当前只有 Provider 接口和 Demo 实现，真实模型尚未接入。</p></details>
+      <p><a href="../reference/sesame-software-bundle-map.html">打开一页式速查表</a></p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="沿着 app_main、VoiceController 与 Gateway 的一个真实回合进入 Sesame V3 源码。">
+  <title>第 15 节｜Sesame 源码第一游</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="15">
+  <nav class="course-nav" aria-label="课程导航"><div class="course-nav__inner">
+    <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+    <div class="lesson-tabs"><a href="0012-esp32-wifi-disconnect-basics.html" title="Wi-Fi 排障">12</a><a href="0013-sesame-v15-project-compass.html" title="项目罗盘">13</a><a href="0014-sesame-reproducible-architecture.html" title="可复现架构">14</a><a href="0015-sesame-code-reading-first-tour.html" aria-current="page" title="源码第一游">15</a></div>
+    <div class="reading-progress" aria-hidden="true"></div>
+  </div></nav>
+  <main>
+    <header class="hero" data-lesson="15"><div>
+      <p class="kicker">Sesame Robot V3 · 源码阅读课</p>
+      <h1>不要先读完全部代码。<br>先跟一轮“说话”走。</h1>
+      <p class="lead">本课只要求掌握一件事：从按下 BOOT 到机器人播放回复，中间关键函数各交接了什么数据。掌握它后，其他文件不再只是陌生名字。</p>
+      <div class="lesson-meta"><span>约 20 分钟</span><span>C++ / Python</span><span>回合状态</span></div>
+    </div></header>
+
+    <section class="chapter" id="entry"><div class="chapter-head"><span class="chapter-no">15—A</span><div><h2>先从入口，而不是目录，开始</h2><p>打开 <code>firmware/esp32_voice_idf/main/app_main.cpp</code>。</p></div></div>
+      <p>这个文件没有实现“机器人如何听懂话”。它只创建对象并连接依赖：</p>
+      <div class="diagram">AudioHal audio                 = I2S 音频硬件
+Esp32ServoDriver robot_driver  = PWM 舵机硬件
+OledExpressionDisplay display  = I²C 表情硬件
+LegacyMotionRunner legacy      = 旧动作表兼容层
+RobotAdapter robot             = 统一机器人操作入口
+WebControlServer web_control   = 设备本地 HTTP 控制
+VoiceController voice          = 语音总调度器</div>
+      <div class="case"><strong>正确的提问方式</strong>看到 <code>VoiceController voice(&amp;audio, &amp;robot)</code>，先问“它拿到了哪些能力？”答案：能读写声音，也能请求安全急停/表情/本地动作；但没有 DashScope Key、OpenClaw Token 或浏览器权限。</div>
+    </section>
+
+    <section class="chapter" id="button"><div class="chapter-head"><span class="chapter-no">15—B</span><div><h2>按 BOOT 后，第一步不是发音频</h2><p>按键逻辑在 <code>recording_button.cpp</code>，主处理在 <code>VoiceController::run()</code>。</p></div></div>
+      <ol class="checklist">
+        <li>主循环读取 GPIO0，低电平表示按下。</li>
+        <li><code>RecordingButton::update()</code> 用 80 ms 去抖，且要求先有一次稳定释放；复位时按住 BOOT 不会误触发。</li>
+        <li><code>handle_button()</code> 只在 <code>session_ready_</code> 时工作：还没与 Gateway 成功握手的设备不会产生无归属录音。</li>
+        <li>已有录音则 <code>finish_listening()</code>；否则 <code>start_listening(..., CaptureSource::kManual)</code>。</li>
+      </ol>
+      <p>所以 BOOT 是一次语音回合的开始/结束触发器，不直接碰 Opus、WebSocket 或模型。</p>
+    </section>
+
+    <section class="chapter" id="listen"><div class="chapter-head"><span class="chapter-no">15—C</span><div><h2><code>start_listening()</code>：不是“开麦”，而是建立可追踪回合</h2><p>它在真正采样前完成身份、状态和打断处理。</p></div></div>
+      <table class="comparison"><thead><tr><th>动作</th><th>代码意图</th><th>为什么必要</th></tr></thead><tbody>
+        <tr><td>检查前提</td><td>必须已经 session.ready、没有 active capture、来源合法。</td><td>避免嵌套录音。</td></tr>
+        <tr><td>打断旧回复</td><td>若正在 Thinking/Speaking，先发 <code>interrupt</code>、清播放、急停。</td><td>新用户输入优先，旧 TTS 不应继续。</td></tr>
+        <tr><td>创建 turn ID</td><td>计数器加一，组合随机数生成独特 ID。</td><td>把每帧音频与一轮业务严格关联。</td></tr>
+        <tr><td>重置 codec/序号</td><td><code>codec_.reset()</code>，<code>audio_sequence_=0</code>。</td><td>前一轮的编码状态和包号不能泄入新回合。</td></tr>
+        <tr><td>先发 listen.start</td><td>告诉 Gateway 当前 trigger 是 manual/wakeword/followup。</td><td>Gateway 只有在这个控制事件后才接受 binary uplink。</td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="chapter" id="audio"><div class="chapter-head"><span class="chapter-no">15—D</span><div><h2>一帧声音如何变成网络包</h2><p>关键文件：<code>audio_hal.cpp</code>、<code>opus_codec.cpp</code>、<code>voice_controller.cpp</code>。</p></div></div>
+      <div class="diagram">INMP441 24-bit 数据在 32-bit I2S 槽内
+  ↓ AudioHal::read_microphone_frame()
+320 个 int16 PCM（20 ms / 640 bytes）
+  ↓ OpusCodec::encode()
+变长 Opus packet（最多 1500 bytes）
+  ↓ protocol::pack_audio_frame()
+32-byte SSM1 header + Opus payload
+  ↓ enqueue_outbound_binary()
+sesame_uplink 任务 → GatewayClient::send_binary() → WSS</div>
+      <p>请区分两种“帧”：PCM 帧固定是 20 ms / 320 samples；Opus 包是可变长度。SSM1 头额外说明它属于上行、哪一轮、这一轮的第几个包。</p>
+      <div class="plain"><strong>为什么要把发送独立为任务</strong><code>capture_and_send()</code> 只做快速编码与入队；真正的 TLS/WSS send 在 <code>sesame_uplink</code> 任务中完成。网络慢不会阻塞 I2S 采样。</div>
+    </section>
+
+    <section class="chapter" id="gateway"><div class="chapter-head"><span class="chapter-no">15—E</span><div><h2>Gateway 收到后，先验证，后处理</h2><p>依次看 <code>app.py::_authenticate_session</code>、<code>_receive_audio</code>、<code>_run_turn</code>。</p></div></div>
+      <ol class="checklist">
+        <li>第一帧必须是 <code>session.hello</code>，且控制序号为 0。</li>
+        <li>Gateway 比对 <code>gateway_id</code>、Bearer token、设备到用户的映射，并拒绝同一设备的第二条活跃连接。</li>
+        <li>二进制包必须为 uplink、stream ID=1、Opus flags=0、generation 非 0、序号连续，且最多 1,500 包/30 秒。</li>
+        <li><code>listen.stop</code> 后才创建异步 <code>_run_turn</code>；接收循环仍在运行，因此用户能随时 interrupt。</li>
+      </ol>
+      <div class="memory"><h3>DeviceSession 不是数据库用户</h3><p>它是一条在线 WSS 连接的内存状态：保存音频包、序号、当前异步任务、<code>turn_epoch</code> 和 <code>send_lock</code>。中断时 epoch 加一并取消旧 task；迟到的旧 task 因 epoch 不匹配而不能再发 TTS。</p></div>
+    </section>
+
+    <section class="chapter" id="pipeline"><div class="chapter-head"><span class="chapter-no">15—F</span><div><h2>Pipeline：一轮业务的五步</h2><p><code>ConversationPipeline.process_turn()</code> 等待云端时不会阻塞其他设备收帧。</p></div></div>
+      <table class="comparison"><thead><tr><th>阶段</th><th>输入</th><th>输出</th><th>失败时</th></tr></thead><tbody>
+        <tr><td>Opus decode</td><td>本轮 packet 列表</td><td>连续 PCM</td><td>失败，不下发半截声音。</td></tr>
+        <tr><td>Privacy + ASR</td><td>PCM</td><td>转写文本</td><td>超 30 秒拒绝；无声/无效文本返回 <code>SilentDiscard</code>，不调用 Agent。</td></tr>
+        <tr><td>OpenClaw</td><td>文本与关联 ID</td><td>严格 JSON AgentResult</td><td>超时/格式错误发送通用 error，不泄露用户内容。</td></tr>
+        <tr><td>TTS</td><td>通过校验的回复文字</td><td>16 kHz PCM</td><td>空 PCM 或非完整帧立即失败。</td></tr>
+        <tr><td>Opus encode</td><td>TTS PCM</td><td>下行 packets + generation</td><td>编码失败则不会开始播放。</td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="chapter" id="downlink"><div class="chapter-head"><span class="chapter-no">15—G</span><div><h2>回复如何安全回到 ESP32</h2><p><code>_send_turn_result()</code> 不是一次把所有字节塞进网络。</p></div></div>
+      <div class="diagram">response.plan（表情、generation；当前 action 始终 null）
+  ↓
+tts.start（generation_id）
+  ↓ 每 20 ms 一包
+SSM1 DOWNLINK，stream_id=2，sequence=0,1,2...
+  ↓
+tts.stop（同一 generation）
+  ↓
+ESP32 begin_tts() → 按序 Opus decode → I2S write → 队列排空后关功放
+  ↓
+等待约 3 秒 follow-up；超时后重新等唤醒词</div>
+      <div class="case"><strong>generation 的意义</strong>用户在旧回复未播完时再次按 BOOT，固件会 interrupt 和清下行队列；Gateway 取消旧 task。迟到的旧 generation 包会被过滤，不能混入下一句回复。</div>
+    </section>
+
+    <section class="chapter" id="check"><div class="chapter-head"><span class="chapter-no">15—H</span><div><h2>读完后应能回答的四件事</h2><p>答不上来就回到函数，不要急着继续浏览新目录。</p></div></div>
+      <div class="quiz">
+        <details><summary>为什么 session.ready 前不接受 BOOT 录音？</summary><p>设备还没有合法会话、认证后的 conversation 和双方确认的音频协议；上传音频无法安全归属。</p></details>
+        <details><summary>为什么 sequence 和 generation 都要检查？</summary><p>sequence 检测同一回合内丢包/重复/乱序；generation 区分不同回合。只检查一个无法防止旧回复迟到。</p></details>
+        <details><summary>当前 AI 为什么不能控制舵机？</summary><p>OpenClaw 适配层将 actions 清空，Gateway 下发前又设 action 为 None。网页操作员控制使用独立的 operator.control 通道。</p></details>
+        <details><summary>DashScope Key 应在哪一层？</summary><p>只在电脑 Gateway 的 <code>.env</code>。ESP32 与 OpenClaw 都不应拥有它。</p></details>
+      </div>
+    </section>
+    <section class="sources"><h2>继续阅读</h2><p>配合 <a href="../reference/sesame-v3-code-atlas.html">Sesame V3 代码地图</a> 阅读。ESP32-S3 的双核任务机制可对照 <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos_idf.html">ESP-IDF FreeRTOS 官方文档</a>。遇到任一函数，直接把函数名发给我；我会按输入、状态变化、输出、失败路径四段解释。</p></section>
+  </main>
+</body>
+</html>

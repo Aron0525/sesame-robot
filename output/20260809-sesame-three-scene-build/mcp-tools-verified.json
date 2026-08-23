@@ -1,0 +1,52 @@
+[
+  {
+    "name": "list_scenes",
+    "description": "List the three selectable Sesame scenes and their dedicated Agent and future knowledge-base mapping.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_scene",
+    "description": "Read the active normal mode or scene profile for one Sesame robot device.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional when the single-device default is configured."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "select_scene",
+    "description": "Switch one Sesame robot to learning, children, or work scene. Use only when the user explicitly requests a scene switch.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional when the single-device default is configured."
+        },
+        "scene_id": {
+          "type": "string",
+          "enum": [
+            "learning",
+            "children",
+            "work"
+          ]
+        }
+      },
+      "required": [
+        "scene_id"
+      ],
+      "additionalProperties": false
+    }
+  }
+]

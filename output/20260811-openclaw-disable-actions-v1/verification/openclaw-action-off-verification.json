@@ -1,0 +1,26 @@
+{
+  "model_duration_ms": 3456,
+  "response": {
+    "v": 1,
+    "request_id": "action-off-20260811",
+    "turn_id": "action-off-20260811",
+    "status": "completed",
+    "reply": {
+      "text": "你好，见到你我也很高兴！不过我暂时不会挥手，就用开心的表情回应你吧。"
+    },
+    "voice": {
+      "voice_id": "sesame_default",
+      "style": "happy",
+      "speed": 1.0
+    },
+    "expression": {
+      "name": "happy",
+      "ttl_ms": 3000
+    },
+    "actions": []
+  },
+  "checks": [
+    "actions is [] even when user requests waving",
+    "expression remains allowed"
+  ]
+}

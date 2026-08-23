@@ -1,0 +1,6 @@
+/Users/mac/Documents/sesame robot/endpoint-gateway/src/sesame_endpoint_gateway/app.py
+/Users/mac/Documents/sesame robot/endpoint-gateway/tests/test_device_stream.py
+/Users/mac/.openclaw/workspace-sesame/AGENTS.md
+/Users/mac/.openclaw/workspace-sesame-learning/AGENTS.md
+/Users/mac/.openclaw/workspace-sesame-children/AGENTS.md
+/Users/mac/.openclaw/workspace-sesame-work/AGENTS.md

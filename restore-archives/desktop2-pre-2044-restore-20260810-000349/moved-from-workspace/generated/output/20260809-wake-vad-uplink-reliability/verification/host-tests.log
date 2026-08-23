@@ -1,0 +1,3 @@
+$ cd /Users/mac/Desktop/2/firmware/esp32_voice_idf && bash ./tests/run_host_tests.sh
+nihao-zhima WakeNet verified: bytes=22456 sha256=79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065
+exit_status=0

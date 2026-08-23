@@ -1,0 +1,110 @@
+{
+    "devices": [
+        {
+            "device_id": "dev_001",
+            "online": true,
+            "session_id": "ses_69bdaee41e954eb7a2247a605c88f3c6",
+            "current_turn_id": null,
+            "current_stage": "ready",
+            "updated_at_ms": 1786334767993
+        }
+    ],
+    "turns": [],
+    "events": [
+        {
+            "id": 1,
+            "timestamp_ms": 1786334399853,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 2,
+            "timestamp_ms": 1786334399853,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 3,
+            "timestamp_ms": 1786334539709,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 4,
+            "timestamp_ms": 1786334544513,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 5,
+            "timestamp_ms": 1786334544513,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        },
+        {
+            "id": 6,
+            "timestamp_ms": 1786334764390,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "disconnected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 7,
+            "timestamp_ms": 1786334767993,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "wss",
+            "status": "connected",
+            "details": {
+                "transport": "wss"
+            }
+        },
+        {
+            "id": 8,
+            "timestamp_ms": 1786334767993,
+            "device_id": "dev_001",
+            "turn_id": null,
+            "stage": "session",
+            "status": "ready",
+            "details": {
+                "protocol": "v1",
+                "codec": "opus",
+                "sample_rate": 16000
+            }
+        }
+    ],
+    "debug_content": true
+}

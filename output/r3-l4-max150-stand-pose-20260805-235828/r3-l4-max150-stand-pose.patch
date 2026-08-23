@@ -1,0 +1,113 @@
+--- a/firmware/esp32_voice_idf/components/sesame_robot/include/sesame_robot/servo_calibration.h
++++ b/firmware/esp32_voice_idf/components/sesame_robot/include/sesame_robot/servo_calibration.h
+@@ -5,12 +5,21 @@
+ namespace sesame::robot {
+ 
+ constexpr uint8_t kMaximumServoAngle = 180;
++constexpr uint8_t kR3ServoIndex = 5;
++constexpr uint8_t kL4ServoIndex = 7;
++constexpr uint8_t kR3L4MaximumServoAngle = 150;
+ 
+-// Servo commands use their authored angle directly. R3 and L4 are no longer
+-// electrically inverted at the PWM output layer.
++constexpr bool is_r3_or_l4(uint8_t servo_index) {
++  return servo_index == kR3ServoIndex || servo_index == kL4ServoIndex;
++}
++
++// R3 and L4 use their authored direction, but their mechanical range ends at
++// 150 degrees. All other channels retain the normal 0..180 degree range.
+ constexpr uint8_t physical_angle_for_servo(uint8_t servo_index,
+                                            uint8_t logical_angle) {
+-  static_cast<void>(servo_index);
++  if (is_r3_or_l4(servo_index) && logical_angle > kR3L4MaximumServoAngle) {
++    return kR3L4MaximumServoAngle;
++  }
+   return logical_angle > kMaximumServoAngle ? kMaximumServoAngle
+                                              : logical_angle;
+ }
+--- a/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp
++++ b/firmware/esp32_voice_idf/tests/test_servo_calibration.cpp
+@@ -5,20 +5,30 @@
+ #include "sesame_robot/servo_calibration.h"
+ 
+ int main() {
++  using sesame::robot::kL4ServoIndex;
+   using sesame::robot::kMaximumServoAngle;
++  using sesame::robot::kR3L4MaximumServoAngle;
++  using sesame::robot::kR3ServoIndex;
+   using sesame::robot::physical_angle_for_servo;
+ 
+-  constexpr std::array<int, 5> kLogicalAngles{0, 45, 90, 135, 180};
++  constexpr std::array<int, 5> kNormalAngles{0, 67, 90, 150, 180};
+   for (uint8_t servo_index = 0; servo_index < 8; ++servo_index) {
+-    for (const int logical_angle : kLogicalAngles) {
++    for (const int logical_angle : kNormalAngles) {
+       const auto logical = static_cast<uint8_t>(logical_angle);
+-      assert(physical_angle_for_servo(servo_index, logical) == logical);
++      const auto expected =
++          (servo_index == kR3ServoIndex || servo_index == kL4ServoIndex) &&
++                  logical > kR3L4MaximumServoAngle
++              ? kR3L4MaximumServoAngle
++              : logical;
++      assert(physical_angle_for_servo(servo_index, logical) == expected);
+     }
+   }
+ 
+-  assert(physical_angle_for_servo(5, 0) == 0);
+-  assert(physical_angle_for_servo(5, 180) == 180);
+-  assert(physical_angle_for_servo(7, 0) == 0);
+-  assert(physical_angle_for_servo(7, 180) == 180);
++  assert(physical_angle_for_servo(kR3ServoIndex, 67) == 67);
++  assert(physical_angle_for_servo(kL4ServoIndex, 150) == 150);
++  assert(physical_angle_for_servo(kR3ServoIndex, 151) == 150);
++  assert(physical_angle_for_servo(kL4ServoIndex, 180) == 150);
++  assert(physical_angle_for_servo(4, 180) == 180);
+   assert(physical_angle_for_servo(0, 255) == kMaximumServoAngle);
++  assert(physical_angle_for_servo(kR3ServoIndex, 255) == 150);
+ }
+--- a/firmware/esp32_voice_idf/components/sesame_web/include/sesame_web/legacy_movement_sequences.h
++++ b/firmware/esp32_voice_idf/components/sesame_web/include/sesame_web/legacy_movement_sequences.h
+@@ -81,10 +81,10 @@
+   setServoAngle(R2, 45); 
+   setServoAngle(L1, 45); 
+   setServoAngle(L2, 135);
+-  setServoAngle(R4, 0);
+-  setServoAngle(R3, 180);
+-  setServoAngle(L3, 0);
+-  setServoAngle(L4, 180);
++  setServoAngle(R4, 30);
++  setServoAngle(R3, 150);
++  setServoAngle(L3, 30);
++  setServoAngle(L4, 150);
+   if (face == 1) enterIdle();
+ }
+ 
+--- a/firmware/arduino/Sesame_Robot_WiFi_Controller/Sesame_Robot_WiFi_Controller.ino
++++ b/firmware/arduino/Sesame_Robot_WiFi_Controller/Sesame_Robot_WiFi_Controller.ino
+@@ -741,7 +741,8 @@
+ // ====== HELPERS ======
+ void setServoAngle(uint8_t channel, int angle) {
+   if (channel < 8 && angle >= 0 && angle <= 180) {
+-    servos[channel].write(angle);
++    const int outputAngle = (channel == R3 || channel == L4) ? min(angle, 150) : angle;
++    servos[channel].write(outputAngle);
+     delayWithFace(motorCurrentDelay);
+   }
+ }
+--- a/gateway/apps/voice_gateway/src/sesame_voice_gateway/console.html
++++ b/gateway/apps/voice_gateway/src/sesame_voice_gateway/console.html
+@@ -78,12 +78,13 @@
+       const commandLabels = Object.freeze({action:'动作',expression:'表情',servo:'舵机',settings:'动作参数',stop:'停止'});
+       const detailLabels = Object.freeze({kind:'类型',action:'动作',expression:'表情',servo:'舵机',angle:'角度',frame_delay_ms:'帧延迟',walk_cycles:'行走循环',motor_current_delay_ms:'舵机间隔'});
+       const servoNames = ['S0 R1','S1 R2','S2 L1','S3 L2','S4 R4','S5 R3','S6 L3','S7 L4'];
++      const servoMaximumAngles = Object.freeze([180,180,180,180,180,150,180,150]);
+       const stageName = {'wss':'WSS 连接','session':'会话就绪','listen':'录音','audio.up':'Opus 上行','audio.down':'Opus 下行','opus.decode':'Opus 解码','asr':'ASR 识别','openclaw':'OpenClaw','tts.synthesis':'TTS 合成','opus.encode':'Opus 编码','response.plan':'动作 / 表情计划','tts.downlink':'Opus 下行','action.execute':'动作执行','pipeline':'网关处理','turn':'对话回合','serial':'USB 串口监控','device.wss':'ESP32 WSS 已连接','device.session':'ESP32 会话就绪','device.listen':'ESP32 正在录音','device.audio.up':'ESP32 正在上传 Opus','device.response.plan':'ESP32 已接收动作计划','device.playback':'ESP32 正在播放','device.action':'ESP32 动作结果','device.error':'ESP32 设备错误'};
+       const stageHelp = {'listen':'ESP32 正在从 I2S 麦克风采样','audio.up':'ESP32 每 20 ms 上传一个 Opus 二进制包','opus.decode':'网关将 Opus 解码为 16 kHz PCM','asr':'ASR 将 PCM 语音转换为文字','openclaw':'OpenClaw 根据文字生成受约束的回复和动作计划','tts.synthesis':'TTS 将回复文字合成为 PCM','opus.encode':'网关将 PCM 分帧编码为 Opus','tts.downlink':'网关每 20 ms 向 ESP32 发送一个 Opus 包','action.execute':'ESP32 执行动作或表情','serial':'Gateway 正在独占读取 ESP32 的 USB 串口','device.wss':'固件确认 WSS 传输层已经连接','device.session':'固件确认已收到 Gateway 的 session.ready','device.listen':'固件已识别 BOOT 按键，正在采集 I2S 麦克风','device.audio.up':'固件正在把音频帧编码并上传','device.response.plan':'固件已验证并接受动作与表情计划','device.playback':'固件正在播放下行 Opus','device.action':'固件已回报本地动作执行结果','device.error':'固件报告了已知的安全错误状态'};
+       let state = {devices:[], turns:[], events:[], debug_content:false}; let selectedExpression = null; let activeDirection = null; let activeGamepadIndex = null; let lastButtonStates = []; let lastAxisDirection = '';
+       const $ = id => document.getElementById(id); const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char])); const actionLabel = value => actionLabels[value] || value || '—'; const expressionLabel = value => expressionLabels[value] || value || '—'; const commandLabel = value => commandLabels[value] || value || '命令'; const detailValue = (key,value) => key==='action' ? actionLabel(value) : key==='expression' ? expressionLabel(value) : typeof value==='object' ? JSON.stringify(value) : value; const formatDetails = details => Object.entries(details||{}).map(([key,value])=>`${detailLabels[key] || key}=${detailValue(key,value)}`).join(' · ')||'—'; const stage = key => stageName[key] || key || '—'; const time = ms => ms ? new Date(ms).toLocaleTimeString('zh-CN',{hour12:false}) : '—'; const size = bytes => bytes >= 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${bytes || 0} B`; const eventTimestamp = event => Number.isFinite(event.timestamp_ms) ? event.timestamp_ms : Date.now();
+       function log(message, error = false) { const node = $('command-log'); node.textContent = message; node.style.color = error ? '#ff918c' : '#b5c5cb'; }
+-      function initializeControls() { const actionGrid = $('action-grid'); poseActions.forEach(action => { const button=document.createElement('button'); button.className='action'; button.dataset.action=action; button.textContent=actionLabel(action); actionGrid.append(button); }); const faceGrid=$('face-grid'); faces.forEach(expression => { const button=document.createElement('button'); button.className='face'; button.dataset.expression=expression; button.textContent=expressionLabel(expression); faceGrid.append(button); }); const servos=$('servo-list'); servoNames.forEach((name,index) => { const servo=index+1; const row=document.createElement('div'); row.className='servo-row'; row.innerHTML=`<label>${name}</label><input aria-label="${name}" type="range" min="0" max="180" value="90" data-servo="${servo}"><output class="servo-value">90°</output>`; const input=row.querySelector('input'); input.addEventListener('input',() => row.querySelector('output').textContent=`${input.value}°`); input.addEventListener('change',() => dispatch({kind:'servo',servo,angle:Number(input.value)})); servos.append(row); }); }
++      function initializeControls() { const actionGrid = $('action-grid'); poseActions.forEach(action => { const button=document.createElement('button'); button.className='action'; button.dataset.action=action; button.textContent=actionLabel(action); actionGrid.append(button); }); const faceGrid=$('face-grid'); faces.forEach(expression => { const button=document.createElement('button'); button.className='face'; button.dataset.expression=expression; button.textContent=expressionLabel(expression); faceGrid.append(button); }); const servos=$('servo-list'); servoNames.forEach((name,index) => { const servo=index+1; const maxAngle=servoMaximumAngles[index]; const row=document.createElement('div'); row.className='servo-row'; row.innerHTML=`<label>${name}</label><input aria-label="${name}" type="range" min="0" max="${maxAngle}" value="90" data-servo="${servo}"><output class="servo-value">90°</output>`; const input=row.querySelector('input'); input.addEventListener('input',() => row.querySelector('output').textContent=`${input.value}°`); input.addEventListener('change',() => dispatch({kind:'servo',servo,angle:Number(input.value)})); servos.append(row); }); }
+       function audioProgress(details) { return {packet_count:Number.isFinite(details?.packet_count) ? details.packet_count : 0, byte_count:Number.isFinite(details?.byte_count) ? details.byte_count : 0}; }
+       function mergeDeviceEvent(event) { if (!event.device_id) return; let device=state.devices.find(item => item.device_id === event.device_id); if (!device) { device={device_id:event.device_id,online:false,session_id:null,current_turn_id:null,current_stage:'offline',updated_at_ms:0}; state.devices.push(device); } const connected=event.stage==='wss' && event.status==='connected'; const ready=event.stage==='session' && event.status==='ready'; const disconnected=event.stage==='wss' && event.status==='disconnected'; device.updated_at_ms=eventTimestamp(event); if (disconnected) { Object.assign(device,{online:false,session_id:null,current_turn_id:null,current_stage:'offline'}); return; } if (connected || ready) device.online=true; if (connected) device.current_stage='wss.connected'; else if (ready) device.current_stage='ready'; else if (event.stage) device.current_stage=event.stage; if (event.turn_id) device.current_turn_id=event.turn_id; if (event.status==='failed'||event.status==='cancelled'||(event.stage==='tts.downlink'&&event.status==='completed')) { device.current_turn_id=null; if(device.online) device.current_stage=event.status==='completed' ? 'ready' : event.status; } }
+       function mergeTurnEvent(event) { if (!event.turn_id || !event.device_id) return; let turn=state.turns.find(item => item.turn_id===event.turn_id && item.device_id===event.device_id); if (!turn) { turn={device_id:event.device_id,turn_id:event.turn_id,status:'running',current_stage:'created',created_at_ms:eventTimestamp(event),updated_at_ms:eventTimestamp(event),uplink:{packet_count:0,byte_count:0},downlink:{packet_count:0,byte_count:0}}; state.turns.push(turn); } turn.current_stage=event.stage || turn.current_stage; turn.updated_at_ms=eventTimestamp(event); if(event.stage==='audio.up') turn.uplink=audioProgress(event.details); if(event.stage==='audio.down'||event.stage==='tts.downlink') turn.downlink=audioProgress(event.details); if(event.status==='failed'||event.status==='cancelled') turn.status=event.status; if(event.stage==='tts.downlink'&&event.status==='completed') turn.status='completed'; }

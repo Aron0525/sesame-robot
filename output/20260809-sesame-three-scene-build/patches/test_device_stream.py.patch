@@ -1,0 +1,44 @@
+--- /Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/originals/test_device_stream.py	2026-08-09 22:35:05
++++ /Users/mac/Documents/sesame robot/output/20260809-sesame-three-scene-build/final/repo/test_device_stream.py	2026-08-09 22:35:05
+@@ -173,7 +173,7 @@
+             )
+         )
+ 
+-    def test_openclaw_can_select_office_scene_and_console_observes_profile(self) -> None:
++    def test_openclaw_can_select_learning_scene_and_console_observes_profile(self) -> None:
+         with self.client.websocket_connect(
+             "/v1/device-stream",
+             headers={"Authorization": "Bearer test-device-token"},
+@@ -183,26 +183,26 @@
+ 
+             with self.client.websocket_connect("/v1/console") as console:
+                 snapshot = console.receive_json()
+-                self.assertEqual(snapshot["payload"]["scene"]["id"], "companion")
++                self.assertEqual(snapshot["payload"]["scene"]["id"], "normal")
+ 
+                 response = self.client.post(
+                     "/v1/openclaw/scene",
+                     headers={"Authorization": "Bearer test-scene-token"},
+-                    json={"device_id": "sesame-v3-001", "scene_id": "office"},
++                    json={"device_id": "sesame-v3-001", "scene_id": "learning"},
+                 )
+                 changed = console.receive_json()
+ 
+         self.assertEqual(response.status_code, 200)
+-        self.assertEqual(response.json()["scene"]["id"], "office")
+-        self.assertEqual(response.json()["scene"]["persona"]["role"], "办公协作桌面机器人")
++        self.assertEqual(response.json()["scene"]["id"], "learning")
++        self.assertEqual(response.json()["scene"]["persona"]["role"], "学习陪伴机器人")
+         self.assertEqual(changed["type"], "scene.changed")
+-        self.assertEqual(changed["payload"]["scene"]["id"], "office")
++        self.assertEqual(changed["payload"]["scene"]["id"], "learning")
+ 
+     def test_openclaw_scene_control_rejects_invalid_scene_and_bad_token(self) -> None:
+         denied = self.client.post(
+             "/v1/openclaw/scene",
+             headers={"Authorization": "Bearer wrong-token"},
+-            json={"device_id": "sesame-v3-001", "scene_id": "office"},
++            json={"device_id": "sesame-v3-001", "scene_id": "learning"},
+         )
+         invalid = self.client.post(
+             "/v1/openclaw/scene",

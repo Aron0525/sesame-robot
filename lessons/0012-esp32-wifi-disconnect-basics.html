@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="用 Sesame Robot 当前 ESP32-S3 固件理解 Wi-Fi 断线、重连和排查顺序。">
+  <title>专题课｜ESP32 Wi-Fi 为什么会掉线</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/course.js" defer></script>
+</head>
+<body data-lesson="12">
+  <nav class="course-nav" aria-label="课程导航">
+    <div class="course-nav__inner">
+      <a class="course-mark" href="0001-gateway-foundations.html">GATEWAY<span>+VOICE</span></a>
+      <div class="lesson-tabs">
+        <a href="0010-sesame-openclaw-config.html" title="OpenClaw 配置">10</a>
+        <a href="0011-openclaw-agent-sandbox-privacy.html" title="Agent、沙盒与隐私">11</a>
+        <a href="0012-esp32-wifi-disconnect-basics.html" aria-current="page" title="ESP32 Wi-Fi 断线">12</a>
+      </div>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" data-lesson="12">
+      <div>
+        <p class="kicker">Sesame Robot · 网络排障入门</p>
+        <h1>Wi-Fi 掉线，<br>先别急着怪路由器</h1>
+        <p class="lead">你的机器人当前有一个更直接的软件问题：它第一次连上 Wi-Fi 后，把“断线提醒器”拆掉了。以后真掉线，机器人就不知道自己该重连。</p>
+        <div class="lesson-meta"><span>约 10 分钟</span><span>面向初学者</span><span>基于当前 ESP32-S3 固件</span></div>
+      </div>
+    </header>
+
+    <section class="chapter" id="picture">
+      <div class="chapter-head">
+        <span class="chapter-no">12—A</span>
+        <div><h2>先看整条通信链路</h2><p>一次“能和机器人说话”的过程，其实有三段连接。</p></div>
+      </div>
+      <div class="diagram">机器人 ESP32-S3
+      │ Wi-Fi（连接家里的路由器）
+      ▼
+路由器 / 局域网
+      │ Internet / 局域网 TCP
+      ▼
+电脑上的 Voice Gateway
+      │ WebSocket（WSS，长连接）
+      ▼
+语音服务、Agent、TTS</div>
+      <p>所以“机器人没反应”不一定等于 Wi-Fi 掉了。可能是第一段 Wi-Fi 断了，也可能是 Wi-Fi 还在、但第三段 WebSocket（网页/程序的长连接）断了。</p>
+      <table class="comparison">
+        <thead><tr><th>看到的现象</th><th>可能含义</th><th>先看什么</th></tr></thead>
+        <tbody>
+          <tr><td>机器人重启、串口从开机日志重新开始</td><td>供电掉压或 brownout（欠压复位）</td><td>3.3 V、电源线、LDO、舵机/功放动作</td></tr>
+          <tr><td>机器人没重启，但显示 Wi-Fi disconnected</td><td>ESP32 与路由器的 Wi-Fi 断开</td><td>断开原因码、RSSI、路由器</td></tr>
+          <tr><td>Wi-Fi 仍有 IP，语音却不工作</td><td>WebSocket / Gateway 连接断开</td><td>Gateway 与 WSS 日志</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="current-bug">
+      <div class="chapter-head">
+        <span class="chapter-no">12—B</span>
+        <div><h2>当前代码到底哪里有问题</h2><p>把它理解成“保安下班了”。</p></div>
+      </div>
+      <div class="diagram">开机
+  → 注册 Wi-Fi 事件处理器（安排一个保安守着）
+  → 连上 Wi-Fi，拿到 IP
+  → 注销事件处理器（保安下班）  ← 当前代码的问题
+  → 后来 Wi-Fi 断开
+  → 没人收到消息，也就没人执行重连</div>
+      <p>“事件处理器”不是一个神秘硬件。它只是程序里的一段回调函数：系统发生某件事时，自动叫它来处理。这里的事包括“Wi-Fi 断开”和“重新拿到 IP”。</p>
+      <p>当前代码确实写了：断线后调用 <code>esp_wifi_connect()</code>。但它只在<strong>第一次连网之前</strong>有效，因为第一次获得 IP 后就被注销了。因此不是“完全没有重连代码”，而是“重连代码活得太短”。</p>
+      <div class="danger"><strong>第二个问题</strong>当前代码没有打印断开的真正原因。例如密码不对、信号差、路由器踢人、路由器重启，日志看起来都可能只是“掉了”。不先记录原因，后面就只能猜。</div>
+    </section>
+
+    <section class="chapter" id="repair">
+      <div class="chapter-head">
+        <span class="chapter-no">12—C</span>
+        <div><h2>正确的重连过程是什么</h2><p>不是“疯狂点连接”，而是有节奏地重新排队。</p></div>
+      </div>
+      <div class="diagram">Wi-Fi 断开
+  │
+  ├─ 记下原因、信号强度、失败次数
+  ├─ 告诉 WebSocket：旧连接已失效
+  └─ 等待 1 秒后重连
+       失败 → 等 2 秒 → 4 秒 → 8 秒……（设上限）
+                         │
+                         ▼
+                    再次拿到 IP
+                         │
+                         ▼
+                    重新连接 Voice Gateway（WSS）</div>
+      <p>为什么要等一会儿？如果是路由器刚重启，它需要时间恢复。如果程序每一毫秒就重连一次，只会制造更多失败日志，还会让扫描 Wi-Fi 的功能无法工作。官方也建议应用自己设计有上限的重连策略。</p>
+      <p>为什么要“重新建立 WSS”？因为 Wi-Fi 断开时，ESP-IDF 会清理原有 TCP 连接。即使稍后又连回了同一个路由器，旧的 WebSocket 也不能当作还活着。</p>
+    </section>
+
+    <section class="chapter" id="cause">
+      <div class="chapter-head">
+        <span class="chapter-no">12—D</span>
+        <div><h2>拿到断开原因后，怎么理解</h2><p>原因码像医院的化验单：它不能包治百病，但能告诉你该查哪一科。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>日志中的原因</th><th>日常说法</th><th>先做什么</th></tr></thead>
+        <tbody>
+          <tr><td><code>BEACON_TIMEOUT</code></td><td>很久没有听到路由器的“我还在”广播</td><td>看 RSSI、距离、天线、2.4 GHz 干扰、AP 是否重启</td></tr>
+          <tr><td><code>NO_AP_FOUND</code></td><td>没找到要连的 Wi-Fi</td><td>确认独立 2.4 GHz、SSID 没隐藏、信道和信号</td></tr>
+          <tr><td><code>AUTH_FAIL</code> / <code>HANDSHAKE_TIMEOUT</code></td><td>密码或加密握手没有谈成</td><td>查密码、WPA2/WPA3、PMF 和路由器设置</td></tr>
+          <tr><td><code>ASSOC_TOOMANY</code></td><td>路由器说“接入设备太多”</td><td>查客户端上限、访客网络、接入控制</td></tr>
+          <tr><td>reset / brownout</td><td>不是 Wi-Fi 先坏，是芯片因为电压不稳重启</td><td>先测 3.3 V，不要先改 Wi-Fi 代码</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="power-save">
+      <div class="chapter-head">
+        <span class="chapter-no">12—E</span>
+        <div><h2>“关闭 Wi-Fi 省电”是什么意思</h2><p>它是排查开关，不是万能药。</p></div>
+      </div>
+      <p>ESP32 默认会让 Wi-Fi 芯片周期性休息，省电但会带来接收延迟。对电池设备这是好事；对你的语音机器人，实时响应更重要，所以可以试验：</p>
+      <pre><code>ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));</code></pre>
+      <p>这句话的意思是：Wi-Fi 不要为了省电而睡觉。它<strong>会更耗电</strong>，所以要做对比试验：默认模式跑一天，再关闭省电跑一天，记录掉线次数、掉线原因和耗电。如果两者没有差别，就不要因为“网上说有用”而永久关闭。</p>
+      <div class="memory"><h3>你现在只要记住</h3><p>先修“保安下班”的代码错误；再测试省电；最后才把重点放到路由器、天线和供电。顺序不能反。</p></div>
+    </section>
+
+    <section class="chapter" id="hardware">
+      <div class="chapter-head">
+        <span class="chapter-no">12—F</span>
+        <div><h2>硬件为什么也会让 Wi-Fi 看起来掉线</h2><p>Wi-Fi 发射瞬间需要的电流会变大，机器人又有音频、舵机和功放。</p></div>
+      </div>
+      <p>ESP32-S3 使用 3.3 V。官方建议供电能力不少于 500 mA，并在电源入口和芯片附近加入去耦电容。若舵机或功放一动作，电压下陷，ESP32 可能直接重启；用户看起来就像“Wi-Fi 忽然断了”。</p>
+      <ol class="checklist">
+        <li>先看串口：掉线前后是否重新出现启动日志或 brownout。</li>
+        <li>把机器人去壳、放到路由器旁边测试；不要一开始在复杂环境里猜。</li>
+        <li>临时停用电机/舵机和蓝牙，观察断线是否消失。</li>
+        <li>用独立的 2.4 GHz、WPA2/AES、非隐藏 SSID 做一次对照。</li>
+        <li>还不稳定，再用示波器测 ESP32 芯片附近 3.3 V，而不是只在电源插头处测。</li>
+      </ol>
+    </section>
+
+    <section class="chapter" id="implementation">
+      <div class="chapter-head">
+        <span class="chapter-no">12—G</span>
+        <div><h2>这段代码具体怎么改</h2><p>核心不是多写一行 <code>esp_wifi_connect()</code>，而是让值班员一直在岗。</p></div>
+      </div>
+      <p>当前 <code>connect_wifi()</code> 在第一次连接后注销事件处理器并释放 event group。正确改法是把“事件处理器、event group、重连次数、重连定时器”放进 <code>GatewayClient</code> 成员中，让它们和整个 Voice Gateway 会话同寿命。</p>
+      <pre><code>// 断线事件：只负责记录和安排下一次重连
+on_wifi_disconnected(event_data) {
+  reason = event_data.reason;
+  log(reason, rssi, bssid, attempts);
+  mark_wss_offline();
+  schedule_after(reconnect_delay_ms(attempts++)); // 0.5/1/2/4/.../30 秒
+}
+
+// 定时器到点：真正调用连接 API
+on_reconnect_timer() {
+  esp_wifi_connect();
+}
+
+// 拿到 IP：说明网络层恢复，业务层可以继续连 WSS
+on_got_ip() {
+  attempts = 0;
+  mark_wifi_online();
+  // 已有 WSS 自动重连配置时，让它自行完成重连；
+  // 否则在这里启动或重建 WSS。
+}</code></pre>
+      <div class="danger"><strong>不要这样改</strong>不要在断线回调内无限、立刻重复 <code>esp_wifi_connect()</code>；也不要继续把 context 指向函数内的局部 event group。函数返回后它已经不存在，后续回调会变成悬空引用。</div>
+      <p>在当前项目里，还要移除首次连上后 <code>esp_event_handler_instance_unregister(...)</code> 和 <code>vEventGroupDelete(group)</code> 的那段清理；清理应移动到 <code>GatewayClient::stop()</code>，即真正关闭整个连接会话时才执行。</p>
+    </section>
+
+    <section class="chapter" id="sleep-wake">
+      <div class="chapter-head">
+        <span class="chapter-no">12—H</span>
+        <div><h2>Wi-Fi 休眠后，谁来唤醒它</h2><p>先区分“无线电小睡”和“整颗芯片睡死”。</p></div>
+      </div>
+      <table class="comparison">
+        <thead><tr><th>模式</th><th>CPU / Wi-Fi 状态</th><th>如何醒来</th><th>适不适合语音机器人</th></tr></thead>
+        <tbody>
+          <tr><td><code>WIFI_PS_MIN_MODEM</code>（默认）</td><td>Wi-Fi 无线电定期休息；不是深度关机</td><td>自动按路由器 DTIM/beacon 节奏醒来接收数据</td><td>可用，但要实测延迟与兼容性</td></tr>
+          <tr><td><code>WIFI_PS_NONE</code></td><td>Wi-Fi 不进入 modem-sleep</td><td>不需要唤醒</td><td>实时语音排查/常态的优先候选，代价是耗电</td></tr>
+          <tr><td>系统 Light-sleep</td><td>CPU 暂停，配置决定哪些外设继续运行</td><td>定时器、GPIO、部分 Wi-Fi MAC 事件等</td><td>当前项目未启用；不作为本次修复手段</td></tr>
+          <tr><td>Deep-sleep</td><td>Wi-Fi 与主 CPU 都关闭，醒后相当于重新启动</td><td>RTC 定时器、外部 GPIO 等硬件唤醒源</td><td>不适合等待语音/WSS 长连接</td></tr>
+        </tbody>
+      </table>
+      <p>所以，若你调用 <code>esp_wifi_set_ps(WIFI_PS_NONE)</code>，根本不会进入 Wi-Fi modem-sleep，也就没有“怎么唤醒”的问题。若保持默认 <code>WIFI_PS_MIN_MODEM</code>，ESP32 会自己在每个 DTIM（路由器周期性广播的接收时刻）醒来；程序不需要写一个“唤醒 Wi-Fi”的函数。</p>
+      <p>当前工程的 <code>CONFIG_PM_ENABLE</code> 没有启用，表示没有在使用系统级的自动 Light-sleep。此处讨论的只是 Wi-Fi 自己的省电，不会让机器人程序、舵机控制或 Voice Gateway 逻辑全部停止。</p>
+    </section>
+
+    <section class="chapter" id="sources">
+      <div class="chapter-head">
+        <span class="chapter-no">12—I</span>
+        <div><h2>继续查阅</h2><p>这些是本课所依据的官方资料。</p></div>
+      </div>
+      <ul class="checklist">
+        <li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi-driver/overview.html">ESP-IDF Wi-Fi Driver Overview</a>：断线事件、IP 和 socket 的关系。</li>
+        <li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_wifi.html">ESP-IDF Wi-Fi API</a>：原因码、连接和省电 API。</li>
+        <li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi-driver/wifi-performance-and-power-save.html">Wi-Fi Performance and Power Save</a>：默认省电与取舍。</li>
+        <li><a href="https://docs.espressif.com/projects/esp-hardware-design-guidelines/en/latest/esp32s3/esp-hardware-design-guidelines-en-master-esp32s3.pdf">ESP32-S3 Hardware Design Guidelines</a>：3.3 V、去耦和 RF/天线设计。</li>
+      </ul>
+      <p>下次你拿到一次真实的串口掉线日志，可以直接发给我；我们会先读 reason，再决定是改软件、改路由器，还是查供电。</p>
+    </section>
+  </main>
+</body>
+</html>

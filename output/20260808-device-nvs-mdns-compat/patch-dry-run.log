@@ -1,0 +1,5 @@
+patching file 'components/sesame_transport/device_config.cpp'
+patching file 'components/sesame_transport/transport_policy.cpp'
+patching file 'components/sesame_transport/include/sesame_transport/transport_policy.h'
+patching file 'components/sesame_transport/gateway_client.cpp'
+patching file 'components/sesame_transport/test/test_transport_policy.cpp'

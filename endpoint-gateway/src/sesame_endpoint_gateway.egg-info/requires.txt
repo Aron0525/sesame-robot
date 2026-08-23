@@ -1,0 +1,7 @@
+fastapi<1,>=0.110
+opuslib<4,>=3
+uvicorn[standard]<1,>=0.29
+zeroconf<1,>=0.147
+
+[test]
+httpx<1,>=0.27
