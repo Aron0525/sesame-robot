@@ -7,6 +7,8 @@
 #include "sesame_protocol/turn_state.h"
 #include "sesame_robot/esp32_servo_driver.h"
 #include "sesame_robot/robot_adapter.h"
+#include "sesame_transport/device_config.h"
+#include "sesame_transport/local_network.h"
 #include "sesame_ui/oled_expression_display.h"
 #include "sesame_voice/voice_controller.h"
 #include "sesame_web/legacy_motion_runner.h"
@@ -60,6 +62,24 @@ extern "C" void app_main() {
     ESP_LOGE(kTag, "Network event loop initialization failed: %s",
              esp_err_to_name(network_result));
     return;
+  }
+
+  // Start infrastructure Wi-Fi before the HTTP or voice runtimes. Gateway,
+  // mDNS, TLS, and WSS failures must not change the STA lifecycle.
+  static sesame::transport::LocalNetwork local_network;
+  sesame::transport::StoredLocalNetworkConfig local_network_config;
+  const esp_err_t local_config_result =
+      sesame::transport::load_local_network_config(&local_network_config);
+  if (local_config_result != ESP_OK) {
+    ESP_LOGW(kTag,
+             "STA configuration unavailable; local network is offline: %s",
+             esp_err_to_name(local_config_result));
+  }
+  const esp_err_t local_network_result =
+      local_network.start(local_network_config.view());
+  if (local_network_result != ESP_OK) {
+    ESP_LOGE(kTag, "STA initialization failed: %s",
+             esp_err_to_name(local_network_result));
   }
 
   static sesame::ui::OledExpressionDisplay display;

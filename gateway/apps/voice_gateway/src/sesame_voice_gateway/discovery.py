@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ipaddress
 import socket
+import time
 from dataclasses import dataclass
 
 from zeroconf import NonUniqueNameException, ServiceInfo, Zeroconf
@@ -66,6 +67,7 @@ def build_service_info(settings: Settings) -> ServiceInfo:
             b"protocol": b"1",
             b"tls": b"1" if settings.tls_enabled else b"0",
             b"path": b"/v1/device-stream",
+            b"unix_time": str(int(time.time())).encode(),
         },
         server=hostname,
     )

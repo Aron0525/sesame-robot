@@ -22,7 +22,7 @@ API Key 和 Workspace ID 必须来自同一地域。创建入口和最新规则�
 ## 2. 本机配置
 
 ```bash
-cd "/Users/mac/Desktop/1/SesameV3_语音机器人项目/gateway"
+cd "/Users/mac/Desktop/2/gateway"
 cp .env.example .env
 ```
 

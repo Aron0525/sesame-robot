@@ -34,12 +34,12 @@ void MotionExecutor::tick(uint32_t now_ms) {
   }
 }
 
-void MotionExecutor::cancel() {
+void MotionExecutor::cancel(bool release_output) {
   active_ = false;
   plan_ = {};
   step_index_ = 0;
   next_step_at_ms_ = 0;
-  if (output_ != nullptr) output_->release_all();
+  if (release_output && output_ != nullptr) output_->release_all();
 }
 
 }  // namespace sesame::robot

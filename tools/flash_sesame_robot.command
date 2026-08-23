@@ -20,12 +20,17 @@ DRY_RUN=false
 GATEWAY_WAS_LOADED=false
 GATEWAY_STOPPED=false
 SERIAL_CANDIDATES=()
+# Keep failed-transfer recovery bounded without reopening the USB-Serial/JTAG
+# connection 116 times for a ~1.8 MiB application image.
 FLASH_CHUNK_BYTES="${SESAME_FLASH_CHUNK_BYTES:-16384}"
 FLASH_MAX_RETRIES="${SESAME_FLASH_MAX_RETRIES:-5}"
 FLASH_CHUNK_FILE=""
 FLASH_DETAIL_LOG=""
 FLASH_VERIFIED_UNITS=0
 FLASH_RETRY_COUNT=0
+# After a verified write, keep the S3 in ROM download mode and avoid another
+# USB reset before the next chunk. A connection failure clears this state.
+FLASH_BOOTLOADER_READY=false
 
 pause_before_exit() {
   # The app bundle keeps this terminal open after flashing.  Restoring only in
@@ -150,10 +155,36 @@ is_esp32s3() {
   local candidate="$1"
   local probe_output
 
-  if ! probe_output="$(esptool.py --chip esp32s3 --port "${candidate}" --baud 115200 chip_id 2>&1)"; then
+  if ! probe_output="$(esptool.py --chip esp32s3 --port "${candidate}" --baud 115200 \
+      --before usb_reset --after no_reset --no-stub chip_id 2>&1)"; then
     return 1
   fi
   [[ "${probe_output}" == *"ESP32-S3"* ]]
+}
+
+recover_download_mode() {
+  local candidate="$1"
+  local attempt
+
+  # The native USB-Serial/JTAG node can remain visible after its endpoint has
+  # stopped responding. Let macOS finish removing and recreating the endpoint,
+  # then probe it repeatedly before asking for a physical BOOT+EN sequence.
+  sleep 1
+  for attempt in {1..8}; do
+    wait_for_download_port || true
+    if is_esp32s3 "${PORT}"; then
+      FLASH_BOOTLOADER_READY=true
+      echo "USB-Serial/JTAG 已恢复，继续从失败块重试。"
+      return 0
+    fi
+    sleep 0.5
+  done
+  if retry_manual_download_mode "${candidate}"; then
+    FLASH_BOOTLOADER_READY=true
+    echo "已重新进入下载模式，继续从失败块重试。"
+    return 0
+  fi
+  return 1
 }
 
 retry_manual_download_mode() {
@@ -256,7 +287,7 @@ flash_verified_unit() {
   local address="$1"
   local file="$2"
   local after_reset="${3:-no_reset}"
-  local attempt rc=1
+  local attempt rc=1 reset_mode
 
   if [[ ! -s "${file}" ]]; then
     echo "错误：待烧录文件不存在或为空：${file}" >&2
@@ -269,27 +300,37 @@ flash_verified_unit() {
       return 1
     fi
 
-    print -r -- "BEGIN address=${address} file=${file} attempt=${attempt}" \
+    reset_mode="usb_reset"
+    if [[ "${FLASH_BOOTLOADER_READY}" == true ]]; then
+      reset_mode="no_reset"
+    fi
+
+    print -r -- "BEGIN address=${address} file=${file} attempt=${attempt} reset=${reset_mode}" \
       >> "${FLASH_DETAIL_LOG}"
     if esptool.py --chip esp32s3 --port "${PORT}" --baud 115200 \
-      --before default_reset --after "${after_reset}" \
+      --before "${reset_mode}" --after "${after_reset}" --no-stub \
       write_flash --flash_mode keep --flash_freq keep --flash_size keep \
       --no-compress --verify "${address}" "${file}" \
       >> "${FLASH_DETAIL_LOG}" 2>&1; then
       print -r -- "PASS address=${address} attempt=${attempt}" \
         >> "${FLASH_DETAIL_LOG}"
       FLASH_VERIFIED_UNITS=$(( FLASH_VERIFIED_UNITS + 1 ))
+      FLASH_BOOTLOADER_READY=true
       return 0
     else
       rc=$?
     fi
 
     FLASH_RETRY_COUNT=$(( FLASH_RETRY_COUNT + 1 ))
+    FLASH_BOOTLOADER_READY=false
     print -r -- "RETRY address=${address} attempt=${attempt} rc=${rc}" \
       >> "${FLASH_DETAIL_LOG}"
     if (( attempt < FLASH_MAX_RETRIES )); then
-      echo "USB 连接在 ${address} 处中断；重连后重试当前块（${attempt}/${FLASH_MAX_RETRIES}）..."
-      sleep 0.4
+      echo "USB 连接在 ${address} 处中断；尝试恢复下载模式（${attempt}/${FLASH_MAX_RETRIES}）..."
+      if ! recover_download_mode "${PORT}"; then
+        echo "错误：无法恢复 ESP32-S3 下载模式。请检查 USB 数据线和供电后重新运行。" >&2
+        return "${rc}"
+      fi
     fi
   done
 
@@ -298,26 +339,32 @@ flash_verified_unit() {
   return "${rc}"
 }
 
-flash_app_in_verified_chunks() {
-  local app_file="$1"
+flash_image_in_verified_chunks() {
+  local image_file="$1"
   local base_address="$2"
-  local app_size total_chunks index address address_hex
+  local image_label="$3"
+  local final_reset="${4:-no_reset}"
+  local image_size total_chunks index address address_hex chunk_reset
 
-  app_size="$(stat -f %z "${app_file}")"
-  total_chunks=$(( (app_size + FLASH_CHUNK_BYTES - 1) / FLASH_CHUNK_BYTES ))
+  image_size="$(stat -f %z "${image_file}")"
+  total_chunks=$(( (image_size + FLASH_CHUNK_BYTES - 1) / FLASH_CHUNK_BYTES ))
   FLASH_CHUNK_FILE="$(mktemp -t sesame-flash-chunk.XXXXXX)"
 
-  echo "分块写入主程序：${total_chunks} 块，每块 ${FLASH_CHUNK_BYTES} bytes。"
+  echo "分块写入${image_label}：${total_chunks} 块，每块 ${FLASH_CHUNK_BYTES} bytes。"
   index=0
   while (( index < total_chunks )); do
-    dd if="${app_file}" of="${FLASH_CHUNK_FILE}" bs="${FLASH_CHUNK_BYTES}" \
+    dd if="${image_file}" of="${FLASH_CHUNK_FILE}" bs="${FLASH_CHUNK_BYTES}" \
       skip="${index}" count=1 status=none
     address=$(( base_address + index * FLASH_CHUNK_BYTES ))
     printf -v address_hex '0x%x' "${address}"
-    flash_verified_unit "${address_hex}" "${FLASH_CHUNK_FILE}"
+    chunk_reset="no_reset"
+    if (( index + 1 == total_chunks )); then
+      chunk_reset="${final_reset}"
+    fi
+    flash_verified_unit "${address_hex}" "${FLASH_CHUNK_FILE}" "${chunk_reset}"
     index=$(( index + 1 ))
-    if (( index == 1 || index % 10 == 0 || index == total_chunks )); then
-      echo "  主程序已写入并校验：${index}/${total_chunks}"
+    if (( index == 1 || index % 5 == 0 || index == total_chunks )); then
+      echo "  ${image_label}已写入并校验：${index}/${total_chunks}"
     fi
   done
   cleanup_flash_temp
@@ -336,9 +383,10 @@ flash_built_images_resiliently() {
   echo "[2/4] 写入并校验分区表..."
   flash_verified_unit 0x8000 "${build_root}/partition_table/partition-table.bin"
   echo "[3/4] 写入并校验主程序..."
-  flash_app_in_verified_chunks "${build_root}/${APP_IMAGE}" 0x10000
+  flash_image_in_verified_chunks "${build_root}/${APP_IMAGE}" 0x10000 "主程序"
   echo "[4/4] 写入并校验模型分区，然后重启..."
-  flash_verified_unit 0x410000 "${build_root}/srmodels/srmodels.bin" hard_reset
+  flash_image_in_verified_chunks "${build_root}/srmodels/srmodels.bin" \
+    0x410000 "模型分区" watchdog_reset
 
   echo "分块烧录校验完成：${FLASH_VERIFIED_UNITS} 个单元，USB 重试 ${FLASH_RETRY_COUNT} 次。"
   echo "详细日志：${FLASH_DETAIL_LOG}"

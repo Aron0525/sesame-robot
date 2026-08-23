@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "components/sesame_voice/voice_controller.cpp"
 HEADER = ROOT / "components/sesame_voice/include/sesame_voice/voice_controller.h"
+PLAYBACK_POLICY = ROOT / "components/sesame_voice/include/sesame_voice/playback_policy.h"
 
 
 def section(source: str, start: str, end: str) -> str:
@@ -18,6 +19,7 @@ def section(source: str, start: str, end: str) -> str:
 def main() -> None:
     source = SOURCE.read_text(encoding="utf-8")
     header = HEADER.read_text(encoding="utf-8")
+    playback_policy = PLAYBACK_POLICY.read_text(encoding="utf-8")
     callback = section(
         source,
         "void VoiceController::on_gateway_binary",
@@ -48,6 +50,10 @@ def main() -> None:
     # All generation and sequence state remains owned by the voice task.
     assert "packet.sequence != expected_downlink_sequence_" in playback
     assert "packet.generation_id != active_generation_" in playback
+    assert "can_start_playback(queued, tts_stop_requested_)" in playback
+    assert "xQueueCreate(kPlaybackQueueCapacity" in source
+    assert "kPlaybackQueueCapacity = 60" in playback_policy
+    assert "kPlaybackStartupFrames = 30" in playback_policy
 
     # TTS is strictly half-duplex: the audio loop must not read microphone
     # frames or feed VAD/MultiNet while playback is active. BOOT is processed

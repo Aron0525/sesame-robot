@@ -22,6 +22,7 @@
 #include "sesame_voice/gateway_connection_state.h"
 #include "sesame_voice/owner_voice_gate.h"
 #include "sesame_voice/pcm_preroll_buffer.h"
+#include "sesame_voice/playback_policy.h"
 #include "sesame_voice/recording_button.h"
 #include "sesame_voice/voice_turn_detector.h"
 #include "sesame_voice/wake_vad_engine.h"
@@ -169,6 +170,7 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   std::atomic<bool> session_ready_{false};
   std::atomic<bool> tts_active_{false};
   std::atomic<bool> tts_stop_requested_{false};
+  bool playback_started_{false};
   sesame::transport::ReconnectSchedule gateway_reconnect_schedule_{};
   uint64_t gateway_connect_deadline_ms_{0};
   uint64_t next_gateway_attempt_ms_{0};

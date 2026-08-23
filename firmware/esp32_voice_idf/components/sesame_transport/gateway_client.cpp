@@ -1,13 +1,17 @@
 #include "sesame_transport/gateway_client.h"
 
 #include <algorithm>
+#include <ctime>
+#include <sys/time.h>
 #include <cstdio>
 #include <cstring>
 
 #include "esp_event.h"
 #include "esp_check.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_netif.h"
+#include "esp_netif_sntp.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
@@ -58,6 +62,10 @@ bool format_mdns_ipv4(const mdns_result_t* result, char* output,
 
 GatewayClient::~GatewayClient() {
   stop();
+  if (sntp_initialized_) {
+    esp_netif_sntp_deinit();
+    sntp_initialized_ = false;
+  }
   if (client_mutex_ != nullptr) {
     vSemaphoreDelete(client_mutex_);
     client_mutex_ = nullptr;
@@ -286,162 +294,101 @@ void GatewayClient::clear_web_control_alias_address() {
 }
 
 esp_err_t GatewayClient::connect_wifi(const StoredDeviceConfig& config) {
-  esp_err_t result = esp_netif_init();
-  if (result != ESP_OK && result != ESP_ERR_INVALID_STATE) return result;
-  result = esp_event_loop_create_default();
-  if (result != ESP_OK && result != ESP_ERR_INVALID_STATE) return result;
+  (void)config;
+  // Wi-Fi belongs to LocalNetwork, which starts before the web or voice
+  // runtimes. Gateway recovery must never configure, stop, or otherwise make
+  // local AP/HTTP availability depend on mDNS, TLS, or WSS success.
   esp_netif_t* station = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
-  if (station == nullptr) {
-    station = esp_netif_create_default_wifi_sta();
-    if (station == nullptr) return ESP_ERR_NO_MEM;
-  }
-
-  // Initialize mDNS before Wi-Fi association. Initializing it only after
-  // GOT_IP misses the normal event that enables and announces the STA
-  // address, leaving the local web page undiscoverable on some networks.
-  result = initialize_local_mdns(config, station);
-  if (result != ESP_OK) return result;
-
-  wifi_init_config_t init_config = WIFI_INIT_CONFIG_DEFAULT();
-  result = esp_wifi_init(&init_config);
-  if (result != ESP_OK && result != ESP_ERR_INVALID_STATE) return result;
-
-  // Wi-Fi association outlives a single WSS attempt. Register one persistent
-  // event pair, so a retry can wait on the in-flight association instead of
-  // calling esp_wifi_set_config()/esp_wifi_start() a second time.
-  if (wifi_event_group_ == nullptr) {
-    wifi_event_group_ = xEventGroupCreate();
-    if (wifi_event_group_ == nullptr) return ESP_ERR_NO_MEM;
-  }
-  if (!wifi_handlers_registered_) {
-    result = esp_event_handler_instance_register(
-        WIFI_EVENT, ESP_EVENT_ANY_ID, GatewayClient::wifi_event, this,
-        &wifi_event_handler_);
-    if (result != ESP_OK) return result;
-    result = esp_event_handler_instance_register(
-        IP_EVENT, ESP_EVENT_ANY_ID, GatewayClient::wifi_event, this,
-        &ip_event_handler_);
-    if (result != ESP_OK) {
-      esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID,
-                                            wifi_event_handler_);
-      wifi_event_handler_ = {};
-      return result;
-    }
-    wifi_handlers_registered_ = true;
-  }
-
-  if (station_has_ipv4(station)) {
-    xEventGroupSetBits(wifi_event_group_, kWifiConnected);
-    return ESP_OK;
-  }
-
-  if (!wifi_configured_) {
-    wifi_config_t wifi_config{};
-    std::strncpy(reinterpret_cast<char*>(wifi_config.sta.ssid),
-                 config.wifi_ssid.data(), sizeof(wifi_config.sta.ssid) - 1);
-    std::strncpy(reinterpret_cast<char*>(wifi_config.sta.password),
-                 config.wifi_password.data(),
-                 sizeof(wifi_config.sta.password) - 1);
-    wifi_config.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
-    wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
-    wifi_config.sta.pmf_cfg.capable = true;
-    wifi_config.sta.pmf_cfg.required = false;
-    wifi_config.sta.failure_retry_cnt = 3;
-
-    result = esp_wifi_set_mode(WIFI_MODE_STA);
-    if (result != ESP_OK && result != ESP_ERR_WIFI_STATE) return result;
-    result = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
-    if (result == ESP_ERR_WIFI_STATE) {
-      // A previous call already started association. Do not fight it by
-      // rewriting STA configuration; wait for its IP event instead.
-      ESP_LOGI(kTag, "Wi-Fi STA is already associating; waiting for IP event");
-      wifi_configured_ = true;
-    } else if (result != ESP_OK) {
-      return result;
-    } else {
-      wifi_configured_ = true;
-    }
-  }
-
-  bool started_now = false;
-  if (!wifi_started_) {
-    result = esp_wifi_start();
-    if (result == ESP_OK) {
-      started_now = true;
-    } else if (result != ESP_ERR_INVALID_STATE) {
-      return result;
-    }
-    wifi_started_ = true;
-  }
-
-  if (station_has_ipv4(station)) {
-    xEventGroupSetBits(wifi_event_group_, kWifiConnected);
-    return ESP_OK;
-  }
-  xEventGroupClearBits(wifi_event_group_, kWifiConnected);
-  // Close the small race where DHCP succeeds between the first address check
-  // and clearing a stale event bit.
-  if (station_has_ipv4(station)) {
-    xEventGroupSetBits(wifi_event_group_, kWifiConnected);
-    return ESP_OK;
-  }
-  // A successful esp_wifi_start() emits WIFI_EVENT_STA_START, whose handler
-  // owns the first connect request. If Wi-Fi was already running, this call
-  // initiates (or observes) the outstanding association exactly once.
-  if (!started_now) request_wifi_connection();
-  const EventBits_t bits = xEventGroupWaitBits(
-      wifi_event_group_, kWifiConnected, pdFALSE, pdFALSE,
-      kWifiConnectWaitTicks);
-  if ((bits & kWifiConnected) != 0) return ESP_OK;
-  log_wifi_diagnostics_after_timeout(config);
-  reset_wifi_association_after_timeout();
-  return ESP_ERR_TIMEOUT;
+  return station_has_ipv4(station) ? ESP_OK : ESP_ERR_TIMEOUT;
 }
 
 esp_err_t GatewayClient::discover_gateway(
     const StoredDeviceConfig& config) {
-  mdns_result_t* results = nullptr;
-  const esp_err_t result =
-      mdns_query_ptr("_sesame-gw", "_tcp", 5000, 8, &results);
-  if (result != ESP_OK) return result;
-
+  discovered_gateway_time_ = 0;
   esp_err_t selected = ESP_ERR_NOT_FOUND;
   std::array<char, 16> gateway_ipv4{};
-  for (mdns_result_t* current = results; current != nullptr;
-       current = current->next) {
-    GatewayCandidate candidate{
-        current->hostname == nullptr ? "" : current->hostname,
-        current->port,
-        txt_value(current, "gateway_id"),
-        txt_value(current, "protocol"),
-        txt_value(current, "tls"),
-        txt_value(current, "path"),
-    };
-    if (validate_candidate(candidate, config.gateway_id.data()) !=
-        CandidateError::kOk) {
-      continue;
+  constexpr std::array<const char*, 2> services{
+      kGatewayMdnsService, kLegacyGatewayMdnsService};
+  for (const char* service : services) {
+    mdns_result_t* results = nullptr;
+    const esp_err_t query_result =
+        mdns_query_ptr(service, "_tcp", 5000, 8, &results);
+    if (query_result != ESP_OK) continue;
+    for (mdns_result_t* current = results; current != nullptr;
+         current = current->next) {
+      GatewayCandidate candidate{
+          current->hostname == nullptr ? "" : current->hostname,
+          current->port,
+          txt_value(current, "gateway_id"),
+          txt_value(current, "protocol"),
+          txt_value(current, "tls"),
+          txt_value(current, "path"),
+      };
+      if (validate_candidate(candidate, config.gateway_id.data()) !=
+          CandidateError::kOk) {
+        continue;
+      }
+      if (!format_mdns_ipv4(current, gateway_ipv4.data(),
+                            gateway_ipv4.size())) {
+        ESP_LOGW(kTag, "mDNS Gateway record has no IPv4 address");
+        continue;
+      }
+      if (format_gateway_tls_hostname(candidate, gateway_tls_name_.data(),
+                                      gateway_tls_name_.size()) &&
+          format_gateway_ipv4_uri(candidate, gateway_ipv4.data(), uri_.data(),
+                                  uri_.size())) {
+        parse_gateway_unix_time(txt_value(current, "unix_time"),
+                                &discovered_gateway_time_);
+        ESP_LOGI(kTag,
+                 "P1 mDNS selected: service=%s host=%.*s port=%u gateway_id=%.*s",
+                 service, static_cast<int>(candidate.host.size()),
+                 candidate.host.data(), static_cast<unsigned>(candidate.port),
+                 static_cast<int>(candidate.gateway_id.size()),
+                 candidate.gateway_id.data());
+        selected = ESP_OK;
+        break;
+      }
     }
-    if (!format_mdns_ipv4(current, gateway_ipv4.data(),
-                          gateway_ipv4.size())) {
-      ESP_LOGW(kTag, "mDNS Gateway record has no IPv4 address");
-      continue;
+    mdns_query_results_free(results);
+    if (selected == ESP_OK) break;
+  }
+  return selected;
+}
+
+esp_err_t GatewayClient::ensure_tls_clock() {
+  std::time_t now = std::time(nullptr);
+  if (tls_clock_is_plausible(static_cast<int64_t>(now))) return ESP_OK;
+
+  if (!sntp_initialized_) {
+    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+    const esp_err_t init_result = esp_netif_sntp_init(&config);
+    if (init_result != ESP_OK && init_result != ESP_ERR_INVALID_STATE) {
+      return init_result;
     }
-    if (format_gateway_tls_hostname(candidate, gateway_tls_name_.data(),
-                                    gateway_tls_name_.size()) &&
-        format_gateway_ipv4_uri(candidate, gateway_ipv4.data(), uri_.data(),
-                                uri_.size())) {
-      ESP_LOGI(kTag,
-               "P1 mDNS selected: host=%.*s port=%u gateway_id=%.*s",
-               static_cast<int>(candidate.host.size()), candidate.host.data(),
-               static_cast<unsigned>(candidate.port),
-               static_cast<int>(candidate.gateway_id.size()),
-               candidate.gateway_id.data());
-      selected = ESP_OK;
-      break;
+    sntp_initialized_ = true;
+  }
+
+  ESP_LOGI(kTag, "waiting for SNTP before TLS certificate validation");
+  const esp_err_t sync_result = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(10000));
+  now = std::time(nullptr);
+  if (sync_result == ESP_OK &&
+      tls_clock_is_plausible(static_cast<int64_t>(now))) {
+    ESP_LOGI(kTag, "system time synchronized for TLS: epoch=%lld",
+             static_cast<long long>(now));
+    return ESP_OK;
+  }
+
+  if (tls_clock_is_plausible(discovered_gateway_time_)) {
+    const timeval gateway_time{
+        static_cast<time_t>(discovered_gateway_time_), 0};
+    if (settimeofday(&gateway_time, nullptr) == 0) {
+      ESP_LOGW(kTag,
+               "SNTP unavailable; initialized TLS clock from mDNS: epoch=%lld",
+               static_cast<long long>(discovered_gateway_time_));
+      return ESP_OK;
     }
   }
-  mdns_query_results_free(results);
-  return selected;
+  return sync_result == ESP_OK ? ESP_ERR_INVALID_STATE : sync_result;
 }
 
 esp_err_t GatewayClient::start(const StoredDeviceConfig& config,
@@ -467,6 +414,12 @@ esp_err_t GatewayClient::start(const StoredDeviceConfig& config,
   // VoiceController owns exponential retry so every retry starts with a new
   // mDNS query instead of blocking this task through nested retry loops.
   result = discover_gateway(config);
+  if (result != ESP_OK) {
+    stop_locked();
+    xSemaphoreGive(client_mutex_);
+    return result;
+  }
+  result = ensure_tls_clock();
   if (result != ESP_OK) {
     stop_locked();
     xSemaphoreGive(client_mutex_);
@@ -508,6 +461,11 @@ esp_err_t GatewayClient::start(const StoredDeviceConfig& config,
   websocket_config.reconnect_timeout_ms = 0;
   websocket_config.network_timeout_ms = 10000;
   websocket_config.ping_interval_sec = 10;
+  ESP_LOGI(kTag,
+           "TLS allocation snapshot: internal_free=%lu internal_largest=%lu psram_free=%lu",
+           static_cast<unsigned long>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL)),
+           static_cast<unsigned long>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL)),
+           static_cast<unsigned long>(heap_caps_get_free_size(MALLOC_CAP_SPIRAM)));
   client_ = esp_websocket_client_init(&websocket_config);
   if (client_ == nullptr) {
     stop_locked();

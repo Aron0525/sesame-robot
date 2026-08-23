@@ -211,11 +211,13 @@ void Esp32ServoDriver::task_entry(void* context) {
 void Esp32ServoDriver::run() {
   while (true) {
     if (stop_requested_.exchange(false)) {
-      executor_.cancel();
+      // begin_web_motion(), begin_manual_control(), and safety stops already
+      // release the PWM outputs synchronously. Releasing them again here can
+      // race with the first servo write (usually R1) of the new movement.
+      executor_.cancel(false);
       xQueueReset(command_queue_);
-      // MotionExecutor::cancel releases all channels. Restore a held manual
-      // pose only when a slider is still the active owner; safety stop and a
-      // legacy action both keep outputs released instead.
+      // Restore a held manual pose only when a slider is still the active
+      // owner; otherwise the new movement writes its next pose.
       apply_manual_pose();
       continue;
     }

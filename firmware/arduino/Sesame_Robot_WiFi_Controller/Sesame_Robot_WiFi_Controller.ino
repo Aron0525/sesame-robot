@@ -510,10 +510,9 @@ void loop() {
     else if (cmd == "stand") { runStandPose(1); if (currentCommand == "stand") currentCommand = ""; }
     else if (cmd == "wave") runWavePose();
     else if (cmd == "dance") runDancePose();
+    else if (cmd == "proud") runProudPose();
     else if (cmd == "swim") runSwimPose();
-    else if (cmd == "point") runPointPose();
     else if (cmd == "pushup") runPushupPose();
-    else if (cmd == "bow") runBowPose();
     else if (cmd == "cute") runCutePose();
     else if (cmd == "freaky") runFreakyPose();
     else if (cmd == "worm") runWormPose();
@@ -541,10 +540,9 @@ void loop() {
         else if(strcmp(command_buffer, "run stand") == 0 || strcmp(command_buffer, "rn st") == 0) runStandPose(1);
         else if(strcmp(command_buffer, "rn wv") == 0) { currentCommand = "wave"; runWavePose(); }
         else if(strcmp(command_buffer, "rn dn") == 0) { currentCommand = "dance"; runDancePose(); }
+        else if(strcmp(command_buffer, "rn pr") == 0) { currentCommand = "proud"; runProudPose(); }
         else if(strcmp(command_buffer, "rn sw") == 0) { currentCommand = "swim"; runSwimPose(); }
-        else if(strcmp(command_buffer, "rn pt") == 0) { currentCommand = "point"; runPointPose(); }
         else if(strcmp(command_buffer, "rn pu") == 0) { currentCommand = "pushup"; runPushupPose(); }
-        else if(strcmp(command_buffer, "rn bw") == 0) { currentCommand = "bow"; runBowPose(); }
         else if(strcmp(command_buffer, "rn ct") == 0) { currentCommand = "cute"; runCutePose(); }
         else if(strcmp(command_buffer, "rn fk") == 0) { currentCommand = "freaky"; runFreakyPose(); }
         else if(strcmp(command_buffer, "rn wm") == 0) { currentCommand = "worm"; runWormPose(); }

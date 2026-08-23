@@ -8,6 +8,7 @@ from sesame_voice_gateway.discovery import (
     MdnsAdvertiser,
     NonUniqueNameException,
     _resolve_advertised_ipv4,
+    build_service_info,
 )
 
 
@@ -97,6 +98,15 @@ class MdnsRefreshTest(unittest.TestCase):
         self.assertEqual(len(zeroconf.registered), 2)
         self.assertEqual(zeroconf.registered[1][1], {"allow_name_change": True})
         self.assertFalse(zeroconf.closed)
+
+    def test_service_advertises_current_time_for_offline_tls_bootstrap(self) -> None:
+        with patch(
+            "sesame_voice_gateway.discovery._resolve_advertised_ipv4",
+            return_value="192.168.88.21",
+        ), patch("sesame_voice_gateway.discovery.time.time", return_value=1787400000.9):
+            service = build_service_info(_settings())
+
+        self.assertEqual(service.properties[b"unix_time"], b"1787400000")
 
     def test_auto_address_prefers_hostname_lan_address_over_vpn_route(self) -> None:
         with patch(

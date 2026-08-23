@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <limits>
 
 namespace sesame::transport {
 namespace {
@@ -90,7 +91,8 @@ CandidateError validate_candidate(const GatewayCandidate& candidate,
   }
   if (candidate.protocol != "1") return CandidateError::kProtocolMismatch;
   if (candidate.tls != "1") return CandidateError::kTlsRequired;
-  if (candidate.path != "/v1/device-stream") {
+  if (candidate.path != "/v2/device-stream" &&
+      candidate.path != "/v1/device-stream") {
     return CandidateError::kPathMismatch;
   }
   return CandidateError::kOk;
@@ -155,6 +157,28 @@ bool format_device_mdns_hostname(std::string_view device_id, char* output,
   return true;
 }
 
+bool tls_clock_is_plausible(int64_t unix_seconds) {
+  // 2020-01-01 UTC. This is only a readiness gate; certificate validity is
+  // still enforced by MbedTLS against the synchronized current time.
+  return unix_seconds >= 1'577'836'800;
+}
+
+bool parse_gateway_unix_time(std::string_view value, int64_t* unix_seconds) {
+  if (unix_seconds == nullptr || value.empty()) return false;
+  int64_t parsed = 0;
+  for (const char character : value) {
+    if (character < '0' || character > '9') return false;
+    const int64_t digit = character - '0';
+    if (parsed > (std::numeric_limits<int64_t>::max() - digit) / 10) {
+      return false;
+    }
+    parsed = parsed * 10 + digit;
+  }
+  if (!tls_clock_is_plausible(parsed)) return false;
+  *unix_seconds = parsed;
+  return true;
+}
+
 ConfigError validate_device_config(const DeviceConfig& config) {
   if (config.wifi_ssid.empty() || config.wifi_password.empty()) {
     return ConfigError::kMissingWifi;
@@ -164,6 +188,11 @@ ConfigError validate_device_config(const DeviceConfig& config) {
   if (config.device_token.empty()) return ConfigError::kMissingToken;
   if (config.root_ca.empty()) return ConfigError::kMissingRootCa;
   return ConfigError::kOk;
+}
+
+bool validate_local_network_config(const LocalNetworkConfig& config) {
+  return !config.wifi_ssid.empty() && !config.wifi_password.empty() &&
+         !config.device_id.empty();
 }
 
 void redact_bearer(std::string_view value, char* output, size_t capacity) {

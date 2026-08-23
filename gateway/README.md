@@ -2,10 +2,15 @@
 
 `gateway` 是电脑端唯一的语音编排服务：它接收 ESP32 的 Opus 音频，完成 ASR → OpenClaw（LLM）→ TTS，再把语音、表情与动作下发给 ESP32。
 
+> 当前实体机使用 0821 streaming-lab 组合：`_sesame-streamgw._tcp.local.`、
+> 8766、`/v2/device-stream`。当前检出的 v1.6 源码默认是 `_sesame-gw._tcp.local.`、
+> 8765、`/v1/device-stream`。两套参数不能混用；运行或重新烧录前先看
+> [`docs/run-gateway.md`](../docs/run-gateway.md)。
+
 ## 启动
 
 ```bash
-cd "/Users/mac/Desktop/1/SesameV3_语音机器人项目/gateway"
+cd "/Users/mac/Desktop/2/gateway"
 cp .env.example .env
 # 填写设备 token、DashScope API Key、OpenClaw token 和 TLS 文件路径
 make sync
@@ -19,7 +24,7 @@ make run
 网关启动后，在**运行网关的这台电脑**浏览器打开：
 
 ```text
-https://sesame-gateway.local:8765/console
+https://sesame-stream-gateway.local:8766/console
 ```
 
 控制台把原机器人控制页和 Voice Trace 合并在一起：可执行动作、OLED 表情、8 路舵机、

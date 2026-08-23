@@ -3,7 +3,6 @@
 #include <array>
 #include <limits>
 
-#include "driver/gpio.h"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -37,23 +36,21 @@ esp_err_t AudioHal::initialize() {
     return ESP_OK;
   }
 
-  const gpio_config_t amplifier_config = {
-      .pin_bit_mask = 1ULL << kAmplifierEnablePin,
-      .mode = GPIO_MODE_OUTPUT,
-      .pull_up_en = GPIO_PULLUP_DISABLE,
-      .pull_down_en = GPIO_PULLDOWN_ENABLE,
-      .intr_type = GPIO_INTR_DISABLE,
-  };
-  ESP_RETURN_ON_ERROR(gpio_config(&amplifier_config), kTag,
-                      "configure amplifier enable");
-  ESP_RETURN_ON_ERROR(set_amplifier_enabled(false), kTag,
-                      "mute amplifier before I2S init");
-
-  const i2s_chan_config_t channel_config =
-      I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
+  const i2s_chan_config_t microphone_channel_config =
+      I2S_CHANNEL_DEFAULT_CONFIG(
+          static_cast<i2s_port_t>(kMicrophoneI2sPort), I2S_ROLE_MASTER);
   ESP_RETURN_ON_ERROR(
-      i2s_new_channel(&channel_config, &tx_channel_, &rx_channel_), kTag,
-      "create full-duplex I2S channels");
+      i2s_new_channel(&microphone_channel_config, nullptr, &rx_channel_), kTag,
+      "create microphone I2S RX channel");
+
+  const i2s_chan_config_t speaker_channel_config =
+      I2S_CHANNEL_DEFAULT_CONFIG(
+          static_cast<i2s_port_t>(kSpeakerI2sPort), I2S_ROLE_MASTER);
+  esp_err_t result = i2s_new_channel(&speaker_channel_config, &tx_channel_, nullptr);
+  if (result != ESP_OK) {
+    shutdown();
+    return result;
+  }
 
   i2s_std_config_t tx_config = {
       .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(kSampleRateHz),
@@ -62,8 +59,8 @@ esp_err_t AudioHal::initialize() {
       .gpio_cfg =
           {
               .mclk = I2S_GPIO_UNUSED,
-              .bclk = kI2sBclkPin,
-              .ws = kI2sWsPin,
+              .bclk = kSpeakerBclkPin,
+              .ws = kSpeakerWsPin,
               .dout = kSpeakerDataPin,
               .din = I2S_GPIO_UNUSED,
               .invert_flags =
@@ -74,7 +71,7 @@ esp_err_t AudioHal::initialize() {
                   },
           },
   };
-  esp_err_t result = i2s_channel_init_std_mode(tx_channel_, &tx_config);
+  result = i2s_channel_init_std_mode(tx_channel_, &tx_config);
   if (result != ESP_OK) {
     shutdown();
     return result;
@@ -87,8 +84,8 @@ esp_err_t AudioHal::initialize() {
       .gpio_cfg =
           {
               .mclk = I2S_GPIO_UNUSED,
-              .bclk = kI2sBclkPin,
-              .ws = kI2sWsPin,
+              .bclk = kMicrophoneBclkPin,
+              .ws = kMicrophoneWsPin,
               .dout = I2S_GPIO_UNUSED,
               .din = kMicrophoneDataPin,
               .invert_flags =
@@ -118,13 +115,11 @@ esp_err_t AudioHal::initialize() {
 
   initialized_ = true;
   ESP_LOGI(kTag,
-           "I2S ready: 16 kHz, 32-bit stereo bus, mic left slot, 20 ms frame");
+           "I2S ready: mic GPIO 14/47/48 on I2S0; speaker GPIO 1/2/3 on I2S1");
   return ESP_OK;
 }
 
 esp_err_t AudioHal::shutdown() {
-  set_amplifier_enabled(false);
-
   if (tx_channel_ != nullptr) {
     i2s_channel_disable(tx_channel_);
     i2s_del_channel(tx_channel_);
@@ -192,7 +187,11 @@ esp_err_t AudioHal::write_speaker_frame(const int16_t* input,
 }
 
 esp_err_t AudioHal::set_amplifier_enabled(bool enabled) {
-  return gpio_set_level(kAmplifierEnablePin, enabled ? 1 : 0);
+  // GPIO 1 is the replacement MAX98357A BCLK, not a shutdown/enable line.
+  // Keep the existing voice-controller API while the always-enabled amplifier
+  // is driven solely by its I2S stream.
+  (void)enabled;
+  return ESP_OK;
 }
 
 }  // namespace sesame::audio

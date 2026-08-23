@@ -1,6 +1,6 @@
 # Sesame V3 P0–P2 实机验证计划
 
-交付目录：`/Users/mac/Desktop/1/SesameV3_语音机器人项目`。
+交付目录：`/Users/mac/Desktop/2`。
 
 ## P0：隔离启动诊断
 

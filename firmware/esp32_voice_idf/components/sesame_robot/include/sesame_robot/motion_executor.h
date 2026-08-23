@@ -21,7 +21,7 @@ class MotionExecutor {
 
   bool start(std::span<const MotionStep> plan, uint32_t now_ms);
   void tick(uint32_t now_ms);
-  void cancel();
+  void cancel(bool release_output = true);
   bool active() const { return active_; }
 
  private:

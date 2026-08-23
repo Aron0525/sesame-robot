@@ -35,10 +35,10 @@ for (const relativePath of sources) {
                `${relativePath}: rest L4 must be 90 - 30 = 60`);
 
   const stand = functionBody(source, 'runStandPose', 'runWavePose');
-  assert.equal(directAngle(stand, 'R3'), 120,
-               `${relativePath}: stand R3 retains the prior 120-degree calibration`);
-  assert.equal(directAngle(stand, 'L4'), 120,
-               `${relativePath}: stand L4 retains the prior 120-degree calibration`);
+  assert.equal(directAngle(stand, 'R3'), 113,
+               `${relativePath}: stand R3 matches the 0821 calibration`);
+  assert.equal(directAngle(stand, 'L4'), 112,
+               `${relativePath}: stand L4 matches the 0821 calibration`);
 
   const dead = functionBody(source, 'runDeadPose()', 'runCrabPose');
   assert.equal(directAngle(dead, 'R3'), 60,

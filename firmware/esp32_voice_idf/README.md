@@ -1,5 +1,9 @@
 # Sesame Robot V3 唯一 ESP-IDF 正式固件
 
+> 当前实体板已刷入 0821 固件，使用 `_sesame-streamgw._tcp.local.`、8766、
+> `/v2/device-stream`。本目录当前检出的 v1.6 源码默认使用 `_sesame-gw._tcp.local.`、
+> 8765、`/v1/device-stream`。重新编译或烧录前必须同时匹配电脑 Gateway，不能只改一端。
+
 目标芯片：ESP32-S3，16 MB Flash、8 MB OPI PSRAM。
 
 ## 固定音频参数
@@ -10,18 +14,20 @@
   MAX98357A 同时接收复制到左右 slot 的 mono PCM。
 
 之所以 I2S 总线使用 32-bit stereo，而网络仍是 mono，是因为 INMP441
-在一个 32-bit slot 中输出 24-bit 麦克风样本；麦克风和功放又共用 BCLK/WS。
-固件读取 left slot 后转换为 mono PCM，播放时将 mono 样本复制到两个 slot。
+在一个 32-bit slot 中输出 24-bit 麦克风样本。麦克风和功放使用独立 I2S
+控制器；固件读取麦克风的 left slot 后转换为 mono PCM，播放时将 mono
+样本复制到功放的两个 slot。
 
 ## 固定引脚
 
 | 信号 | GPIO |
 |---|---:|
-| I2S BCLK / INMP441 SCK | 14 |
-| I2S WS / LRCLK | 47 |
+| INMP441 SCK / I2S0 BCLK | 14 |
+| INMP441 WS / I2S0 WS | 47 |
 | INMP441 SD | 48 |
-| MAX98357A DIN | 2 |
-| MAX98357A SD/EN | 1 |
+| MAX98357A BCLK / I2S1 BCLK | 1 |
+| MAX98357A LRC / I2S1 WS | 2 |
+| MAX98357A DIN | 3 |
 | S0–S7 servo PWM | 4, 5, 6, 7, 10, 11, 12, 13 |
 | OLED SDA / SCL | 8 / 9 |
 

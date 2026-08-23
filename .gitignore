@@ -19,6 +19,10 @@ firmware/esp32_voice_idf/device-nvs.bin
 firmware/esp32_voice_idf/components/sesame_transport/include/sesame_transport/local-device-config.h
 firmware/esp32_voice_idf/diagnostics/multinet_real19_eval/
 
+# Device-local Arduino credentials and biometric enrollment artifacts
+firmware/arduino/**/local-config.h
+/firmware/esp32_voice_idf/components/sesame_voice/private/
+
 # Arduino and diagnostic generated outputs
 firmware/arduino/**/build/
 firmware/esp32_voice_idf/diagnostics/**/build*/
@@ -36,6 +40,8 @@ firmware/esp32_voice_idf/diagnostics/**/build*/
 /output/
 /training/
 /tools/*real19*.py
+/.codex/
+/gateway/.migration-backups/
 # Personal speaker-embedding image and its embedded biometric template.
 /firmware/speaker_embedding_s3/
 /\.r3_l4_action_artifact_dir

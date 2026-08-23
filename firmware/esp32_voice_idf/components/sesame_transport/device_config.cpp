@@ -100,6 +100,52 @@ DeviceConfig StoredDeviceConfig::view() const {
   };
 }
 
+LocalNetworkConfig StoredLocalNetworkConfig::view() const {
+  return {wifi_ssid.data(), wifi_password.data(), device_id.data(),
+          web_control_hostname.data()};
+}
+
+esp_err_t load_local_network_config(StoredLocalNetworkConfig* output) {
+  if (output == nullptr) return ESP_ERR_INVALID_ARG;
+  *output = {};
+
+#if SESAME_HAS_LOCAL_DEVICE_CONFIG
+  const bool copied =
+      copy_local_value(SESAME_LOCAL_WIFI_SSID, &output->wifi_ssid) &&
+      copy_local_value(SESAME_LOCAL_WIFI_PASSWORD, &output->wifi_password) &&
+      copy_local_value(SESAME_LOCAL_DEVICE_ID, &output->device_id);
+  if (copied && !std::string_view(SESAME_LOCAL_WEB_CONTROL_HOSTNAME).empty() &&
+      !copy_local_value(SESAME_LOCAL_WEB_CONTROL_HOSTNAME,
+                        &output->web_control_hostname)) {
+    return ESP_ERR_INVALID_ARG;
+  }
+  return copied && validate_local_network_config(output->view())
+             ? ESP_OK
+             : ESP_ERR_INVALID_ARG;
+#else
+  esp_err_t result = nvs_flash_init();
+  if (result != ESP_OK) return result;
+  nvs_handle_t handle = 0;
+  result = nvs_open("sesame", NVS_READONLY, &handle);
+  if (result != ESP_OK) return result;
+  result = read_string(handle, "wifi_ssid", &output->wifi_ssid, true);
+  if (result == ESP_OK) {
+    result = read_string(handle, "wifi_pass", &output->wifi_password, true);
+  }
+  if (result == ESP_OK) {
+    result = read_string(handle, "device_id", &output->device_id, true);
+  }
+  if (result == ESP_OK) {
+    result = read_string(handle, "web_host", &output->web_control_hostname,
+                         false);
+  }
+  nvs_close(handle);
+  return result == ESP_OK && validate_local_network_config(output->view())
+             ? ESP_OK
+             : ESP_ERR_INVALID_ARG;
+#endif
+}
+
 esp_err_t load_device_config(StoredDeviceConfig* output) {
   if (output == nullptr) return ESP_ERR_INVALID_ARG;
   *output = {};
