@@ -1,0 +1,6 @@
+# ESP-IDF build trees record absolute host paths and must be regenerated locally.
+/build/
+/build-codex-*/
+
+# Device configuration backups may contain network credentials and tokens.
+/flash-diagnostics/nvs-backups/
