@@ -1,9 +1,0 @@
-{
-  "additionalFiles": "",
-  "compiler.optimization_flags": "-Os",
-  "customBuildProperties": "",
-  "fqbn": "esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=cdc,FlashMode=qio,FlashSize=4M,PartitionScheme=default",
-  "hardwareFolders": "/Users/mac/Library/Arduino15/packages/esp32/hardware/esp32/3.3.10,/Users/mac/Library/Arduino15/packages/esp32/hardware/esp32/3.3.10",
-  "otherLibrariesFolders": "/Users/mac/Documents/Arduino/libraries",
-  "sketchLocation": "/Users/mac/Documents/sesame robot/.internal/upstream-sesame-v3-sketch"
-}

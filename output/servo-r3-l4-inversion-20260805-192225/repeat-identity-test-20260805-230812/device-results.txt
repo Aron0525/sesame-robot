@@ -1,8 +1,0 @@
-delivered {'kind': 'servo', 'action': None, 'expression': None}
-accepted {'request_id': 'ctl_50c7798a6eed4d4ab587b9901ea96a55', 'error_code': None}
-delivered {'kind': 'stop', 'action': None, 'expression': None}
-accepted {'request_id': 'ctl_759c28f17c8c48b9b25b20f6d326c27e', 'error_code': None}
-delivered {'kind': 'servo', 'action': None, 'expression': None}
-accepted {'request_id': 'ctl_fda2130fe9bf4397b609b14c0edac1d0', 'error_code': None}
-delivered {'kind': 'stop', 'action': None, 'expression': None}
-accepted {'request_id': 'ctl_9a421023e6a54d93bd966e1a1cd6ae65', 'error_code': None}

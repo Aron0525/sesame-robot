@@ -239,7 +239,7 @@ cd "$project_dir"
 idf.py -B "$build_dir" build
 
 umask 077
-backup_dir="${SESAME_FLASH_BACKUP_DIR:-$project_dir/flash-diagnostics/nvs-backups}"
+backup_dir="${SESAME_FLASH_BACKUP_DIR:-${HOME}/Documents/sesame robot-backups/nvs}"
 mkdir -p "$backup_dir"
 backup_file="$backup_dir/nvs-before-app-flash-$(date +%Y%m%d-%H%M%S).bin"
 

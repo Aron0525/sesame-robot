@@ -1,3 +1,0 @@
-$ bash ./tests/run_host_tests.sh
-nihao-zhima WakeNet verified: bytes=22456 sha256=2247f91d43b4d70fe17c90b1e999130c2b51476e044a86156b4ea250ba6ae305
-exit_status=0

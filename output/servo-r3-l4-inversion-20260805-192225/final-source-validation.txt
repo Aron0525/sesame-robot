@@ -1,5 +1,0 @@
-$ git -C PROJECT diff --check -- TARGET_FILES
-EXIT_STATUS=0
-
-$ rg -n -i "servoSubtrim|adjustedAngle|legacy_motion_calibration|physical_angle_for_legacy_motion|angle\s*[+]-=|angle\s*[+-]\s*[0-9]+" firmware
-EXIT_STATUS=0

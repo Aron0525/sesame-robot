@@ -1,4 +1,0 @@
-0x00000000  flash-images/bootloader/bootloader.bin
-0x00008000  flash-images/partition_table/partition-table.bin
-0x00010000  flash-images/sesame_robot_v3.bin
-0x00410000  flash-images/srmodels/srmodels.bin

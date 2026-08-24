@@ -1,9 +1,0 @@
-{
-  "additionalFiles": "../..,../..,../..,../..",
-  "compiler.optimization_flags": "-Os",
-  "customBuildProperties": "build.extra_flags=-DARDUINO_HOST_OS=\"macosx\" -DARDUINO_FQBN=\"esp32:esp32:esp32s3:UploadSpeed=921600,USBMode=hwcdc,CDCOnBoot=cdc,UploadMode=default,CPUFreq=240,FlashMode=qio,FlashSize=4M,PartitionScheme=default,PSRAM=disabled\" -DESP32=ESP32 -DCORE_DEBUG_LEVEL=0 -DARDUINO_RUNNING_CORE=1 -DARDUINO_EVENT_RUNNING_CORE=1 -DARDUINO_USB_MODE=1 -DARDUINO_USB_CDC_ON_BOOT=1 -DARDUINO_USB_MSC_ON_BOOT=0 -DARDUINO_USB_DFU_ON_BOOT=0 -DSESAME_DIAGNOSTIC_SKIP_SERVO_ATTACH -DSESAME_DIAGNOSTIC_SKIP_FACE_RENDER -DSESAME_DIAGNOSTIC_SKIP_STARTUP_DELAY -DSESAME_DIAGNOSTIC_SKIP_POST_NETWORK_SERIAL",
-  "fqbn": "esp32:esp32:esp32s3:UploadSpeed=921600,USBMode=hwcdc,CDCOnBoot=cdc,UploadMode=default,CPUFreq=240,FlashMode=qio,FlashSize=4M,PartitionScheme=default,PSRAM=disabled",
-  "hardwareFolders": "/Users/mac/Library/Arduino15/packages/esp32/hardware/esp32/3.3.10,/Users/mac/Library/Arduino15/packages/esp32/hardware/esp32/3.3.10",
-  "otherLibrariesFolders": "/Users/mac/Documents/Arduino/libraries",
-  "sketchLocation": "/Users/mac/Desktop/1/SesameV3_语音机器人项目/01-设备端/主固件/Sesame_Robot_V3"
-}

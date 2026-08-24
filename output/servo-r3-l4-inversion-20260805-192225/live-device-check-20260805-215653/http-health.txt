@@ -1,6 +1,0 @@
-### http://192.168.88.183/api/status
-
-### http://192.168.88.183/
-
-### http://dev-001.local/api/status
-

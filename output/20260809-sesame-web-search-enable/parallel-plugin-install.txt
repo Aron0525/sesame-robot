@@ -1,6 +1,0 @@
-Installing @openclaw/parallel-plugin into /Users/mac/.openclaw/npm/projects/openclaw-parallel-plugin-609efe5372…
-Linked peerDependency "openclaw" -> /Users/mac/.nvm/versions/node/v26.4.0/lib/node_modules/openclaw
-Plugin manifest id "parallel" differs from npm package name "@openclaw/parallel-plugin"; using manifest id as the config key.
-Pinned npm install record to @openclaw/parallel-plugin@2026.7.1.
-Installed plugin: parallel
-Restart the gateway to load plugins.

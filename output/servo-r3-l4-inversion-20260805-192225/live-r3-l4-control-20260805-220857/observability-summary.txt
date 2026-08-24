@@ -1,7 +1,0 @@
-{"details": {"action": null, "expression": null, "kind": "servo"}, "device_id": "dev_001", "id": 3, "stage": "operator.control", "status": "delivered", "timestamp_ms": 1785992937457, "turn_id": null}
-{"details": {"error_code": null, "request_id": "ctl_1a19070de511451c8bad0508e562b87b"}, "device_id": "dev_001", "id": 4, "stage": "operator.control", "status": "accepted", "timestamp_ms": 1785992937524, "turn_id": null}
-{"details": {"action": null, "expression": null, "kind": "servo"}, "device_id": "dev_001", "id": 5, "stage": "operator.control", "status": "delivered", "timestamp_ms": 1785992938520, "turn_id": null}
-{"details": {"error_code": null, "request_id": "ctl_905c937210434cd5a7f8e42421efa296"}, "device_id": "dev_001", "id": 6, "stage": "operator.control", "status": "accepted", "timestamp_ms": 1785992938579, "turn_id": null}
-{"details": {"action": null, "expression": null, "kind": "stop"}, "device_id": "dev_001", "id": 7, "stage": "operator.control", "status": "delivered", "timestamp_ms": 1785992939578, "turn_id": null}
-{"details": {"error_code": null, "request_id": "ctl_ebec334856ea478196af4ca0828acbbb"}, "device_id": "dev_001", "id": 8, "stage": "operator.control", "status": "accepted", "timestamp_ms": 1785992939715, "turn_id": null}
-device_online= True

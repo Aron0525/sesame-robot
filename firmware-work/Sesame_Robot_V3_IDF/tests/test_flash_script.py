@@ -71,9 +71,10 @@ class FlashScriptTest(unittest.TestCase):
 
         self.assertIn('build_dir="${SESAME_BUILD_DIR:-build-codex-2}"', script)
         self.assertIn(
-            'backup_dir="${SESAME_FLASH_BACKUP_DIR:-$project_dir/flash-diagnostics/nvs-backups}"',
+            'backup_dir="${SESAME_FLASH_BACKUP_DIR:-${HOME}/Documents/sesame robot-backups/nvs}"',
             script,
         )
+        self.assertNotIn("$project_dir/flash-diagnostics/nvs-backups", script)
 
     def test_default_flash_is_115200_app_only_and_preserves_nvs(self) -> None:
         commands = self.run_flash()

@@ -1,1 +1,0 @@
-Applied 7 config update(s). No gateway restart needed.

@@ -1,8 +1,0 @@
-{
-  "tts_wav_hashes_verified": 10,
-  "candidate_passed": true,
-  "current_deployed_model_sha256": "79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065",
-  "candidate_model_sha256": "2247f91d43b4d70fe17c90b1e999130c2b51476e044a86156b4ea250ba6ae305",
-  "candidate_bytes": 22456,
-  "current_project_model_unchanged": true
-}

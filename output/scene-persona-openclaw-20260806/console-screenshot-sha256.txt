@@ -1,2 +1,0 @@
-1fb37d3d73996d7bf2ed2cf89b0048297680982bf8222ff61926bdbe1f20c640  tests/console-desktop.png
-1648fc3ff15bb0333da99af2ee3ec23d1fc3c49ca73f0942bec1bce1ecf923c9  tests/console-mobile.png

@@ -299,3 +299,19 @@ to a non-isolated hotspot. This is a network-security setting and may require
 router credentials, so the user must perform/authorize it. After the LAN allows
 unicast, poll `/api/observability/snapshot` until the device is online and
 verify Chrome `/console` changes to READY before testing audio or motion.
+
+## 2026-08-24 formal project boundary cleanup
+
+- `/Users/mac/Desktop/2` is now the formal V3 project only. Historical task
+  output, restore archives, old Gateway and microphone experiments, local tool
+  environments, upstream reference copies, root flash diagnostics, serial logs
+  and Desktop metadata were moved—without deletion—to
+  `/Users/mac/Documents/sesame robot-backups/desktop-2-20260824/`.
+- The current source tree retains the formal `firmware-work/`, `gateway/`,
+  `contracts/`, `ops/`, `docs/`, `tools/`, assets and project guidance. A root
+  `.gitignore` prevents the moved historical paths from returning to Git.
+- `firmware-work/Sesame_Robot_V3_IDF/tools/flash.sh` now stores new NVS backups
+  outside the project at `~/Documents/sesame robot-backups/nvs/` by default;
+  `SESAME_FLASH_BACKUP_DIR` remains the explicit override. Its regression suite
+  passed after the change. Existing NVS backups are in the dated archive, not
+  the formal project.

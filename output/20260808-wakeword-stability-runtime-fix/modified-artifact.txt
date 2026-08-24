@@ -1,6 +1,0 @@
-Modified firmware image
-path=/Users/mac/Documents/sesame robot/output/20260808-wakeword-stability-runtime-fix/modified/sesame_robot_v3.bin
-bytes=1676976
-sha256=60a1dd725801d1ccb155f5a67fe69dbab737914dc9f07b1d0562a0cb739a2f2b
-embedded_model_sha256=79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065
-flash_offset=0x10000

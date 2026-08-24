@@ -1,9 +1,0 @@
-# Original source and image SHA-256
-f9b3a562c3eda7b8773317024aa4b21d7c9122306d0024cced75ccd6a54992b7  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/flash-images/bootloader/bootloader.bin
-4bb1bef4f34ffb14f5a1383b5e1626d08f37e1a1e4767c324ce90414a7710ade  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/flash-images/partition_table/partition-table.bin
-2ef20576bb1cf700d11f7cd7d8b2b78cc94249997dedc12945507086f7f1af1c  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/flash-images/sesame_robot_v3.bin
-df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/flash-images/srmodels/srmodels.bin
-55fb909f7c3c79fd2b7d3e57ccb38053006f871e1695ed0d0358c12b0b97ca17  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/source/firmware/esp32_voice_idf/components/sesame_voice/include/sesame_voice/zhima_wakeword_config.h
-fc61c979c367952bb2c51ec60648ea1f4aee17e7afc618c137135be2d06a7d3e  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/source/firmware/esp32_voice_idf/components/sesame_voice/include/sesame_voice/zhima_wakeword_model_data.h
-79125ad813275425e5ebadd838cf5f81efaac2d158e2bcbe3527286b2fc32065  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/source/firmware/esp32_voice_idf/components/sesame_voice/models/zhima_wakeword_tts_v2_int8.tflite
-4edc76160f0be31b91248abaaf357b0b64c7b57a7b159edbb91a1dab83cb931f  /Users/mac/Desktop/2/output/20260809-dashscope-tts10-wakenet/deployment/original/source/firmware/esp32_voice_idf/components/sesame_voice/zhima_wakeword_model_data.cpp

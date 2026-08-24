@@ -1,2 +1,0 @@
-wakeword asset and trained contract verified: bytes=22528 sha256=9c20563309845fa620296a278e94877d15de0e0c23fee9bcd156388b764f1949
-Wi-Fi policy verified: STA power saving preserved

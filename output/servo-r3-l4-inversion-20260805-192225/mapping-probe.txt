@@ -1,9 +1,0 @@
-$ g++ -std=c++17 -I firmware/esp32_voice_idf/components/sesame_robot/include mapping-probe.cpp -o mapping-probe && ./mapping-probe
-R3 0 -> 180
-L4 0 -> 180
-R3 90 -> 90
-L4 90 -> 90
-R3 180 -> 0
-L4 180 -> 0
-R2 45 -> 45
-EXIT_STATUS=0

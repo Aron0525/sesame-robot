@@ -54,13 +54,13 @@ Gateway 支持一个正常模式与三个场景模式。场景切换已有限制
 | --- | --- | --- |
 | `firmware-work/Sesame_Robot_V3_IDF/` | V3 ESP-IDF 正式固件。 | 是 |
 | `gateway/`、`contracts/` | 正式 Voice Gateway、开发控制台、ASR/OpenClaw/TTS/搜索编排、测试和共享协议 Schema。 | 是 |
-| `endpoint-gateway/` | 早期简化 Gateway，仅保留作迁移与兼容参考；不作为正式运行入口。 | 否 |
 | `ops/openclaw/` | OpenClaw workspace、Agent 与 MCP 的脱敏项目模板。 | 是 |
 | `docs/` | 架构、实施、技术设计与跨设备搭建资料。 | 是 |
-| `firmware/INMP441_Audio_Test/`、`flash-diagnostics/` | 音频实验和刷机诊断。 | 按调试需要保留 |
 | `Bottango/`、`tools/`、`assets/` | 动作创作和辅助材料。 | 按是否维护动作资产决定 |
-| `github_refs/sesame-robot/` | 原版 Sesame 的本地参考副本。 | 不要作为 V3 源码交付；记录其上游来源和 commit 即可 |
-| `output/`、`restore-archives/`、`.internal/` | 历史任务产物、备份与本机状态。 | 否 |
+
+历史任务产物、恢复归档、旧 Gateway、旧固件实验、NVS 备份和本机虚拟环境不属于本项目目录；统一存放在
+`/Users/mac/Documents/sesame robot-backups/`。烧录脚本默认把新的 NVS 备份写入该目录，且可通过
+`SESAME_FLASH_BACKUP_DIR` 改为其他项目外路径。
 
 原版 Sesame 的上游仓库是 [dorianborian/sesame-robot](https://github.com/dorianborian/sesame-robot)。需要打印、装配或维修机体时，另外克隆该仓库并使用其 `hardware/`、装配与接线资料；不要把原版源码与 V3 改动混在同一个源代码目录中。
 

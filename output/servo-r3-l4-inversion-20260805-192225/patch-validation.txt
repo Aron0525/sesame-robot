@@ -1,9 +1,0 @@
-$ patch --dry-run -d forward-check-fixture -p1 < servo-r3-l4-inversion.patch
-patching file 'firmware/esp32_voice_idf/components/sesame_robot/include/sesame_robot/servo_calibration.h'
-patching file 'firmware/esp32_voice_idf/tests/test_servo_calibration.cpp'
-patching file 'firmware/arduino/Sesame_Robot_WiFi_Controller/Sesame_Robot_WiFi_Controller.ino'
-EXIT_STATUS=0
-$ git -C PROJECT apply --check --reverse servo-r3-l4-inversion.patch
-EXIT_STATUS=0
-$ git -C PROJECT diff --check -- TARGET_FILES
-EXIT_STATUS=0

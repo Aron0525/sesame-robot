@@ -1,4 +1,0 @@
-I (26110) wake_vad: custom wake word confirmed (score=0.988)
-I (26112) sesame_voice: wake detected: playing local acknowledgement
-I (26552) sesame_voice: wake acknowledgement complete: waiting 3000 ms for speech
-I (29590) sesame_voice: wake window expired without speech

@@ -1,2 +1,0 @@
-Assertion failed: (validate_device_config(valid) == ConfigError::kOk), function main, file test_transport_policy.cpp, line 37.
-/Users/mac/Documents/sesame robot/firmware-work/Sesame_Robot_V3_IDF/tests/run_host_tests.sh: line 59: 36421 Abort trap: 6           "${build_dir}/test_transport_policy"

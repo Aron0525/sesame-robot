@@ -1,1 +1,0 @@
-Applied 3 config update(s). Restart the gateway to apply.

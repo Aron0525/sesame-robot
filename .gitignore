@@ -1,0 +1,15 @@
+# Historical materials and local tooling stay outside the formal V3 project.
+/output/
+/restore-archives/
+/.internal/
+/endpoint-gateway/
+/firmware/
+/github_refs/
+/.venv-sesame-studio/
+/.playwright-cli/
+/flash-diagnostics/
+/screenlog.0
+/git-diff-demo/
+
+# Desktop metadata is local to this Mac.
+.DS_Store

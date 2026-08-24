@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/mac/Desktop/2/firmware/esp32_voice_idf/./tests/verify_nihao_zhima_wakeword.py", line 44, in <module>
-    main()
-  File "/Users/mac/Desktop/2/firmware/esp32_voice_idf/./tests/verify_nihao_zhima_wakeword.py", line 28, in main
-    assert hashlib.sha256(model).hexdigest() == EXPECTED_SHA256
-AssertionError

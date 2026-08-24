@@ -1,5 +1,0 @@
-{"detail":"device is busy with a voice turn"}{"status":"accepted","device_id":"dev_001","kind":"stop"}
-{"detail":"device is busy with a voice turn"}{"detail":"device is busy with a voice turn"}{"status":"accepted","device_id":"dev_001","kind":"servo"}
-{"status":"accepted","device_id":"dev_001","kind":"servo"}
-{"status":"accepted","device_id":"dev_001","kind":"action"}
-{"status":"accepted","device_id":"dev_001","kind":"stop"}

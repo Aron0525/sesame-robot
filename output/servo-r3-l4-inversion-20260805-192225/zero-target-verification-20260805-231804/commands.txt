@@ -1,4 +1,0 @@
-2026-08-05 23:18:04 R3_LOGICAL_180_OUTPUT_0 {"kind":"servo","servo":6,"angle":180}
-2026-08-05 23:18:09 STOP_AFTER_R3 {"kind":"stop"}
-2026-08-05 23:18:11 L4_LOGICAL_180_OUTPUT_0 {"kind":"servo","servo":8,"angle":180}
-2026-08-05 23:18:16 STOP_AFTER_L4 {"kind":"stop"}

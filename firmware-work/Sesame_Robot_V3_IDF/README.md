@@ -79,7 +79,8 @@ bash tools/flash.sh /dev/cu.usbmodem101
 自动进入下载模式时，按住 BOOT（GPIO0），短按 RESET/EN，看到 `Connecting...` 后
 再松开 BOOT。请不要把 Bluetooth 或 debug-console 端口作为烧录端口。
 
-脚本会在 `flash-diagnostics/nvs-backups/` 留下一份仅当前用户可读写的 NVS 备份。
+脚本会在项目外的 `~/Documents/sesame robot-backups/nvs/` 留下一份仅当前用户可读写的 NVS
+备份。需要使用其他项目外位置时，设置 `SESAME_FLASH_BACKUP_DIR`。
 默认不写入设备密钥；要在同一次烧录中更新每台设备的私密配置，明确提供 NVS 镜像：
 
 ```bash
