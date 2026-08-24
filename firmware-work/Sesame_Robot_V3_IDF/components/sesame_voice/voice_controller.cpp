@@ -147,9 +147,9 @@ esp_err_t VoiceController::start() {
     stop();
     return ESP_ERR_NO_MEM;
   }
-  if (xTaskCreatePinnedToCoreWithCaps(
-          playback_task_entry, "sesame_playback", 16384, this, 8,
-          &playback_task_, 1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT) != pdPASS) {
+  if (xTaskCreatePinnedToCore(
+          playback_task_entry, "sesame_playback", kPlaybackTaskStackBytes,
+          this, 8, &playback_task_, 1) != pdPASS) {
     running_ = false;
     stop();
     return ESP_ERR_NO_MEM;
@@ -187,7 +187,7 @@ void VoiceController::stop() {
       vTaskDelay(pdMS_TO_TICKS(10));
     }
     if (playback_task_ != nullptr) {
-      vTaskDeleteWithCaps(playback_task_);
+      vTaskDelete(playback_task_);
       playback_task_ = nullptr;
     }
   }
@@ -233,7 +233,7 @@ void VoiceController::playback_task_entry(void* context) {
   auto* self = static_cast<VoiceController*>(context);
   self->run_playback();
   self->playback_task_ = nullptr;
-  vTaskDeleteWithCaps(nullptr);
+  vTaskDelete(nullptr);
 }
 
 void VoiceController::outbound_task_entry(void* context) {
@@ -309,11 +309,18 @@ void VoiceController::run() {
 void VoiceController::run_playback() {
   bool playback_started = false;
   uint32_t playback_generation = 0;
-  std::array<int16_t, sesame::audio::kSamplesPerFrame> pcm{};
-  std::array<int16_t, sesame::audio::kSamplesPerFrame> silence{};
+  auto& pcm = playback_pcm_;
+  auto& silence = playback_silence_;
 
   while (running_) {
     if (!tts_active_ || downlink_queue_ == nullptr) {
+      if (playback_started) {
+        playback_busy_ = true;
+        if (audio_->stop_speaker() != ESP_OK) {
+          ESP_LOGW(kTag, "failed to stop speaker after playback flush");
+        }
+        playback_busy_ = false;
+      }
       playback_started = false;
       playback_started_ = false;
       vTaskDelay(pdMS_TO_TICKS(5));
@@ -322,9 +329,22 @@ void VoiceController::run_playback() {
 
     const uint32_t generation = active_generation_;
     if (generation == 0) {
+      if (playback_started) {
+        playback_busy_ = true;
+        audio_->stop_speaker();
+        playback_busy_ = false;
+      }
       playback_started = false;
       playback_started_ = false;
       vTaskDelay(pdMS_TO_TICKS(5));
+      continue;
+    }
+    if (playback_started && playback_generation != generation) {
+      playback_busy_ = true;
+      audio_->stop_speaker();
+      playback_busy_ = false;
+      playback_started = false;
+      playback_started_ = false;
       continue;
     }
     if (playback_control_.paused()) {
@@ -338,16 +358,84 @@ void VoiceController::run_playback() {
         vTaskDelay(pdMS_TO_TICKS(5));
         continue;
       }
+      playback_generation = generation;
+      const size_t preload_frames =
+          queued < sesame::audio::kSpeakerDmaDescriptorFrames
+              ? queued
+              : sesame::audio::kSpeakerDmaDescriptorFrames;
+      // Keep codec reset/interrupt handling out of the whole DMA bootstrap.
+      // Releasing this flag between descriptors can let a new generation
+      // reset the shared Opus decoder before the speaker has been enabled.
+      playback_busy_ = true;
+      bool preload_ok = preload_frames > 0;
+      for (size_t index = 0; index < preload_frames && preload_ok; ++index) {
+        DownlinkPacket& packet = playback_work_packet_;
+        packet = {};
+        if (xQueueReceive(downlink_queue_, &packet, 0) != pdTRUE) {
+          preload_ok = false;
+          break;
+        }
+        if (!tts_active_ ||
+            packet.generation_id != playback_generation ||
+            packet.generation_id != active_generation_) {
+          preload_ok = false;
+          break;
+        }
+        playback_telemetry_.note_buffered(
+            uxQueueMessagesWaiting(downlink_queue_));
+        size_t samples = 0;
+        const int64_t decode_started_us = esp_timer_get_time();
+        const bool decoded =
+            codec_.decode(packet.data.data(), packet.size, pcm.data(),
+                          pcm.size(), &samples) == ESP_OK &&
+            samples == pcm.size();
+        playback_telemetry_.note_decode_duration(static_cast<uint32_t>(
+            esp_timer_get_time() - decode_started_us));
+        const int64_t i2s_started_us = esp_timer_get_time();
+        const bool preloaded =
+            decoded &&
+            audio_->preload_speaker_frame(pcm.data(), pcm.size()) == ESP_OK;
+        if (decoded) {
+          playback_telemetry_.note_i2s_duration(static_cast<uint32_t>(
+              esp_timer_get_time() - i2s_started_us));
+        }
+        if (!preloaded) {
+          playback_telemetry_.note_dropped_packet();
+          ESP_LOGE(kTag,
+                   "failed to preload TTS packet: generation=%lu sequence=%lu",
+                   static_cast<unsigned long>(packet.generation_id),
+                   static_cast<unsigned long>(packet.sequence));
+          preload_ok = false;
+          break;
+        }
+        playback_telemetry_.note_rendered();
+      }
+      if (!preload_ok || audio_->start_speaker() != ESP_OK) {
+        if (preload_ok) playback_telemetry_.note_dropped_packet();
+        if (audio_->discard_speaker_preload() != ESP_OK) {
+          ESP_LOGE(kTag, "failed to reset speaker after DMA preload failure");
+          transport_fault_requested_ = true;
+        }
+        queue_playback_stats(false, true);
+        tts_active_ = false;
+        tts_playback_complete_ = true;
+        playback_busy_ = false;
+        playback_started = false;
+        playback_started_ = false;
+        ESP_LOGE(kTag, "failed to start preloaded TTS playback");
+        continue;
+      }
       playback_started = true;
       playback_started_ = true;
-      playback_generation = generation;
+      playback_busy_ = false;
       ESP_LOGI(kTag, "start TTS playback: generation=%lu queued=%u",
                static_cast<unsigned long>(generation),
                static_cast<unsigned>(queued));
       queue_playback_stats(true);
     }
 
-    DownlinkPacket packet{};
+    DownlinkPacket& packet = playback_work_packet_;
+    packet = {};
     if (xQueueReceive(downlink_queue_, &packet, pdMS_TO_TICKS(20)) != pdTRUE) {
       if (!tts_active_ || generation != active_generation_) {
         playback_started = false;
@@ -361,17 +449,16 @@ void VoiceController::run_playback() {
         playback_busy_ = true;
         vTaskDelay(pdMS_TO_TICKS(160));
         if (!tts_active_ || generation != active_generation_) {
+          audio_->stop_speaker();
           playback_busy_ = false;
           playback_started = false;
           playback_started_ = false;
           continue;
         }
-        const bool muted =
-            audio_->write_speaker_frame(silence.data(), silence.size(), 100) ==
-            ESP_OK;
-        if (!muted) playback_telemetry_.note_dropped_packet();
+        const bool stopped = audio_->stop_speaker() == ESP_OK;
+        if (!stopped) playback_telemetry_.note_dropped_packet();
         const bool playback_succeeded =
-            muted && playback_telemetry_.healthy() &&
+            stopped && playback_telemetry_.healthy() &&
             playback_telemetry_.rendered_frames() ==
                 expected_downlink_sequence_.load();
         // playback_complete is a terminal acknowledgement. Success is
@@ -701,9 +788,10 @@ void VoiceController::queue_playback_stats(bool playback_started,
   const uint32_t generation_id = active_generation_;
   if (generation_id == 0) return;
 
-  const PlaybackStats stats = playback_telemetry_.snapshot(
-      uxQueueMessagesWaiting(downlink_queue_), playback_started,
-      playback_control_.paused(), playback_complete);
+  const PlaybackStats stats = normalize_playback_startup_ack(
+      playback_telemetry_.snapshot(uxQueueMessagesWaiting(downlink_queue_),
+                                   playback_started, playback_control_.paused(),
+                                   playback_complete));
   // A newer tts.start can race a queued report from the old generation. Never
   // let such a report influence the gateway's current flow-control window.
   if (stats.generation_id != generation_id) return;
@@ -933,6 +1021,24 @@ void VoiceController::process_control_json(const char* data, size_t size) {
     if (conversation != nullptr) {
       sesame::transport::save_conversation_id(conversation);
     }
+  } else if (std::strcmp(type, "turn.complete") == 0) {
+    // Gateway sends this terminal event for a valid listen turn that produced
+    // no usable speech, so there will be no tts.start/tts.stop pair to bring
+    // the local turn state out of Thinking.  Accept only the active turn's
+    // explicit discard; a delayed completion from an older turn must not
+    // cancel a newer recording.
+    const char* incoming_turn_id = string_field(root, "turn_id");
+    const char* outcome = string_field(payload, "outcome");
+    if (incoming_turn_id != nullptr && outcome != nullptr &&
+        std::strcmp(outcome, "discard") == 0 && turn_id_[0] != '\0' &&
+        std::strcmp(incoming_turn_id, turn_id_.data()) == 0 &&
+        turn_state_.state() == sesame::protocol::TurnState::kThinking) {
+      turn_state_.apply(sesame::protocol::TurnEvent::kInterrupted);
+      turn_detector_.reset();
+      button_.finish_from_endpoint();
+      voice_capture_enabled_ = true;
+      ESP_LOGI(kTag, "discarded turn completed; ready for the next listen");
+    }
   } else if (std::strcmp(type, "tts.start") == 0) {
     const char* incoming_turn_id = string_field(root, "turn_id");
     // Gateway-local PCM diagnostics use their own authenticated `test_`
@@ -1093,10 +1199,12 @@ void VoiceController::begin_tts(uint32_t generation_id,
     transport_fault_requested_ = true;
     return;
   }
-  std::array<int16_t, sesame::audio::kSamplesPerFrame> silence{};
-  audio_->write_speaker_frame(silence.data(), silence.size(), 100);
   playback_started_ = false;
   tts_active_ = true;
+  // Publish a state transition even before the first audio packet arrives.
+  // This makes a rejected/stalled downlink observable at the gateway instead
+  // of looking identical to a silent speaker.
+  queue_playback_stats(false);
 }
 
 void VoiceController::finish_tts(uint32_t generation_id) {

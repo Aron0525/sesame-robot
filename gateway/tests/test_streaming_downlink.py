@@ -259,6 +259,88 @@ class StreamingDownlinkTest(unittest.IsolatedAsyncioTestCase):
         flow.record_sent()
         self.assertEqual(flow._send_credit, 9)
 
+    async def test_confirmed_playback_credit_does_not_bypass_20ms_timeline(self) -> None:
+        """Watermark credit authorizes a packet, but never an early burst."""
+        clock = type("Clock", (), {"now": 0.0})()
+        delays: list[float] = []
+
+        def perf_counter() -> float:
+            return clock.now
+
+        async def sleep(seconds: float) -> None:
+            delays.append(seconds)
+            clock.now += seconds
+
+        session = DeviceSession(
+            device_id="device_001",
+            user_id="user_001",
+            session_id="ses_001",
+            conversation_id="conv_001",
+        )
+        flow = _begin_downlink_flow(
+            session, generation_id=7, turn_id="turn_001", fixed_music=False
+        )
+        flow.packets_sent = flow.bootstrap_packets
+        session.playback_stats = {
+            "generation_id": 7,
+            "buffered_packets": 20,
+            "max_buffered_packets": 30,
+            "low_watermark_packets": 20,
+            "high_watermark_packets": 40,
+            "playback_started": True,
+        }
+        session.playback_stats_revision = 1
+
+        with (
+            patch("sesame_voice_gateway.app.time.perf_counter", new=perf_counter),
+            patch("sesame_voice_gateway.app.asyncio.sleep", new=sleep),
+        ):
+            await flow.wait_before_send(session, fallback_deadline=0.6)
+
+        self.assertEqual(delays, [0.6])
+
+    async def test_confirmed_playback_credit_spaces_successive_refill_packets(self) -> None:
+        """A granted refill burst still traverses the media clock one frame at a time."""
+        clock = type("Clock", (), {"now": 0.0})()
+        delays: list[float] = []
+
+        def perf_counter() -> float:
+            return clock.now
+
+        async def sleep(seconds: float) -> None:
+            delays.append(seconds)
+            clock.now += seconds
+
+        session = DeviceSession(
+            device_id="device_001",
+            user_id="user_001",
+            session_id="ses_001",
+            conversation_id="conv_001",
+        )
+        flow = _begin_downlink_flow(
+            session, generation_id=7, turn_id="turn_001", fixed_music=False
+        )
+        flow.packets_sent = flow.bootstrap_packets
+        session.playback_stats = {
+            "generation_id": 7,
+            "buffered_packets": 20,
+            "max_buffered_packets": 30,
+            "low_watermark_packets": 20,
+            "high_watermark_packets": 40,
+            "playback_started": True,
+        }
+        session.playback_stats_revision = 1
+
+        with (
+            patch("sesame_voice_gateway.app.time.perf_counter", new=perf_counter),
+            patch("sesame_voice_gateway.app.asyncio.sleep", new=sleep),
+        ):
+            await flow.wait_before_send(session, fallback_deadline=0.0)
+            flow.record_sent()
+            await flow.wait_before_send(session, fallback_deadline=0.0)
+
+        self.assertEqual(delays, [0.02])
+
     async def test_legacy_device_waits_for_telemetry_only_once(self) -> None:
         session = DeviceSession(
             device_id="device_001",

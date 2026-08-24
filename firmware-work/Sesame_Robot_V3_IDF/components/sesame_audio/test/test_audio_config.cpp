@@ -13,6 +13,7 @@ int main() {
   static_assert(kPcmBytesPerFrame == 640);
   static_assert(kI2sSlotsPerFrame == 2);
   static_assert(kRawI2sSamplesPerFrame == 640);
+  static_assert(kSpeakerDmaDescriptorFrames == 8);
   static_assert(kMicrophoneI2sPort == 0);
   static_assert(kSpeakerI2sPort == 1);
   static_assert(kMicrophoneBclkGpio == 14);

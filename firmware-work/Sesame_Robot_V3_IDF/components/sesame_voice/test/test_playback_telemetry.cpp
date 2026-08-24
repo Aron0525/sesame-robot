@@ -65,5 +65,28 @@ int main() {
   assert(stats.paused);
   assert(telemetry.rendered_frames() == 0);
   assert(telemetry.healthy());
+
+  // The deployed v1 Gateway confirms its initial 30-packet lead only from
+  // max_buffered_packets. The playback task can dequeue the 30th packet on
+  // the other core before the WebSocket callback samples the queue, so a
+  // started renderer must advertise that completed bootstrap conservatively.
+  PlaybackStats startup_race{};
+  startup_race.startup_packets = 30;
+  startup_race.max_buffered_packets = 29;
+  startup_race.playback_started = true;
+  const PlaybackStats confirmed =
+      normalize_playback_startup_ack(startup_race);
+  assert(confirmed.max_buffered_packets == 30);
+
+  startup_race.playback_started = false;
+  const PlaybackStats not_started =
+      normalize_playback_startup_ack(startup_race);
+  assert(not_started.max_buffered_packets == 29);
+
+  startup_race.playback_started = true;
+  startup_race.max_buffered_packets = 35;
+  const PlaybackStats higher_observation =
+      normalize_playback_startup_ack(startup_race);
+  assert(higher_observation.max_buffered_packets == 35);
   return 0;
 }

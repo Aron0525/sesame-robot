@@ -1814,6 +1814,7 @@ class _DownlinkFlowControl:
     low_watermark_packets: int = 20
     _last_revision: int = -1
     _send_credit: int = 0
+    _next_media_deadline: float | None = None
 
     def _refresh(self, session: DeviceSession) -> bool:
         if (
@@ -1901,13 +1902,26 @@ class _DownlinkFlowControl:
                 break
             self._refresh(session)
 
-        if self.telemetry_seen and self.bootstrap_confirmed and self._send_credit > 0:
-            return
-        remaining_seconds = fallback_deadline - time.perf_counter()
+        # The bootstrap reaches the 30-frame start threshold as a bounded
+        # burst. Its first telemetry can arrive after the ESP32 has already
+        # started consuming, so restart the media clock at the first refill.
+        # Thereafter every post-bootstrap packet is exactly one 20-ms slot
+        # apart. Credit permits a slot; it must never turn the refill into a
+        # WSS burst that overflows the 60-frame queue.
+        now = time.perf_counter()
+        if self._next_media_deadline is None:
+            self._next_media_deadline = now
+        deadline = max(fallback_deadline, self._next_media_deadline)
+        remaining_seconds = deadline - now
         if remaining_seconds > 0:
             await asyncio.sleep(remaining_seconds)
 
     def record_sent(self) -> None:
+        if self.packets_sent >= self.bootstrap_packets:
+            sent_at = time.perf_counter()
+            self._next_media_deadline = max(
+                self._next_media_deadline or sent_at, sent_at
+            ) + AudioFormat().frame_duration_ms / 1_000
         self.packets_sent += 1
         if self.telemetry_seen and self.bootstrap_confirmed and self._send_credit > 0:
             self._send_credit -= 1
@@ -2134,10 +2148,12 @@ async def _send_turn_result(
     for sequence, packet in enumerate(result.opus_packets):
         if turn_epoch is not None and not _turn_is_current(session, turn_epoch):
             return
-        # Bootstrap into the ESP32's bounded Opus buffer, then let its real
-        # 20/40 watermarks govern replenishment. If telemetry disappears, the
-        # fallback remains an absolute (not cumulative sleep) timeline.
-        deadline = downlink_started_at + sequence * downlink_frame_interval_seconds
+        # Bootstrap into the ESP32's bounded Opus buffer, then begin the
+        # normal media clock from its first refill.  The flow controller keeps
+        # that clock continuous when telemetry arrives late or in bursts.
+        deadline = downlink_started_at + max(
+            0, sequence - flow.bootstrap_packets
+        ) * downlink_frame_interval_seconds
         await flow.wait_before_send(session, fallback_deadline=deadline)
         await _send_binary(
             websocket,
@@ -2376,8 +2392,13 @@ async def _send_stream_audio(
     for packet in output.opus_packets:
         if turn_epoch is not None and not _turn_is_current(session, turn_epoch):
             return
+        bootstrap_packets = (
+            downlink.flow.bootstrap_packets if downlink.flow is not None else 0
+        )
         deadline = downlink.started_at_monotonic + (
-            downlink.next_sequence * AudioFormat().frame_duration_ms / 1_000
+            max(0, downlink.next_sequence - bootstrap_packets)
+            * AudioFormat().frame_duration_ms
+            / 1_000
         )
         if downlink.flow is not None:
             await downlink.flow.wait_before_send(

@@ -9,6 +9,8 @@ mkdir -p "${build_dir}"
 python3 "${project_dir}/tests/verify_wakeword_model.py"
 python3 "${project_dir}/tests/verify_realtime_wifi_policy.py"
 python3 "${project_dir}/tests/test_generate_nvs.py"
+python3 "${project_dir}/tests/test_speaker_reference_contract.py"
+python3 "${project_dir}/tests/test_turn_completion_contract.py"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"${project_dir}/components/sesame_protocol/include" \
@@ -24,6 +26,15 @@ c++ -std=c++20 -Wall -Wextra -Werror \
 
 "${build_dir}/test_audio_frame"
 "${build_dir}/test_turn_state"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"${project_dir}/components/sesame_protocol/include" \
+  "${project_dir}/components/sesame_protocol/test/audio_frame_probe.cpp" \
+  "${project_dir}/components/sesame_protocol/audio_frame.cpp" \
+  -o "${build_dir}/audio_frame_probe"
+
+python3 "${project_dir}/tests/test_audio_downlink_contract.py" \
+  "${build_dir}/audio_frame_probe"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"${project_dir}/components/sesame_protocol/include" \
@@ -53,6 +64,15 @@ c++ -std=c++20 -Wall -Wextra -Werror \
   -o "${build_dir}/test_audio_config"
 
 "${build_dir}/test_audio_config"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"${project_dir}/components/sesame_audio/test/fakes" \
+  -I"${project_dir}/components/sesame_audio/include" \
+  "${project_dir}/components/sesame_audio/test/test_audio_hal_lifecycle.cpp" \
+  "${project_dir}/components/sesame_audio/audio_hal.cpp" \
+  -o "${build_dir}/test_audio_hal_lifecycle"
+
+"${build_dir}/test_audio_hal_lifecycle"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"${project_dir}/components/sesame_audio/include" \

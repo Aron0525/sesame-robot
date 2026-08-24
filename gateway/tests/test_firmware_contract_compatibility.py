@@ -42,6 +42,75 @@ def _listen_start(payload: dict[str, object]) -> str:
 
 
 class FirmwareControlContractCompatibilityTest(unittest.TestCase):
+    def test_playback_stats_match_the_running_gateway_contract(self) -> None:
+        """The live Gateway requires render and terminal status on every report."""
+        payload = {
+            "generation_id": 7,
+            "buffered_packets": 30,
+            "buffered_ms": 600,
+            "startup_packets": 30,
+            "low_watermark_packets": 20,
+            "high_watermark_packets": 40,
+            "min_buffered_packets": 0,
+            "max_buffered_packets": 30,
+            "underflow_count": 0,
+            "dropped_packet_count": 0,
+            "stale_generation_count": 0,
+            "out_of_order_count": 0,
+            "sequence_discontinuity_count": 0,
+            "playback_started": False,
+            "paused": False,
+            "decode_last_us": 0,
+            "decode_max_us": 0,
+            "decode_avg_us": 0,
+            "i2s_last_us": 0,
+            "i2s_max_us": 0,
+            "i2s_avg_us": 0,
+            "rendered_frames": 0,
+            "playback_complete": False,
+        }
+        event = parse_control_event(
+            json.dumps(
+                {
+                    "v": 1,
+                    "type": "playback.stats",
+                    "session_id": "ses_contract",
+                    "turn_id": "turn_contract",
+                    "request_id": None,
+                    "sequence": 3,
+                    "timestamp_ms": 3,
+                    "payload": payload,
+                }
+            )
+        )
+        self.assertEqual(event.payload, payload)
+        source = VOICE_CONTROLLER.read_text(encoding="utf-8")
+        telemetry = source[
+            source.index("void VoiceController::send_pending_playback_stats()") :
+            source.index("void VoiceController::send_operator_result")
+        ]
+        self.assertIn(r'\"rendered_frames\"', telemetry)
+        self.assertIn(r'\"playback_complete\"', telemetry)
+
+        missing_terminal_fields = dict(payload)
+        missing_terminal_fields.pop("rendered_frames")
+        missing_terminal_fields.pop("playback_complete")
+        with self.assertRaises(ControlProtocolError):
+            parse_control_event(
+                json.dumps(
+                    {
+                        "v": 1,
+                        "type": "playback.stats",
+                        "session_id": "ses_contract",
+                        "turn_id": "turn_contract",
+                        "request_id": None,
+                        "sequence": 3,
+                        "timestamp_ms": 3,
+                        "payload": missing_terminal_fields,
+                    }
+                )
+            )
+
     def test_gateway_requires_a_typed_capture_trigger(self) -> None:
         with self.assertRaisesRegex(ControlProtocolError, "trigger.*required"):
             parse_control_event(_listen_start({}))
@@ -89,8 +158,6 @@ class FirmwareControlContractCompatibilityTest(unittest.TestCase):
             "sequence_discontinuity_count",
             "decode_last_us",
             "i2s_last_us",
-            "rendered_frames",
-            "playback_complete",
         ):
             self.assertIn(field, source)
 

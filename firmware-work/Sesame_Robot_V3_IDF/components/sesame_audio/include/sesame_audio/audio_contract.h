@@ -14,6 +14,7 @@ inline constexpr size_t kPcmBytesPerFrame =
 inline constexpr size_t kI2sSlotsPerFrame = 2;
 inline constexpr size_t kRawI2sSamplesPerFrame =
     kSamplesPerFrame * kI2sSlotsPerFrame;
+inline constexpr size_t kSpeakerDmaDescriptorFrames = 8;
 
 // The microphone stays on the original I2S bus. The replacement MAX98357A
 // speaker module uses the independently verified GPIO 1/2/3 wiring, so it

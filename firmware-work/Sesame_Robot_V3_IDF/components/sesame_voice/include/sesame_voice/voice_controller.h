@@ -48,6 +48,9 @@ class VoiceController final : public sesame::transport::GatewayObserver {
  private:
   static constexpr UBaseType_t kOutboundQueueDepth = 6;
   static constexpr uint32_t kOutboundTaskStackBytes = 24576;
+  // The I2S renderer is latency-sensitive. Keep its stack in internal RAM,
+  // matching the known-good standalone MAX98357A playback task.
+  static constexpr uint32_t kPlaybackTaskStackBytes = 8192;
 
   struct DownlinkPacket {
     uint32_t generation_id;
@@ -150,6 +153,12 @@ class VoiceController final : public sesame::transport::GatewayObserver {
   std::atomic<uint32_t> expected_downlink_sequence_{0};
   std::array<char, 101> session_id_{};
   std::array<char, 101> turn_id_{};
+  // Keep the renderer's working data out of the playback task stack. This
+  // makes the 8 KiB internal-RAM task stack comparable with the known-good
+  // standalone player while avoiding per-frame allocations.
+  std::array<int16_t, sesame::audio::kSamplesPerFrame> playback_pcm_{};
+  std::array<int16_t, sesame::audio::kSamplesPerFrame> playback_silence_{};
+  DownlinkPacket playback_work_packet_{};
   OutboundFrame outbound_work_frame_{};
 };
 

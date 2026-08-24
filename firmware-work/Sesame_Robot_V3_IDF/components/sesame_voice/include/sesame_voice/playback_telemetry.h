@@ -36,6 +36,20 @@ struct PlaybackStats {
   bool playback_complete{false};
 };
 
+// Some deployed v1 gateways use max_buffered_packets as the only proof that
+// their startup burst reached the ESP32. A WebSocket callback and the playback
+// task can race on the 30th packet: the queue may be sampled at 29 immediately
+// after a valid renderer already dequeued packet 30. Playback itself is then
+// safe, but the gateway would otherwise throttle every later packet. Once the
+// renderer is running, its startup threshold is the reliable acknowledgement.
+inline PlaybackStats normalize_playback_startup_ack(PlaybackStats stats) {
+  if (stats.playback_started &&
+      stats.max_buffered_packets < stats.startup_packets) {
+    stats.max_buffered_packets = stats.startup_packets;
+  }
+  return stats;
+}
+
 // This state is shared by the WSS receive callback and the playback task.
 // Atomics avoid having either real-time path wait for the voice control task.
 class PlaybackTelemetry final {
