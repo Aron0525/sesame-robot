@@ -52,17 +52,6 @@ class DashboardRoutesTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_test_console_exposes_live_status_and_local_pcm_playback(self) -> None:
-        with TestClient(self.app, client=("127.0.0.1", 4321)) as client:
-            response = client.get("/test-console")
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("WSS / OPUS / I2S", response.text)
-        self.assertIn("选择 PCM 文件", response.text)
-        self.assertIn("/api/local-pcm-test/", response.text)
-        self.assertIn("暂停播放", response.text)
-        self.assertIn("继续播放", response.text)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,6 +11,7 @@ from sesame_voice_gateway.app import (
     _send_turn_result,
 )
 from sesame_voice_gateway.pipeline import TurnResult
+from sesame_voice_gateway.protocol.audio import AudioDirection, unpack_audio_frame
 from sesame_voice_gateway.protocol.control import ControlEvent, parse_control_event
 from sesame_voice_gateway.providers.base import (
     AgentResult,
@@ -30,32 +31,6 @@ class FakeWebSocket:
 
     async def send_bytes(self, value: bytes) -> None:
         self.binary_frames.append(value)
-
-
-class _Clock:
-    def __init__(self) -> None:
-        self.now = 0.0
-        self.sleep_calls: list[float] = []
-
-    def perf_counter(self) -> float:
-        return self.now
-
-    async def sleep(self, seconds: float) -> None:
-        self.sleep_calls.append(seconds)
-        self.now += seconds
-
-
-class ClockedWebSocket(FakeWebSocket):
-    def __init__(self, clock: _Clock, send_cost_seconds: float) -> None:
-        super().__init__()
-        self._clock = clock
-        self._send_cost_seconds = send_cost_seconds
-        self.packet_sent_at: list[float] = []
-
-    async def send_bytes(self, value: bytes) -> None:
-        self.packet_sent_at.append(self._clock.now)
-        await super().send_bytes(value)
-        self._clock.now += self._send_cost_seconds
 
 
 class BlockingPipeline:
@@ -111,9 +86,8 @@ class InterruptibleTurnTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([event.type for event in controls], ["tts.flush"])
         self.assertIsNone(session.active_turn_task)
 
-    async def test_downlink_bootstrap_fills_the_esp32_jitter_buffer_without_relative_sleep(self) -> None:
-        clock = _Clock()
-        websocket = ClockedWebSocket(clock, send_cost_seconds=0.0)
+    async def test_downlink_reserves_thirty_frames_before_pacing(self) -> None:
+        websocket = FakeWebSocket()
         session = DeviceSession(
             device_id="device_001",
             user_id="user_001",
@@ -131,20 +105,26 @@ class InterruptibleTurnTest(unittest.IsolatedAsyncioTestCase):
             generation_id=1,
             opus_packets=(b"frame-a", b"frame-b", b"frame-c"),
         )
-        with (
-            patch("sesame_voice_gateway.app.asyncio.sleep", new=clock.sleep),
-            patch("sesame_voice_gateway.app.time.perf_counter", new=clock.perf_counter),
-        ):
+        delays: list[float] = []
+
+        async def record_delay(seconds: float) -> None:
+            delays.append(seconds)
+
+        with patch("sesame_voice_gateway.app.asyncio.sleep", new=record_delay):
             await _send_turn_result(websocket, session, result)
 
-        self.assertEqual(clock.sleep_calls, [])
+        self.assertEqual(delays, [])
         self.assertEqual(len(websocket.binary_frames), 3)
+        frames = [unpack_audio_frame(frame) for frame in websocket.binary_frames]
+        self.assertEqual([frame.direction for frame in frames], [AudioDirection.DOWNLINK] * 3)
+        self.assertEqual([frame.stream_id for frame in frames], [2, 2, 2])
+        self.assertEqual([frame.generation_id for frame in frames], [1, 1, 1])
+        self.assertEqual([frame.sequence for frame in frames], [0, 1, 2])
         controls = [json.loads(frame)["type"] for frame in websocket.text_frames]
         self.assertEqual(controls, ["response.plan", "tts.start", "tts.stop"])
 
-    async def test_downlink_bootstrap_does_not_accumulate_sender_cost(self) -> None:
-        clock = _Clock()
-        websocket = ClockedWebSocket(clock, send_cost_seconds=0.003)
+    async def test_downlink_paces_after_thirty_frame_reserve(self) -> None:
+        websocket = FakeWebSocket()
         session = DeviceSession(
             device_id="device_001",
             user_id="user_001",
@@ -154,21 +134,27 @@ class InterruptibleTurnTest(unittest.IsolatedAsyncioTestCase):
         )
         result = TurnResult(
             transcript=AsrResult(text="测试"),
-            agent=AgentResult(text="回复"),
-            generation_id=1,
-            opus_packets=(b"frame-a", b"frame-b", b"frame-c"),
+            agent=AgentResult(
+                text="回复",
+                voice=VoiceSpec(),
+                expression=ExpressionSpec(name="happy", ttl_ms=1_000),
+            ),
+            generation_id=7,
+            opus_packets=tuple(f"frame-{index}".encode() for index in range(31)),
         )
+        delays: list[float] = []
 
-        with (
-            patch("sesame_voice_gateway.app.asyncio.sleep", new=clock.sleep),
-            patch("sesame_voice_gateway.app.time.perf_counter", new=clock.perf_counter),
-        ):
+        async def record_delay(seconds: float) -> None:
+            delays.append(seconds)
+
+        with patch("sesame_voice_gateway.app.asyncio.sleep", new=record_delay):
             await _send_turn_result(websocket, session, result)
 
-        self.assertEqual(len(websocket.packet_sent_at), 3)
-        self.assertAlmostEqual(websocket.packet_sent_at[0], 0.0)
-        self.assertAlmostEqual(websocket.packet_sent_at[1], 0.003)
-        self.assertAlmostEqual(websocket.packet_sent_at[2], 0.006)
+        self.assertEqual(delays, [0.02])
+        frames = [unpack_audio_frame(frame) for frame in websocket.binary_frames]
+        self.assertEqual([frame.stream_id for frame in frames], [2] * 31)
+        self.assertEqual([frame.generation_id for frame in frames], [7] * 31)
+        self.assertEqual([frame.sequence for frame in frames], list(range(31)))
 
 
 if __name__ == "__main__":

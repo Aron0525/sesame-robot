@@ -368,7 +368,7 @@ class ConversationPipeline:
             elapsed_ms=self._elapsed_ms(encode_started_at),
             details={"packet_count": len(opus_output)},
         )
-        generation_id = await self.next_generation_id()
+        generation_id = await self._next_generation_id()
         return TurnResult(
             transcript=transcript,
             agent=agent_result,
@@ -485,8 +485,7 @@ class ConversationPipeline:
             raise PolicyViolation("agent requested more than one tool call in a turn")
         return final_reply
 
-    async def next_generation_id(self) -> int:
-        """Reserve the next downlink generation for an authenticated turn."""
+    async def _next_generation_id(self) -> int:
         async with self._generation_lock:
             self._generation_id = (self._generation_id + 1) & 0xFFFFFFFF
             return self._generation_id

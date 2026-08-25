@@ -99,6 +99,15 @@ class MdnsRefreshTest(unittest.TestCase):
         self.assertEqual(zeroconf.registered[1][1], {"allow_name_change": True})
         self.assertFalse(zeroconf.closed)
 
+    def test_service_advertises_current_time_for_offline_tls_bootstrap(self) -> None:
+        with patch(
+            "sesame_voice_gateway.discovery._resolve_advertised_ipv4",
+            return_value="192.168.88.21",
+        ), patch("sesame_voice_gateway.discovery.time.time", return_value=1787400000.9):
+            service = build_service_info(_settings())
+
+        self.assertEqual(service.properties[b"unix_time"], b"1787400000")
+
     def test_auto_address_prefers_hostname_lan_address_over_vpn_route(self) -> None:
         with patch(
             "sesame_voice_gateway.discovery.socket.getaddrinfo",
@@ -109,19 +118,6 @@ class MdnsRefreshTest(unittest.TestCase):
                 return_value=_FakeRouteProbe(),
             ):
                 self.assertEqual(_resolve_advertised_ipv4(_settings()), "192.168.88.21")
-
-    def test_lab_advertises_only_its_own_service_identity(self) -> None:
-        with patch(
-            "sesame_voice_gateway.discovery._resolve_advertised_ipv4",
-            return_value="192.168.88.21",
-        ):
-            service = build_service_info(_settings())
-
-        self.assertEqual(service.type, "_sesame-streamgw._tcp.local.")
-        self.assertEqual(service.port, 8766)
-        self.assertEqual(service.server, "sesame-stream-gateway.local.")
-        self.assertEqual(service.properties[b"gateway_id"], b"gw_stream_lab")
-        self.assertEqual(service.properties[b"path"], b"/v2/device-stream")
 
 
 if __name__ == "__main__":

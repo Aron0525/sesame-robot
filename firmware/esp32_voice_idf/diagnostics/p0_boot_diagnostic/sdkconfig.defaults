@@ -1,0 +1,12 @@
+# P0 intentionally leaves PSRAM, Wi-Fi, I2S, OLED, and servo PWM untouched.
+# It matches the physical board's verified flash geometry and USB Serial/JTAG
+# console so that reset diagnostics are visible on /dev/cu.usbmodem101.
+CONFIG_IDF_TARGET="esp32s3"
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_ESPTOOLPY_FLASHMODE_DIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+# CONFIG_ESP_CONSOLE_UART_DEFAULT is not set
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+# CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG is not set
+# CONFIG_SPIRAM is not set

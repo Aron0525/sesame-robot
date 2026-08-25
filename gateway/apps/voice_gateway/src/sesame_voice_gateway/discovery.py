@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import ipaddress
 import socket
+import time
 from dataclasses import dataclass
 
 from zeroconf import NonUniqueNameException, ServiceInfo, Zeroconf
 
 from sesame_voice_gateway.config import Settings
 
-SERVICE_TYPE = "_sesame-streamgw._tcp.local."
+SERVICE_TYPE = "_sesame-gw._tcp.local."
 
 
 class DiscoveryError(RuntimeError):
@@ -54,10 +55,10 @@ def _resolve_advertised_ipv4(settings: Settings) -> str:
 
 def build_service_info(settings: Settings) -> ServiceInfo:
     address = _resolve_advertised_ipv4(settings)
-    instance = f"{settings.mdns_instance_name}.{settings.mdns_service_type}"
+    instance = f"{settings.mdns_instance_name}.{SERVICE_TYPE}"
     hostname = f"{settings.mdns_hostname.rstrip('.')}.local."
     return ServiceInfo(
-        type_=settings.mdns_service_type,
+        type_=SERVICE_TYPE,
         name=instance,
         addresses=[socket.inet_aton(address)],
         port=settings.port,
@@ -65,7 +66,8 @@ def build_service_info(settings: Settings) -> ServiceInfo:
             b"gateway_id": settings.gateway_id.encode(),
             b"protocol": b"1",
             b"tls": b"1" if settings.tls_enabled else b"0",
-            b"path": settings.device_stream_path.encode(),
+            b"path": b"/v1/device-stream",
+            b"unix_time": str(int(time.time())).encode(),
         },
         server=hostname,
     )

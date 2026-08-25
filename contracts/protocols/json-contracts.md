@@ -23,15 +23,15 @@
   "request_id": null,
   "sequence": 1,
   "timestamp_ms": 1000,
-  "payload": { "trigger": "manual" }
+  "payload": {}
 }
 ```
 
 Schema：
 
-- [`control-event.v1.schema.json`](../schemas/control-event.v1.schema.json)
-- [`agent-request.v1.schema.json`](../schemas/agent-request.v1.schema.json)
-- [`agent-response.v1.schema.json`](../schemas/agent-response.v1.schema.json)
+- [`control-event.v1.schema.json`](../../schemas/control-event.v1.schema.json)
+- [`agent-request.v1.schema.json`](../../schemas/agent-request.v1.schema.json)
+- [`agent-response.v1.schema.json`](../../schemas/agent-response.v1.schema.json)
 
 ## Agent 输入
 

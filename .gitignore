@@ -1,15 +1,54 @@
-# Historical materials and local tooling stay outside the formal V3 project.
-/output/
-/restore-archives/
-/.internal/
-/endpoint-gateway/
-/firmware/
-/github_refs/
-/.venv-sesame-studio/
-/.playwright-cli/
-/flash-diagnostics/
-/screenlog.0
-/git-diff-demo/
+# Runtime secrets and generated files
+gateway/.env
+**/.env
+gateway/.venv/
+gateway/test-recordings/
+gateway/__pycache__/
+gateway/**/__pycache__/
+gateway/**/.pytest_cache/
+gateway/**/.ruff_cache/
+gateway/.codex-backups/
+gateway/mic-diagnostics-*/
+gateway/wakeword-*/
 
-# Desktop metadata is local to this Mac.
+# ESP-IDF generated dependencies and build outputs
+firmware/esp32_voice_idf/build*/
+firmware/esp32_voice_idf/managed_components/
+firmware/esp32_voice_idf/*.bin
+firmware/esp32_voice_idf/device-nvs.bin
+firmware/esp32_voice_idf/components/sesame_transport/include/sesame_transport/local-device-config.h
+firmware/esp32_voice_idf/diagnostics/multinet_real19_eval/
+
+# Device-local Arduino credentials and biometric enrollment artifacts
+firmware/arduino/**/local-config.h
+/firmware/esp32_voice_idf/components/sesame_voice/private/
+
+# Arduino and diagnostic generated outputs
+firmware/arduino/**/build/
+firmware/esp32_voice_idf/diagnostics/**/build*/
+
+# Local Python environments and caches
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+
+# Local workspaces, private training data, and release artifacts
+/.internal/
+/.vscode/
+/.workbuddy/
+/endpoint-gateway/
+/output/
+/training/
+/tools/*real19*.py
+/.codex/
+/gateway/.migration-backups/
+# Personal speaker-embedding image and its embedded biometric template.
+/firmware/speaker_embedding_s3/
+/\.r3_l4_action_artifact_dir
+
+# Local owner-voiceprint enrollment artifacts. These are biometric data.
+/firmware/esp32_voice_idf/components/sesame_voice/private/owner_voiceprint_template.h
+/training/nihao_zhima_real19_20260810/owner_voiceprint_report.json
+
+# macOS metadata
 .DS_Store

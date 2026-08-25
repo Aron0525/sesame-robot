@@ -19,16 +19,15 @@ def load_schema(name: str) -> dict[str, Any]:
     """Load a versioned JSON contract shipped inside the installed package."""
     if name not in SCHEMA_NAMES:
         raise ValueError(f"unknown schema resource: {name}")
-    # Editable development must validate against the checked-in contract,
-    # not a stale force-included copy left in an existing virtualenv.
-    project_schema = Path(__file__).resolve().parents[5] / "contracts" / "schemas" / name
     resource = files("sesame_voice_gateway").joinpath("_schemas", name)
-    if project_schema.is_file():
-        raw_schema = project_schema.read_text(encoding="utf-8")
-    elif resource.is_file():
+    if resource.is_file():
         raw_schema = resource.read_text(encoding="utf-8")
     else:
-        raise FileNotFoundError(f"schema resource is missing: {name}")
+        # Editable source installs do not materialize Hatch's force-included resources.
+        project_root = Path(__file__).resolve().parents[5]
+        raw_schema = (project_root / "contracts" / "schemas" / name).read_text(
+            encoding="utf-8"
+        )
     data = json.loads(raw_schema)
     if not isinstance(data, dict):
         raise ValueError(f"schema resource must contain a JSON object: {name}")

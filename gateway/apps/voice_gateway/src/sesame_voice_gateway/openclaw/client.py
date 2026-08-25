@@ -527,8 +527,16 @@ class OpenClawAgentProvider:
                     max_delay_seconds=self.retry_max_delay_seconds,
                 )
         except asyncio.CancelledError:
+            await self._abort_run_best_effort(
+                session_key=session_key,
+                run_id=idempotency_key,
+            )
             raise
         except (OSError, TimeoutError, WebSocketException) as exc:
+            await self._abort_run_best_effort(
+                session_key=session_key,
+                run_id=idempotency_key,
+            )
             raise OpenClawUnavailableError("OpenClaw is temporarily unavailable") from exc
 
     async def _run_chat_attempt(
@@ -563,28 +571,13 @@ class OpenClawAgentProvider:
             if not isinstance(run_id, str) or not run_id:
                 raise OpenClawProtocolError("chat.send response is missing runId")
 
-            try:
-                while True:
-                    frame = await self._receive_json(
-                        websocket, timeout=self.recv_timeout_seconds
-                    )
-                    final_text = extract_final_text(frame, expected_run_id=run_id)
-                    if final_text is not None:
-                        return final_text
-            except asyncio.CancelledError:
-                await asyncio.shield(
-                    self._abort_run_best_effort(
-                        session_key=session_key,
-                        run_id=run_id,
-                    )
+            while True:
+                frame = await self._receive_json(
+                    websocket, timeout=self.recv_timeout_seconds
                 )
-                raise
-            except (OSError, TimeoutError, WebSocketException):
-                await self._abort_run_best_effort(
-                    session_key=session_key,
-                    run_id=run_id,
-                )
-                raise
+                final_text = extract_final_text(frame, expected_run_id=run_id)
+                if final_text is not None:
+                    return final_text
 
     async def _abort_run_best_effort(self, *, session_key: str, run_id: str) -> None:
         """Ask OpenClaw to stop the exact run without delaying device flush."""

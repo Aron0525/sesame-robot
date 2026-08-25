@@ -1,0 +1,8 @@
+{
+  "wifi_ssid": "replace-with-wifi-ssid",
+  "wifi_pass": "replace-with-wifi-password",
+  "device_id": "sesame-v3-001",
+  "gateway_id": "sesame-gateway-local",
+  "device_token": "replace-with-a-unique-device-token",
+  "root_ca_path": "/absolute/path/to/gateway-root-ca.pem"
+}

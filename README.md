@@ -1,114 +1,54 @@
-# Sesame Robot V3
+# Sesame V3 语音机器人
 
-Sesame Robot V3 是一个运行在 ESP32-S3 机器人与本地电脑之间的语音交互方案：机器人负责本地唤醒、音频采集和播放、动作与表情；电脑上的 Endpoint Gateway 负责设备连接、对话状态与安全控制；OpenClaw 只负责文字对话和受限的场景能力。
+这是一个单设备、本机优先的语音机器人项目。唯一运行链路是：
 
-这不是原版 Sesame Robot 的简单升级包。原版仓库提供机械结构、PCB、Arduino 基线和 Sesame Studio；V3 在此之外增加了 ESP32-S3 语音固件、WSS（加密 WebSocket）通信、电脑端 Gateway 和本地 OpenClaw 配置模板。
-
-> **当前状态：软件链已完成修复与全量测试，整机验收待进行。** `gateway/` 已包含 DashScope ASR/TTS、OpenClaw、受限联网搜索和 Opus/WSS 语音链；ESP32-S3 固件、场景接口和 OpenClaw 模板也已纳入项目。当前没有连接 ESP32，因此刷机、MAX98357 实际出声、真实舵机执行和整机压力测试仍需在硬件在线后完成。
-
-## 项目要解决什么
-
-用户对机器人说话后，系统应在本地唤醒，再把语音交给电脑端完成识别、理解与合成，最后让机器人播放语音、显示表情，并在通过安全校验的前提下执行已验收的动作。系统将实时音频、AI 决策和硬件控制分开，避免大模型直接控制 GPIO 或舵机角度。
-
-```mermaid
-flowchart LR
-    User["用户"] <-->|"语音 / 回复"| Robot["机器人：ESP32-S3\nINMP441、WakeNet、Opus、MAX98357\n动作与 OLED"]
-    Robot <-->|"WSS：Opus 音频 + JSON 控制"| Gateway["Endpoint Gateway\n设备鉴权、会话、白名单与开发控制台"]
-    Gateway <-->|"PCM / 文本"| Providers["ASR、TTS、Agent Adapter\n由部署者选择并配置"]
-    Gateway <-->|"最终文本 / 受限意图"| OpenClaw["本地 OpenClaw\n四个场景 Agent 与受限 MCP"]
-
-    classDef boundary fill:#fff4e5,stroke:#d97706,color:#111827;
-    class OpenClaw boundary;
+```text
+ESP32-S3（麦克风、扬声器、舵机）
+  → WSS / Opus → 电脑端 Voice Gateway
+  → ASR → OpenClaw（LLM）→ TTS
+  → WSS / Opus → ESP32-S3（语音播放、表情、动作）
 ```
 
-OpenClaw 不接收 ESP32 的实时音频，也不能直接连接设备、读取设备 token、执行宿主机命令或控制舵机。Gateway 是它与物理设备之间的安全边界。
+## 目录
 
-## 当前能做什么、还不能做什么
-
-下面的“已具备”表示仓库已有相应源码、模板或可验证的开发基线，不表示整机体验已经全部完成。
-
-| 部分 | 已具备的内容 | 仍未完成或不能据此保证的内容 |
-| --- | --- | --- |
-| ESP32-S3 端 | `firmware-work/Sesame_Robot_V3_IDF/` 中的 I2S 音频、WakeNet、Opus、WSS、NVS 配置与主机侧协议测试基线。 | 真实硬件接线、每台设备的网络凭据和实机验收仍需单独完成。 |
-| Endpoint Gateway | 单设备 WSS 入口、协议/设备 token 校验、开发控制台、动作/表情白名单、场景 API 和 MCP bridge。 | 它不是公网服务；生产认证、TLS 终止、审计存储和多设备运营能力尚未配置。 |
-| OpenClaw | 四个 Agent 的脱敏 workspace 模板，以及仅读取/切换场景的 `sesame-scene` MCP 配置模板。 | 不含本机 `~/.openclaw/`、模型凭据、会话或个人记忆；知识库检索尚未接入。 |
-| 语音与 Agent | `gateway/` 中实现 DashScope ASR/TTS、OpenClaw Adapter、Gateway 执行的单次受限联网搜索以及 Opus 下行。 | Provider 凭据和远程语音许可只在部署环境配置；当前不能用软件测试代替 MAX98357 实机验收。 |
-| 动作与表情 | Gateway 可以校验白名单并向设备转发受控命令；开发控制台可发起人工动作。 | ESP-IDF 的 `RobotAdapter` 尚未接入真实 `RobotDriver`。因此不能保证命令会让真实舵机动作；当前 OpenClaw 输出的动作也会被 Gateway 忽略。 |
-
-### 已有的场景
-
-Gateway 支持一个正常模式与三个场景模式。场景切换已有限制，主要用于选择对应的 OpenClaw Agent；它不是硬件控制权限。
-
-| 场景 ID | 用途 | Agent ID | 当前约束 |
-| --- | --- | --- | --- |
-| `normal` | 日常基础对话 | `sesame` | 独立的基础对话状态。 |
-| `learning` | 学习陪伴 | `sesame-learning` | 重点是结论、原因和一个下一步。 |
-| `children` | 儿童互动 | `sesame-children` | 短句、故事问答、一次一个任务。 |
-| `work` | 工作辅助 | `sesame-work` | 重点是结论、待办、风险和下一步。 |
-
-当前 MCP 只提供 `list_scenes`、`get_scene` 和 `select_scene` 三个工具。四个 Agent 的动作输出固定为空数组，只能请求 `default`、`happy`、`thinking` 三种表情；这是在真实动作执行经过硬件验证前的有意限制。
-
-## 目录说明
-
-| 目录 | 内容 | 是否属于 V3 应交付内容 |
-| --- | --- | --- |
-| `firmware-work/Sesame_Robot_V3_IDF/` | V3 ESP-IDF 正式固件。 | 是 |
-| `gateway/`、`contracts/` | 正式 Voice Gateway、开发控制台、ASR/OpenClaw/TTS/搜索编排、测试和共享协议 Schema。 | 是 |
-| `ops/openclaw/` | OpenClaw workspace、Agent 与 MCP 的脱敏项目模板。 | 是 |
-| `docs/` | 架构、实施、技术设计与跨设备搭建资料。 | 是 |
-| `Bottango/`、`tools/`、`assets/` | 动作创作和辅助材料。 | 按是否维护动作资产决定 |
-
-历史任务产物、恢复归档、旧 Gateway、旧固件实验、NVS 备份和本机虚拟环境不属于本项目目录；统一存放在
-`/Users/mac/Documents/sesame robot-backups/`。烧录脚本默认把新的 NVS 备份写入该目录，且可通过
-`SESAME_FLASH_BACKUP_DIR` 改为其他项目外路径。
-
-原版 Sesame 的上游仓库是 [dorianborian/sesame-robot](https://github.com/dorianborian/sesame-robot)。需要打印、装配或维修机体时，另外克隆该仓库并使用其 `hardware/`、装配与接线资料；不要把原版源码与 V3 改动混在同一个源代码目录中。
-
-## 快速开始
-
-### 只验证电脑端 Gateway
-
-这是新设备上最先应完成的路径：不需要机器人、不需要 OpenClaw Provider，也不能证明语音或舵机已经可用。
-
-```bash
-cd gateway
-python3 -m venv .venv
-. .venv/bin/activate
-uv sync --frozen --python 3.12
-sh tests/run_lab_tests.sh
+```text
+firmware/
+  esp32_voice_idf/         唯一正式固件：I2S、Opus、WSS、网页控制、OLED、舵机与 NVS 配置
+gateway/                   电脑端 FastAPI 网关：ASR、OpenClaw、TTS 编排
+contracts/                 ESP32、网关与 OpenClaw 共用的 JSON / 音频协议
+docs/                      部署、TLS、云语音、发现和安全说明
+ops/openclaw/              固定版本的 OpenClaw 安装入口
 ```
 
-正式运行配置见 `gateway/README.md`。控制台仅供受信任的本机/局域网开发环境使用，不应直接暴露到公网。
+## 使用顺序
 
-### 继续搭建完整开发环境
+1. 编译并烧录 `firmware/esp32_voice_idf`；它同时包含网页控制与语音闭环，需要 INMP441 麦克风和 MAX98357A 功放。
+2. 在电脑上配置并启动 `gateway`，使用真实 ASR/TTS 与 OpenClaw。
+3. 用每台设备独立的 NVS 配置烧录 Wi-Fi、设备 token 和网关根证书；这些秘密不进入源码。
+4. ESP32 接入 Wi-Fi 后，优先通过 `http://<device_id>.local/` 打开原网页控制台；
+   DHCP IPv4 可作为不支持 mDNS 的备用入口。电脑和 ESP32 必须位于同一非访客
+   Wi-Fi/VLAN，且网络不得拦截客户端之间的 mDNS 和 TCP 连接。
 
-完整流程、ESP-IDF v5.5.4 构建、每台设备 NVS 配置和 OpenClaw 安装，见以下文档。先从人类指南开始；换电脑后交给 AI 执行时使用 AI 交接文档。
+## v1.6.0：主人声纹门控与“你好，芝麻”唤醒
 
-- [换电脑后的搭建指南](docs/setup/new-machine-setup-guide.md)
-- [给 AI 的新电脑搭建交接文档](docs/setup/ai-agent-new-machine-handoff.md)
-- [OpenClaw 本地配置](ops/openclaw/README.md)
+- **MultiNet 唤醒词**：当前唤醒词为“你好，芝麻”（`ni hao zhi ma`）；“芝麻阿奇”可作为备用 MultiNet 配置恢复，不将个人语音样本上传到仓库。
+- **网页调参**：本机控制台支持以 `0.01` 步长输入或拖动 MultiNet 阈值；设备即时应用，并以独立内部 RAM 任务保存到 NVS，重启后恢复。
+- **会话收尾**：首次唤醒及 TTS 回复后均进入 3 秒追问窗口；没有人声、ASR 空结果或纯语气词会静默回到待唤醒，不再发送“没有听清”。
+- **播放与烧录可靠性**：没有 AEC 参考通道时维持严格半双工；修正阈值恢复时的错误码处理，并在下载模式无法自动进入时引导 BOOT/RESET 手动重试。
 
-## 必须遵守的安全边界
+## v1.5.0：可靠采集、连续对话与动作隔离
 
-- 不提交 `.env`、真实 `device-config.json`、`device-nvs.bin`、设备 token、Wi-Fi 密码或私有 CA 证书。
-- 不复制或提交完整 `~/.openclaw/`；其中包含模型凭据、会话、个人记忆与 sandbox 运行状态。只提交 `ops/openclaw/` 的模板。
-- 不让模型直接生成舵机角度、GPIO、固件代码片段或任意宿主机命令。模型只能表达通过白名单的高层意图。
-- 不把本机开发控制台当作生产设备入口。实机需要 `wss://.../v1/device-stream`、私有 CA、设备身份和单独的网络部署。
-- 没有完成机械校准、限位、急停和断电测试前，不要让真实机器人执行高风险动作。
+- **可靠语音采集**：手动、唤醒词和追问采集使用明确来源与统一会话状态；500 ms 预录音减少开头吞字，音频上行与唤醒推理彼此解耦。
+- **连续对话**：TTS 回复后保留 3 秒追问窗口，并支持播放期间通过完整唤醒词打断；独立下行队列避免语音流阻塞控制事件。
+- **动作隔离**：OpenClaw 只生成文字、音色和表情，不再下发物理动作；网页本地控制继续使用原有动作白名单。
+- **诊断与训练采样**：监控台会标记断线中的失败回合；测试录音可限制为手动按键采集，并记录对应 ASR 文本。
+- **仍需现场配置**：真实硬件的 I2S 接线、TLS 证书、云端 ASR/TTS 凭据与 OpenClaw token 需要按设备在本机完成配置和联调。
 
-## 阅读路径
+硬件模块、GPIO 和供电关系见 [硬件模块清单](docs/hardware_modules.md)。
 
-| 你想了解什么 | 先读什么 |
-| --- | --- |
-| 当前 V3 全链路和职责边界 | [当前完整架构图](docs/architecture/sesame-robot-v3-current-complete-architecture.md) |
-| V3 与原版 GitHub 的差异、哪些文件要带到新设备 | [项目范围与跨设备快速复现指南](docs/sesame-robot-v3-scope-and-replication-guide.md) |
-| Gateway 的 API、控制台与当前限制 | [Voice Gateway README](gateway/README.md) |
-| OpenClaw 的安装、四个 workspace 与 MCP bridge | [OpenClaw 本地配置](ops/openclaw/README.md) |
-| ESP32、Opus、OpenClaw 的平台级技术设计 | [技术设计](docs/technical-design/esp32-opus-openclaw-platform.md) |
-| Voice Gateway 后续实现细节 | [Voice Gateway 后端实现指南](docs/implementation/voice-gateway-backend.md) |
+## 项目说明与迁移文档
 
-## V3 代码交付边界
-
-如果要把项目放到 GitHub 或迁移到另一台电脑，应建立独立的私有 `sesame-robot-v3` 仓库，至少包含 `firmware-work/Sesame_Robot_V3_IDF/`、`gateway/`、`contracts/`、`ops/openclaw/`、`docs/` 以及必要的动作资产。原版 Sesame 保持为清晰记录的上游依赖，历史输出、构建目录、虚拟环境和任何凭据不进入 Git。
-
-具体清单和两种迁移方式见[项目范围与跨设备快速复现指南](docs/sesame-robot-v3-scope-and-replication-guide.md)。
+- [项目概览与当前边界](docs/project-overview.md)：功能、组件职责、OpenClaw 的位置与当前限制。
+- [GitHub 范围与跨设备复现](docs/setup/github-scope-and-replication-guide.md)：仓库包含什么、不包含什么，以及换设备时应迁移哪些内容。
+- [换电脑后的搭建指南](docs/setup/new-machine-setup-guide.md)：写给开发者的本地搭建顺序。
+- [给 AI 的新电脑搭建交接文档](docs/setup/ai-agent-new-machine-handoff.md)：在新电脑交给 AI 执行配置时使用。

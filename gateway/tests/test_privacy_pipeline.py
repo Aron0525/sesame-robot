@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 import unittest
+from unittest.mock import patch
 
 from sesame_voice_gateway.config import Settings
 from sesame_voice_gateway.observability import ObservabilityStore
@@ -139,16 +141,16 @@ class FakeObserver:
 
 class PrivacyAndPipelineTest(unittest.IsolatedAsyncioTestCase):
     def test_remote_speech_requires_explicit_consent(self) -> None:
-        with self.assertRaisesRegex(ValueError, "ALLOW_REMOTE_SPEECH"):
-            Settings(
-                _env_file=None,
-                dashscope_api_key="test-key",
-                allow_remote_speech=False,
-                openclaw_token="test-token",
-                openclaw_session_key_secret="test-secret",
-                device_tokens={"device": "token"},
-                device_users={"device": "user"},
-            )
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(ValueError, "ALLOW_REMOTE_SPEECH"):
+                Settings(
+                    _env_file=None,
+                    dashscope_api_key="test-key",
+                    openclaw_token="test-token",
+                    openclaw_session_key_secret="test-secret",
+                    device_tokens={"device": "token"},
+                    device_users={"device": "user"},
+                )
 
     def test_remote_audio_has_a_30_second_limit(self) -> None:
         with self.assertRaises(PrivacyPolicyViolation):

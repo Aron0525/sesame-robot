@@ -25,25 +25,6 @@ class _FakeWebSocket:
         self.text_frames.append(value)
 
 
-class _ChatWebSocket:
-    def __init__(self) -> None:
-        self.sent: list[str] = []
-
-    async def send(self, value: str) -> None:
-        self.sent.append(value)
-
-
-class _WebSocketContext:
-    def __init__(self, websocket: _ChatWebSocket) -> None:
-        self.websocket = websocket
-
-    async def __aenter__(self) -> _ChatWebSocket:
-        return self.websocket
-
-    async def __aexit__(self, *_: object) -> None:
-        return None
-
-
 class _UnavailablePipeline:
     async def process_turn(self, **_: object) -> object:
         raise OpenClawUnavailableError("OpenClaw is temporarily unavailable")
@@ -143,7 +124,7 @@ class OpenClawRetryTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(attempts, 2)
 
-    async def test_cancel_before_ack_does_not_guess_a_run_id(self) -> None:
+    async def test_cancel_aborts_only_the_current_run(self) -> None:
         provider = OpenClawAgentProvider(
             url="ws://127.0.0.1:18789",
             token="test-token",
@@ -181,73 +162,9 @@ class OpenClawRetryTest(unittest.IsolatedAsyncioTestCase):
                 with self.assertRaises(asyncio.CancelledError):
                     await task
 
-        self.assertEqual(aborted, [])
-
-    async def test_cancel_after_ack_aborts_the_real_openclaw_run_id(self) -> None:
-        provider = OpenClawAgentProvider(
-            url="ws://127.0.0.1:18789",
-            token="test-token",
-            session_key_secret="test-secret",
-        )
-        websocket = _ChatWebSocket()
-        receiving_events = asyncio.Event()
-        aborted: list[tuple[str, str]] = []
-
-        async def authenticate(
-            _provider: OpenClawAgentProvider, _websocket: object
-        ) -> None:
-            return None
-
-        async def receive_ack(
-            _provider: OpenClawAgentProvider,
-            _websocket: object,
-            _request_id: str,
-        ) -> dict[str, str]:
-            return {"runId": "run_real_001"}
-
-        async def wait_for_event(
-            _provider: OpenClawAgentProvider, _websocket: object, **_: object
-        ) -> dict[str, object]:
-            receiving_events.set()
-            await asyncio.Event().wait()
-            raise AssertionError("unreachable")
-
-        async def record_abort(
-            _provider: OpenClawAgentProvider, *, session_key: str, run_id: str
-        ) -> None:
-            aborted.append((session_key, run_id))
-
-        with patch(
-            "sesame_voice_gateway.openclaw.client.websockets.connect",
-            return_value=_WebSocketContext(websocket),
-        ):
-            with patch.object(OpenClawAgentProvider, "_authenticate", new=authenticate):
-                with patch.object(
-                    OpenClawAgentProvider, "_receive_response", new=receive_ack
-                ):
-                    with patch.object(
-                        OpenClawAgentProvider, "_receive_json", new=wait_for_event
-                    ):
-                        with patch.object(
-                            OpenClawAgentProvider,
-                            "_abort_run_best_effort",
-                            new=record_abort,
-                        ):
-                            task = asyncio.create_task(
-                                provider._run_chat_attempt(
-                                    prompt="test prompt",
-                                    session_key="agent:sesame:conversation:test",
-                                    idempotency_key="turn_001",
-                                )
-                            )
-                            await asyncio.wait_for(receiving_events.wait(), timeout=1)
-                            task.cancel()
-                            with self.assertRaises(asyncio.CancelledError):
-                                await task
-
         self.assertEqual(
             aborted,
-            [("agent:sesame:conversation:test", "run_real_001")],
+            [("agent:sesame:conversation:test", "turn_001")],
         )
 
     async def test_total_timeout_covers_all_attempts_and_requests_abort(self) -> None:
@@ -293,7 +210,10 @@ class OpenClawRetryTest(unittest.IsolatedAsyncioTestCase):
         # still cancel the last retry, so we verify at least two
         # attempts ran rather than the old single attempt.
         self.assertGreaterEqual(attempts, 2)
-        self.assertEqual(aborted, [])
+        self.assertEqual(
+            aborted,
+            [("agent:sesame:conversation:test", "turn_001")],
+        )
 
     def test_abort_request_always_names_one_run(self) -> None:
         request = build_chat_abort_request(
