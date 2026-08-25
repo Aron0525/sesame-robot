@@ -36,6 +36,7 @@ enum FaceAnimMode : uint8_t {
 // External globals and helpers used by movement/pose sequences
 extern int frameDelay;
 extern int walkCycles;
+extern int motorCurrentDelay;
 extern String currentCommand;
 
 extern void setServoAngle(uint8_t channel, int angle);
@@ -123,13 +124,13 @@ inline void runDancePose() {
   for (int i = 0; i < 5; i++) {
     setServoAngle(R1, 90); setServoAngle(R2, 90);
     setServoAngle(L1, 90); setServoAngle(L2, 90);
-    setServoAngle(R4, 130); setServoAngle(R3, 100);
-    setServoAngle(L3, 25); setServoAngle(L4, 25);
+    setServoAngle(R4, 90); setServoAngle(R3, 55);
+    setServoAngle(L3, 80); setServoAngle(L4, 80);
     delayWithFace(300);
     setServoAngle(R1, 90); setServoAngle(R2, 90);
     setServoAngle(L1, 90); setServoAngle(L2, 90);
     setServoAngle(R4, 145); setServoAngle(R3, 145);
-    setServoAngle(L3, 80); setServoAngle(L4, 80);
+    setServoAngle(L3, 25); setServoAngle(L4, 25);
     delayWithFace(300); 
   } 
   runStandPose(1); 
@@ -139,13 +140,15 @@ inline void runDancePose() {
 inline void runProudPose() {
   Serial.println(F("PROUD"));
   setFaceWithMode("stand", FACE_ANIM_ONCE);
+  const int originalMotorCurrentDelay = motorCurrentDelay;
+  motorCurrentDelay = (originalMotorCurrentDelay * 4) / 5;
 
   // A: the upper legs stay at stand; lower legs move away from 90°.
   setServoAngle(R1, 135); setServoAngle(R2, 45);
   setServoAngle(L1, 45); setServoAngle(L2, 135);
   setServoAngle(R4, 23); setServoAngle(R3, 128);
   setServoAngle(L3, 26); setServoAngle(L4, 127);
-  delayWithFace(300);
+  delayWithFace(240);
 
   for (int i = 0; i < 5; i++) {
     // B: cross the standing angle by 15° for the proud sway.
@@ -153,15 +156,16 @@ inline void runProudPose() {
     setServoAngle(L1, 45); setServoAngle(L2, 135);
     setServoAngle(R4, 53); setServoAngle(R3, 98);
     setServoAngle(L3, 56); setServoAngle(L4, 97);
-    delayWithFace(300);
+    delayWithFace(240);
 
     setServoAngle(R1, 135); setServoAngle(R2, 45);
     setServoAngle(L1, 45); setServoAngle(L2, 135);
     setServoAngle(R4, 23); setServoAngle(R3, 128);
     setServoAngle(L3, 26); setServoAngle(L4, 127);
-    delayWithFace(300);
+    delayWithFace(240);
   }
 
+  motorCurrentDelay = originalMotorCurrentDelay;
   runStandPose(1);
   if (currentCommand == "proud") currentCommand = "";
 }
@@ -190,8 +194,8 @@ inline void runPushupPose() {
   setFaceWithMode("pushup", FACE_ANIM_ONCE);
   runStandPose(0); 
   delayWithFace(200);
-  setServoAngle(L1, 0);
-  setServoAngle(R1, 180);
+  setServoAngle(L1, 30);
+  setServoAngle(R1, 150);
   setServoAngle(L3, 90);
   setServoAngle(R3, 60);
   delayWithFace(500);
@@ -338,9 +342,12 @@ inline void runCrabPose() {
 inline void runWalkPose() {
   Serial.println(F("WALK FWD"));
   setFaceWithMode("walk", FACE_ANIM_ONCE);
-  // Initial Step
-  setServoAngle(R3, 98); setServoAngle(L3, 56);
-  setServoAngle(R2, 90); setServoAngle(L1, 45);
+  // Establish the confirmed 0 ms gait state before the first 920 ms cycle.
+  // Calls remain staggered by motorCurrentDelay; the loop itself is unchanged.
+  setServoAngle(R1, 90); setServoAngle(R2, 90);
+  setServoAngle(L1, 45); setServoAngle(L2, 135);
+  setServoAngle(R4, 53); setServoAngle(R3, 98);
+  setServoAngle(L3, 56); setServoAngle(L4, 142);
   if (!pressingCheck("forward", frameDelay)) return;
   
   for (int i = 0; i < walkCycles; i++) {

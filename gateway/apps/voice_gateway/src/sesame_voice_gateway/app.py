@@ -73,6 +73,7 @@ REMOTE_ACTIONS = frozenset(
         "stand",
         "wave",
         "dance",
+        "proud",
         "swim",
         "point",
         "pushup",

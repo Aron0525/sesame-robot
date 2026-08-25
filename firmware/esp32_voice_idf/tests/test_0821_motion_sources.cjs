@@ -36,10 +36,10 @@ for (const sourcePath of sources) {
   assert.doesNotMatch(source, /inline void runBowPose\(\)/);
 
   const dance = body(source, 'runDancePose', 'runProudPose');
-  assert.deepEqual(angles(dance, 'R4'), [145, 130, 145]);
-  assert.deepEqual(angles(dance, 'R3'), [145, 100, 145]);
-  assert.deepEqual(angles(dance, 'L3'), [25, 25, 80]);
-  assert.deepEqual(angles(dance, 'L4'), [25, 25, 80]);
+  assert.deepEqual(angles(dance, 'R4'), [145, 90, 145]);
+  assert.deepEqual(angles(dance, 'R3'), [145, 55, 145]);
+  assert.deepEqual(angles(dance, 'L3'), [25, 80, 25]);
+  assert.deepEqual(angles(dance, 'L4'), [25, 80, 25]);
   assert.equal(angles(dance, 'R1').length, 3,
     'dance must rewrite R1 in every keyframe');
 
@@ -48,6 +48,8 @@ for (const sourcePath of sources) {
   assert.deepEqual(angles(swim, 'L4'), [60]);
 
   const pushup = body(source, 'runPushupPose', 'runCutePose');
+  assert.deepEqual(angles(pushup, 'L1'), [30]);
+  assert.deepEqual(angles(pushup, 'R1'), [150]);
   assert.deepEqual(angles(pushup, 'R3'), [60, 150, 60]);
 
   const worm = body(source, 'runWormPose', 'runShakePose');
@@ -65,8 +67,8 @@ for (const sourcePath of sources) {
   const forward = body(source, 'runWalkPose', 'runWalkBackward');
   assert.deepEqual(angles(forward, 'R3'), [98, 98, 143, 98]);
   assert.deepEqual(angles(forward, 'L3'), [56, 11, 56]);
-  assert.deepEqual(angles(forward, 'R4'), [8, 53]);
-  assert.deepEqual(angles(forward, 'L4'), [97, 142]);
+  assert.deepEqual(angles(forward, 'R4'), [53, 8, 53]);
+  assert.deepEqual(angles(forward, 'L4'), [142, 97, 142]);
   assert.match(forward, /pressingCheck\("forward", 80\)/);
   assert.match(forward, /pressingCheck\("forward", 20\)/);
 }

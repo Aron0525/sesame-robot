@@ -133,6 +133,9 @@ node "$project_root/tests/test_0821_motion_sources.cjs"
 node "$project_root/tests/test_stand_pose_sources.cjs"
 node "$project_root/tests/test_r3_l4_offset_actions.cjs"
 node "$project_root/tests/test_forward_pose_sources.cjs"
+node "$project_root/tests/test_forward_gait_timeline.cjs"
+node "$project_root/tests/test_dance_pairing_sources.cjs"
+node "$project_root/tests/test_proud_action_contract.cjs"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_robot/include" \
