@@ -8,10 +8,10 @@ namespace sesame::robot {
 
 // The motion names exposed by the on-device web controller. Voice response
 // plans use this same catalog so a name always selects the same pose sequence.
-inline constexpr std::array<std::string_view, 19> kWebActions{
-    "rest", "stand", "wave", "dance", "swim", "point", "pushup",
-    "bow", "cute", "freaky", "worm", "shake", "shrug", "dead",
-    "crab", "forward", "backward", "left", "right",
+inline constexpr std::array<std::string_view, 18> kWebActions{
+    "rest", "stand", "wave", "dance", "proud", "swim", "pushup", "cute",
+    "freaky", "worm", "shake", "shrug", "dead", "crab", "forward",
+    "backward", "left", "right",
 };
 
 // These are the faces with bitmap data currently exposed by /api/catalog.

@@ -7,7 +7,7 @@ const path = require('node:path');
 const projectRoot = path.join(__dirname, '..');
 const targetCalls = [
   ['R1', 135], ['R2', 45], ['L1', 45], ['L2', 135],
-  ['R4', 30], ['R3', 120], ['L3', 30], ['L4', 120],
+  ['R4', 38], ['R3', 113], ['L3', 41], ['L4', 112],
 ];
 
 function standPoseCalls(filePath) {

@@ -20,3 +20,8 @@ CONFIG_SR_VADN_WEBRTC=y
 CONFIG_SR_MN_CN_MULTINET7_QUANT=y
 CONFIG_ESP_WS_CLIENT_SEPARATE_TX_LOCK=y
 CONFIG_ESP_WS_CLIENT_TX_LOCK_TIMEOUT_MS=2000
+# TLS setup previously needed a contiguous 16-KiB internal allocation, while
+# the real voice runtime had only a 14,848-byte largest free block. WebSocket
+# frames are capped at 2 KiB, so a 4-KiB TLS input record budget is sufficient.
+CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=4096
+CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN=4096

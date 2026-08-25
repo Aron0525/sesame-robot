@@ -26,7 +26,19 @@ struct StoredDeviceConfig {
   DeviceConfig view() const;
 };
 
+// Kept separate from StoredDeviceConfig so the AP and local HTTP controller
+// can start even if Gateway credentials are absent or invalid.
+struct StoredLocalNetworkConfig {
+  std::array<char, 33> wifi_ssid{};
+  std::array<char, 65> wifi_password{};
+  std::array<char, 101> device_id{};
+  std::array<char, 64> web_control_hostname{};
+
+  LocalNetworkConfig view() const;
+};
+
 esp_err_t load_device_config(StoredDeviceConfig* output);
+esp_err_t load_local_network_config(StoredLocalNetworkConfig* output);
 esp_err_t save_conversation_id(const char* conversation_id);
 esp_err_t load_wake_threshold_hundredths(uint8_t* output);
 esp_err_t save_wake_threshold_hundredths(uint8_t value);

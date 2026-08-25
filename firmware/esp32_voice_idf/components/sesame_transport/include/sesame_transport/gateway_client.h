@@ -58,6 +58,7 @@ class GatewayClient {
   esp_err_t initialize_local_mdns(const StoredDeviceConfig& config,
                                   esp_netif_t* station);
   esp_err_t connect_wifi(const StoredDeviceConfig& config);
+  esp_err_t ensure_tls_clock();
   esp_err_t discover_gateway(const StoredDeviceConfig& config);
   esp_err_t ensure_client_mutex();
   void stop_locked();
@@ -83,6 +84,8 @@ class GatewayClient {
   // is already associating.
   bool wifi_configured_{false};
   bool wifi_started_{false};
+  bool sntp_initialized_{false};
+  int64_t discovered_gateway_time_{0};
   bool local_mdns_published_{false};
   bool web_control_alias_published_{false};
   std::array<char, 64> web_control_hostname_{};

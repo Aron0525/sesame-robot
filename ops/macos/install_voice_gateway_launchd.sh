@@ -3,10 +3,10 @@ set -eu
 
 project_root=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
 gateway_dir="$project_root/gateway"
-label="com.sesame.voice-gateway"
+label="com.sesame.streaming-lab-gateway"
 user_id=$(id -u)
 launch_agents_dir="$HOME/Library/LaunchAgents"
-logs_dir="$HOME/Library/Logs/SesameVoiceGateway"
+logs_dir="$HOME/Library/Logs/SesameStreamingLabGateway"
 plist="$launch_agents_dir/$label.plist"
 
 if ! command -v uv >/dev/null 2>&1; then
@@ -66,6 +66,10 @@ cat >"$plist" <<EOF
 </plist>
 EOF
 
+# 旧标签与正式标签不能并存，否则可能争用端口并广播两套协议。
+launchctl disable "gui/$user_id/com.sesame.voice-gateway"
+launchctl bootout "gui/$user_id/com.sesame.voice-gateway" 2>/dev/null || true
+launchctl enable "gui/$user_id/$label"
 launchctl bootout "gui/$user_id/$label" 2>/dev/null || true
 attempt=1
 while ! launchctl bootstrap "gui/$user_id" "$plist" 2>/dev/null; do

@@ -1,78 +1,72 @@
-# mDNS 服务发现与身份固定
+# mDNS 服务发现与版本配对
 
-## mDNS 解决什么
+## 先确认版本
 
-电脑局域网 IP 可能因 DHCP、切换 Wi‑Fi 或睡眠恢复而改变。Voice Gateway 发布 mDNS 服务后，ESP32-S3 通过固定服务类型找到**当前**主机名、IP 和端口：
+ESP32 和 Voice Gateway 必须使用同一行配置：
+
+| 配置 | ESP 查询的服务 | Gateway TXT `path` | 设备入口 | 默认端口 |
+|---|---|---|---|---:|
+| 当前部署：0821 | `_sesame-streamgw._tcp.local.` | `/v2/device-stream` | `/v2/device-stream` | 8766 |
+| 仓库 v1.6 默认值 | `_sesame-gw._tcp.local.` | `/v1/device-stream` | `/v1/device-stream` | 8765 |
+
+如果 Gateway 广播 `_sesame-gw`，而 ESP 查询 `_sesame-streamgw`，设备会停在 `Gateway discovery ... ESP_ERR_NOT_FOUND`，不会进入 TLS 或 token 鉴权。不要通过修改 token、关闭 TLS 或重写 NVS 来处理这种版本不匹配。
+
+## 当前 0821 服务记录
+
+当前部署发布：
 
 ```text
-_sesame-gw._tcp.local.
+服务类型：_sesame-streamgw._tcp.local.
+实例名称：Sesame Streaming Lab Gateway
+主机名：sesame-stream-gateway.local.
+端口：8766
 ```
 
-mDNS 返回 SRV、A/AAAA 和 TXT 记录，但不证明该服务属于正确用户。
-
-## 服务记录
+TXT 只包含非秘密信息：
 
 ```text
-服务类型：_sesame-gw._tcp.local.
-实例名称：Sesame Voice Gateway
-端口：8765
-```
-
-TXT 只放非秘密信息：
-
-```text
-gateway_id=gw_xxx
+gateway_id=gw_stream_lab
 protocol=1
 tls=1
-path=/v1/device-stream
+path=/v2/device-stream
 ```
 
-禁止放入 token、WiFi 密码、设备密钥或用户信息。
+禁止把 token、Wi-Fi 密码、设备密钥或用户信息写入 mDNS TXT。
 
-## 身份固定
+## 发现与身份校验
 
-ESP32-S3 建立连接前后必须校验：
+ESP32 的连接顺序是：
 
 ```text
-mDNS 发现地址
-+ gateway_id 匹配配对记录
-+ TLS 证书或公钥匹配
-+ Voice Gateway 验证设备凭据
-+ 协议版本兼容
+连接 NVS 中的 Wi-Fi
+→ 查询匹配版本的 mDNS PTR
+→ 校验 gateway_id / protocol / tls / path
+→ 取得 Gateway IPv4 和端口
+→ 使用发现到的 IPv4 建立 WSS
+→ 使用 sesame-stream-gateway.local 校验 TLS 证书
+→ Gateway 校验设备 Bearer token
+→ session.hello / session.ready
 ```
 
-`gateway_id` 在 Voice Gateway 首次安装时随机生成并持久化。实例名称可以重复，`gateway_id` 不可重复。
+mDNS 只解决地址发现，不证明服务身份。`gateway_id`、TLS 证书、设备 token 和协议校验缺一不可。
 
-固件将 mDNS 返回的裸主机名规范成 `<hostname>.local` 后再建立
-`wss://<hostname>.local:<port>/v1/device-stream`。TLS 证书的 DNS SAN 必须包含这个 `.local` 名称；不要为绕过 DHCP 或证书问题关闭主机名校验。
+## DHCP 与重连
 
-## DHCP 与地址刷新
+- 默认不要设置 `SESAME_ADVERTISED_IPV4`。普通 DHCP 地址改变后，Gateway 应重新发布 mDNS。
+- ESP32 在首次发现失败、WSS 断线或 Gateway 重启后重新查询 mDNS，并以最高 30 秒的退避重试。
+- ESP32 的 HTTP 页面同时发布 `http://<device_id>.local/`。它与 ESP 主动连接 Voice Gateway 是两条独立路径。
+- 2.4 GHz 与 5 GHz 本身不会阻止通信；只要路由器把两个频段桥接到同一局域网即可。不能仅凭频段不同判断为网络隔离。
+- macOS 工具可能因隐私权限不显示 SSID。判断电脑是否联网时，应结合 `ifconfig`、路由、Gateway 监听状态、ESP IP 可达性和会话快照。
 
-- 默认不要设置 `SESAME_ADVERTISED_IPV4`。网关每 30 秒重新检查当前 LAN IPv4，地址变化时用同一个 mDNS 服务名更新记录。
-- `SESAME_ADVERTISED_IPV4` 只适用于路由器已做 DHCP reservation（DHCP 地址保留）或真正静态 IP 的主机。对普通 DHCP 地址强行设置它会让 mDNS 广播旧地址。
-- ESP32 在 WSS 断线、首次没有找到服务、连接超时后，以 0.5 秒、1 秒、2 秒……最高 30 秒的退避重新连接 Wi‑Fi、重新发现 mDNS，再新建 WSS。它不缓存旧 IP/旧端口作为永久地址。
-- ESP32 自己的 DHCP 地址不影响它主动连 Gateway；网页控制除 `http://<ESP32-IP>/` 外，还发布 `http://<device_id>.local/`（设备 ID 中 `_` 规范为 `-`）。路由器为 ESP32 做 DHCP reservation 仍可作为不支持 mDNS 的网络的备用方案。
+## 故障定位
 
-## 失败与重连
+| 现象 | 所在阶段 | 优先检查 |
+|---|---|---|
+| 8766/8765 没有监听 | Gateway 未运行 | LaunchAgent 标签是否启用、plist、进程日志 |
+| `ESP_ERR_NOT_FOUND` | mDNS 发现 | 固件与 Gateway 的服务类型和 `path` 是否成对、Gateway 是否持续运行 |
+| 已选择 mDNS，TLS 失败 | TLS | 根 CA、证书 SAN、发现到的主机名 |
+| HTTP 401/403 或 WSS 关闭 | 设备鉴权 | `device_id` 和 token 是否一致 |
+| WSS connected 但不 ready | 会话握手 | 协议版本、`session.hello` 和 Gateway 事件 |
+| `online=true`、`ready` | 连接完成 | 再测试动作、ASR、OpenClaw 和 TTS |
 
-- 找到多个实例：只选择配对记录中的 `gateway_id`。
-- IP 或服务端口变化：重新解析 mDNS，不缓存旧 IP/端口为永久地址。
-- 服务消失：指数退避后重新发现。
-- 证书或公钥不匹配：拒绝连接，不自动信任新身份。
-- 协议版本不兼容：返回明确错误并停止音频上传。
-- 访客 WiFi 或客户端隔离：mDNS 和直连可能失败，首版不绕过该限制。
-
-## 适用范围
-
-mDNS 只适合本地链路：
-
-```text
-ESP32-S3 → Voice Gateway
-```
-
-以下连接使用固定本机配置，不使用 mDNS：
-
-```text
-Voice Gateway → OpenClaw：127.0.0.1:18789
-Voice Gateway → ASR/TTS：DashScope HTTPS/WSS 配置（不使用 mDNS）
-```
+当前电脑的实际恢复记录见[2026-08-21 ESP32 网关恢复记录](validation/2026-08-21-esp32-gateway-recovery.md)。

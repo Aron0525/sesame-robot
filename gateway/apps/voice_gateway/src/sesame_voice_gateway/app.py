@@ -66,12 +66,14 @@ from sesame_voice_gateway.tools.web_search import DashScopeWebSearchProvider, We
 logger = logging.getLogger(__name__)
 
 MAX_UPLINK_OPUS_BYTES = MAX_UPLINK_PACKETS * MAX_OPUS_PACKET_BYTES
+TTS_STARTUP_FRAMES = 30
 REMOTE_ACTIONS = frozenset(
     {
         "rest",
         "stand",
         "wave",
         "dance",
+        "proud",
         "swim",
         "point",
         "pushup",
@@ -1350,7 +1352,10 @@ async def _send_turn_result(
                 packet_count=sequence + 1,
                 byte_count=downlink_bytes,
             )
-        if sequence + 1 < len(result.opus_packets):
+        if (
+            sequence + 1 >= TTS_STARTUP_FRAMES
+            and sequence + 1 < len(result.opus_packets)
+        ):
             await asyncio.sleep(0.02)
     if turn_epoch is not None and not _turn_is_current(session, turn_epoch):
         return

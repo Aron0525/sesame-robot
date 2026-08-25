@@ -36,6 +36,7 @@ enum FaceAnimMode : uint8_t {
 // External globals and helpers used by movement/pose sequences
 extern int frameDelay;
 extern int walkCycles;
+extern int motorCurrentDelay;
 extern String currentCommand;
 
 extern void setServoAngle(uint8_t channel, int angle);
@@ -51,10 +52,9 @@ void runRestPose();
 void runStandPose(int face = 1);
 void runWavePose();
 void runDancePose();
+void runProudPose();
 void runSwimPose();
-void runPointPose();
 void runPushupPose();
-void runBowPose();
 void runCutePose();
 void runFreakyPose();
 void runWormPose();
@@ -88,10 +88,10 @@ inline void runStandPose(int face) {
   setServoAngle(R2, 45); 
   setServoAngle(L1, 45); 
   setServoAngle(L2, 135);
-  setServoAngle(R4, 30);
-  setServoAngle(R3, 120);
-  setServoAngle(L3, 30);
-  setServoAngle(L4, 120);
+  setServoAngle(R4, 38);
+  setServoAngle(R3, 113);
+  setServoAngle(L3, 41);
+  setServoAngle(L4, 112);
   if (face == 1) enterIdle();
 }
 
@@ -113,24 +113,61 @@ inline void runWavePose() {
   if (currentCommand == "wave") currentCommand = "";
 }
 
-inline void runDancePose() { 
-  Serial.println(F("DANCE")); 
-  setFaceWithMode("dance", FACE_ANIM_LOOP); 
-  setServoAngle(R1, 90); setServoAngle(R2, 90); 
-  setServoAngle(L1, 90); setServoAngle(L2, 90); 
-  setServoAngle(R4, 160); setServoAngle(R3, 160); 
-  setServoAngle(L3, 10); setServoAngle(L4, 10); 
-  delayWithFace(300); 
-  for (int i = 0; i < 5; i++) { 
-    setServoAngle(R4, 115); setServoAngle(R3, 115); 
-    setServoAngle(L3, 10); setServoAngle(L4, 10); 
-    delayWithFace(300); 
-    setServoAngle(R4, 160); setServoAngle(R3, 160); 
-    setServoAngle(L3, 65); setServoAngle(L4, 65); 
+inline void runDancePose() {
+  Serial.println(F("DANCE"));
+  setFaceWithMode("dance", FACE_ANIM_LOOP);
+  setServoAngle(R1, 90); setServoAngle(R2, 90);
+  setServoAngle(L1, 90); setServoAngle(L2, 90);
+  setServoAngle(R4, 145); setServoAngle(R3, 145);
+  setServoAngle(L3, 25); setServoAngle(L4, 25);
+  delayWithFace(300);
+  for (int i = 0; i < 5; i++) {
+    setServoAngle(R1, 90); setServoAngle(R2, 90);
+    setServoAngle(L1, 90); setServoAngle(L2, 90);
+    setServoAngle(R4, 90); setServoAngle(R3, 55);
+    setServoAngle(L3, 80); setServoAngle(L4, 80);
+    delayWithFace(300);
+    setServoAngle(R1, 90); setServoAngle(R2, 90);
+    setServoAngle(L1, 90); setServoAngle(L2, 90);
+    setServoAngle(R4, 145); setServoAngle(R3, 145);
+    setServoAngle(L3, 25); setServoAngle(L4, 25);
     delayWithFace(300); 
   } 
   runStandPose(1); 
   if (currentCommand == "dance") currentCommand = "";
+}
+
+inline void runProudPose() {
+  Serial.println(F("PROUD"));
+  setFaceWithMode("stand", FACE_ANIM_ONCE);
+  const int originalMotorCurrentDelay = motorCurrentDelay;
+  motorCurrentDelay = (originalMotorCurrentDelay * 4) / 5;
+
+  // A: the upper legs stay at stand; lower legs move away from 90°.
+  setServoAngle(R1, 135); setServoAngle(R2, 45);
+  setServoAngle(L1, 45); setServoAngle(L2, 135);
+  setServoAngle(R4, 23); setServoAngle(R3, 128);
+  setServoAngle(L3, 26); setServoAngle(L4, 127);
+  delayWithFace(240);
+
+  for (int i = 0; i < 5; i++) {
+    // B: cross the standing angle by 15° for the proud sway.
+    setServoAngle(R1, 135); setServoAngle(R2, 45);
+    setServoAngle(L1, 45); setServoAngle(L2, 135);
+    setServoAngle(R4, 53); setServoAngle(R3, 98);
+    setServoAngle(L3, 56); setServoAngle(L4, 97);
+    delayWithFace(240);
+
+    setServoAngle(R1, 135); setServoAngle(R2, 45);
+    setServoAngle(L1, 45); setServoAngle(L2, 135);
+    setServoAngle(R4, 23); setServoAngle(R3, 128);
+    setServoAngle(L3, 26); setServoAngle(L4, 127);
+    delayWithFace(240);
+  }
+
+  motorCurrentDelay = originalMotorCurrentDelay;
+  runStandPose(1);
+  if (currentCommand == "proud") currentCommand = "";
 }
 
 inline void runSwimPose() {
@@ -152,25 +189,13 @@ inline void runSwimPose() {
   if (currentCommand == "swim") currentCommand = "";
 }
 
-inline void runPointPose() {
-  Serial.println(F("POINT")); 
-  setFaceWithMode("point", FACE_ANIM_BOOMERANG); 
-  setServoAngle(L2, 90); setServoAngle(R1, 135); 
-  setServoAngle(R2, 100); setServoAngle(L4, 150);
-  setServoAngle(L1, 25); setServoAngle(L3, 145);
-  setServoAngle(R4, 80); setServoAngle(R3, 140);
-  delayWithFace(2000); 
-  runStandPose(1); 
-  if (currentCommand == "point") currentCommand = "";
-}
-
 inline void runPushupPose() {
   Serial.println(F("PUSHUP"));
   setFaceWithMode("pushup", FACE_ANIM_ONCE);
   runStandPose(0); 
   delayWithFace(200);
-  setServoAngle(L1, 0);
-  setServoAngle(R1, 180);
+  setServoAngle(L1, 30);
+  setServoAngle(R1, 150);
   setServoAngle(L3, 90);
   setServoAngle(R3, 60);
   delayWithFace(500);
@@ -184,27 +209,6 @@ inline void runPushupPose() {
   }
   runStandPose(1);
   if (currentCommand == "pushup") currentCommand = "";
-}
-
-inline void runBowPose() {
-  Serial.println(F("BOW"));
-  setFaceWithMode("bow", FACE_ANIM_ONCE);
-  runStandPose(0); 
-  delayWithFace(200);
-  setServoAngle(L1, 0);
-  setServoAngle(R1, 180);
-  setServoAngle(L3, 0);
-  setServoAngle(R3, 150);
-  setServoAngle(L2, 180);
-  setServoAngle(R2, 0);
-  setServoAngle(R4, 0);
-  setServoAngle(L4, 150);
-  delayWithFace(600);
-  setServoAngle(L3, 90);
-  setServoAngle(R3, 60);
-  delayWithFace(3000);
-  runStandPose(1);
-  if (currentCommand == "bow") currentCommand = "";
 }
 
 inline void runCutePose() {
@@ -338,9 +342,12 @@ inline void runCrabPose() {
 inline void runWalkPose() {
   Serial.println(F("WALK FWD"));
   setFaceWithMode("walk", FACE_ANIM_ONCE);
-  // Initial Step
-  setServoAngle(R3, 98); setServoAngle(L3, 56);
-  setServoAngle(R2, 90); setServoAngle(L1, 45);
+  // Establish the confirmed 0 ms gait state before the first 920 ms cycle.
+  // Calls remain staggered by motorCurrentDelay; the loop itself is unchanged.
+  setServoAngle(R1, 90); setServoAngle(R2, 90);
+  setServoAngle(L1, 45); setServoAngle(L2, 135);
+  setServoAngle(R4, 53); setServoAngle(R3, 98);
+  setServoAngle(L3, 56); setServoAngle(L4, 142);
   if (!pressingCheck("forward", frameDelay)) return;
 
   for (int i = 0; i < walkCycles; i++) {
@@ -399,20 +406,20 @@ inline void runTurnLeft() {
   setFaceWithMode("walk", FACE_ANIM_ONCE);
   for (int i = 0; i < walkCycles; i++) {
     //legset 1 (R1 L2)
-    setServoAngle(R3, 105); setServoAngle(L4, 105);
+    setServoAngle(R3, 98); setServoAngle(L4, 97);
     if (!pressingCheck("left", frameDelay)) return;
     setServoAngle(R1, 135); setServoAngle(L2, 135);
     if (!pressingCheck("left", frameDelay)) return;
-    setServoAngle(R3, 150); setServoAngle(L4, 150);
+    setServoAngle(R3, 143); setServoAngle(L4, 142);
     if (!pressingCheck("left", frameDelay)) return;
     setServoAngle(R1, 90); setServoAngle(L2, 90);
     if (!pressingCheck("left", frameDelay)) return;
       //legset 2 (R2 L1)
-    setServoAngle(R4, 45); setServoAngle(L3, 45);
+    setServoAngle(R4, 53); setServoAngle(L3, 56);
     if (!pressingCheck("left", frameDelay)) return;
     setServoAngle(R2, 90); setServoAngle(L1, 90); 
     if (!pressingCheck("left", frameDelay)) return;
-    setServoAngle(R4, 0); setServoAngle(L3, 0);
+    setServoAngle(R4, 8); setServoAngle(L3, 11);
     if (!pressingCheck("left", frameDelay)) return;
     setServoAngle(R2, 45); setServoAngle(L1, 45);
     if (!pressingCheck("left", frameDelay)) return;  
@@ -425,20 +432,20 @@ inline void runTurnRight() {
   setFaceWithMode("walk", FACE_ANIM_ONCE);
   for (int i = 0; i < walkCycles; i++) {
     //legset 2 (R2 L1)
-    setServoAngle(R4, 45); setServoAngle(L3, 45);
+    setServoAngle(R4, 53); setServoAngle(L3, 56);
     if (!pressingCheck("right", frameDelay)) return;
     setServoAngle(R2, 45); setServoAngle(L1, 45);
     if (!pressingCheck("right", frameDelay)) return;
-    setServoAngle(R4, 0); setServoAngle(L3, 0);
+    setServoAngle(R4, 8); setServoAngle(L3, 11);
     if (!pressingCheck("right", frameDelay)) return;
     setServoAngle(R2, 90); setServoAngle(L1, 90);
     if (!pressingCheck("right", frameDelay)) return;  
     //legset 1 (R1 L2)
-    setServoAngle(R3, 105); setServoAngle(L4, 105);
+    setServoAngle(R3, 98); setServoAngle(L4, 97);
     if (!pressingCheck("right", frameDelay)) return;
     setServoAngle(R1, 90); setServoAngle(L2, 90); 
     if (!pressingCheck("right", frameDelay)) return;
-    setServoAngle(R3, 150); setServoAngle(L4, 150);
+    setServoAngle(R3, 143); setServoAngle(L4, 142);
     if (!pressingCheck("right", frameDelay)) return;
     setServoAngle(R1, 135); setServoAngle(L2, 135);
     if (!pressingCheck("right", frameDelay)) return;

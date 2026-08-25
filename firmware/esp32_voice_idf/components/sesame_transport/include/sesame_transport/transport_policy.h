@@ -6,6 +6,9 @@
 
 namespace sesame::transport {
 
+inline constexpr char kGatewayMdnsService[] = "_sesame-streamgw";
+inline constexpr char kLegacyGatewayMdnsService[] = "_sesame-gw";
+
 struct GatewayCandidate {
   std::string_view host;
   uint16_t port;
@@ -22,6 +25,16 @@ struct DeviceConfig {
   std::string_view gateway_id;
   std::string_view device_token;
   std::string_view root_ca;
+};
+
+// The local control network deliberately has a smaller configuration
+// boundary than the Gateway: it must keep working even when credentials for
+// mDNS/WSS/TLS are absent or invalid.
+struct LocalNetworkConfig {
+  std::string_view wifi_ssid;
+  std::string_view wifi_password;
+  std::string_view device_id;
+  std::string_view web_control_hostname;
 };
 
 enum class CandidateError {
@@ -65,7 +78,10 @@ bool format_gateway_ipv4_uri(const GatewayCandidate& candidate,
                              size_t capacity);
 bool format_device_mdns_hostname(std::string_view device_id, char* output,
                                  size_t capacity);
+bool tls_clock_is_plausible(int64_t unix_seconds);
+bool parse_gateway_unix_time(std::string_view value, int64_t* unix_seconds);
 ConfigError validate_device_config(const DeviceConfig& config);
+bool validate_local_network_config(const LocalNetworkConfig& config);
 void redact_bearer(std::string_view value, char* output, size_t capacity);
 
 }  // namespace sesame::transport

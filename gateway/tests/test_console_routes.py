@@ -60,7 +60,7 @@ class ConsoleRoutesTest(unittest.TestCase):
 
         self.assertEqual(console.status_code, 200)
         self.assertIn("CONTROL", console.text)
-        self.assertIn("19 ACTIONS", console.text)
+        self.assertIn("20 ACTIONS", console.text)
         self.assertIn("挥手", console.text)
         self.assertIn("开心说话", console.text)
         self.assertIn("手动舵机", console.text)
@@ -79,6 +79,38 @@ class ConsoleRoutesTest(unittest.TestCase):
                     {
                         "kind": "action",
                         "action": "wave",
+                        "expression": None,
+                        "servo": None,
+                        "angle": None,
+                        "frame_delay_ms": None,
+                        "walk_cycles": None,
+                        "motor_current_delay_ms": None,
+                        "wake_threshold_hundredths": None,
+                    },
+                )
+            ],
+        )
+
+    def test_console_lists_and_dispatches_proud(self) -> None:
+        with TestClient(self.app, client=("127.0.0.1", 4321)) as client:
+            console = client.get("/console")
+            response = client.post(
+                "/api/local-control/dev_001",
+                json={"kind": "action", "action": "proud"},
+            )
+
+        self.assertIn("20 ACTIONS", console.text)
+        self.assertIn("'proud'", console.text)
+        self.assertIn("proud:'得意'", console.text)
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(
+            self.controls.commands,
+            [
+                (
+                    "dev_001",
+                    {
+                        "kind": "action",
+                        "action": "proud",
                         "expression": None,
                         "servo": None,
                         "angle": None,

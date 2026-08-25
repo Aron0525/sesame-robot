@@ -16,6 +16,20 @@ python3 "$project_root/tests/verify_opus_voice_stack.py"
 python3 "$project_root/tests/verify_continuous_conversation.py"
 python3 "$project_root/tests/verify_silent_discard.py"
 python3 "$project_root/tests/verify_owner_voice_gate_integration.py"
+python3 "$project_root/tests/test_local_network_startup.py"
+python3 "$project_root/tests/test_tls_buffer_budget.py"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_audio/include" \
+  "$project_root/tests/test_audio_config.cpp" \
+  -o "$build_dir/test_audio_config"
+"$build_dir/test_audio_config"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_voice/include" \
+  "$project_root/tests/test_playback_policy.cpp" \
+  -o "$build_dir/test_playback_policy"
+"$build_dir/test_playback_policy"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_voice/include" \
@@ -94,6 +108,13 @@ c++ -std=c++20 -Wall -Wextra -Werror \
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_robot/include" \
+  "$project_root/tests/test_motion_executor.cpp" \
+  "$project_root/components/sesame_robot/motion_executor.cpp" \
+  -o "$build_dir/test_motion_executor"
+"$build_dir/test_motion_executor"
+
+c++ -std=c++20 -Wall -Wextra -Werror \
+  -I"$project_root/components/sesame_robot/include" \
   "$project_root/tests/test_control_catalog.cpp" \
   "$project_root/components/sesame_robot/action_policy.cpp" \
   -o "$build_dir/test_control_catalog"
@@ -108,9 +129,13 @@ c++ -std=c++20 -Wall -Wextra -Werror \
 "$build_dir/test_web_command"
 
 node "$project_root/tests/test_web_control_page.cjs"
+node "$project_root/tests/test_0821_motion_sources.cjs"
 node "$project_root/tests/test_stand_pose_sources.cjs"
 node "$project_root/tests/test_r3_l4_offset_actions.cjs"
 node "$project_root/tests/test_forward_pose_sources.cjs"
+node "$project_root/tests/test_forward_gait_timeline.cjs"
+node "$project_root/tests/test_dance_pairing_sources.cjs"
+node "$project_root/tests/test_proud_action_contract.cjs"
 
 c++ -std=c++20 -Wall -Wextra -Werror \
   -I"$project_root/components/sesame_robot/include" \

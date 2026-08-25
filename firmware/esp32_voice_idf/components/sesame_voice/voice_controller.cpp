@@ -187,17 +187,18 @@ esp_err_t VoiceController::start() {
 
   ESP_LOGI(kTag,
            "voice allocation before queues: internal free=%lu largest=%lu; PSRAM free=%lu; "
-           "downlink=%u x 16; gateway=%u x %u; outbound=%u x %u",
+           "downlink=%u x %u; gateway=%u x %u; outbound=%u x %u",
            static_cast<unsigned long>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL)),
            static_cast<unsigned long>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL)),
            static_cast<unsigned long>(heap_caps_get_free_size(MALLOC_CAP_SPIRAM)),
            static_cast<unsigned>(sizeof(DownlinkPacket)),
+           static_cast<unsigned>(kPlaybackQueueCapacity),
            static_cast<unsigned>(sizeof(GatewayEvent)),
            static_cast<unsigned>(kGatewayEventQueueDepth),
            static_cast<unsigned>(sizeof(OutboundFrame)),
            static_cast<unsigned>(kOutboundQueueDepth));
 
-  downlink_queue_ = xQueueCreate(16, sizeof(DownlinkPacket));
+  downlink_queue_ = xQueueCreate(kPlaybackQueueCapacity, sizeof(DownlinkPacket));
   if (downlink_queue_ == nullptr) {
     ESP_LOGE(kTag, "allocate downlink queue in internal RAM");
     return ESP_ERR_NO_MEM;
@@ -882,6 +883,14 @@ void VoiceController::discard_outbound_frames() {
 
 void VoiceController::play_pending_audio() {
   if (!tts_active_ || downlink_queue_ == nullptr) return;
+  if (!playback_started_) {
+    const size_t queued = uxQueueMessagesWaiting(downlink_queue_);
+    if (!can_start_playback(queued, tts_stop_requested_)) return;
+    playback_started_ = true;
+    ESP_LOGI(kTag, "P2 TTS playback started: generation=%lu queued=%u",
+             static_cast<unsigned long>(active_generation_),
+             static_cast<unsigned>(queued));
+  }
   DownlinkPacket packet{};
   for (UBaseType_t inspected = 0; inspected < 16; ++inspected) {
     if (xQueueReceive(downlink_queue_, &packet, 0) != pdTRUE) return;
@@ -1402,6 +1411,7 @@ void VoiceController::begin_tts(uint32_t generation_id) {
   active_generation_ = generation_id;
   expected_downlink_sequence_ = 0;
   tts_stop_requested_ = false;
+  playback_started_ = false;
   if (!wake_turn_detector_.start_tts_playback()) {
     ESP_LOGW(kTag, "resetting unexpected local wake state before TTS");
     wake_turn_detector_.reset();
@@ -1435,6 +1445,7 @@ void VoiceController::complete_tts_if_drained() {
   audio_->set_amplifier_enabled(false);
   tts_active_ = false;
   tts_stop_requested_ = false;
+  playback_started_ = false;
   turn_state_.stop_generation(generation_id);
   // Keep the state machine's generation for monotonic validation, but clear
   // the active playback binding. Otherwise BOOT pressed while the next turn
@@ -1478,6 +1489,7 @@ void VoiceController::flush_tts(bool clear_downlink) {
   }
   tts_active_ = false;
   tts_stop_requested_ = false;
+  playback_started_ = false;
   planned_generation_ = 0;
   active_generation_ = 0;
   expected_downlink_sequence_ = 0;
